@@ -27,7 +27,7 @@ from nextgisweb.resource import DataScope, ResourceFactory, ResourceRef, Resourc
 from .adapter import ImageAdapter, WebMapAdapter
 from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
 from .option import WebMapOption
-from .plugin import WebmapLayerPlugin, WebmapPlugin
+from .plugin import WebmapGroupPlugin, WebmapLayerPlugin, WebmapPlugin
 
 AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
 
@@ -521,6 +521,8 @@ class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
 class GroupItemConfig(BaseItem, tag="group", tag_field="type"):
     expanded: bool
     exclusive: bool
+    visibility: bool
+    plugin: dict[str, Any]
     children: "list[GroupItemConfig | LayerItemConfig]"
 
 
@@ -582,6 +584,14 @@ def display_config(obj, request) -> DisplayConfig:
     mid = MidConfig(adapter=set(), plugin=set())
     checked_items: set[int] = set()
     expanded_items: set[int] = set()
+
+    group_plugin = dict()
+    for pcls in WebmapGroupPlugin.registry:
+        p_payload = pcls.get_payload(webmap=obj, user=request.user)
+        if p_payload is not None:
+            assert isinstance(p_payload, dict)
+            group_plugin[pcls.entry] = p_payload
+    mid.plugin.update(group_plugin.keys())
 
     def traverse(item):
         data = dict(
@@ -677,6 +687,12 @@ def display_config(obj, request) -> DisplayConfig:
             # Hide empty groups
             if (item.item_type in "group") and not data["children"]:
                 return None
+
+            if item.item_type == "group":
+                data.update(
+                    visibility=bool(item.group_enabled),
+                    plugin=group_plugin,
+                )
 
         return data
 

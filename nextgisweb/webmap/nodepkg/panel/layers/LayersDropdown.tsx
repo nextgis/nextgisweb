@@ -52,7 +52,7 @@ export const LayersDropdown = observer(({ display }: { display: Display }) => {
   const {
     contextHolder: addItemContextHolder,
     addLayers,
-    // addGroup,
+    addGroup,
   } = useAddItem({ display });
 
   const zoomToAllLayers = () => {
@@ -66,7 +66,7 @@ export const LayersDropdown = observer(({ display }: { display: Display }) => {
   };
 
   const hideAllLayers = () => {
-    treeStore.setVisibleIds([]);
+    treeStore.setItemVisibleIds([]);
   };
 
   const restoreLayers = async () => {
@@ -112,12 +112,12 @@ export const LayersDropdown = observer(({ display }: { display: Display }) => {
           label: gettext("Add layers"),
           onClick: addLayers,
         },
-        // {
-        //   key: "addGroup",
-        //   icon: <AddIcon />,
-        //   label: gettext("Add group"),
-        //   onClick: addGroup,
-        // },
+        {
+          key: "addGroup",
+          icon: <AddIcon />,
+          label: gettext("Add group"),
+          onClick: addGroup,
+        },
       ]
     );
   }

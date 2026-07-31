@@ -5,7 +5,10 @@ import type { LayerSymbols } from "../compat/type";
 import type { Display } from "../display";
 import type { MapStore } from "../ol/MapStore";
 import type { PluginBase } from "../plugin/PluginBase";
-import type { TreeLayerStore } from "../store/tree-store/TreeItemStore";
+import type {
+  TreeItemStore,
+  TreeLayerStore,
+} from "../store/tree-store/TreeItemStore";
 import type { TreeStore } from "../store/tree-store/TreeStore";
 import type { AnnotationVisibleMode } from "../ui/annotations-manager";
 
@@ -49,7 +52,7 @@ export interface TinyConfig {
   mainDisplayUrl: string;
 }
 
-export type MapPlugin = new (val: PluginParams) => PluginBase;
+export type MapPlugin = new (val: PluginParams) => PluginBase<TreeItemStore>;
 
 export interface PluginMenuItem {
   icon: ReactNode;
@@ -64,9 +67,9 @@ export interface PluginParams {
   treeStore: TreeStore | boolean;
 }
 
-export interface PluginState {
+export interface PluginState<T extends TreeItemStore = TreeLayerStore> {
   enabled: boolean;
-  nodeData: TreeLayerStore;
+  nodeData: T;
   map: MapStore;
   active?: boolean;
 }

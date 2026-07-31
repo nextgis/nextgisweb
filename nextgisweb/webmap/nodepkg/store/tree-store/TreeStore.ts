@@ -14,8 +14,18 @@ import type {
 
 import { TreeLayerStore, createTreeItemStore } from "./TreeItemStore";
 import type { TreeGroupStore, TreeItemStore } from "./TreeItemStore";
-import { filterItems, someItem, validateVisible } from "./treeStoreUtil";
-import type { ConfigByType, NodeByType } from "./treeStoreUtil";
+import {
+  filterItems,
+  setParentsVisibility,
+  someItem,
+  updateItemVisibility,
+  validateVisible,
+} from "./treeStoreUtil";
+import type {
+  ConfigByType,
+  NodeByType,
+  SetItemVisibilityOptions,
+} from "./treeStoreUtil";
 
 interface TreeStoreOptions {
   drawOrderEnabled?: boolean;
@@ -25,7 +35,7 @@ export class TreeStore {
 
   @observable.shallow accessor items = new Map<number, TreeItemStore>();
   @observable.shallow accessor childrenIds: number[] = [];
-  @observable.ref accessor visibleLayerIds: number[] = [];
+  @observable.ref accessor visibleItemIds: number[] = [];
 
   @observable.ref accessor drawOrderEnabled = false;
 
@@ -47,48 +57,46 @@ export class TreeStore {
 
     reaction(
       () => {
-        void this.hasExclusiveGroup;
-        void this.treeStructureStamp;
         const ids: number[] = [];
-        for (const it of this.items.values()) {
-          if (it.isLayer() && it.visibility) {
-            ids.push(it.id);
-          }
+        for (const item of this.items.values()) {
+          void item.parentId;
+          if (item.isGroup()) void item.exclusive;
+          if (item.visibility) ids.push(item.id);
         }
         return ids;
       },
-      (curVisibleIds, prevVisibleIds = []) => {
-        if (this.hasExclusiveGroup) {
-          const validVisibleIds = validateVisible(
-            this,
-            curVisibleIds,
-            prevVisibleIds
-          );
-
-          const same =
-            validVisibleIds.length === curVisibleIds.length &&
-            validVisibleIds.every((v, i) => v === curVisibleIds[i]);
-
-          if (!same) {
-            runInAction(() => {
-              const keep = new Set(validVisibleIds);
-              for (const n of this.items.values()) {
-                if (!n.isLayer()) continue;
-                const shouldBe = keep.has(n.id);
-                if (n.visibility !== shouldBe)
-                  n.update({ visibility: shouldBe });
-              }
-
-              this.visibleLayerIds = validVisibleIds;
-            });
-          }
-        }
+      (currentVisibleIds, previousVisibleIds = []) => {
         runInAction(() => {
-          this.visibleLayerIds = curVisibleIds;
+          const validVisibleIds = this.hasExclusiveGroup
+            ? validateVisible(this, currentVisibleIds, previousVisibleIds)
+            : currentVisibleIds;
+          const visibleIds = new Set(validVisibleIds);
+
+          for (const item of this.items.values()) {
+            const visibility = visibleIds.has(item.id);
+            if (item.visibility !== visibility) {
+              item.update({ visibility });
+            }
+            item.update({ visible: this._isItemVisible(item) });
+          }
+          this.visibleItemIds = validVisibleIds;
         });
       },
       { fireImmediately: true }
     );
+  }
+
+  private _isItemVisible(item: TreeItemStore): boolean {
+    if (!item.visibility) return false;
+
+    let parentId = item.parentId;
+    while (parentId !== null) {
+      const parent = this.items.get(parentId);
+      if (!parent) break;
+      if (!parent.visibility) return false;
+      parentId = parent.parentId;
+    }
+    return true;
   }
 
   private get _snapshot(): string {
@@ -116,7 +124,7 @@ export class TreeStore {
     TreeLayerStore.order = 0;
 
     this.childrenIds = [];
-    this.visibleLayerIds = [];
+    this.visibleItemIds = [];
 
     [...children].reverse().forEach((child) => {
       this.addItem(child);
@@ -223,10 +231,23 @@ export class TreeStore {
   }
 
   @computed.struct
+  get visibleLayerIds(): number[] {
+    const ids: number[] = [];
+    for (const item of this.items.values()) {
+      if (item.isLayer() && item.visibility) {
+        ids.push(item.id);
+      }
+    }
+    return ids;
+  }
+
+  @computed.struct
   get visibleLayers(): TreeLayerStore[] {
-    return this.visibleLayerIds.map((id) =>
-      this.items.get(id)
-    ) as TreeLayerStore[];
+    return this.visibleLayerIds
+      .map((id) => this.items.get(id))
+      .filter(
+        (item): item is TreeLayerStore => !!item?.isLayer() && item.visible
+      );
   }
   @computed
   get visibleInRangeIds(): number[] {
@@ -492,18 +513,46 @@ export class TreeStore {
   }
 
   @action.bound
-  setVisibleIds(val: number[]) {
-    let validVisibleIds = val;
-    if (this.hasExclusiveGroup) {
-      validVisibleIds = validateVisible(this, val, this.visibleLayerIds);
-    }
+  setItemVisibility(
+    itemId: number,
+    visibility: boolean,
+    options?: SetItemVisibilityOptions
+  ) {
+    updateItemVisibility(this, itemId, visibility, options);
+  }
+
+  @action.bound
+  setLayerVisibleIds(val: number[]) {
+    const visibleIds = new Set(val);
+
     for (const item of this.items.values()) {
       if (item.isLayer()) {
         item.update({
-          visibility: validVisibleIds.includes(item.id),
+          visibility: visibleIds.has(item.id),
         });
       }
     }
+
+    setParentsVisibility(this, visibleIds, true);
+  }
+
+  @action.bound
+  setItemVisibleIds(val: number[]) {
+    const visibleIds = new Set(val);
+    const enabledLayerIds: number[] = [];
+
+    for (const id of visibleIds) {
+      const item = this.items.get(id);
+      if (item?.isLayer() && !item.visibility) {
+        enabledLayerIds.push(id);
+      }
+    }
+
+    for (const item of this.items.values()) {
+      item.update({ visibility: visibleIds.has(item.id) });
+    }
+
+    setParentsVisibility(this, enabledLayerIds, true);
   }
 
   @action.bound

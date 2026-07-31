@@ -12,10 +12,11 @@ import type {
   TreeItemStore,
   TreeLayerStore,
 } from "../store/tree-store/TreeItemStore";
+import type { SetItemVisibilityOptions } from "../store/tree-store/treeStoreUtil";
 
 import { LayerTreeItemTitle } from "./LayerTreeItemTitle";
+import type { LayerTreeItemTitleProps } from "./LayerTreeItemTitle";
 import { useDrag } from "./hook/useDrag";
-import { updateKeysForGroup } from "./util/treeItems";
 
 import "./LayersTree.less";
 
@@ -93,7 +94,8 @@ export const LayersTree = observer(
     const {
       expanded,
       childrenIds,
-      visibleLayerIds,
+      deepTreeStamp,
+      visibleItemIds,
       treeStructureStamp,
       layersWithoutLegendInfo,
     } = store;
@@ -127,22 +129,29 @@ export const LayersTree = observer(
           treeItem: treeItem,
           className: inExclusiveGroup ? "exclusive-child" : undefined,
         };
+        const titleProps: LayerTreeItemTitleProps = {
+          treeItem,
+          checkable,
+          showLegend: false,
+          showDropdown,
+          onSelect,
+        };
+
         if (treeItem.isLayer()) {
           item.isLeaf = true;
 
           item.title = (
             <LayerTreeItemTitle
+              {...titleProps}
               icon={<ItemIcon treeItem={treeItem} />}
-              treeItem={treeItem}
-              checkable={checkable}
               showLegend={showLegend}
-              showDropdown={showDropdown}
-              onSelect={onSelect}
             />
           );
         }
 
         if (treeItem.isGroup()) {
+          item.title = <LayerTreeItemTitle {...titleProps} />;
+
           const children: TreeWebmapItem[] = [];
           [...treeItem.childrenIds].reverse().forEach((cid) => {
             const it = store.getItemById(cid);
@@ -159,10 +168,17 @@ export const LayersTree = observer(
 
     const preparedWebMapItems = useMemo(() => {
       void treeStructureStamp;
+      void deepTreeStamp;
       return store
         .getChildren({ childrenIds: [...childrenIds].reverse() })
         .map(handleWebMapItem);
-    }, [childrenIds, treeStructureStamp, handleWebMapItem, store]);
+    }, [
+      store,
+      childrenIds,
+      deepTreeStamp,
+      treeStructureStamp,
+      handleWebMapItem,
+    ]);
 
     const treeItems = useMemo(() => {
       if (onFilterItems) {
@@ -193,36 +209,24 @@ export const LayersTree = observer(
       store.setExpanded(expandedKeysValue.map(Number));
     };
 
-    const onCheck: TreeProps<TreeWebmapItem>["onCheck"] = (
-      checkedKeysValue,
-      event
-    ) => {
-      const checkedItem = event.node;
-      const checkedKeys = (
-        Array.isArray(checkedKeysValue)
-          ? checkedKeysValue
-          : checkedKeysValue.checked
-      ).map(Number);
+    const onCheck: TreeProps<TreeWebmapItem>["onCheck"] = (_, event) => {
+      const item = event.node.treeItem;
+      let cascade: SetItemVisibilityOptions["cascade"];
 
-      let updatedCheckedKeys = checkedKeys;
-
-      if (checkedItem.treeItem.isGroup()) {
-        updatedCheckedKeys = updateKeysForGroup(
-          checkedItem,
-          checkedKeys,
-          store.visibleLayerIds
-        );
+      if (event.nativeEvent.ctrlKey) {
+        if (item.isGroup()) cascade = "descendants";
+        if (!event.checked && item.isLayer()) cascade = "ancestors";
       }
 
-      store.setVisibleIds(updatedCheckedKeys);
+      store.setItemVisibility(item.id, event.checked, { cascade });
     };
 
     const checkedKeys = useMemo(() => {
-      const ch = visibleLayerIds.filter((id) =>
+      const ch = visibleItemIds.filter((id) =>
         findNode(treeItems, (node) => node.key === id)
       );
       return ch;
-    }, [visibleLayerIds, treeItems]);
+    }, [visibleItemIds, treeItems]);
 
     const shouldShowLine = showLine && hasGroups;
 
@@ -233,6 +237,7 @@ export const LayersTree = observer(
         virtual={false}
         motion={false}
         checkable={checkable}
+        checkStrictly
         selectable={selectable}
         showIcon={false}
         showLine={shouldShowLine}

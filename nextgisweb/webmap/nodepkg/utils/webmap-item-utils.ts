@@ -2,12 +2,14 @@ import { route } from "@nextgisweb/pyramid/api";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { TreeStore } from "@nextgisweb/webmap/store";
 import type {
+  TreeGroupStore,
   TreeItemStore,
   TreeLayerStore,
 } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 import type {
   LayerItemConfig,
   WebMapItemGroupRead,
+  WebMapItemGroupWrite,
   WebMapItemLayerRead,
   WebMapItemLayerWrite,
 } from "@nextgisweb/webmap/type/api";
@@ -26,6 +28,23 @@ const adapterMidAliases: Record<string, string> = {
 export type TreeLayerWebmapItemWrite = Partial<
   Omit<WebMapItemLayerWrite, "item_type">
 >;
+
+export type TreeGroupWebmapItemWrite = Partial<
+  Omit<WebMapItemGroupWrite, "item_type" | "children">
+>;
+
+export function updateTreeGroupFromWebmapItem(
+  item: TreeGroupStore,
+  value: TreeGroupWebmapItemWrite
+) {
+  item.update({
+    label: value.display_name,
+    title: value.display_name,
+    visibility: value.group_enabled,
+    expanded: value.group_expanded,
+    exclusive: value.group_exclusive,
+  });
+}
 
 export function updateTreeLayerFromWebmapItem(
   item: TreeLayerStore,
@@ -78,7 +97,8 @@ export function convertToWebmapItem({
       item_type: "group",
       display_name: item.title,
       group_expanded: item.expanded,
-      group_exclusive: false,
+      group_enabled: item.visibility,
+      group_exclusive: item.exclusive,
       children,
     } satisfies WebMapItemGroupRead;
   }

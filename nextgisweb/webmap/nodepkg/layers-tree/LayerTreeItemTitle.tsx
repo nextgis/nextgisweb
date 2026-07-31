@@ -44,18 +44,18 @@ export const LayerTreeItemTitle = observer(
 
     const isLayer = treeItem.isLayer();
     const hasFilter = isLayer && treeItem.filter;
+    const isOutOfScaleRange = isLayer && treeItem.isOutOfScaleRange;
+    const isNotOnMap = isLayer && (!treeItem.visible || isOutOfScaleRange);
 
     const shouldActions = showLegend || showDropdown || hasFilter;
 
     let actions;
-    let isOutOfScaleRange = false;
     if (shouldActions) {
       let legendAction;
       let filterAction;
       if (isLayer) {
         const treeLayer = treeItem;
 
-        isOutOfScaleRange = treeItem.isOutOfScaleRange;
         legendAction = treeLayer.legendInfo.has_legend &&
           treeLayer.legendInfo.symbols &&
           treeLayer.legendInfo.symbols.length > 1 &&
@@ -103,7 +103,7 @@ export const LayerTreeItemTitle = observer(
           {icon && <Col className="tree-item-title-icon">{icon}</Col>}
           <Col
             className={classNames("tree-item-title", {
-              "out-of-scale-range": isOutOfScaleRange,
+              "not-on-map": isNotOnMap,
             })}
             flex="auto"
             title={isOutOfScaleRange ? msgOutOfScaleRange : undefined}

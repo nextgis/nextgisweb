@@ -6,6 +6,7 @@ import { Divider, Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { CentralLoading } from "@nextgisweb/gui/component";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 
 import { useDisplayContext } from "../display/context";
 import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
@@ -80,8 +81,9 @@ DropdownPlugins.displayName = "DropdownPlugins";
 
 export function DropdownActions(props: DropdownActionsProps) {
   const { nodeData, moreClickId, setMoreClickId, update, setUpdate } = props;
-  const { id, type } = nodeData;
+  const { id } = nodeData;
   const { display } = useDisplayContext();
+  const { makeSignal } = useAbortController();
 
   const [menuItems, setMenuItems] = useState<MenuProps["items"]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -99,7 +101,7 @@ export function DropdownActions(props: DropdownActionsProps) {
   }, []);
 
   const startup = useCallback(async () => {
-    if (!nodeData.isLayer() || isLoadingRef.current) return;
+    if (isLoadingRef.current) return;
     isLoadingRef.current = true;
 
     try {
@@ -116,21 +118,31 @@ export function DropdownActions(props: DropdownActionsProps) {
 
       for (const keyPlugin in plugins) {
         const plugin = plugins[keyPlugin];
-        if (!plugin || !plugin.getPluginState) {
+        if (
+          !plugin ||
+          plugin.type !== nodeData.type ||
+          !plugin.getPluginState
+        ) {
           continue;
         }
         const { render } = plugin;
         const pluginInfo = plugin.getPluginState(nodeData);
+        const pluginRunOptions = {
+          signal: makeSignal(),
+        };
+
         if (pluginInfo.enabled) {
           if (plugin.getMenuItem) {
-            const { icon, title, onClick, order } =
-              plugin.getMenuItem(nodeData);
+            const { icon, title, onClick, order } = plugin.getMenuItem(
+              nodeData,
+              pluginRunOptions
+            );
             const onClick_ = async () => {
               if (plugin) {
                 if (onClick) {
                   onClick();
                 } else if (plugin.run) {
-                  const result = await plugin.run(nodeData);
+                  const result = await plugin.run(nodeData, pluginRunOptions);
                   if (result !== undefined) {
                     setUpdate(!update);
                   }
@@ -179,11 +191,7 @@ export function DropdownActions(props: DropdownActionsProps) {
       isLoadingRef.current = false;
       setIsLoading(false);
     }
-  }, [display, id, nodeData, setMoreClickId, setUpdate, update]);
-
-  if (type === "group") {
-    return <></>;
-  }
+  }, [display, id, makeSignal, nodeData, setMoreClickId, setUpdate, update]);
 
   if (moreClickId === undefined || moreClickId !== id) {
     return (

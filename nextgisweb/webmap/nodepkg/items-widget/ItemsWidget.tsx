@@ -57,7 +57,7 @@ export interface LayerWidgetProps {
   item: Layer;
 }
 
-const GroupWidget = observer(({ item }: { item: Group }) => {
+export const GroupWidget = observer(({ item }: { item: Group }) => {
   return (
     <Area pad>
       <LotMV
@@ -67,6 +67,9 @@ const GroupWidget = observer(({ item }: { item: Group }) => {
       />
       <Lot>
         <Space size="middle">
+          <CheckboxValue {...item.groupEnabled.cprops()}>
+            {msgEnabled}
+          </CheckboxValue>
           <CheckboxValue {...item.groupExpanded.cprops()}>
             {msgExpanded}
           </CheckboxValue>
@@ -78,6 +81,8 @@ const GroupWidget = observer(({ item }: { item: Group }) => {
     </Area>
   );
 });
+
+GroupWidget.displayName = "GroupWidget";
 
 const adapterOptions = sortBy(
   Object.entries(adapters).map(([k, v]) => ({
@@ -226,7 +231,6 @@ export const LayerWidget = observer(({ item }: LayerWidgetProps) => {
   );
 });
 
-GroupWidget.displayName = "GroupWidget";
 LayerWidget.displayName = "LayerWidget";
 
 export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {

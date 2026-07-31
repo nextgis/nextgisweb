@@ -47,7 +47,7 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
     opacity,
     adapter,
     symbols,
-    visibility,
+    visible,
     legendInfo,
     minScaleDenom,
     maxScaleDenom,
@@ -109,9 +109,9 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
 
   useEffect(() => {
     if (layer) {
-      layer.setVisibility(visibility);
+      layer.setVisibility(visible);
     }
-  }, [visibility, layer, mapStore]);
+  }, [visible, layer, mapStore]);
 
   useEffect(() => {
     if (layer && opacity !== null && opacity !== undefined) {
