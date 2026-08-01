@@ -18,7 +18,7 @@
         <table>          
             %for fld in flayer.fields:
                 <tr>
-                    <th style="text-align: left; color: #666;">${fld.display_name}</th>
+                    <th style="text-align: start; color: #666;">${fld.display_name}</th>
                     <td>${feature.fields[fld.keyname]}</td>
                 </tr>
             %endfor

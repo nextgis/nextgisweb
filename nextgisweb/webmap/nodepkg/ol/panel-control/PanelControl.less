@@ -5,15 +5,15 @@
   .ol-control {
     position: relative;
     top: inherit;
-    right: inherit;
     bottom: inherit;
-    left: inherit;
+    inset-inline-end: inherit;
+    inset-inline-start: inherit;
   }
 
   .ol-attribution {
-    right: inherit;
     bottom: inherit;
     margin: 0 !important;
+    inset-inline-end: inherit;
     padding: 0;
     max-width: 100%;
     white-space: nowrap;
@@ -23,15 +23,15 @@
     }
 
     &.ol-uncollapsible {
-      right: inherit;
       bottom: inherit;
+      inset-inline-end: inherit;
     }
   }
 
   .ol-scale-line {
     position: unset;
     bottom: unset;
-    left: unset;
+    inset-inline-start: unset;
     background: unset;
 
     > .ol-scale-line-inner {

@@ -32,7 +32,9 @@ const ResourceSearchPageBody = observer<{ store: ResourceSearchStore }>(
       <>
         <PageTitle pullRight>
           {store.totalCount > 0 && (
-            <span style={{ marginRight: 8, color: "var(--text-secondary)" }}>
+            <span
+              style={{ marginInlineEnd: 8, color: "var(--text-secondary)" }}
+            >
               {msgFound}:{" "}
               <Badge
                 style={{ backgroundColor: "#076dbf" }}

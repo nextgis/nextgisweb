@@ -40,7 +40,7 @@ export default function FinishEditingModal({
       <div>
         <p>{gettext("Do you want to save changes?")}</p>
 
-        <div style={{ marginTop: 24, textAlign: "right" }}>
+        <div style={{ marginTop: 24, textAlign: "end" }}>
           <Space>
             <Button
               onClick={() => {

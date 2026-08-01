@@ -80,7 +80,7 @@ export function ExportSettings() {
             {gettext("Save")}
           </SaveButton>
         </Col>
-        <Col flex="auto" style={{ marginLeft: "4em" }}>
+        <Col flex="auto" style={{ marginInlineStart: "4em" }}>
           <Typography.Text type="secondary" style={{ marginTop: "8em" }}>
             {msgNote}
           </Typography.Text>

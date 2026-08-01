@@ -1,11 +1,11 @@
 .annotation-access-type {
   margin: 0 0 9px 0;
   border: 1px solid transparent;
-  border-left-width: 8px;
+  border-inline-start-width: 8px;
   padding: 1px 2px 1px 5px;
   color: #818181;
   font-size: 12px;
-  text-align: left;
+  text-align: start;
 }
 
 .annotation-access-type .empty {

@@ -44,7 +44,7 @@
         }
 
         .container {
-            text-align: left;
+            text-align: start;
             margin: 0 auto;
             padding: 0 1em;
         }

@@ -11,7 +11,7 @@
 
 .mapadapter-ctrl-top-left {
   top: 0;
-  left: 0;
+  inset-inline-start: 0;
 
   .mapadapter-ctrl.mapadapter-ctrl-margin {
     margin-inline-start: 8px;
@@ -21,8 +21,8 @@
 
 .mapadapter-ctrl-top-right {
   top: 0;
-  right: 0;
   align-items: end;
+  inset-inline-end: 0;
 
   .mapadapter-ctrl.mapadapter-ctrl-margin {
     margin-inline-end: 8px;
@@ -32,7 +32,7 @@
 
 .mapadapter-ctrl-bottom-left {
   bottom: 0;
-  left: 0;
+  inset-inline-start: 0;
 
   .mapadapter-ctrl.mapadapter-ctrl-margin {
     margin-inline-start: 8px;
@@ -41,10 +41,10 @@
 }
 
 .mapadapter-ctrl-bottom-right {
-  right: 0;
   bottom: 0;
   align-items: flex-end;
   gap: 4px;
+  inset-inline-end: 0;
 
   > div:last-child > .mapadapter-ctrl {
     background-color: var(--ol-partial-background-color);

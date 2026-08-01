@@ -16,8 +16,7 @@ const MapLoadingIndicatorControl = observer((props: MapControlProps) => {
         <div
           className="ol-unselectable"
           style={{
-            paddingLeft: "5px",
-            paddingRight: "5px",
+            paddingInline: "5px",
           }}
         >
           <Spin />

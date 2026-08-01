@@ -23,7 +23,7 @@
         display: flex;
         flex: 1;
         cursor: pointer;
-        border-right-color: var(--color-border);
+        border-inline-end-color: var(--color-border);
         min-width: 3em;
 
         &:hover {
@@ -82,8 +82,8 @@
       .tr {
         position: absolute;
         top: 0;
-        left: 0;
         cursor: pointer;
+        inset-inline-start: 0;
         min-width: 100%;
 
         .td {
@@ -115,7 +115,7 @@
 
   .td,
   .th {
-    border-right: 1px solid var(--color-border);
+    border-inline-end: 1px solid var(--color-border);
     padding: 2px 4px;
   }
 }

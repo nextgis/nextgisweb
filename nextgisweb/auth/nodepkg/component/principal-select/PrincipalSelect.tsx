@@ -75,7 +75,7 @@ export function PrincipalSelect({
         }}
         closable={closable}
         onClose={onClose}
-        style={{ marginRight: 3 }}
+        style={{ marginInlineEnd: 3 }}
       >
         {editOnClick ? (
           <a

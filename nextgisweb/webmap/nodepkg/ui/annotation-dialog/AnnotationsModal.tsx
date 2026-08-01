@@ -175,7 +175,11 @@ export function AnnotationsModal({
           {contextHolder}
           {annFeature?.getId() ? (
             <Space>
-              <Button onClick={handleDelete} style={{ float: "left" }} danger>
+              <Button
+                onClick={handleDelete}
+                style={{ float: "inline-start" }}
+                danger
+              >
                 {gettext("Delete")}
               </Button>
               <Button onClick={handleClose}>{gettext("Cancel")}</Button>

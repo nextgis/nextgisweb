@@ -62,7 +62,7 @@ const circleStyleFunc = (feature: Feature, resolution: number) => {
         const text = `${radiusText}\n${radiusStr} ${unitText}`;
         newStyle.setText(
           new Text({
-            textAlign: "left",
+            textAlign: "start",
             textBaseline: "middle",
             text,
           })

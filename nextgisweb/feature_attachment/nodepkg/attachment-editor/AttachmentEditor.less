@@ -14,7 +14,7 @@
     }
   }
 
-  .ant-table table {
+  .ant-table-wrapper > .ant-table table {
     > thead > tr,
     > tbody > tr {
       td {
@@ -39,7 +39,7 @@
       }
 
       .description {
-        padding-right: 0;
+        padding-inline-end: 0;
         width: 60%;
 
         &::before {
@@ -50,7 +50,7 @@
       .size {
         width: 0;
         line-height: 32px;
-        text-align: right;
+        text-align: end;
         white-space: nowrap;
       }
     }

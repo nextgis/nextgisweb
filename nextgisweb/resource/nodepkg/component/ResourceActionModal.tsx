@@ -34,7 +34,7 @@ export function ResourceActionModal({
       <Space
         size={8}
         style={{
-          marginRight: "-16px",
+          marginInlineEnd: "-16px",
           marginTop: "-16px",
         }}
       >

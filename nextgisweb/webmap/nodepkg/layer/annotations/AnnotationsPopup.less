@@ -12,7 +12,7 @@
   display: none;
   position: absolute;
   bottom: 12px;
-  left: -50px;
+  inset-inline-start: -50px;
   border: 1px solid var(--popup-border);
   background: var(--popup-bg);
   padding: 15px 25px 15px 15px;
@@ -29,15 +29,15 @@
   }
 
   &::after {
-    left: 50px;
-    margin-left: -10px;
+    margin-inline-start: -10px;
+    inset-inline-start: 50px;
     border-width: 10px;
     border-top-color: var(--popup-bg);
   }
 
   &::before {
-    left: 48px;
-    margin-left: -11px;
+    margin-inline-start: -11px;
+    inset-inline-start: 48px;
     border-width: 11px;
     border-top-color: var(--popup-border);
   }
@@ -55,7 +55,7 @@
   &-closer {
     position: absolute;
     top: 2px;
-    right: 2px;
+    inset-inline-end: 2px;
     padding: 0 4px;
     color: gray;
     font-size: 150%;
@@ -80,11 +80,11 @@
   }
 
   &.annotation {
-    left: -55px;
+    inset-inline-start: -55px;
     box-shadow: var(--popup-shadow);
     border: 0;
-    border-left: 5px solid var(--annotation-color);
     border-radius: 2px;
+    border-inline-start: 5px solid var(--annotation-color);
     padding: 6px 8px 8px;
     min-height: 30px;
 
@@ -112,7 +112,7 @@
       display: none;
       position: absolute;
       top: -8px;
-      right: -8px;
+      inset-inline-end: -8px;
       box-shadow: 0 2px 3px rgba(2, 34, 60, 0.24);
       border-radius: 2px;
       background: #f1f1f1;

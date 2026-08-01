@@ -121,7 +121,7 @@ export const DashPatternInput: FC<DashPatternInputProps> = ({
             }}
             placeholder={msgDash}
             min={0}
-            style={{ width: "90px", marginRight: "12px" }}
+            style={{ width: "90px", marginInlineEnd: "12px" }}
           />
           <InputNumber
             value={isLastRow ? undefined : dashPattern[i + 1]}
@@ -138,7 +138,7 @@ export const DashPatternInput: FC<DashPatternInputProps> = ({
             danger
             icon={<CloseIcon />}
             onClick={() => handleDeleteRow(i)}
-            style={{ marginLeft: 8 }}
+            style={{ marginInlineStart: 8 }}
           />
         </div>
       );

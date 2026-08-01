@@ -123,7 +123,7 @@ export const FilterGroup = observer(
             <Radio.Button value="all">{gettext("ALL")}</Radio.Button>
             <Radio.Button value="any">{gettext("ANY")}</Radio.Button>
           </Radio.Group>
-          <Space style={{ marginLeft: "auto" }}>
+          <Space style={{ marginInlineStart: "auto" }}>
             <Button
               icon={<AddIcon />}
               onClick={() => store.addCondition(group.id)}

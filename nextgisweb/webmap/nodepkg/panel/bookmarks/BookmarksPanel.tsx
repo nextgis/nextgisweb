@@ -38,7 +38,7 @@ function BookmarkRow({
       style={{
         position: "absolute",
         top: 0,
-        left: 0,
+        insetInlineStart: 0,
         width: "100%",
         transform: `translateY(${start}px)`,
       }}
