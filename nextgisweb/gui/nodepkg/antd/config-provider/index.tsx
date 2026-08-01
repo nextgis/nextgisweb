@@ -1,5 +1,6 @@
-import Base from "antd/es/config-provider";
+import Base, { ConfigContext } from "antd/es/config-provider";
 import color from "color";
+import { use } from "react";
 import type { ComponentProps } from "react";
 
 import { antd } from "@nextgisweb/jsrealm/i18n/lang";
@@ -38,6 +39,7 @@ const components: Theme["components"] = {
 
 const defaults: ComponentProps<typeof Base> = {
   locale: antd,
+  direction: (computed.direction as "ltr" | "rtl") || "ltr",
   theme: { token, components },
   wave: { disabled: true },
   modal: {
@@ -54,4 +56,14 @@ const defaults: ComponentProps<typeof Base> = {
 
 export default function ConfigProvider(props: ComponentProps<typeof Base>) {
   return <Base {...defaults} {...props} />;
+}
+
+interface UseConfigReturn extends ReturnType<typeof Base.useConfig> {
+  direction: "ltr" | "rtl";
+}
+
+export function useConfig(): UseConfigReturn {
+  const config = Base.useConfig();
+  const { direction } = use(ConfigContext);
+  return { direction: direction || "ltr", ...config };
 }

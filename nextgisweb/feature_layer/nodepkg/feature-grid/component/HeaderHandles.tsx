@@ -32,7 +32,8 @@ export function HeaderHandles({
   return headerCols.map(([id, width, cum]) => (
     <DraggableColumn
       key={`${id}-${width}`}
-      onStop={(_, { x }) => {
+      onStop={(_, { x, node }) => {
+        if (getComputedStyle(node).direction === "rtl") x = -x;
         const next = Math.max(MIN_WIDTH, width + x);
         setUserDefinedWidths((prev) => ({
           ...prev,
@@ -40,7 +41,7 @@ export function HeaderHandles({
         }));
       }}
       style={{
-        left: cum - RESIZE_HANDLE_WIDTH / 2,
+        insetInlineStart: cum - RESIZE_HANDLE_WIDTH / 2,
         width: RESIZE_HANDLE_WIDTH,
       }}
     />

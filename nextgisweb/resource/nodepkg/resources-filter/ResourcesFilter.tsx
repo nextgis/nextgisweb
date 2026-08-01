@@ -9,6 +9,8 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { CompositeRead, ResourceCls } from "@nextgisweb/resource/type/api";
 
+import { ResourceIcon } from "../icon";
+
 import SettingsIcon from "@nextgisweb/icon/material/tune";
 
 import "./ResourcesFilter.less";
@@ -37,14 +39,12 @@ const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {
           style={{
             display: "inline-flex",
             alignItems: "center",
+            gap: "0.5em",
           }}
+          title={resource.display_name}
         >
-          <svg className="icon">
-            <use xlinkHref={`#icon-rescls-${resource.cls}`} />
-          </svg>
-          <span className="title" title={resource.display_name}>
-            {resource.display_name}
-          </span>
+          <ResourceIcon identity={resource.cls} />
+          <span className="title">{resource.display_name}</span>
         </div>
       ),
     };

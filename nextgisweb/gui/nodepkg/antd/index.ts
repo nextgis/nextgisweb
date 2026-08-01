@@ -64,9 +64,11 @@ export {
 
 export * from "./theme";
 
+export { default as ConfigProvider } from "./config-provider";
+export { useConfig } from "./config-provider";
+
 export { default as InputInteger } from "./input-integer";
 export { default as Calendar } from "./calendar";
-export { default as ConfigProvider } from "./config-provider";
 export { default as DatePicker } from "./date-picker";
 export { default as TimePicker } from "./time-picker";
 export { default as RangePicker } from "./range-picker";

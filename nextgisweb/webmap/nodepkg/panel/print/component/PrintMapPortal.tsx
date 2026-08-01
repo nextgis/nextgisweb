@@ -47,9 +47,11 @@ export function PrintMapPortal({
 
     const updatePos = () => {
       if (!mapElRef.current || !containerRef.current) return;
-      const { left, top } = mapElRef.current.getBoundingClientRect();
-      containerRef.current.style.left = `${left}px`;
-      containerRef.current.style.top = `${top}px`;
+      const rect = mapElRef.current.getBoundingClientRect();
+      containerRef.current.style.left = `${rect.left}px`;
+      containerRef.current.style.top = `${rect.top}px`;
+      containerRef.current.style.height = `${rect.height}px`;
+      containerRef.current.style.width = `${rect.width}px`;
     };
 
     const ro = new ResizeObserver(updatePos);

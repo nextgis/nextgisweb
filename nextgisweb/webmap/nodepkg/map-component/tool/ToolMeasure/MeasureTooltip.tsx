@@ -42,6 +42,7 @@ export function MeasureTooltip({
 
   useEffect(() => {
     const el = document.createElement("div");
+    el.style.direction = getComputedStyle(document.body).direction;
     const overlay = new Overlay({
       offset: offsetRef.current,
       element: el,

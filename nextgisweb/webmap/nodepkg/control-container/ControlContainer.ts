@@ -182,6 +182,7 @@ export class ControlContainer {
   } {
     const element = document.createElement("div");
     element.className = `${this.classPrefix}-control-container`;
+    element.style.direction = getComputedStyle(document.body).direction;
 
     const positions: ControlPosition[] = [
       "top-right",

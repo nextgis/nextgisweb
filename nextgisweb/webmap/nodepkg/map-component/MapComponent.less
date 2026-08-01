@@ -1,9 +1,15 @@
-/* Global ol styles */
 .ol-selectable {
   -ms-user-select: text;
   -moz-user-select: text;
   -webkit-user-select: text;
   user-select: text;
+}
+
+/* Make sure that overlay containers use screen coordinates positioning */
+
+.ol-overlaycontainer,
+.ol-overlaycontainer-stopevent {
+  direction: ltr;
 }
 
 /* Rotate control */

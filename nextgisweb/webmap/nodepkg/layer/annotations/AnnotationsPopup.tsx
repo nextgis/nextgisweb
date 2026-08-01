@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import Overlay from "ol/Overlay";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -23,17 +24,6 @@ interface AnnotationsPopupProps {
   onChange?: AnnotationChangeCallback;
 }
 
-function getClassName(annFeature: AnnotationFeature): string {
-  const classNames = ["ol-popup", "annotation"];
-  const accessType = annFeature.getAccessType();
-
-  if (accessType) {
-    classNames.push(accessType);
-  }
-
-  return classNames.join(" ");
-}
-
 export function AnnotationsPopup({
   annFeature,
   editable = false,
@@ -45,8 +35,12 @@ export function AnnotationsPopup({
 
   useEffect(() => {
     const el = document.createElement("div");
-    el.className = getClassName(annFeature);
-    el.style.display = "block";
+    el.className = classNames(
+      "ol-popup",
+      "annotation",
+      annFeature.getAccessType()
+    );
+    el.style.direction = getComputedStyle(document.body).direction;
     el.title = annFeature.getAccessTypeTitle() ?? "";
     const overlay = new Overlay({
       autoPan: false,

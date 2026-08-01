@@ -24,6 +24,7 @@ export function Code({ whenReady, ...props }: CodeProps) {
       ref={editorRef}
       style={{
         height: "100%",
+        direction: "ltr",
         minHeight: (props.autoHeight && props.minHeight) || undefined,
       }}
     ></div>
