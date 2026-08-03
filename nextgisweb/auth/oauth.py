@@ -65,7 +65,7 @@ class OAuthHelper:
             _set("server.token_endpoint", f"{oauth_url}/token/")
             _set("server.auth_endpoint", f"{oauth_url}/authorize/")
             _set("server.introspection_endpoint", f"{oauth_url}/introspect/")
-            _set("server.sync_endpoint", f"{base_url}/api/v1/teams/")
+            _set("server.sync_endpoint", f"{base_url}/api/v1/webgis/{{uuid}}/users/")
             _set("profile.subject.attr", "sub")
             _set("profile.keyname.attr", "username")
             _set("profile.display_name.attr", "first_name, last_name")
@@ -379,16 +379,9 @@ class OAuthHelper:
         oauth_tstamp = utcnow_naive()
         data = self._server_request("sync", params, default_method="GET", access_token=token)
 
-        if (tc := len(data)) == 0:
-            logger.warning("NextGIS ID team missing")
-            return
-        elif tc != 1:
-            raise RuntimeError(f"Only one NextGIS ID team expected, got {tc} teams")
-
-        team = data[0]
         subs = set()
         with DBSession.no_autoflush:
-            for udata in team["users"]:
+            for udata in data["items"]:
                 sub = udata.pop("nextgis_guid")
                 lang = udata.pop("locale")
                 subs.add(sub)
@@ -439,6 +432,8 @@ class OAuthHelper:
 
     def _server_request(self, endpoint, params, *, default_method="POST", access_token=None):
         url = self.options["server.{}_endpoint".format(endpoint)]
+        if endpoint == "sync":
+            url = url.format(uuid=env.core.instance_id)
         method = self.options.get("server.{}_method".format(endpoint), default_method).lower()
         timeout = self.options["timeout"].total_seconds()
 
