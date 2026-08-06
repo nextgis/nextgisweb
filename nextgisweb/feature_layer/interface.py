@@ -163,6 +163,9 @@ class IGeometryEditableFeatureLayer(IFeatureLayer):
 class IWritableFeatureLayer(IFeatureLayer):
     """Feature layer that supports writing"""
 
+    def transaction(self, source=None, /, **kwargs):
+        """Transaction context"""
+
     def feature_create(self, feature):
         """Create new feature with description from feature
 
@@ -188,11 +191,6 @@ class IWritableFeatureLayer(IFeatureLayer):
 
 class IVersionableFeatureLayer(IWritableFeatureLayer):
     pass
-
-
-class ITransactionLayer(IWritableFeatureLayer):
-    def transaction(self):
-        """Transaction context"""
 
 
 class IFeatureQuery(Interface):

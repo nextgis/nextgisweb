@@ -1,4 +1,5 @@
 import re
+from contextlib import ExitStack
 from datetime import date, datetime, time
 from os import path
 from tempfile import NamedTemporaryFile
@@ -29,7 +30,6 @@ from nextgisweb.feature_layer import (
     GEOM_TYPE,
     Feature,
     IFeatureLayer,
-    IVersionableFeatureLayer,
 )
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import DataScope
@@ -1197,9 +1197,9 @@ class WFSHandler:
             _summary = El("TransactionSummary", namespace=_ns_wfs, parent=_response)
             summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
 
-        fversioning_flayers = set()
+        transaction_flayers = set()
 
-        try:
+        with ExitStack() as stack:
             for _operation in self.root_body:
                 operation = ns_trim(_operation.tag)
                 if operation not in ("Insert", "Update", "Delete"):
@@ -1212,13 +1212,9 @@ class WFSHandler:
                 feature_layer = layer.resource
                 geom_column = get_geom_column(feature_layer)
 
-                if (
-                    IVersionableFeatureLayer.providedBy(feature_layer)
-                    and feature_layer.fversioning
-                    and feature_layer not in fversioning_flayers
-                ):
-                    feature_layer.fversioning_open(self.request)
-                    fversioning_flayers.add(feature_layer)
+                if feature_layer not in transaction_flayers:
+                    stack.enter_context(feature_layer.transaction(self.request))
+                    transaction_flayers.add(feature_layer)
 
                 if operation == "Insert":
                     feature = Feature()
@@ -1311,9 +1307,6 @@ class WFSHandler:
                             feature_layer.feature_delete(fid)
                         if show_summary:
                             summary["totalDeleted"] += 1
-        finally:
-            for flayer in fversioning_flayers:
-                flayer.fversioning_close()
 
         if show_summary:
             for param, value in summary.items():

@@ -7,7 +7,6 @@ from pyramid.response import FileResponse
 from nextgisweb.lib.apitype import EmptyObject
 
 from nextgisweb.feature_layer import IFeatureLayer
-from nextgisweb.feature_layer.api import versioning
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import DataScope, ResourceFactory
 
@@ -54,7 +53,7 @@ def import_description(resource, request) -> EmptyObject:
     data = request.json_body
     replace = data.get("replace", False) is True
     fupload = FileUpload(id=data["source"]["id"])
-    with versioning(resource, request):
+    with resource.transaction(request):
         descriptions_import(resource, fupload.data_path, replace=replace)
 
 

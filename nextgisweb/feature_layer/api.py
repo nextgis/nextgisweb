@@ -1,5 +1,4 @@
 import re
-from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
 from typing import Annotated, Any, Literal
@@ -32,8 +31,6 @@ from .interface import (
     IFeatureQueryIlike,
     IFeatureQueryLike,
     IFilterableFeatureLayer,
-    ITransactionLayer,
-    IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
 from .numutil import BIGINT_DUMPERS, BigIntFormat, bigint_loader, bool_loader, int_loader
@@ -275,18 +272,6 @@ def query_feature_or_not_found(query, resource_id, feature_id):
     raise FeatureNotFound(resource_id, feature_id)
 
 
-@contextmanager
-def versioning(resource, request):
-    if IVersionableFeatureLayer.providedBy(resource) and resource.fversioning:
-        with resource.fversioning_context(request) as vobj:
-            yield vobj
-    elif ITransactionLayer.providedBy(resource):
-        with resource.transaction():
-            yield None
-    else:
-        yield None
-
-
 def feature_query_pit(resource, feature_query, version, epoch):
     if version is None:
         return
@@ -338,7 +323,7 @@ def iput(
     loader = Loader(resource, loader_params)
 
     result = FeatureChangeResult(id=feature.id)
-    with versioning(resource, request) as vobj:
+    with resource.transaction(request) as vobj:
         updated = loader.extensions(feature, request.json_body)
         loader(feature, request.json_body)
         if (
@@ -357,7 +342,7 @@ def idelete(resource, request, fid: FeatureID) -> FeatureChangeResult:
     :returns: Feature deleted successfully"""
     request.resource_permission(DataScope.write)
 
-    with versioning(resource, request) as vobj:
+    with resource.transaction(request) as vobj:
         resource.feature_delete(fid)
         result = FeatureChangeResult(id=fid)
         result.version_from(vobj)
@@ -533,7 +518,7 @@ def cpost(
     request.resource_permission(DataScope.write)
 
     loader = Loader(resource, loader_params)
-    with versioning(resource, request) as vobj:
+    with resource.transaction(request) as vobj:
         feature = Feature(layer=resource)
         loader(feature, request.json_body)
         feature.id = resource.feature_create(feature)
@@ -558,7 +543,7 @@ def cpatch(
     loader = Loader(resource, loader_params)
 
     result: list[FeatureChangeResult] = list()
-    with versioning(resource, request) as vobj:
+    with resource.transaction(request) as vobj:
         for fdata in request.json_body:
             if "id" not in fdata:
                 # Create new feature
@@ -599,7 +584,7 @@ def cdelete(resource, request) -> JSONType:
     :returns: Features deleted successfully"""
     request.resource_permission(DataScope.write)
 
-    with versioning(resource, request):
+    with resource.transaction(request):
         if len(request.body) > 0:
             result = []
             for fdata in request.json_body:

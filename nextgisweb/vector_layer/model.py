@@ -27,7 +27,6 @@ from nextgisweb.feature_layer import (
     IFieldEditableFeatureLayer,
     IFilterableFeatureLayer,
     IGeometryEditableFeatureLayer,
-    IVersionableFeatureLayer,
     IWritableFeatureLayer,
     LayerField,
 )
@@ -370,6 +369,14 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
         self.geometry_type = geometry_type
 
     # IWritableFeatureLayer
+
+    @contextmanager
+    def transaction(self, source=None, /, **kwargs):
+        if self.fversioning:
+            with self.fversioning_context(source, **kwargs) as vobj:
+                yield vobj
+        else:
+            yield None
 
     @vlschema_autoflush
     @fversioning_guard
@@ -1002,17 +1009,7 @@ class DeleteAllFeaturesAttr(SAttribute):
         if not value:
             return
 
-        obj = srlzr.obj
-
-        @contextmanager
-        def _fversioning_context():
-            if IVersionableFeatureLayer.providedBy(obj) and obj.fversioning:
-                with obj.fversioning_context(srlzr):
-                    yield
-            else:
-                yield
-
-        with _fversioning_context():
+        with srlzr.obj.transaction():
             srlzr.obj.feature_delete_all()
 
 

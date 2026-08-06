@@ -25,7 +25,6 @@ from .interface import (
     IFieldEditableFeatureLayer,
     IFilterableFeatureLayer,
     IGeometryEditableFeatureLayer,
-    ITransactionLayer,
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
