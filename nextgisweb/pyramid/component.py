@@ -4,6 +4,7 @@ from os import getenv
 from typing import Any
 
 import transaction
+from pyramid.interfaces import ITweens
 
 from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option, OptionAnnotations
@@ -42,11 +43,16 @@ class PyramidComponent(Component):
         config.commit()
 
         self.route_meta = route_meta = dict()
-
         for route in iter_routes(config.registry.introspector):
             if not route.client or route.name.startswith("_"):
                 continue
             route_meta[route.name] = [route.itemplate, *route.path_params.keys()]
+
+        logger.debug("Registered tweens in order of execution, from INGRESS to MAIN:")
+        tutil = config.registry.queryUtility(ITweens)
+        assert not tutil.explicit, "Explicit tweens are not supported"
+        for i, tween in enumerate(tutil.implicit(), 1):
+            logger.debug("Tween #%d: %s", i, tween[0])
 
         return config
 
