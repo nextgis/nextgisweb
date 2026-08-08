@@ -40,13 +40,17 @@ class PyramidComponent(Component):
         api.setup_pyramid_csettings(self, config)
 
         config.commit()
+        introspector = config.registry.introspector
 
         self.route_meta = route_meta = dict()
-
-        for route in iter_routes(config.registry.introspector):
+        for route in iter_routes(introspector):
             if not route.client or route.name.startswith("_"):
                 continue
             route_meta[route.name] = [route.itemplate, *route.path_params.keys()]
+
+        logger.debug("Registered tweens in order of execution, from INGRESS to MAIN:")
+        for i, tween in enumerate(reversed(introspector.get_category("tweens")), 1):
+            logger.debug("Tween #%d: %s", i, tween["introspectable"].get("name"))
 
         return config
 
