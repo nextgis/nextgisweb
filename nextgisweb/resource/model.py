@@ -66,7 +66,9 @@ class ResourceMeta(orm.DeclarativeMeta):
         nspc.setdefault("__tablename__", identity)
 
         if (id_column := nspc.get("id")) is None:
-            id_column = nspc["id"] = bres.id_column()
+            id_column = bres.id_column()
+            # Place at the beginning for reasonable column order
+            nspc = {"id": id_column, **nspc}
 
         margs = nspc["__mapper_args__"] = nspc.get("__mapper_args__", {})
         margs.setdefault("polymorphic_identity", identity)
