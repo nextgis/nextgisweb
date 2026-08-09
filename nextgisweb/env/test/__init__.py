@@ -1,15 +1,16 @@
+import re
 import warnings
 from collections.abc import Sequence
 from contextvars import ContextVar
 from functools import cache, partial
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Generator
 
 import pytest
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import BindParameter
+from sqlglot.dialects.postgres import Postgres as SqlglotPostgres
 
 current_request = ContextVar("current_request")
 
@@ -22,26 +23,48 @@ def fixture_value(name: str, *alt: str):
     raise ValueError(f"No fixture found for names: {names}")
 
 
-def sql_compare(sql, file):
-    has_sqlglot = getattr(sql_compare, "has_sqlglot", None)
-    if has_sqlglot is None:
-        has_sqlglot = find_spec("sqlglot") is not None
-        setattr(sql_compare, "has_sqlglot", has_sqlglot)
+@cache
+def get_sqlglot_transpile():
+    if find_spec("sqlglot") is None:
 
-    if not has_sqlglot:
-        pytest.skip("sqlglot not installed")
+        def _transpile(*args, **kwargs):
+            pytest.skip("sqlglot not installed")
+
+        return _transpile
 
     from sqlglot import transpile
+    from sqlglot.dialects.postgres import Postgres, PostgresGenerator
+    from sqlglot.expressions import Reference, UniqueColumnConstraint
 
-    sqlglot_kwargs = dict(read="postgres", write="postgres", pretty=True)
+    param_re, param_repl = re.compile(r"^%\((.*)\)s$"), r":\1"
+
+    class Dialect(Postgres):
+        class Generator(PostgresGenerator):
+            def placeholder_sql(self, expression):
+                result = super().placeholder_sql(expression)
+                return param_re.sub(param_repl, result)
+
+            def schema_columns_sql(self, expression) -> str:
+                if isinstance(expression.parent, (UniqueColumnConstraint, Reference)):
+                    columns = self.expressions(expression, flat=True)
+                    return f"({columns})"
+                return super().schema_columns_sql(expression)
+
+    sqlglot_kwargs = dict(read="postgres", write=Dialect, pretty=True)
     sqlglot_kwargs.update(indent=4, pad=4, normalize_functions=False)
-    tr = partial(transpile, **sqlglot_kwargs)
+
+    return partial(transpile, **sqlglot_kwargs)
+
+
+def sql_compare(sql, file):
+    transpile = get_sqlglot_transpile()
 
     out = list()
     for s in sql:
         c = _compile_sql(s)
-        f = "".join(tr(c))
+        f = ";\n\n".join(transpile(c))
         out.append(f.strip(" \n") + ";\n")
+
     norm_sql = "\n".join(out)
 
     update = sql_compare.update

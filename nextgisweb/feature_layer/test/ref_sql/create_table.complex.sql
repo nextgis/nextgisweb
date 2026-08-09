@@ -14,13 +14,8 @@ CREATE TABLE complex_et (
     version_id INT NOT NULL,
     version_op CHAR(1) NOT NULL,
     PRIMARY KEY (resource_id, feature_id, extension_id),
-    CONSTRAINT complex_et_resource_id_version_id_fkey FOREIGN KEY (resource_id, version_id) REFERENCES feature_layer_vobj (
-        resource_id,
-        version_id
-    ) DEFERRABLE INITIALLY DEFERRED,
-    FOREIGN KEY (resource_id) REFERENCES feature_layer_vmeta (
-        resource_id
-    ) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED
+    CONSTRAINT complex_et_resource_id_version_id_fkey FOREIGN KEY (resource_id, version_id) REFERENCES feature_layer_vobj (resource_id, version_id) DEFERRABLE INITIALLY DEFERRED,
+    FOREIGN KEY (resource_id) REFERENCES feature_layer_vmeta (resource_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE INDEX complex_et_resource_id_version_id_feature_id_idx ON complex_et(resource_id, version_id, feature_id);
@@ -36,12 +31,7 @@ CREATE TABLE complex_ht (
     column_a VARCHAR,
     column_b VARCHAR,
     PRIMARY KEY (resource_id, version_id, feature_id, extension_id),
-    CONSTRAINT complex_ht_resource_id_version_nid_fkey FOREIGN KEY (resource_id, version_nid) REFERENCES feature_layer_vobj (
-        resource_id,
-        version_id
-    ) DEFERRABLE INITIALLY DEFERRED,
+    CONSTRAINT complex_ht_resource_id_version_nid_fkey FOREIGN KEY (resource_id, version_nid) REFERENCES feature_layer_vobj (resource_id, version_id) DEFERRABLE INITIALLY DEFERRED,
     CONSTRAINT complex_ht_range_idx EXCLUDE USING gist(int4range(resource_id, resource_id, '[]') WITH &&, int4range(version_id, version_nid) WITH &&, int4range(feature_id, feature_id, '[]') WITH &&, int4range(extension_id, extension_id, '[]') WITH &&),
-    FOREIGN KEY (resource_id) REFERENCES feature_layer_vmeta (
-        resource_id
-    ) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED
+    FOREIGN KEY (resource_id) REFERENCES feature_layer_vmeta (resource_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED
 );

@@ -73,7 +73,7 @@ extras_require = dict(
         "pytest-cov",
         "pytest==9.0.*",
         "ruff==0.14.*",
-        "sqlglot==26.30.0",
+        "sqlglot==30.15.0",
         "ty",
         "webtest",
     ]

@@ -49,7 +49,7 @@ WITH cs AS (
         AND complex_et.extension_id = hi.extension_id
     RETURNING complex_et.resource_id, complex_et.feature_id, complex_et.extension_id
 )
-DELETE FROM complex USING eq
+DELETE FROM complex USING     eq
 WHERE
     eq.resource_id = complex.resource_id
     AND eq.feature_id = complex.feature_id

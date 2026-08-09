@@ -40,7 +40,7 @@ WITH cs AS (
         simple_et.resource_id = hi.resource_id AND simple_et.feature_id = hi.feature_id
     RETURNING simple_et.resource_id, simple_et.feature_id
 )
-DELETE FROM simple USING eq
+DELETE FROM simple USING     eq
 WHERE
     eq.resource_id = simple.resource_id AND eq.feature_id = simple.feature_id
 RETURNING simple.resource_id, simple.feature_id;

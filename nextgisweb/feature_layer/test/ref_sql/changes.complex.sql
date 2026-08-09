@@ -70,9 +70,9 @@ FULL OUTER JOIN (
     ON qi.fid = qt.fid AND qi.eid = qt.eid
 JOIN LATERAL (
     SELECT
-        NOT qi.fid IS NULL AND NOT qi.deleted AS pi,
-        NOT qi.fid IS NULL AND qi.deleted AS di,
-        NOT qt.fid IS NULL AND NOT qt.deleted AS pt
+        qi.fid IS NOT NULL AND NOT qi.deleted AS pi,
+        qi.fid IS NOT NULL AND qi.deleted AS di,
+        qt.fid IS NOT NULL AND NOT qt.deleted AS pt
 ) AS lat_pr
     ON TRUE
 JOIN LATERAL (
