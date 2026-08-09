@@ -4,9 +4,9 @@ WITH uct AS (
         ct.id = :id
         AND (
             ST_GeomFromWKB(:geom, 3857) IS DISTINCT FROM geom
-            OR CAST(:fld_1 AS INT) IS DISTINCT FROM fld_i
-            OR CAST(:fld_2 AS TEXT) IS DISTINCT FROM fld_t
-            OR CAST(:fld_3 AS DATE) IS DISTINCT FROM fld_d
+            OR CAST(:fld_1 AS integer) IS DISTINCT FROM fld_i
+            OR CAST(:fld_2 AS text) IS DISTINCT FROM fld_t
+            OR CAST(:fld_3 AS date) IS DISTINCT FROM fld_d
         )
     RETURNING ct.id
 ), iht AS (

@@ -11,7 +11,7 @@ FROM (
         et.fid AS fid,
         et.vop <> 'D' AS current,
         COALESCE(ht.vop <> 'D', FALSE) AS previous,
-        CAST(NULL AS GEOMETRY) AS geom,
+        CAST(NULL AS geometry) AS geom,
         ht.fld_i AS fld_1,
         ht.fld_t AS fld_2,
         ht.fld_d AS fld_3

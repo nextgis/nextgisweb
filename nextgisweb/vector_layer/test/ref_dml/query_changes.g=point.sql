@@ -27,7 +27,7 @@ FROM (
         fld_d AS fld_3
     FROM ht AS ht
     WHERE
-        int4range(vid, nid) @> CAST(:p_initial AS INT)
+        int4range(vid, nid) @> CAST(:p_initial AS integer)
         AND ht.fid >= :p_fid_min
         AND ht.fid <= :p_fid_max
 ) AS qi
@@ -59,7 +59,7 @@ FULL OUTER JOIN (
         fld_d AS fld_3
     FROM ht AS ht
     WHERE
-        int4range(vid, nid) @> CAST(:p_target AS INT)
+        int4range(vid, nid) @> CAST(:p_target AS integer)
         AND ht.fid >= :p_fid_min
         AND ht.fid <= :p_fid_max
 ) AS qt

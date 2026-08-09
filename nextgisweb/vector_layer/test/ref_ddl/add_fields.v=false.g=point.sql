@@ -1,2 +1,2 @@
 ALTER TABLE ct
-ADD COLUMN fld_i INT, ADD COLUMN fld_d DATE;
+ADD COLUMN fld_i integer, ADD COLUMN fld_d date;

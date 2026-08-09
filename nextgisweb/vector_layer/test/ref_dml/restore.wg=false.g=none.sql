@@ -10,9 +10,9 @@ WITH qet AS (
         ht.fid AS fid,
         ht.nid AS nid,
         ht.nop AS nop,
-        CAST(:fld_1 AS INT) AS fld_i,
-        CAST(:fld_2 AS TEXT) AS fld_t,
-        CAST(:fld_3 AS DATE) AS fld_d
+        CAST(:fld_1 AS integer) AS fld_i,
+        CAST(:fld_2 AS text) AS fld_t,
+        CAST(:fld_3 AS date) AS fld_d
     FROM ht, qet
     WHERE
         ht.fid = qet.fid

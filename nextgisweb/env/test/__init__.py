@@ -34,12 +34,22 @@ def get_sqlglot_transpile():
 
     from sqlglot import transpile
     from sqlglot.dialects.postgres import Postgres, PostgresGenerator
-    from sqlglot.expressions import Reference, UniqueColumnConstraint
+    from sqlglot.expressions import DType, Reference, UniqueColumnConstraint
 
     param_re, param_repl = re.compile(r"^%\((.*)\)s$"), r":\1"
 
     class Dialect(Postgres):
         class Generator(PostgresGenerator):
+            TYPE_MAPPING = {
+                **{i: i.value.lower() for i in DType},
+                **{k: v.lower() for k, v in PostgresGenerator.TYPE_MAPPING.items()},
+                DType.INT: "integer",
+                DType.CHAR: "character",
+                DType.VARCHAR: "character varying",
+                DType.TIMESTAMP: "timestamp without time zone",
+                DType.TIME: "time without time zone",
+            }
+
             def placeholder_sql(self, expression):
                 result = super().placeholder_sql(expression)
                 return param_re.sub(param_repl, result)

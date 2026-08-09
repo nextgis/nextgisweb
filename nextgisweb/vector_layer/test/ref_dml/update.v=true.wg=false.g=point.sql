@@ -3,9 +3,9 @@ WITH uct AS (
     WHERE
         ct.id = :id
         AND (
-            CAST(:fld_1 AS INT) IS DISTINCT FROM fld_i
-            OR CAST(:fld_2 AS TEXT) IS DISTINCT FROM fld_t
-            OR CAST(:fld_3 AS DATE) IS DISTINCT FROM fld_d
+            CAST(:fld_1 AS integer) IS DISTINCT FROM fld_i
+            OR CAST(:fld_2 AS text) IS DISTINCT FROM fld_t
+            OR CAST(:fld_3 AS date) IS DISTINCT FROM fld_d
         )
     RETURNING ct.id
 ), iht AS (

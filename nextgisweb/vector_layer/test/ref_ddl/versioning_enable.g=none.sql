@@ -1,21 +1,21 @@
 CREATE TABLE et (
-    fid INT NOT NULL,
-    vid INT NOT NULL,
-    vop CHAR(1) NOT NULL,
+    fid integer NOT NULL,
+    vid integer NOT NULL,
+    vop character(1) NOT NULL,
     PRIMARY KEY (fid)
 );
 
 CREATE INDEX et_vid_fid_idx ON et(vid, fid);
 
 CREATE TABLE ht (
-    vid INT NOT NULL,
-    fid INT NOT NULL,
-    nid INT NOT NULL CHECK (nid > vid),
-    vop CHAR(1) NOT NULL,
-    nop CHAR(1) NOT NULL,
-    fld_i INT,
-    fld_t TEXT,
-    fld_d DATE,
+    vid integer NOT NULL,
+    fid integer NOT NULL,
+    nid integer NOT NULL CHECK (nid > vid),
+    vop character(1) NOT NULL,
+    nop character(1) NOT NULL,
+    fld_i integer,
+    fld_t text,
+    fld_d date,
     PRIMARY KEY (vid, fid),
     CONSTRAINT ht_vid_nid_fid_idx EXCLUDE USING gist(int4range(vid, nid) WITH &&, int4range(fid, fid, '[]') WITH &&)
 );

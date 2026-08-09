@@ -21,13 +21,13 @@ FROM (
         ht.fid AS fid,
         ht.vid AS vid,
         ht.vop = 'D' AS deleted,
-        CAST(NULL AS GEOMETRY) AS geom,
+        CAST(NULL AS geometry) AS geom,
         fld_i AS fld_1,
         fld_t AS fld_2,
         fld_d AS fld_3
     FROM ht AS ht
     WHERE
-        int4range(vid, nid) @> CAST(:p_initial AS INT)
+        int4range(vid, nid) @> CAST(:p_initial AS integer)
         AND ht.fid >= :p_fid_min
         AND ht.fid <= :p_fid_max
 ) AS qi
@@ -36,7 +36,7 @@ FULL OUTER JOIN (
         et.fid AS fid,
         et.vid AS vid,
         ct.id IS NULL AS deleted,
-        CAST(NULL AS GEOMETRY) AS geom,
+        CAST(NULL AS geometry) AS geom,
         fld_i AS fld_1,
         fld_t AS fld_2,
         fld_d AS fld_3
@@ -53,13 +53,13 @@ FULL OUTER JOIN (
         ht.fid AS fid,
         ht.vid AS vid,
         ht.vop = 'D' AS deleted,
-        CAST(NULL AS GEOMETRY) AS geom,
+        CAST(NULL AS geometry) AS geom,
         fld_i AS fld_1,
         fld_t AS fld_2,
         fld_d AS fld_3
     FROM ht AS ht
     WHERE
-        int4range(vid, nid) @> CAST(:p_target AS INT)
+        int4range(vid, nid) @> CAST(:p_target AS integer)
         AND ht.fid >= :p_fid_min
         AND ht.fid <= :p_fid_max
 ) AS qt
