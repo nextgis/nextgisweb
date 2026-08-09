@@ -1,16 +1,21 @@
+from collections import defaultdict, deque
+from contextlib import contextmanager
+from functools import cache
+from pathlib import Path
+from typing import Any, Type
+from unittest.mock import PropertyMock, patch
+
+import pytest
+from sqlalchemy import DDL, Table
+from sqlalchemy.schema import CreateIndex, CreateTable, SetTableComment
+
 __all__ = [
     "ngw_cleanup",
     "ngw_commit",
     "ngw_core_settings_override",
     "ngw_txn",
+    "test_model_ddl",
 ]
-
-from collections import defaultdict, deque
-from contextlib import contextmanager
-from functools import cache
-from typing import Any, Type
-
-import pytest
 
 
 def pytest_addoption(parser):
@@ -180,3 +185,31 @@ def ngw_cleanup(request):
     preserve = request.config.getoption("--ngw-preserve")
     with CleanupHelper(preserve=preserve) as helper:
         yield helper
+
+
+@patch.object(Table, "comment", new_callable=PropertyMock, create=True)
+def test_model_ddl(mock_table_comment, *, request):
+    from nextgisweb.env import Component
+    from nextgisweb.env.environment import pkginfo
+    from nextgisweb.env.test import Raw, sql_compare
+
+    module = request.module
+    cid = pkginfo.component_by_module(module.__name__)
+
+    tables = Component.registry[cid].metadata.tables
+    mock_table_comment.return_value = cid
+
+    sql = []
+    for t in sorted(tables.values(), key=lambda x: x.name):
+        sql.append(Raw(f"/*** Table: {t.name} ***/"))
+        sql.append(CreateTable(t))
+        sql.append(SetTableComment(t))
+        sql.extend(CreateIndex(idx) for idx in sorted(t.indexes, key=lambda x: x.name))
+
+        for listener in t.dispatch.after_create:
+            if isinstance(listener, DDL):
+                sql.append(listener)
+                continue
+
+    sql_file_name = Path(module.__file__).with_suffix(".sql")
+    sql_compare(sql, sql_file_name)

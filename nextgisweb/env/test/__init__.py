@@ -66,11 +66,19 @@ def get_sqlglot_transpile():
     return partial(transpile, **sqlglot_kwargs)
 
 
+class Raw(str):
+    pass
+
+
 def sql_compare(sql, file):
     transpile = get_sqlglot_transpile()
 
     out = list()
     for s in sql:
+        if isinstance(s, Raw):
+            out.append(s + "\n")
+            continue
+
         c = _compile_sql(s)
         f = ";\n\n".join(transpile(c))
         out.append(f.strip(" \n") + ";\n")
