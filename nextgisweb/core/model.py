@@ -8,13 +8,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from nextgisweb.env import Base
 
 
-class CState(Base):
-    __tablename__ = "core_cstate"
-
-    component: Mapped[str] = mapped_column(primary_key=True)
-    heads: Mapped[str]
-
-
 class Migration(Base):
     __tablename__ = "core_migration"
 
