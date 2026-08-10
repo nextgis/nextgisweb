@@ -5,8 +5,6 @@ import type { TreeItemStore } from "@nextgisweb/webmap/store/tree-store/TreeItem
 
 import type { TreeStore } from "../../store";
 
-type TreeNodeData = NonNullable<TreeProps["treeData"]>[0];
-
 interface UseDragProps {
   store: TreeStore;
 }
@@ -15,10 +13,13 @@ type AllowDrop = NonNullable<TreeProps["allowDrop"]>;
 type OnDrop = NonNullable<TreeProps["onDrop"]>;
 
 export function useDrag({ store }: UseDragProps) {
-  const allowDrop = useCallback<AllowDrop>((e) => {
-    const dropNode = e.dropNode as TreeNodeData;
-    return dropNode.isLeaf ? !!e.dropPosition : true;
-  }, []);
+  const allowDrop = useCallback<AllowDrop>(
+    (e) => {
+      const dropItem = store.getItemById(Number(e.dropNode.key));
+      return !!dropItem?.isGroup() || !!e.dropPosition;
+    },
+    [store]
+  );
 
   const onDrop = useCallback<OnDrop>(
     (info) => {

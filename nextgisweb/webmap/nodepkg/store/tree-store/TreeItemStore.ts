@@ -20,6 +20,9 @@ abstract class BaseTreeItemStore {
   @observable.ref accessor parentId: number | null;
   @observable.ref accessor label: string;
   @observable.ref accessor title: string;
+  @observable.ref accessor visibility: boolean;
+  @observable.ref accessor visible: boolean;
+  @observable.ref accessor plugin: CompositeMembersConfig;
 
   // increments automatically whenever any property changes
   // used to trigger reactive updates in the UI
@@ -31,7 +34,7 @@ abstract class BaseTreeItemStore {
   protected constructor(
     init: Pick<
       TreeChildrenItemConfig,
-      "id" | "key" | "type" | "label" | "title"
+      "id" | "key" | "type" | "label" | "title" | "visibility" | "plugin"
     >,
     parentId: number | null
   ) {
@@ -42,6 +45,9 @@ abstract class BaseTreeItemStore {
     this.type = init.type;
     this.label = init.label ?? "";
     this.title = init.title ?? "";
+    this.visibility = !!init.visibility;
+    this.visible = this.visibility;
+    this.plugin = init.plugin;
   }
 
   abstract dump(): GroupItemConfig | LayerItemConfig;
@@ -150,7 +156,6 @@ export class TreeLayerStore
 
   readonly type: LayerItemConfig["type"] = "layer";
 
-  @observable.ref accessor plugin: CompositeMembersConfig;
   @observable.ref accessor adapter: string;
   @observable.ref accessor layerId: number;
   @observable.ref accessor styleId: number;
@@ -158,7 +163,6 @@ export class TreeLayerStore
 
   @observable.ref accessor filterable: boolean;
   @observable.ref accessor legendInfo: LegendInfoStore;
-  @observable.ref accessor visibility: boolean;
   @observable.ref accessor identifiable: boolean;
   @observable.ref accessor transparency: number | null;
   @observable.ref accessor minScaleDenom: number | null;
@@ -187,7 +191,6 @@ export class TreeLayerStore
 
     this.layerId = init.layerId;
     this.styleId = init.styleId;
-    this.visibility = !!init.visibility;
     this.identifiable = !!init.identifiable;
     this.transparency = init.transparency ?? null;
     this.minScaleDenom = init.minScaleDenom ?? null;
@@ -347,8 +350,10 @@ export class TreeGroupStore
       key: this.key,
       label: this.label,
       title: this.title,
+      plugin: this.plugin,
       expanded: !!this.expanded,
       exclusive: !!this.exclusive,
+      visibility: this.visibility,
       children: [],
     } satisfies GroupItemConfig;
   }

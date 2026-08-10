@@ -75,11 +75,11 @@ msgstr "Отключить"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:285
+#: nodepkg/display/Display.ts:286
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:286
+#: nodepkg/display/Display.ts:287
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -147,7 +147,7 @@ msgstr "Назад к слоям и группам"
 msgid "Use default draw order"
 msgstr "Порядок рисования по умолчанию"
 
-#: nodepkg/items-widget/Item.ts:112
+#: nodepkg/items-widget/Item.ts:115
 msgid "Group members have errors"
 msgstr "Ошибка в участниках группы"
 
@@ -215,7 +215,7 @@ msgstr "Настроить порядок рисования"
 msgid "Use current map scale"
 msgstr "Использовать текущий масштаб карты"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:312 nodepkg/panel/layers/plugin.tsx:15
+#: nodepkg/items-widget/ItemsWidget.tsx:316 nodepkg/panel/layers/plugin.tsx:15
 msgid "Layers"
 msgstr "Слои"
 
@@ -557,13 +557,14 @@ msgstr "Восстановить исходное состояние"
 msgid "Add layers"
 msgstr "Добавить слои"
 
-#: nodepkg/panel/layers/useAddItem.tsx:16
-msgid "New group"
-msgstr "Новая группа"
-
+#: nodepkg/panel/layers/LayersDropdown.tsx:118
 #: nodepkg/panel/layers/useAddItem.tsx:114
 msgid "Add group"
 msgstr "Добавить группу"
+
+#: nodepkg/panel/layers/useAddItem.tsx:16
+msgid "New group"
+msgstr "Новая группа"
 
 #: nodepkg/panel/layers/useAddItem.tsx:115
 msgid "Add"
@@ -788,6 +789,16 @@ msgstr "Поделиться"
 msgid "Feature table"
 msgstr "Таблица объектов"
 
+#: nodepkg/plugin/group-properties/GroupPropertiesModal.tsx:14
+#: nodepkg/plugin/group-properties/GroupPropertiesPlugin.tsx:27
+#: nodepkg/plugin/layer-properties/LayerPropertiesPlugin.tsx:24
+msgid "Properties"
+msgstr "Свойства"
+
+#: nodepkg/plugin/group-remove/GroupRemovePlugin.tsx:19
+msgid "Remove group"
+msgstr "Удалить группу"
+
 #: nodepkg/plugin/layer-editor/EditableItem.tsx:169
 msgid "Undo the last change"
 msgstr "Отменить последнее изменение"
@@ -851,10 +862,6 @@ msgstr "Переместить"
 msgid "Layer properties"
 msgstr "Свойства слоя"
 
-#: nodepkg/plugin/layer-properties/LayerPropertiesPlugin.tsx:24
-msgid "Properties"
-msgstr "Свойства"
-
 #: nodepkg/plugin/layer-remove/LayerRemovePlugin.tsx:15
 msgid "Remove layer"
 msgstr "Удалить слой"
@@ -867,7 +874,11 @@ msgstr "Редактировать слой"
 msgid "Edit style"
 msgstr "Редактировать стиль"
 
-#: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:20
+#: nodepkg/plugin/zoom-to-group/ZoomToGroupPlugin.tsx:66
+msgid "Zoom to group"
+msgstr "Увеличить до группы"
+
+#: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:23
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 

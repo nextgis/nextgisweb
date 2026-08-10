@@ -121,8 +121,16 @@ export function useAddItem({ display }: { display: Display }) {
           onChange={(e) => (inputValue = e.target.value)}
         />
       ),
-      onOk: () => {
+      onOk: async () => {
         const newId = treeStore.nextId();
+
+        const plugins = await display.installPlugins(config.mid.plugin);
+        const plugin: GroupItemConfig["plugin"] = {};
+
+        for (const key of config.mid.plugin) {
+          if (plugins[key]?.type !== "group") continue;
+          plugin[key] = {};
+        }
 
         const group: GroupItemConfig = {
           id: newId,
@@ -130,15 +138,17 @@ export function useAddItem({ display }: { display: Display }) {
           type: "group",
           label: inputValue ?? newGroupDefValue,
           title: inputValue ?? newGroupDefValue,
+          plugin,
+          children: [],
           expanded: false,
           exclusive: false,
-          children: [],
+          visibility: true,
         };
 
         treeStore.addItem(group, parentId);
       },
     });
-  }, [parentId, modal, treeStore]);
+  }, [config, display, parentId, modal, treeStore]);
 
   return { addLayers, addGroup, contextHolder };
 }

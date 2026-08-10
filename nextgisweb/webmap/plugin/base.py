@@ -28,3 +28,18 @@ class WebmapLayerPlugin:
         user: User,
     ) -> dict[str, Any] | None:
         raise NotImplementedError
+
+
+@list_registry
+class WebmapGroupPlugin:
+    registry: ClassVar[ListRegistry[type["WebmapGroupPlugin"]]]
+    entry: ClassVar[str]
+
+    @classmethod
+    def get_payload(
+        cls,
+        *,
+        webmap: WebMap,
+        user: User,
+    ) -> dict[str, Any] | None:
+        raise NotImplementedError

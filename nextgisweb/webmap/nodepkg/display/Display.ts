@@ -40,7 +40,8 @@ export class Display {
   panelManager: PanelManager;
   annotationsManager: AnnotationsManager;
 
-  @observable.ref accessor plugins: Record<string, PluginBase> = {};
+  @observable.ref accessor plugins: Record<string, PluginBase<TreeItemStore>> =
+    {};
 
   urlParams: DisplayURLParams;
 
@@ -128,7 +129,7 @@ export class Display {
 
   getVisibleItems() {
     const store = this.treeStore;
-    return store.filter({ type: "layer", visibility: true });
+    return store.filter({ type: "layer", visible: true });
   }
 
   @action.bound
@@ -153,7 +154,7 @@ export class Display {
           }
         }
       });
-      store.setVisibleIds(checked);
+      store.setLayerVisibleIds(checked);
     }
   }
 
@@ -226,7 +227,7 @@ export class Display {
   }
 
   @action.bound
-  private setPlugin(key: string, plugin: PluginBase) {
+  private setPlugin(key: string, plugin: PluginBase<TreeItemStore>) {
     this.plugins = {
       ...this.plugins,
       [key]: plugin,

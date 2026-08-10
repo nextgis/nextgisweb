@@ -55,6 +55,7 @@ CREATE TABLE webmap_item (
     position integer,
     display_name character varying,
     group_expanded boolean,
+    group_enabled boolean,
     group_exclusive boolean,
     layer_style_id integer,
     layer_enabled boolean,

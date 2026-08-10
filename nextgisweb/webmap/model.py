@@ -161,6 +161,7 @@ class WebMapItem(Base):
     position = sa.Column(sa.Integer, nullable=True)
     display_name = sa.Column(sa.Unicode, nullable=True)
     group_expanded = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", False))
+    group_enabled = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", True))
     group_exclusive = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", False))
     layer_style_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
     layer_enabled = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", False))
@@ -203,6 +204,7 @@ class WebMapItem(Base):
 
         if self.item_type == "group":
             data["group_expanded"] = self.group_expanded
+            data["group_enabled"] = self.group_enabled
             data["group_exclusive"] = self.group_exclusive
 
         if self.item_type in ("root", "group"):
@@ -245,6 +247,7 @@ class WebMapItem(Base):
             if "children" in child:
                 item = WebMapItem(item_type="group")
                 _set(item, "group_expanded", True)
+                _set(item, "group_enabled", True)
                 _set(item, "group_exclusive", True)
 
                 defaults_next = defaults.copy()
@@ -373,6 +376,7 @@ class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_ty
 class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_type"):
     display_name: str
     group_expanded: bool
+    group_enabled: bool
     group_exclusive: bool
     children: "list[WebMapItemGroupRead | WebMapItemLayerRead]"
 
@@ -381,27 +385,48 @@ class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_typ
         return WebMapItemGroupRead(
             display_name=obj.display_name,
             group_expanded=bool(obj.group_expanded),
+            group_enabled=bool(obj.group_enabled),
             group_exclusive=bool(obj.group_exclusive),
             children=_children_from_model(obj),
         )
 
 
-def enable_exclusive(group, _disable=False):
-    _found = False
+def enable_exclusive(group):
+    def enabled(item):
+        return item.group_enabled if item.item_type == "group" else item.layer_enabled
+
+    def disable(item):
+        if item.item_type == "group":
+            item.group_enabled = False
+        else:
+            item.layer_enabled = False
+
+    def has_enabled_layer(item):
+        if not enabled(item):
+            return False
+        if item.item_type == "layer":
+            return True
+        return any(has_enabled_layer(child) for child in item.children)
+
+    selected = None
+
     for child in group.children:
-        disable = _disable or (_found and group.group_exclusive)
-        if child.item_type == "group":
-            _found = enable_exclusive(child, disable) or _found
-        elif child.item_type == "layer" and child.layer_enabled:
-            if disable:
-                child.layer_enabled = False
-            _found = True
-    return _found
+        if not enabled(child):
+            continue
+
+        if selected is None:
+            selected = child
+        elif has_enabled_layer(child) and not has_enabled_layer(selected):
+            disable(selected)
+            selected = child
+        else:
+            disable(child)
 
 
 class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_type"):
     display_name: str
     group_expanded: bool = False
+    group_enabled: bool = True
     group_exclusive: bool = False
     children: "list[WebMapItemGroupWrite | WebMapItemLayerWrite]" = []
 
