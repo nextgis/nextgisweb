@@ -114,26 +114,23 @@ class MigrationContext:
     def execute_operations(self, operations, state, dry_run=False):
         with transaction.manager:
             idx = 0
+
+            def _batch(op_type):
+                nonlocal idx
+                iops = []
+                while idx < len(operations) and isinstance(operations[idx], op_type):
+                    iops.append(operations[idx])
+                    idx += 1
+                return iops
+
             while idx < len(operations):
                 match operations[idx]:
                     case InstallOperation():
-                        iops = []
-                        while idx < len(operations) and isinstance(
-                            operations[idx], InstallOperation
-                        ):
-                            iops.append(operations[idx])
-                            idx += 1
-                        state = self.execute_install(iops, state)
+                        state = self.execute_install(_batch(InstallOperation), state)
                         self.registry.write_state(state)
 
                     case UninstallOperation():
-                        uops = []
-                        while idx < len(operations) and isinstance(
-                            operations[idx], UninstallOperation
-                        ):
-                            uops.append(operations[idx])
-                            idx += 1
-                        state = self.execute_uninstall(uops, state)
+                        state = self.execute_uninstall(_batch(UninstallOperation), state)
                         self.registry.write_state(state)
 
                     case _:

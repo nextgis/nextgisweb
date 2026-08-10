@@ -1,6 +1,5 @@
 import sqlite3
 from contextlib import contextmanager
-from pathlib import Path
 from textwrap import dedent
 
 from ..graph import (
@@ -11,7 +10,9 @@ from ..graph import (
     UninstallOperation,
     resolve,
 )
-from ..registry import Registry
+from ..migration import Dependency, Migration, MigrationKey
+from ..registry import Registry, _normalize_metadata
+from ..revision import REVID_ZERO
 
 
 def foo_install(ctx):
@@ -196,22 +197,54 @@ def test_rewind(graph):
     assert new_dump == ref_dump
 
 
+class DummyMigration(Migration):
+    def __init__(
+        self,
+        component,
+        revision,
+        *,
+        parents=(REVID_ZERO,),
+        dependencies=(),
+        has_forward=True,
+        has_rewind=True,
+    ):
+        super().__init__(component, revision)
+        self._has_forward = has_forward
+        self._has_rewind = has_rewind
+
+        metadata = _normalize_metadata(
+            {"parents": parents, "dependencies": dependencies},
+            component,
+            revision,
+        )
+
+        self._parents = tuple(MigrationKey(component, r) for r in metadata["parents"])
+        self._date = metadata.get("date")
+        self._message = metadata.get("message")
+        self._dependencies = [
+            (Dependency(i[0]), Dependency(i[1])) for i in metadata["dependencies"]
+        ]
+
+
 def test_interleaved_install_forward():
-    regpath = Path(__file__).parent / "registry"
     reg = Registry()
-    for c in ("alpha", "beta", "gamma", "delta"):
-        reg.scandir(c, regpath / c)
+
+    reg.add(DummyMigration("a", "a1a1a1a1"))
+    reg.add(DummyMigration("b", "b2b2b2b2"))
+    reg.add(DummyMigration("g", "c3c3c3c3", dependencies=[("this", "b==b2b2b2b2")]))
+    reg.add(DummyMigration("d", "d4d4d4d4"))
+
     graph = MigrationGraph(
         reg,
         install_dependencies={
-            "beta": ("alpha",),
-            "delta": ("gamma",),
+            "b": ("a",),
+            "d": ("g",),
         },
     )
 
     cstate = {k: False for k in graph._nodes}
     for k in graph._nodes:
-        if k.component in ("alpha", "gamma") and k.revision == "00000000":
+        if k.component in ("a", "g") and k.revision == "00000000":
             cstate[k] = True
     tstate = {k: True for k in graph.select("head")}
 
@@ -222,14 +255,7 @@ def test_interleaved_install_forward():
     )
 
     assert len(solution) == 4, solution
-    assert isinstance(solution[0], ForwardOperation)
-    assert isinstance(solution[1], InstallOperation)
-    assert isinstance(solution[2], ForwardOperation)
-    assert isinstance(solution[3], InstallOperation)
-
-    # Verify the resolver obeyed dependencies:
-    # Forward [alpha] → Install [beta] → Forward [gamma] → Install [delta]
-    assert solution[0].component == "alpha"
-    assert solution[1].component == "beta"
-    assert solution[2].component == "gamma"
-    assert solution[3].component == "delta"
+    assert isinstance(solution[0], ForwardOperation) and solution[0].component == "a"
+    assert isinstance(solution[1], InstallOperation) and solution[1].component == "b"
+    assert isinstance(solution[2], ForwardOperation) and solution[2].component == "g"
+    assert isinstance(solution[3], InstallOperation) and solution[3].component == "d"
