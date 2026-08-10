@@ -1,7 +1,7 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { openLayerFilter } from "@nextgisweb/webmap/layers-tree/util/openLayerFilter";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
-import type { PluginState } from "@nextgisweb/webmap/type";
+import type { PluginMenuItem, PluginState } from "@nextgisweb/webmap/type";
 
 import { PluginBase } from "../PluginBase";
 
@@ -22,10 +22,11 @@ export class LayerFilterPlugin extends PluginBase {
     return undefined;
   }
 
-  getMenuItem() {
+  getMenuItem(): PluginMenuItem {
     return {
       icon: <FilterIcon />,
       title: gettext("Filter"),
+      order: 20,
     };
   }
 }

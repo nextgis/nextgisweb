@@ -3,6 +3,7 @@ import { lazy } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
+import type { PluginMenuItem } from "@nextgisweb/webmap/type";
 
 import { PluginBase } from "../PluginBase";
 
@@ -13,10 +14,11 @@ const webmapFeatureGridTabLazy = lazy(
 );
 
 export class FeatureLayerPlugin extends PluginBase {
-  getMenuItem(nodeData: TreeLayerStore) {
+  getMenuItem(nodeData: TreeLayerStore): PluginMenuItem {
     return {
       icon: <TableIcon />,
       title: gettext("Feature table"),
+      order: 30,
       onClick: () => {
         this.openFeatureGrid(nodeData);
         return Promise.resolve(undefined);

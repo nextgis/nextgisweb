@@ -27,12 +27,12 @@ export class StyleResourceEditor extends PluginBase {
   }
 
   getMenuItem(nodeData: TreeLayerStore): PluginMenuItem {
-    const title = gettext("Edit style resource");
+    const title = gettext("Edit style");
 
     return {
       icon: <EditIcon />,
       title,
-      order: 100,
+      order: 110,
       onClick: () => {
         this.run(nodeData);
       },

@@ -2,6 +2,7 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
+import type { PluginMenuItem } from "@nextgisweb/webmap/type";
 
 import { PluginBase } from "../PluginBase";
 
@@ -13,10 +14,11 @@ export class ZoomToLayerPlugin extends PluginBase {
     return;
   }
 
-  getMenuItem(nodeData: TreeLayerStore) {
+  getMenuItem(nodeData: TreeLayerStore): PluginMenuItem {
     return {
       icon: <Icon />,
       title: gettext("Zoom to layer"),
+      order: -10,
       onClick: () => {
         this.run(nodeData);
       },

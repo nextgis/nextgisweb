@@ -21,8 +21,8 @@ export class LayerPropertiesPlugin extends PluginBase {
   getMenuItem(nodeData: TreeLayerStore): PluginMenuItem {
     return {
       icon: <PropertiesIcon />,
-      title: gettext("Layer properties"),
-      order: 120,
+      title: gettext("Properties"),
+      order: 50,
       onClick: () => {
         void this.run(nodeData);
       },

@@ -51,11 +51,12 @@ export class LayerEditor extends PluginBase {
 
   getMenuItem(nodeData: TreeLayerStore): PluginMenuItem {
     const active = nodeData.editable === true;
-    const title = active ? gettext("Stop editing") : gettext("Edit");
+    const title = active ? gettext("Stop editing") : gettext("Edit on map");
 
     return {
       icon: <EditIcon />,
       title,
+      order: 40,
       onClick: async () => {
         await this.run(nodeData);
       },

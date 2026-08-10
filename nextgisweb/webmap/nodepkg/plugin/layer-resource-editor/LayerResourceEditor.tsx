@@ -18,15 +18,11 @@ export class LayerResourceEditor extends PluginBase {
   }
 
   getMenuItem(nodeData: TreeLayerStore): PluginMenuItem {
-    const hasStyle = nodeData.styleId !== nodeData.layerId;
-    const title = hasStyle
-      ? gettext("Edit layer resource")
-      : gettext("Edit resource");
-
+    const title = gettext("Edit layer");
     return {
       icon: <EditIcon />,
       title,
-      order: 110,
+      order: 120,
       onClick: async () => {
         await this.run(nodeData);
       },

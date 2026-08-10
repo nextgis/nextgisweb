@@ -415,7 +415,6 @@ msgid "With messages"
 msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:111
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:54
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -462,7 +461,7 @@ msgid "Contact Web GIS administrator"
 msgstr "Связаться с администратором Веб ГИС"
 
 #: nodepkg/panel/description/plugin.tsx:15
-#: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:42
+#: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:43
 msgid "Description"
 msgstr "Описание"
 
@@ -571,8 +570,8 @@ msgid "Add"
 msgstr "Добавить"
 
 #: nodepkg/panel/layers/useAddItem.tsx:116
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:181
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:188
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:185
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:192
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
 msgid "Cancel"
 msgstr "Отменить"
@@ -785,7 +784,7 @@ msgstr "Предпросмотр"
 msgid "Share"
 msgstr "Поделиться"
 
-#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:19
+#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:20
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -797,6 +796,10 @@ msgstr "Отменить последнее изменение"
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:32
 msgid "Stop editing"
 msgstr "Завершить редактирование"
+
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:54
+msgid "Edit on map"
+msgstr "Редактировать на карте"
 
 #: nodepkg/plugin/layer-editor/SnapToggle.tsx:30
 msgid "Disable snapping"
@@ -819,12 +822,12 @@ msgid "Delete all"
 msgstr "Удалить все"
 
 #: nodepkg/plugin/layer-editor/modes/DeleteMode.tsx:70
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:179
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:183
 msgid "Delete"
 msgstr "Удалить"
 
 #: nodepkg/plugin/layer-editor/modes/DrawMode.tsx:117
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:190
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:194
 msgid "Create"
 msgstr "Создать"
 
@@ -845,27 +848,26 @@ msgid "Move"
 msgstr "Переместить"
 
 #: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:18
-#: nodepkg/plugin/layer-properties/LayerPropertiesPlugin.tsx:24
 msgid "Layer properties"
 msgstr "Свойства слоя"
+
+#: nodepkg/plugin/layer-properties/LayerPropertiesPlugin.tsx:24
+msgid "Properties"
+msgstr "Свойства"
 
 #: nodepkg/plugin/layer-remove/LayerRemovePlugin.tsx:15
 msgid "Remove layer"
 msgstr "Удалить слой"
 
-#: nodepkg/plugin/layer-resource-editor/LayerResourceEditor.tsx:23
-msgid "Edit layer resource"
-msgstr "Редактировать ресурс слоя"
-
-#: nodepkg/plugin/layer-resource-editor/LayerResourceEditor.tsx:24
-msgid "Edit resource"
-msgstr "Редактировать ресурс"
+#: nodepkg/plugin/layer-resource-editor/LayerResourceEditor.tsx:21
+msgid "Edit layer"
+msgstr "Редактировать слой"
 
 #: nodepkg/plugin/style-resource-editor/StyleResourceEditor.tsx:30
-msgid "Edit style resource"
-msgstr "Редактировать ресурс стиля"
+msgid "Edit style"
+msgstr "Редактировать стиль"
 
-#: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:19
+#: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:20
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
@@ -1036,7 +1038,7 @@ msgid "Visibility"
 msgstr "Видимость"
 
 #: nodepkg/settings/SettingsForm.tsx:266
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:183
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:187
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:62
 msgid "Save"
 msgstr "Сохранить"

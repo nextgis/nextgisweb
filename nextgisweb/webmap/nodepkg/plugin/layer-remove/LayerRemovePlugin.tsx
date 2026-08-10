@@ -17,6 +17,7 @@ export class LayerRemovePlugin extends PluginBase {
     return {
       icon: <RemoveIcon />,
       title,
+      order: 100,
       onClick: () => {
         this.run(nodeData);
       },
