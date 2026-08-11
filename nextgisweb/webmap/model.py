@@ -391,38 +391,6 @@ class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_typ
         )
 
 
-def enable_exclusive(group):
-    def enabled(item):
-        return item.group_enabled if item.item_type == "group" else item.layer_enabled
-
-    def disable(item):
-        if item.item_type == "group":
-            item.group_enabled = False
-        else:
-            item.layer_enabled = False
-
-    def has_enabled_layer(item):
-        if not enabled(item):
-            return False
-        if item.item_type == "layer":
-            return True
-        return any(has_enabled_layer(child) for child in item.children)
-
-    selected = None
-
-    for child in group.children:
-        if not enabled(child):
-            continue
-
-        if selected is None:
-            selected = child
-        elif has_enabled_layer(child) and not has_enabled_layer(selected):
-            disable(selected)
-            selected = child
-        else:
-            disable(child)
-
-
 class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_type"):
     display_name: str
     group_expanded: bool = False
@@ -434,8 +402,26 @@ class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_ty
         asdict = struct_asdict(self)
         children = [i.to_model() for i in asdict.pop("children")]
         result = WebMapItem(item_type="group", children=children, **asdict)
+
+        enabled_seen = False
         if result.group_exclusive:
-            enable_exclusive(result)
+            for child in result.children:
+                match child.item_type:
+                    case "layer":
+                        if child.layer_enabled:
+                            if enabled_seen:
+                                child.layer_enabled = False
+                            else:
+                                enabled_seen = True
+                    case "group":
+                        if child.group_enabled:
+                            if enabled_seen:
+                                child.group_enabled = False
+                            else:
+                                enabled_seen = True
+                    case _:
+                        raise NotImplementedError
+
         return result
 
 
