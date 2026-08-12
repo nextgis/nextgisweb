@@ -179,6 +179,9 @@ class Configurator(PyramidConfigurator):
 
         self.set_execution_policy(execution_policy)
 
+    def add_default_tweens(self):
+        pass  # Skip pyramid.tweens.excview_tween_factory registration
+
     def add_default_view_predicates(self):
         import pyramid.predicates as pp
 

@@ -47,20 +47,19 @@ def handled_exception_tween_factory(handler, registry):
 
     def handled_exception_tween(request):
         try:
-            response = handler(request)
-
-            if isinstance(response, httpexceptions.HTTPError):
-                raise PyramidHTTPError(response)
-
-            return response
-
-        except UserException as exc:
+            return handler(request)
+        except (httpexceptions.HTTPSuccessful, httpexceptions.HTTPRedirection) as exc:
+            return exc
+        except (UserException, httpexceptions.HTTPError) as exc:
             if request.path_info.startswith("/test/request/"):
                 raise
 
-            eresp = err_response(request, exc, exc, sys.exc_info())
-            if eresp is not None:
-                return eresp
+            if isinstance(exc, httpexceptions.HTTPError):
+                exc = PyramidHTTPError(exc)
+
+            response = err_response(request, exc, exc, sys.exc_info())
+            if response is not None:
+                return response
 
             raise
 
