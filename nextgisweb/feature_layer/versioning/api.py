@@ -400,7 +400,7 @@ def version_cget(
                 p_initial=initial,
                 p_target=target,
                 p_fid_last=None,
-                p_fid_limit=(1 << 32) - 1,
+                p_fid_limit=(1 << 31) - 1,
             ),
         ).first()
         return resource.fversioning_summary(
