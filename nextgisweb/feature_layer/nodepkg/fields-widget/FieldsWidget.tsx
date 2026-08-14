@@ -140,23 +140,26 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
 
       const originalCb = deleteAction.callback;
       deleteAction.callback = async (item, env) => {
-        const lunkwill = new LunkwillParam();
-        const dump = await store.composite.dump(lunkwill);
         const layerNotNew = item.id.value !== undefined;
-        const versioningInitially =
-          store.composite.initialValue?.feature_layer?.versioning?.enabled;
-        const versioningNow =
-          dump?.feature_layer?.versioning?.enabled ?? versioningInitially;
 
-        if (layerNotNew && versioningNow) {
-          modal.confirm({
-            title: msgDeleteFieldTitle,
-            content: msgDeleteFieldContent,
-            onOk: () => originalCb(item, env),
-          });
-        } else {
-          originalCb(item, env);
+        if (layerNotNew) {
+          const lunkwill = new LunkwillParam();
+          const dump = await store.composite.dump(lunkwill);
+          const versioningInitially =
+            store.composite.initialValue?.feature_layer?.versioning?.enabled;
+          const versioningNow =
+            dump?.feature_layer?.versioning?.enabled ?? versioningInitially;
+
+          if (versioningNow) {
+            modal.confirm({
+              title: msgDeleteFieldTitle,
+              content: msgDeleteFieldContent,
+              onOk: () => originalCb(item, env),
+            });
+            return;
+          }
         }
+        originalCb(item, env);
       };
 
       return [deleteAction];
