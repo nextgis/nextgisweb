@@ -188,11 +188,7 @@ def test_fid(fid_source, fid_field, id_expect, ngw_txn, ngw_data_path):
     assert query().total_count == 1
 
 
-def test_source_layer(
-    ngw_webtest_app: WebTestApp,
-    ngw_file_upload,
-    ngw_data_path,
-):
+def test_source_layer(ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data_path):
     rapi = ResourceAPI()
     upload_meta = ngw_file_upload(ngw_data_path / "two-layers.zip")
 
@@ -226,8 +222,8 @@ def test_source_layer(
 
 
 @parametrize_versioning()
-def test_copy(versioning, ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data_path):
-    rapi = ResourceAPI(ngw_webtest_app)
+def test_copy(versioning, ngw_file_upload, ngw_data_path):
+    rapi = ResourceAPI()
     upload_meta = ngw_file_upload(ngw_data_path / "layer.geojson")
     extensions = ["attachment", "description"]
 
@@ -307,13 +303,16 @@ def test_copy(versioning, ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data
         assert dst_fapi.feature_list() == expected
 
 
-def test_geometry_type_change(ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data_path):
-    rapi = ResourceAPI(ngw_webtest_app)
+def test_geometry_type_change(ngw_file_upload, ngw_data_path):
+    rapi = ResourceAPI()
     upload_meta = ngw_file_upload(ngw_data_path / "pointz.geojson")
 
     res_id = rapi.create(
         "vector_layer",
         {
+            "feature_layer": {
+                "versioning": {"enabled": False},
+            },
             "vector_layer": {
                 "source": upload_meta,
                 "srs": {"id": 3857},
@@ -323,23 +322,52 @@ def test_geometry_type_change(ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_
 
     assert rapi.read(res_id)["vector_layer"]["geometry_type"] == "POINTZ"
 
-    rapi.update_request(res_id, {"vector_layer": {"geometry_type": "LINESTRINGZ"}}, status=422)
-    rapi.update_request(res_id, {"vector_layer": {"geometry_type": "MULTIPOINT"}}, status=200)
+    # Points cannot be converted to lines
+    rapi.update_request(
+        res_id,
+        {"vector_layer": {"geometry_type": "LINESTRINGZ"}},
+        status=422,
+    )
+
+    # But points can be converted to multipoints
+    rapi.update_request(
+        res_id,
+        {"vector_layer": {"geometry_type": "MULTIPOINT"}},
+        status=200,
+    )
+
+    # Enable feature versioning
+    rapi.update_request(
+        res_id,
+        {"feature_layer": {"versioning": {"enabled": True}}},
+        status=200,
+    )
+
+    # Geometry type change is not implemented for versioned layers
+    rapi.update_request(
+        res_id,
+        {"vector_layer": {"geometry_type": "MULTIPOINTZ"}},
+        status=501,
+    )
 
 
-def test_replace_file(ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data_path):
-    rapi = ResourceAPI(ngw_webtest_app)
+def test_replace_file(ngw_file_upload, ngw_data_path):
+    rapi = ResourceAPI()
     pointz_geojson = ngw_file_upload(ngw_data_path / "pointz.geojson")
 
     res_id = rapi.create(
         "vector_layer",
         {
+            "feature_layer": {
+                "versioning": {"enabled": False},
+            },
             "vector_layer": {
                 "source": pointz_geojson,
                 "srs": {"id": 3857},
             },
         },
     )
+    assert rapi.read(res_id)["vector_layer"]["geometry_type"] == "POINTZ"
 
     type_geojson = ngw_file_upload(ngw_data_path / "type.geojson")
     rapi.update(res_id, {"vector_layer": {"source": type_geojson}})
