@@ -7,6 +7,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET
 from osgeo import ogr, osr
 from PIL import Image
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
@@ -48,15 +49,15 @@ class Connection(Resource):
 
     __scope__ = ConnectionScope
 
-    capmode = sa.Column(saext.Enum(NEXTGIS_GEOSERVICES))
-    url_template = sa.Column(sa.Unicode, nullable=False)
-    apikey = sa.Column(sa.Unicode)
-    apikey_param = sa.Column(sa.Unicode)
-    username = sa.Column(sa.Unicode)
-    password = sa.Column(sa.Unicode)
-    scheme = sa.Column(saext.Enum(*SCHEME.enum), nullable=False, default=SCHEME.XYZ)
-    insecure = sa.Column(sa.Boolean, nullable=False, default=False)
-    referer = sa.Column(sa.Unicode)
+    capmode: Mapped[str | None] = mapped_column(saext.Enum(NEXTGIS_GEOSERVICES))
+    url_template: Mapped[str] = mapped_column(sa.Unicode)
+    apikey: Mapped[str | None] = mapped_column(sa.Unicode)
+    apikey_param: Mapped[str | None] = mapped_column(sa.Unicode)
+    username: Mapped[str | None] = mapped_column(sa.Unicode)
+    password: Mapped[str | None] = mapped_column(sa.Unicode)
+    scheme: Mapped[str] = mapped_column(saext.Enum(*SCHEME.enum), default=SCHEME.XYZ)
+    insecure: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    referer: Mapped[str | None] = mapped_column(sa.Unicode)
 
     @classmethod
     def check_parent(cls, parent):
@@ -160,20 +161,19 @@ class Layer(Resource, SpatialLayerMixin):
 
     __scope__ = DataScope
 
-    connection_id = sa.Column(sa.ForeignKey(Connection.id), nullable=False)
-    layer_name = sa.Column(sa.Unicode)
-    tilesize = sa.Column(sa.Integer, nullable=False, default=256)
-    minzoom = sa.Column(sa.Integer, nullable=False, default=0)
-    maxzoom = sa.Column(sa.Integer, nullable=False, default=14)
-    extent_left = sa.Column(sa.Float, default=-180.0)
-    extent_right = sa.Column(sa.Float, default=+180.0)
-    extent_bottom = sa.Column(sa.Float, default=-90.0)
-    extent_top = sa.Column(sa.Float, default=+90.0)
+    connection_id: Mapped[int] = mapped_column(sa.ForeignKey(Connection.id))
+    layer_name: Mapped[str | None] = mapped_column(sa.Unicode)
+    tilesize: Mapped[int] = mapped_column(sa.Integer, default=256)
+    minzoom: Mapped[int] = mapped_column(sa.Integer, default=0)
+    maxzoom: Mapped[int] = mapped_column(sa.Integer, default=14)
+    extent_left: Mapped[float | None] = mapped_column(sa.Float, default=-180.0)
+    extent_right: Mapped[float | None] = mapped_column(sa.Float, default=+180.0)
+    extent_bottom: Mapped[float | None] = mapped_column(sa.Float, default=-90.0)
+    extent_top: Mapped[float | None] = mapped_column(sa.Float, default=+90.0)
 
-    connection = orm.relationship(
-        Connection,
+    connection: Mapped[Connection] = orm.relationship(
         foreign_keys=connection_id,
-        cascade="save-update, merge",
+        cascade="save-update,merge",
     )
 
     @classmethod

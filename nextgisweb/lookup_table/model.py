@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Literal
 
-import sqlalchemy as sa
 from msgspec import UNSET, UnsetType
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
@@ -33,12 +33,15 @@ class SortEnum(Enum):
     CUSTOM = "CUSTOM"
 
 
+LookupTableValue = list[tuple[str, str]]
+
+
 class LookupTable(Resource):
     identity = "lookup_table"
     cls_display_name = gettext("Lookup table")
 
-    value = sa.Column(saext.Msgspec(list[tuple[str, str]]), nullable=False, default=list)
-    sort = sa.Column(saext.Enum(SortEnum), nullable=False, default=SortEnum.KEY_ASC)
+    value: Mapped[LookupTableValue] = mapped_column(saext.Msgspec(LookupTableValue), default=list)
+    sort: Mapped[SortEnum] = mapped_column(saext.Enum(SortEnum), default=SortEnum.KEY_ASC)
 
     @classmethod
     def check_parent(cls, parent):

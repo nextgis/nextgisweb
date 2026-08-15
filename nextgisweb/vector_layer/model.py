@@ -11,6 +11,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from osgeo import gdal, ogr
 from sqlalchemy import inspect, select, text
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
 
@@ -108,8 +109,8 @@ class VectorLayerField(LayerField):
     __tablename__ = LayerField.__tablename__ + "_" + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
-    fld_uuid = sa.Column(sa.Unicode(32), nullable=False)
+    id: Mapped[int] = mapped_column(sa.ForeignKey(LayerField.id), primary_key=True)
+    fld_uuid: Mapped[str] = mapped_column(sa.Unicode(32))
 
     def __init__(self, *args, **kwagrs):
         if "fld_uuid" not in kwagrs:
@@ -154,7 +155,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
     __scope__ = DataScope
     __allow_none_geometry__ = True
 
-    tbl_uuid = sa.Column(sa.Unicode(32), nullable=False)
+    tbl_uuid: Mapped[str] = mapped_column(sa.Unicode(32))
 
     __table_args__ = (
         sa.CheckConstraint(

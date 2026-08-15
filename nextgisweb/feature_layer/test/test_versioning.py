@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env.test import sql_compare
 
@@ -22,9 +23,9 @@ class Simple(Base, FVersioningExtensionMixin):
     fversioning_columns = ("value",)
     fversioning_registry = registry
 
-    resource_id = sa.Column(sa.Integer, primary_key=True)
-    feature_id = sa.Column(sa.Integer, primary_key=True)
-    value = sa.Column(sa.Unicode, nullable=True)
+    resource_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    feature_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    value: Mapped[str | None] = mapped_column(sa.Unicode)
 
 
 class Complex(Base, FVersioningExtensionMixin):
@@ -35,11 +36,11 @@ class Complex(Base, FVersioningExtensionMixin):
     fversioning_columns = ("column_a", "column_b")
     fversioning_registry = registry
 
-    extension_id = sa.Column(sa.Integer, primary_key=True)
-    resource_id = sa.Column(sa.Integer, nullable=False)
-    feature_id = sa.Column(sa.Integer, nullable=False)
-    column_a = sa.Column(sa.Unicode, nullable=True)
-    column_b = sa.Column(sa.Unicode, nullable=True)
+    extension_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    resource_id: Mapped[int] = mapped_column(sa.Integer)
+    feature_id: Mapped[int] = mapped_column(sa.Integer)
+    column_a: Mapped[str | None] = mapped_column(sa.Unicode)
+    column_b: Mapped[str | None] = mapped_column(sa.Unicode)
 
 
 @pytest.fixture(scope="module", autouse=True)

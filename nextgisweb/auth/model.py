@@ -1,5 +1,6 @@
 from collections import namedtuple
 from collections.abc import Mapping
+from datetime import datetime
 from functools import cached_property, lru_cache
 from itertools import chain
 from secrets import token_hex, token_urlsafe
@@ -9,6 +10,7 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from passlib.hash import sha256_crypt
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.event import notify
 from zope.event.classhandler import handler
 
@@ -33,14 +35,13 @@ OnFindReferencesData = namedtuple("OnFindReferencesData", ["cls", "id", "autorem
 class Principal(Base):
     __tablename__ = "auth_principal"
 
-    id = sa.Column(sa.Integer, sa.Sequence("principal_seq"), primary_key=True)
-    cls = sa.Column(sa.Unicode(1), nullable=False)
-    system = sa.Column(sa.Boolean, nullable=False, default=False)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-    description = sa.Column(sa.Unicode)
-    permissions = sa.Column(
+    id: Mapped[int] = mapped_column(sa.Integer, sa.Sequence("principal_seq"), primary_key=True)
+    cls: Mapped[str] = mapped_column(sa.Unicode(1))
+    system: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    display_name: Mapped[str] = mapped_column(sa.Unicode)
+    description: Mapped[str | None] = mapped_column(sa.Unicode)
+    permissions: Mapped[tuple] = mapped_column(
         sa_pg.ARRAY(sa.Unicode, as_tuple=True),
-        nullable=False,
         default=tuple(),
     )
 
@@ -81,18 +82,21 @@ class Principal(Base):
 class User(Principal):
     __tablename__ = "auth_user"
 
-    principal_id = sa.Column(
-        sa.Integer, sa.Sequence("principal_seq"), sa.ForeignKey(Principal.id), primary_key=True
+    principal_id: Mapped[int] = mapped_column(
+        sa.Integer,
+        sa.Sequence("principal_seq"),
+        sa.ForeignKey(Principal.id),
+        primary_key=True,
     )
-    keyname = sa.Column(sa.Unicode, unique=True)
-    superuser = sa.Column(sa.Boolean, nullable=False, default=False)
-    disabled = sa.Column(sa.Boolean, nullable=False, default=False)
-    password_hash = sa.Column(sa.Unicode)
-    oauth_subject = sa.Column(sa.Unicode, unique=True)
-    oauth_tstamp = sa.Column(sa.DateTime)
-    alink_token = sa.Column(sa.Unicode, unique=True)
-    last_activity = sa.Column(sa.DateTime)
-    language = sa.Column(sa.Unicode)
+    keyname: Mapped[str | None] = mapped_column(sa.Unicode, unique=True)
+    superuser: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    disabled: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    password_hash: Mapped[str | None] = mapped_column(sa.Unicode)
+    oauth_subject: Mapped[str | None] = mapped_column(sa.Unicode, unique=True)
+    oauth_tstamp: Mapped[datetime | None] = mapped_column(sa.DateTime)
+    alink_token: Mapped[str | None] = mapped_column(sa.Unicode, unique=True)
+    last_activity: Mapped[datetime | None] = mapped_column(sa.DateTime)
+    language: Mapped[str | None] = mapped_column(sa.Unicode)
 
     system_display_name = {
         "guest": gettext("Guest"),
@@ -105,6 +109,11 @@ class User(Principal):
 
     __table_args__ = (
         sa.Index("auth_user_lower_keyname_idx", sa.func.lower(keyname), unique=True),
+    )
+
+    member_of: Mapped[list["Group"]] = orm.relationship(
+        secondary=tab_group_user,
+        back_populates="members",
     )
 
     def __init__(self, password=None, **kwargs):
@@ -210,22 +219,20 @@ class User(Principal):
 class Group(Principal):
     __tablename__ = "auth_group"
 
-    principal_id = sa.Column(
+    principal_id: Mapped[int] = mapped_column(
         sa.Integer, sa.Sequence("principal_seq"), sa.ForeignKey(Principal.id), primary_key=True
     )
-    keyname = sa.Column(sa.Unicode, unique=True)
-    register = sa.Column(sa.Boolean, nullable=False, default=False)
-    oauth_mapping = sa.Column(sa.Boolean, nullable=False, default=False)
+    keyname: Mapped[str | None] = mapped_column(sa.Unicode, unique=True)
+    register: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    oauth_mapping: Mapped[bool] = mapped_column(sa.Boolean, default=False)
 
     system_display_name = {
         "administrators": gettext("Administrators"),
     }
 
-    members = orm.relationship(
-        User,
+    members: Mapped[list[User]] = orm.relationship(
         secondary=tab_group_user,
-        cascade_backrefs=False,
-        backref=orm.backref("member_of"),
+        back_populates="member_of",
     )
 
     __mapper_args__ = dict(polymorphic_identity="G")
@@ -274,24 +281,24 @@ User.is_administrator = orm.column_property(
 class OAuthAToken(Base):
     __tablename__ = "auth_oauth_atoken"
 
-    id = sa.Column(sa.Unicode, primary_key=True)
-    exp = sa.Column(sa.BigInteger, nullable=False)
-    sub = sa.Column(sa.Unicode, nullable=False)
-    data = sa.Column(sa_pg.JSONB, nullable=False)
+    id: Mapped[str] = mapped_column(sa.Unicode, primary_key=True)
+    exp: Mapped[int] = mapped_column(sa.BigInteger)
+    sub: Mapped[str] = mapped_column(sa.Unicode)
+    data: Mapped[dict] = mapped_column(sa_pg.JSONB)
 
 
 class OAuthPToken(Base):
     __tablename__ = "auth_oauth_ptoken"
 
-    id = sa.Column(sa.Unicode, primary_key=True)
-    tstamp = sa.Column(sa.BigInteger, nullable=False)
-    user_id = sa.Column(sa.ForeignKey(User.id, ondelete="CASCADE"), nullable=False)
-    access_token = sa.Column(sa.Unicode, nullable=False)
-    access_exp = sa.Column(sa.BigInteger, nullable=False)
-    refresh_token = sa.Column(sa.Unicode, nullable=False)
-    refresh_exp = sa.Column(sa.BigInteger, nullable=False)
+    id: Mapped[str] = mapped_column(sa.Unicode, primary_key=True)
+    tstamp: Mapped[int] = mapped_column(sa.BigInteger)
+    user_id: Mapped[int] = mapped_column(sa.ForeignKey(User.id, ondelete="CASCADE"))
+    access_token: Mapped[str] = mapped_column(sa.Unicode)
+    access_exp: Mapped[int] = mapped_column(sa.BigInteger)
+    refresh_token: Mapped[str] = mapped_column(sa.Unicode)
+    refresh_exp: Mapped[int] = mapped_column(sa.BigInteger)
 
-    user = orm.relationship(User)
+    user: Mapped[User] = orm.relationship()
 
 
 @lru_cache(maxsize=256)

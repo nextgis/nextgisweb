@@ -5,6 +5,7 @@ from typing import Any
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import Struct
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base
 
@@ -21,20 +22,18 @@ Base.depends_on("resource", "feature_layer")
 class FeatureDescription(Base, FVersioningExtensionMixin):
     __tablename__ = "feature_description"
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    feature_id = sa.Column(sa.Integer, primary_key=True)
-    value = sa.Column(sa.Unicode, nullable=False)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    feature_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    value: Mapped[str] = mapped_column(sa.Unicode)
 
     fversioning_metadata_version = 1
     fversioning_extension = "description"
     fversioning_columns = ("value",)
 
-    resource = orm.relationship(
-        Resource,
+    resource: Mapped[Resource] = orm.relationship(
         backref=orm.backref(
             "_backref_feature_description",
             cascade="all",
-            cascade_backrefs=False,
         ),
     )
 

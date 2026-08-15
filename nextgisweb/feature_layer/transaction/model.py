@@ -1,9 +1,11 @@
+from datetime import datetime
 from typing import Any, Generator
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType, to_builtins
 from sqlalchemy.dialects import postgresql as pg
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base
@@ -18,15 +20,16 @@ from .exception import TransactionOperationConflict
 class FeatureLayerTransaction(Base):
     __tablename__ = "feature_layer_transaction"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    resource_id = sa.Column(sa.ForeignKey(Resource.id, ondelete="CASCADE"), nullable=False)
-    epoch = sa.Column(sa.Integer, nullable=True)
-    user_id = sa.Column(sa.ForeignKey(User.id, ondelete="CASCADE"), nullable=False)
-    started = sa.Column(sa.DateTime, nullable=False, default=utcnow_naive)
-    committed = sa.Column(sa.DateTime, nullable=True)
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id, ondelete="CASCADE"))
+    epoch: Mapped[int | None] = mapped_column(sa.Integer)
+    user_id: Mapped[int] = mapped_column(sa.ForeignKey(User.id, ondelete="CASCADE"))
+    started: Mapped[datetime] = mapped_column(sa.DateTime, default=utcnow_naive)
+    committed: Mapped[datetime | None] = mapped_column(sa.DateTime)
 
-    resource = orm.relationship(Resource)
-    user = orm.relationship(User)
+    resource: Mapped[Resource] = orm.relationship()
+
+    user: Mapped[User] = orm.relationship()
 
     def put_operation(
         self,

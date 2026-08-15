@@ -9,7 +9,7 @@ from queue import Empty, Full, Queue
 from threading import Lock, Thread
 from time import time
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -17,6 +17,7 @@ import sqlalchemy.orm as orm
 import transaction
 from PIL import Image
 from sqlalchemy import MetaData, Table
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base, DBSession, env
@@ -285,22 +286,20 @@ class ResourceTileCache(Base):
 
     EXPRIRES_MAX = 2147483647
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    uuid = sa.Column(saext.UUID, nullable=False)
-    enabled = sa.Column(sa.Boolean, nullable=False, default=False)
-    image_compose = sa.Column(sa.Boolean, nullable=False, default=False)
-    max_z = sa.Column(sa.SmallInteger)
-    ttl = sa.Column(sa.Integer)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    uuid: Mapped[UUID] = mapped_column(saext.UUID)
+    enabled: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    image_compose: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    max_z: Mapped[int | None] = mapped_column(sa.SmallInteger)
+    ttl: Mapped[int | None] = mapped_column(sa.Integer)
 
     async_writing = False
 
-    resource = orm.relationship(
-        Resource,
+    resource: Mapped[Resource] = orm.relationship(
         backref=orm.backref(
             "tile_cache",
             uselist=False,
-            cascade="all, delete-orphan",
-            cascade_backrefs=False,
+            cascade="all,delete-orphan",
         ),
     )
 

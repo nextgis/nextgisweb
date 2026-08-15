@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Annotated, Any, Literal, TypeVar
 
 import sqlalchemy as sa
@@ -9,6 +10,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
 from sqlalchemy import inspect
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import classImplements
 
 from nextgisweb.env import Base, gettext
@@ -30,7 +32,7 @@ class FVersioningMixin:
         return orm.relationship(
             FVersioningMeta,
             uselist=False,
-            cascade="all, delete-orphan",
+            cascade="all,delete-orphan",
         )
 
     @property
@@ -112,11 +114,11 @@ classImplements(FVersioningMixin, IVersionableFeatureLayer)
 class FVersioningMeta(Base):
     __tablename__ = "feature_layer_vmeta"
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    epoch = sa.Column(sa.Integer, nullable=False)
-    latest = sa.Column(sa.Integer, nullable=False)
-    started = sa.Column(sa.DateTime, nullable=False)
-    updated = sa.Column(sa.DateTime, nullable=False)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    epoch: Mapped[int] = mapped_column(sa.Integer)
+    latest: Mapped[int] = mapped_column(sa.Integer)
+    started: Mapped[datetime] = mapped_column(sa.DateTime)
+    updated: Mapped[datetime] = mapped_column(sa.DateTime)
 
     __table_args__ = (
         sa.CheckConstraint(
@@ -164,14 +166,16 @@ sa_event.listen(
 class FVersioningObj(Base):
     __tablename__ = "feature_layer_vobj"
 
-    resource_id = sa.Column(sa.Integer, primary_key=True)
-    version_id = sa.Column(sa.Integer, primary_key=True)
-    tstamp = sa.Column(sa.DateTime, nullable=False)
-    user_id = sa.Column(sa.ForeignKey(User.principal_id), nullable=True)
+    resource_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    version_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(sa.DateTime)
+    user_id: Mapped[int | None] = mapped_column(sa.ForeignKey(User.principal_id))
 
-    resource = orm.relationship(Resource)
-    vmeta = orm.relationship(FVersioningMeta, overlaps="resource")
-    user = orm.relationship(User)
+    resource: Mapped[Resource] = orm.relationship()
+
+    vmeta: Mapped[FVersioningMeta] = orm.relationship(overlaps="resource")
+
+    user: Mapped[User | None] = orm.relationship()
 
     __table_args__ = (
         sa.ForeignKeyConstraint(

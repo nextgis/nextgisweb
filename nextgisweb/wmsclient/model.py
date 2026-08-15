@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from io import BytesIO
 from typing import Annotated, Literal
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
@@ -12,6 +13,7 @@ from cachetools import LRUCache
 from lxml import etree
 from msgspec import Struct, field
 from requests.exceptions import RequestException
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
@@ -83,16 +85,16 @@ class Connection(Resource):
 
     __scope__ = ConnectionScope
 
-    url = sa.Column(sa.Unicode, nullable=False)
-    version = sa.Column(saext.Enum(*WMS_VERSIONS), nullable=False)
-    username = sa.Column(sa.Unicode)
-    password = sa.Column(sa.Unicode)
-    insecure = sa.Column(sa.Boolean, nullable=False, default=False)
-    referer = sa.Column(sa.Unicode)
+    url: Mapped[str] = mapped_column(sa.Unicode)
+    version: Mapped[str] = mapped_column(saext.Enum(*WMS_VERSIONS))
+    username: Mapped[str | None] = mapped_column(sa.Unicode)
+    password: Mapped[str | None] = mapped_column(sa.Unicode)
+    insecure: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    referer: Mapped[str | None] = mapped_column(sa.Unicode)
 
-    capcache_xml = orm.deferred(sa.Column(sa.Unicode))
-    capcache_json = orm.deferred(sa.Column(sa_pg.JSONB))
-    capcache_tstamp = sa.Column(sa.DateTime)
+    capcache_xml: Mapped[str | None] = orm.deferred(mapped_column(sa.Unicode))
+    capcache_json: Mapped[dict | None] = orm.deferred(mapped_column(sa_pg.JSONB))
+    capcache_tstamp: Mapped[datetime | None] = mapped_column(sa.DateTime)
 
     @classmethod
     def check_parent(cls, parent):
@@ -271,24 +273,25 @@ class Layer(Resource, SpatialLayerMixin):
 
     __scope__ = DataScope
 
-    connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
-    wmslayers = sa.Column(sa.Unicode, nullable=False)
-    imgformat = sa.Column(sa.Unicode, nullable=False)
-    vendor_params = sa.Column(sa_pg.JSONB, nullable=False, default=dict)
-    remote_srs_id = sa.Column(sa.ForeignKey(SRS.id), nullable=False)
+    connection_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id))
+    wmslayers: Mapped[str] = mapped_column(sa.Unicode)
+    imgformat: Mapped[str] = mapped_column(sa.Unicode)
+    vendor_params: Mapped[dict] = mapped_column(sa_pg.JSONB, default=dict)
+    remote_srs_id: Mapped[int] = mapped_column(sa.ForeignKey(SRS.id))
 
-    connection = orm.relationship(
-        Resource,
+    connection: Mapped[Resource] = orm.relationship(
         foreign_keys=connection_id,
-        cascade="save-update, merge",
+        cascade="save-update,merge",
     )
 
     @orm.declared_attr
     def srs(cls):
         return orm.relationship(SRS, foreign_keys=[cls.srs_id], lazy="joined")
 
-    remote_srs = orm.relationship(
-        SRS, primaryjoin=remote_srs_id == SRS.id, foreign_keys=[remote_srs_id], lazy="joined"
+    remote_srs: Mapped[SRS] = orm.relationship(
+        primaryjoin=remote_srs_id == SRS.id,
+        foreign_keys=[remote_srs_id],
+        lazy="joined",
     )
 
     @classmethod

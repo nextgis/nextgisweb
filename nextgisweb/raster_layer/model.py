@@ -16,6 +16,7 @@ import sqlalchemy.orm as orm
 from affine import Affine
 from msgspec import UNSET, Meta, Struct, UnsetType
 from osgeo import gdal, gdalconst, ogr, osr
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf, ngettextf
@@ -123,11 +124,11 @@ class RasterLayerStorage(Resource):
 
     __scope__ = ConnectionScope
 
-    endpoint = sa.Column(sa.Unicode, nullable=False)
-    bucket = sa.Column(sa.Unicode, nullable=False)
-    access_key = sa.Column(sa.Unicode, nullable=True)
-    secret_key = sa.Column(sa.Unicode, nullable=True)
-    prefix = sa.Column(sa.Unicode, nullable=False)
+    endpoint: Mapped[str] = mapped_column(sa.Unicode)
+    bucket: Mapped[str] = mapped_column(sa.Unicode)
+    access_key: Mapped[str | None] = mapped_column(sa.Unicode)
+    secret_key: Mapped[str | None] = mapped_column(sa.Unicode)
+    prefix: Mapped[str] = mapped_column(sa.Unicode)
 
     @classmethod
     def check_parent(cls, parent):
@@ -216,27 +217,36 @@ class RasterLayer(Resource, SpatialLayerMixin):
 
     __scope__ = DataScope
 
-    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
-    fileobj_pam_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
+    fileobj_id: Mapped[int | None] = mapped_column(sa.ForeignKey(FileObj.id))
+    fileobj_pam_id: Mapped[int | None] = mapped_column(sa.ForeignKey(FileObj.id))
 
-    xsize = sa.Column(sa.Integer, nullable=False)
-    ysize = sa.Column(sa.Integer, nullable=False)
-    dtype = sa.Column(sa.Unicode, nullable=False)
-    band_count = sa.Column(sa.Integer, nullable=False)
-    geo_transform = sa.Column(
-        sa_pg.ARRAY(sa.FLOAT, dimensions=1, zero_indexes=True),
-        nullable=True,
+    xsize: Mapped[int] = mapped_column(sa.Integer)
+    ysize: Mapped[int] = mapped_column(sa.Integer)
+    dtype: Mapped[str] = mapped_column(sa.Unicode)
+    band_count: Mapped[int] = mapped_column(sa.Integer)
+    geo_transform: Mapped[list[float] | None] = mapped_column(
+        sa_pg.ARRAY(sa.FLOAT, dimensions=1, zero_indexes=True)
     )
-    cog = sa.Column(sa.Boolean, nullable=False, default=False)
+    cog: Mapped[bool] = mapped_column(sa.Boolean, default=False)
 
-    meta = sa.Column(Msgspec(RasterLayerMeta), nullable=True)
+    meta: Mapped[RasterLayerMeta | None] = mapped_column(Msgspec(RasterLayerMeta))
 
-    storage_id = sa.Column(sa.ForeignKey(RasterLayerStorage.id), nullable=True)
-    storage_filename = sa.Column(sa.Unicode, nullable=True)
+    storage_id: Mapped[int | None] = mapped_column(sa.ForeignKey(RasterLayerStorage.id))
+    storage_filename: Mapped[str | None] = mapped_column(sa.Unicode)
 
-    fileobj = orm.relationship(FileObj, foreign_keys=fileobj_id, cascade="all")
-    fileobj_pam = orm.relationship(FileObj, foreign_keys=fileobj_pam_id, cascade="all")
-    storage = orm.relationship(RasterLayerStorage, foreign_keys=storage_id)
+    fileobj: Mapped[FileObj | None] = orm.relationship(
+        foreign_keys=fileobj_id,
+        cascade="all",
+    )
+
+    fileobj_pam: Mapped[FileObj | None] = orm.relationship(
+        foreign_keys=fileobj_pam_id,
+        cascade="all",
+    )
+
+    storage: Mapped[RasterLayerStorage | None] = orm.relationship(
+        foreign_keys=storage_id,
+    )
 
     @classmethod
     def check_parent(cls, parent):

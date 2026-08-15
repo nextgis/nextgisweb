@@ -3,6 +3,7 @@ from io import BytesIO
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from PIL import Image
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import COMP_ID, Base
 
@@ -18,19 +19,19 @@ MAX_SIZE = (1600, 630)
 class ResourceSocial(Base):
     __tablename__ = "resource_social"
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    preview_fileobj_id = sa.Column(sa.ForeignKey(FileObj.id))
-    preview_description = sa.Column(sa.Unicode)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    preview_fileobj_id: Mapped[int | None] = mapped_column(sa.ForeignKey(FileObj.id))
+    preview_description: Mapped[str | None] = mapped_column(sa.Unicode)
 
-    resource = orm.relationship(
-        Resource,
+    resource: Mapped[Resource] = orm.relationship(
         backref=orm.backref(
             "social",
-            cascade="all, delete-orphan",
+            cascade="all,delete-orphan",
             uselist=False,
         ),
     )
-    preview_fileobj = orm.relationship(FileObj, lazy="joined")
+
+    preview_fileobj: Mapped[FileObj | None] = orm.relationship(lazy="joined")
 
 
 class FileUploadAttr(SAttribute):

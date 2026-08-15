@@ -3,6 +3,7 @@ from typing import Annotated
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import Meta
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base
 
@@ -14,17 +15,16 @@ Base.depends_on("resource")
 class ResourceMetadataItem(Base):
     __tablename__ = "resmeta_item"
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    key = sa.Column(sa.Unicode(255), primary_key=True)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    key: Mapped[str] = mapped_column(sa.Unicode(255), primary_key=True)
 
-    vinteger = sa.Column(sa.Integer)
-    vfloat = sa.Column(sa.Float)
-    vtext = sa.Column(sa.Unicode)
-    vboolean = sa.Column(sa.Boolean)
+    vinteger: Mapped[int | None] = mapped_column(sa.Integer)
+    vfloat: Mapped[float | None] = mapped_column(sa.Float)
+    vtext: Mapped[str | None] = mapped_column(sa.Unicode)
+    vboolean: Mapped[bool | None] = mapped_column(sa.Boolean)
 
-    resource = orm.relationship(
-        Resource,
-        backref=orm.backref("resmeta", cascade="all, delete-orphan"),
+    resource: Mapped[Resource] = orm.relationship(
+        backref=orm.backref("resmeta", cascade="all,delete-orphan"),
     )
 
     def tval(self):

@@ -11,6 +11,7 @@ from msgspec import UNSET, Struct, UnsetType
 from PIL import Image, UnidentifiedImageError
 from PIL.Image import DecompressionBombError
 from sqlalchemy.dialects import postgresql as pg
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base
 
@@ -35,21 +36,21 @@ KEYNAME_RE = re.compile(r"[a-z_][a-z0-9_]*", re.IGNORECASE)
 class FeatureAttachment(Base, FVersioningExtensionMixin):
     __tablename__ = "feature_attachment"
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    feature_id = sa.Column(sa.Integer, primary_key=True)
-    extension_id = sa.Column(
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    feature_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    extension_id: Mapped[int] = mapped_column(
         sa.Integer,
         primary_key=True,
         autoincrement=True,
     )
 
-    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
-    keyname = sa.Column(sa.Unicode, nullable=True)
-    name = sa.Column(sa.Unicode, nullable=True)
-    mime_type = sa.Column(sa.Unicode, nullable=False)
-    description = sa.Column(sa.Unicode, nullable=True)
+    fileobj_id: Mapped[int] = mapped_column(sa.ForeignKey(FileObj.id))
+    keyname: Mapped[str | None] = mapped_column(sa.Unicode)
+    name: Mapped[str | None] = mapped_column(sa.Unicode)
+    mime_type: Mapped[str] = mapped_column(sa.Unicode)
+    description: Mapped[str | None] = mapped_column(sa.Unicode)
 
-    file_meta = sa.Column(pg.JSONB, nullable=True)
+    file_meta: Mapped[dict | None] = mapped_column(pg.JSONB)
 
     __table_args__ = (
         sa.UniqueConstraint(
@@ -79,13 +80,12 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         )
     ]
 
-    fileobj = orm.relationship(FileObj, lazy="joined")
-    resource = orm.relationship(
-        Resource,
+    fileobj: Mapped[FileObj] = orm.relationship(lazy="joined")
+
+    resource: Mapped[Resource] = orm.relationship(
         backref=orm.backref(
             "_backref_feature_attachment",
             cascade="all",
-            cascade_backrefs=False,
         ),
     )
 

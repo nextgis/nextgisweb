@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import partial
 from typing import Annotated, Literal, Type
 
 import sqlalchemy as sa
@@ -9,6 +10,7 @@ from msgspec import Meta, Struct
 from msgspec.structs import asdict as struct_asdict
 from sqlalchemy import text
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm.attributes import set_committed_value
 
 from nextgisweb.env import COMP_ID, Base, DBSession, gettext, pgettext
@@ -67,46 +69,43 @@ class WebMap(Resource):
 
     __scope__ = WebMapScope
 
-    root_item_id = sa.Column(sa.ForeignKey("webmap_item.id"), nullable=False)
-    bookmark_resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
-    draw_order_enabled = sa.Column(sa.Boolean, nullable=True)
-    editable = sa.Column(sa.Boolean, nullable=False, default=True)
+    root_item_id: Mapped[int] = mapped_column(sa.ForeignKey("webmap_item.id"))
+    bookmark_resource_id: Mapped[int | None] = mapped_column(sa.ForeignKey(Resource.id))
+    draw_order_enabled: Mapped[bool | None] = mapped_column(sa.Boolean)
+    editable: Mapped[bool] = mapped_column(sa.Boolean, default=True)
 
-    extent_left = sa.Column(sa.Float, default=-180)
-    extent_right = sa.Column(sa.Float, default=+180)
-    extent_bottom = sa.Column(sa.Float, default=-90)
-    extent_top = sa.Column(sa.Float, default=+90)
+    extent_left: Mapped[float | None] = mapped_column(sa.Float, default=-180)
+    extent_right: Mapped[float | None] = mapped_column(sa.Float, default=+180)
+    extent_bottom: Mapped[float | None] = mapped_column(sa.Float, default=-90)
+    extent_top: Mapped[float | None] = mapped_column(sa.Float, default=+90)
 
-    extent_const_left = sa.Column(sa.Float)
-    extent_const_right = sa.Column(sa.Float)
-    extent_const_bottom = sa.Column(sa.Float)
-    extent_const_top = sa.Column(sa.Float)
+    extent_const_left: Mapped[float | None] = mapped_column(sa.Float)
+    extent_const_right: Mapped[float | None] = mapped_column(sa.Float)
+    extent_const_bottom: Mapped[float | None] = mapped_column(sa.Float)
+    extent_const_top: Mapped[float | None] = mapped_column(sa.Float)
 
-    title = sa.Column(sa.Unicode)
+    title: Mapped[str | None] = mapped_column(sa.Unicode)
 
-    annotation_enabled = sa.Column(sa.Boolean, nullable=False, default=False)
-    annotation_default = sa.Column(
-        saext.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
+    annotation_enabled: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    annotation_default: Mapped[str] = mapped_column(
+        saext.Enum(*ANNOTATIONS_DEFAULT_VALUES), default="no"
     )
-    legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
-    measure_srs_id = sa.Column(sa.ForeignKey(SRS.id, ondelete="SET NULL"), nullable=True)
-    options = sa.Column(saext.Msgspec(dict[str, bool]), nullable=False, default=dict)
+    legend_symbols: Mapped[LegendSymbolsEnum | None] = mapped_column(saext.Enum(LegendSymbolsEnum))
+    measure_srs_id: Mapped[int | None] = mapped_column(sa.ForeignKey(SRS.id, ondelete="SET NULL"))
+    options: Mapped[dict] = mapped_column(saext.Msgspec(dict[str, bool]), default=dict)
 
-    root_item = orm.relationship("WebMapItem", cascade="all")
+    root_item: Mapped["WebMapItem"] = orm.relationship(cascade="all")
 
-    bookmark_resource = orm.relationship(
-        Resource,
+    bookmark_resource: Mapped[Resource | None] = orm.relationship(
         foreign_keys=bookmark_resource_id,
         backref=orm.backref("bookmarked_webmaps"),
     )
 
-    measure_srs = orm.relationship(SRS, foreign_keys=measure_srs_id)
+    measure_srs: Mapped[SRS | None] = orm.relationship(foreign_keys=measure_srs_id)
 
-    annotations = orm.relationship(
-        "WebMapAnnotation",
-        back_populates="webmap",
+    annotations: Mapped[list["WebMapAnnotation"]] = orm.relationship(
         cascade="all,delete-orphan",
-        cascade_backrefs=False,
+        back_populates="webmap",
     )
 
     def __init__(self, *args, **kwagrs):
@@ -144,7 +143,7 @@ class WebMap(Resource):
         )
 
 
-def _item_default(item_type, default):
+def _default_factory(item_type, default):
     def _default(context):
         if context.get_current_parameters()["item_type"] == item_type:
             return default
@@ -152,47 +151,49 @@ def _item_default(item_type, default):
     return _default
 
 
+_gdefault = partial(_default_factory, "group")
+_ldefault = partial(_default_factory, "layer")
+
+
 class WebMapItem(Base):
     __tablename__ = "webmap_item"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    parent_id = sa.Column(sa.Integer, sa.ForeignKey("webmap_item.id"))
-    item_type = sa.Column(saext.Enum("root", "group", "layer"), nullable=False)
-    position = sa.Column(sa.Integer, nullable=True)
-    display_name = sa.Column(sa.Unicode, nullable=True)
-    group_expanded = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", False))
-    group_enabled = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", True))
-    group_exclusive = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", False))
-    layer_style_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
-    layer_enabled = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", False))
-    layer_identifiable = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", True))
-    layer_transparency = sa.Column(sa.Float, nullable=True)
-    layer_min_scale_denom = sa.Column(sa.Float, nullable=True)
-    layer_max_scale_denom = sa.Column(sa.Float, nullable=True)
-    layer_adapter = sa.Column(saext.Enum(*WebMapAdapter.registry.keys()), nullable=True)
-    draw_order_position = sa.Column(sa.Integer, nullable=True)
-    legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    parent_id: Mapped[int | None] = mapped_column(sa.Integer, sa.ForeignKey("webmap_item.id"))
+    item_type: Mapped[str] = mapped_column(saext.Enum("root", "group", "layer"))
+    position: Mapped[int | None] = mapped_column(sa.Integer)
+    display_name: Mapped[str | None] = mapped_column(sa.Unicode)
+    group_expanded: Mapped[bool | None] = mapped_column(sa.Boolean, default=_gdefault(False))
+    group_enabled: Mapped[bool | None] = mapped_column(sa.Boolean, default=_gdefault(True))
+    group_exclusive: Mapped[bool | None] = mapped_column(sa.Boolean, default=_gdefault(False))
+    layer_style_id: Mapped[int | None] = mapped_column(sa.ForeignKey(Resource.id))
+    layer_enabled: Mapped[bool | None] = mapped_column(sa.Boolean, default=_ldefault(False))
+    layer_identifiable: Mapped[bool | None] = mapped_column(sa.Boolean, default=_ldefault(True))
+    layer_transparency: Mapped[float | None] = mapped_column(sa.Float)
+    layer_min_scale_denom: Mapped[float | None] = mapped_column(sa.Float)
+    layer_max_scale_denom: Mapped[float | None] = mapped_column(sa.Float)
+    layer_adapter: Mapped[str | None] = mapped_column(saext.Enum(*WebMapAdapter.registry.keys()))
+    draw_order_position: Mapped[int | None] = mapped_column(sa.Integer)
+    legend_symbols: Mapped[LegendSymbolsEnum | None] = mapped_column(saext.Enum(LegendSymbolsEnum))
 
-    parent = orm.relationship(
-        "WebMapItem",
+    parent: Mapped["WebMapItem | None"] = orm.relationship(
         remote_side=id,
-        cascade_backrefs=False,
-        backref=orm.backref(
-            "children",
-            order_by=position,
-            cascade="all, delete-orphan",
-            collection_class=ordering_list("position"),
-        ),
+        back_populates="children",
     )
 
-    style = orm.relationship(
-        "Resource",
+    children: Mapped[list["WebMapItem"]] = orm.relationship(
+        order_by=position,
+        collection_class=ordering_list("position"),
+        cascade="all,delete-orphan",
+        back_populates="parent",
+    )
+
+    style: Mapped[Resource | None] = orm.relationship(
         # Temporary solution that allows to automatically
         # remove web-map elements when style is removed
         backref=orm.backref(
             "webmap_items",
-            cascade="all",
-            cascade_backrefs=False,
+            cascade="all,delete-orphan",
         ),
     )
 
@@ -285,20 +286,20 @@ def load_webmap_item_children(target, context):
 class WebMapAnnotation(Base):
     __tablename__ = "webmap_annotation"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    webmap_id = sa.Column(sa.ForeignKey(WebMap.id), nullable=False)
-    description = sa.Column(sa.Unicode)
-    style = sa.Column(sa_pg.JSONB)
-    geom = sa.Column(saext.Geometry("GEOMETRY", 3857), nullable=False)
-    public = sa.Column(sa.Boolean, nullable=False, default=True)
-    user_id = sa.Column(sa.ForeignKey(User.id), nullable=True)
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    webmap_id: Mapped[int] = mapped_column(sa.ForeignKey(WebMap.id))
+    description: Mapped[str | None] = mapped_column(sa.Unicode)
+    style: Mapped[dict | None] = mapped_column(sa_pg.JSONB)
+    geom: Mapped[saext.Geometry] = mapped_column(saext.Geometry("GEOMETRY", 3857))
+    public: Mapped[bool] = mapped_column(sa.Boolean, default=True)
+    user_id: Mapped[int | None] = mapped_column(sa.ForeignKey(User.id))
 
-    webmap = orm.relationship(WebMap, back_populates="annotations")
-    user = orm.relationship(
-        User,
+    webmap: Mapped[WebMap] = orm.relationship(back_populates="annotations")
+
+    user: Mapped[User | None] = orm.relationship(
         backref=orm.backref(
             "webmap_annotations",
-            cascade="all, delete-orphan",
+            cascade="all,delete-orphan",
         ),
     )
 

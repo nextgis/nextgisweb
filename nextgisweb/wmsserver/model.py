@@ -5,6 +5,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import Meta, Struct, to_builtins
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, gettext
 
@@ -29,27 +30,27 @@ class Service(Resource):
 class Layer(Base):
     __tablename__ = "wmsserver_layer"
 
-    service_id = sa.Column(sa.ForeignKey("wmsserver_service.id"), primary_key=True)
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    keyname = sa.Column(sa.Unicode, nullable=False)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-    min_scale_denom = sa.Column(sa.Float, nullable=True)
-    max_scale_denom = sa.Column(sa.Float, nullable=True)
-    position = sa.Column(sa.Integer, nullable=True)
+    service_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("wmsserver_service.id"), primary_key=True
+    )
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    keyname: Mapped[str] = mapped_column(sa.Unicode)
+    display_name: Mapped[str] = mapped_column(sa.Unicode)
+    min_scale_denom: Mapped[float | None] = mapped_column(sa.Float)
+    max_scale_denom: Mapped[float | None] = mapped_column(sa.Float)
+    position: Mapped[int | None] = mapped_column(sa.Integer)
 
-    service = orm.relationship(
-        Service,
+    service: Mapped[Service] = orm.relationship(
         foreign_keys=service_id,
         backref=orm.backref(
             "layers",
-            cascade="all, delete-orphan",
+            cascade="all,delete-orphan",
             order_by=position,
             collection_class=ordering_list("position"),
         ),
     )
 
-    resource = orm.relationship(
-        Resource,
+    resource: Mapped[Resource] = orm.relationship(
         foreign_keys=resource_id,
         backref=orm.backref("_wmsserver_layers", cascade="all"),
     )

@@ -12,6 +12,7 @@ import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from osgeo import ogr, osr
 from PIL import Image, UnidentifiedImageError
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
@@ -126,19 +127,18 @@ class Tileset(Resource, SpatialLayerMixin):
 
     __scope__ = DataScope
 
-    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
-    tileset_zmin = sa.Column(sa.SmallInteger, nullable=False)
-    tileset_zmax = sa.Column(sa.SmallInteger, nullable=False)
-    tileset_ntiles = sa.Column(
+    fileobj_id: Mapped[int] = mapped_column(sa.ForeignKey(FileObj.id))
+    tileset_zmin: Mapped[int] = mapped_column(sa.SmallInteger)
+    tileset_zmax: Mapped[int] = mapped_column(sa.SmallInteger)
+    tileset_ntiles: Mapped[list[int]] = mapped_column(
         sa_pg.ARRAY(sa.Integer, dimensions=1, zero_indexes=True),
-        nullable=False,
     )
-    minx = sa.Column(sa.Float, nullable=False)
-    miny = sa.Column(sa.Float, nullable=False)
-    maxx = sa.Column(sa.Float, nullable=False)
-    maxy = sa.Column(sa.Float, nullable=False)
+    minx: Mapped[float] = mapped_column(sa.Float)
+    miny: Mapped[float] = mapped_column(sa.Float)
+    maxx: Mapped[float] = mapped_column(sa.Float)
+    maxy: Mapped[float] = mapped_column(sa.Float)
 
-    fileobj = orm.relationship(FileObj, cascade="all")
+    fileobj: Mapped[FileObj] = orm.relationship(cascade="all")
 
     @classmethod
     def check_parent(cls, parent):

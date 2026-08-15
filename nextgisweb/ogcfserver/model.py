@@ -3,6 +3,7 @@ from typing import Annotated
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import Meta, Struct
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, gettext
 
@@ -17,6 +18,11 @@ class Service(Resource):
 
     __scope__ = ServiceScope
 
+    collections: Mapped[list["Collection"]] = orm.relationship(
+        cascade="all,delete-orphan",
+        back_populates="service",
+    )
+
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
@@ -25,22 +31,22 @@ class Service(Resource):
 class Collection(Base):
     __tablename__ = "ogcfserver_collection"
 
-    service_id = sa.Column(sa.ForeignKey("ogcfserver_service.id"), primary_key=True)
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    keyname = sa.Column(sa.Unicode, nullable=False)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-    maxfeatures = sa.Column(sa.Integer, nullable=True)
+    service_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("ogcfserver_service.id"), primary_key=True
+    )
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    keyname: Mapped[str] = mapped_column(sa.Unicode)
+    display_name: Mapped[str] = mapped_column(sa.Unicode)
+    maxfeatures: Mapped[int | None] = mapped_column(sa.Integer)
 
     __table_args__ = (sa.UniqueConstraint(service_id, keyname),)
 
-    service = orm.relationship(
-        Service,
+    service: Mapped[Service] = orm.relationship(
         foreign_keys=service_id,
-        backref=orm.backref("collections", cascade="all, delete-orphan"),
+        back_populates="collections",
     )
 
-    resource = orm.relationship(
-        Resource,
+    resource: Mapped[Resource] = orm.relationship(
         foreign_keys=resource_id,
         backref=orm.backref("_ogcfserver_collections", cascade="all"),
     )

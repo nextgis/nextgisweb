@@ -27,12 +27,12 @@ class BasemapLayer(Resource):
 
     __scope__ = DataScope
 
-    url = sa.Column(sa.Unicode, nullable=False)
-    qms = sa.Column(sa.Unicode)
-    copyright_text = sa.Column(sa.Unicode)
-    copyright_url = sa.Column(sa.Unicode)
-    z_min = sa.Column(sa.Integer)
-    z_max = sa.Column(sa.Integer)
+    url: Mapped[str] = mapped_column(sa.Unicode)
+    qms: Mapped[str | None] = mapped_column(sa.Unicode)
+    copyright_text: Mapped[str | None] = mapped_column(sa.Unicode)
+    copyright_url: Mapped[str | None] = mapped_column(sa.Unicode)
+    z_min: Mapped[int | None] = mapped_column(sa.Integer)
+    z_max: Mapped[int | None] = mapped_column(sa.Integer)
 
     @classmethod
     def check_parent(cls, parent):
@@ -51,32 +51,26 @@ class BasemapLayerSerializer(Serializer, resource=BasemapLayer):
 class BasemapWebMap(Base):
     __tablename__ = "basemap_webmap"
 
-    webmap_id = sa.Column(sa.ForeignKey(WebMap.id), primary_key=True)
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    position = sa.Column(sa.Integer)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-    enabled = sa.Column(sa.Boolean)
-    opacity = sa.Column(sa.Float)
+    webmap_id: Mapped[int] = mapped_column(sa.ForeignKey(WebMap.id), primary_key=True)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    position: Mapped[int | None] = mapped_column(sa.Integer)
+    display_name: Mapped[str] = mapped_column(sa.Unicode)
+    enabled: Mapped[bool | None] = mapped_column(sa.Boolean)
+    opacity: Mapped[float | None] = mapped_column(sa.Float)
 
-    webmap = orm.relationship(
-        WebMap,
+    webmap: Mapped[WebMap] = orm.relationship(
         foreign_keys=webmap_id,
         backref=orm.backref(
             "basemaps",
-            cascade="all, delete-orphan",
+            cascade="all,delete-orphan",
             order_by=position,
             collection_class=ordering_list("position"),
         ),
     )
 
-    resource = orm.relationship(
-        Resource,
+    resource: Mapped[Resource] = orm.relationship(
         foreign_keys=resource_id,
-        backref=orm.backref(
-            "_backref_basemap_webmap",
-            cascade="all",
-            cascade_backrefs=False,
-        ),
+        backref=orm.backref("_backref_basemap_webmap", cascade="all"),
     )
 
     def to_dict(self):
@@ -96,11 +90,10 @@ class BasemapWebMapConfig(Base):
     background_color: Mapped[str | None] = mapped_column(sa.Unicode(6))
     disable: Mapped[bool] = mapped_column(default=False)
 
-    webmap = orm.relationship(
-        WebMap,
+    webmap: Mapped[WebMap] = orm.relationship(
         backref=orm.backref(
             "basemap_config",
-            cascade="all, delete-orphan",
+            cascade="all,delete-orphan",
             uselist=False,
         ),
     )

@@ -10,6 +10,7 @@ from lxml import etree
 from osgeo import ogr
 from requests.exceptions import RequestException
 from shapely.geometry import box
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, env, gettext
@@ -139,10 +140,10 @@ class WFSConnection(Resource):
 
     __scope__ = ConnectionScope
 
-    path = sa.Column(sa.Unicode, nullable=False)
-    username = sa.Column(sa.Unicode)
-    password = sa.Column(sa.Unicode)
-    version = sa.Column(saext.Enum(*WFS_VERSIONS), nullable=False)
+    path: Mapped[str] = mapped_column(sa.Unicode)
+    username: Mapped[str | None] = mapped_column(sa.Unicode)
+    password: Mapped[str | None] = mapped_column(sa.Unicode)
+    version: Mapped[str] = mapped_column(saext.Enum(*WFS_VERSIONS))
 
     @classmethod
     def check_parent(cls, parent):
@@ -485,9 +486,9 @@ class WFSLayerField(LayerField):
     __tablename__ = LayerField.__tablename__ + "_" + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
-    column_name = sa.Column(sa.Unicode, nullable=False)
-    orig_datatype = sa.Column(saext.Enum(*FIELD_TYPE_WFS.keys()), nullable=False)
+    id: Mapped[int] = mapped_column(sa.ForeignKey(LayerField.id), primary_key=True)
+    column_name: Mapped[str] = mapped_column(sa.Unicode)
+    orig_datatype: Mapped[str] = mapped_column(saext.Enum(*FIELD_TYPE_WFS.keys()))
 
 
 @implementer(IFeatureLayer, IBboxLayer)
@@ -497,17 +498,16 @@ class WFSLayer(Resource, FeatureLayerMixin):
 
     __scope__ = DataScope
 
-    connection_id = sa.Column(sa.ForeignKey(WFSConnection.id), nullable=False)
-    layer_name = sa.Column(sa.Unicode, nullable=False)
-    column_geom = sa.Column(sa.Unicode, nullable=False)
-    geometry_srid = sa.Column(sa.Integer, nullable=False)
+    connection_id: Mapped[int] = mapped_column(sa.ForeignKey(WFSConnection.id))
+    layer_name: Mapped[str] = mapped_column(sa.Unicode)
+    column_geom: Mapped[str] = mapped_column(sa.Unicode)
+    geometry_srid: Mapped[int] = mapped_column(sa.Integer)
 
     __field_class__ = WFSLayerField
 
-    connection = orm.relationship(
-        WFSConnection,
+    connection: Mapped[WFSConnection] = orm.relationship(
         foreign_keys=connection_id,
-        cascade="save-update, merge",
+        cascade="save-update,merge",
     )
 
     @classmethod

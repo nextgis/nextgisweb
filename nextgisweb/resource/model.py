@@ -1,4 +1,5 @@
 from collections import namedtuple
+from datetime import datetime
 from types import MappingProxyType
 from typing import Annotated, ClassVar, Literal, Type
 
@@ -6,6 +7,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy import event, func, text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, DBSession, env, gettext, gettextf
 from nextgisweb.lib.apitype import Gap
@@ -121,18 +123,18 @@ class Resource(Base, metaclass=ResourceMeta):
 
     __scope__: ClassVar[ResourceScopeType] = (ResourceScope,)
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    cls = sa.Column(sa.Unicode, nullable=False)
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    cls: Mapped[str] = mapped_column(sa.Unicode)
 
-    parent_id = sa.Column(sa.ForeignKey(id))
+    parent_id: Mapped[int | None] = mapped_column(sa.ForeignKey("resource.id"))
 
-    keyname = sa.Column(sa.Unicode, unique=True)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-    creation_date = sa.Column(sa.TIMESTAMP, nullable=False, default=utcnow_naive)
+    keyname: Mapped[str | None] = mapped_column(sa.Unicode, unique=True)
+    display_name: Mapped[str] = mapped_column(sa.Unicode)
+    creation_date: Mapped[datetime] = mapped_column(sa.TIMESTAMP, default=utcnow_naive)
 
-    owner_user_id = sa.Column(sa.ForeignKey(User.id), nullable=False)
+    owner_user_id: Mapped[int] = mapped_column(sa.ForeignKey(User.id))
 
-    description = sa.Column(sa.Unicode)
+    description: Mapped[str | None] = mapped_column(sa.Unicode)
 
     __mapper_args__ = dict(polymorphic_on=cls)
     __table_args__ = (
@@ -146,13 +148,23 @@ class Resource(Base, metaclass=ResourceMeta):
         ),
     )
 
-    parent = orm.relationship(
-        "Resource",
+    parent: Mapped["Resource | None"] = orm.relationship(
         remote_side=[id],
-        backref=orm.backref("children", cascade=None, order_by=display_name),
+        back_populates="children",
     )
 
-    owner_user = orm.relationship(User)
+    children: Mapped[list["Resource"]] = orm.relationship(
+        remote_side=[parent_id],
+        order_by=display_name,
+        back_populates="parent",
+    )
+
+    owner_user: Mapped[User] = orm.relationship()
+
+    acl: Mapped[list["ResourceACLRule"]] = orm.relationship(
+        cascade="all,delete-orphan",
+        back_populates="resource",
+    )
 
     def __str__(self):
         return self.display_name
@@ -161,9 +173,7 @@ class Resource(Base, metaclass=ResourceMeta):
     def id_column(cls):
         """Constructs new 'id' column with a foreign key to cls.id"""
 
-        col = sa.Column("id", sa.ForeignKey(cls.id), primary_key=True)
-        col._creation_order = cls.id._creation_order
-        return col
+        return sa.Column("id", sa.ForeignKey(cls.id), primary_key=True)
 
     @classmethod
     def check_parent(cls, parent: "Resource") -> bool:
@@ -400,22 +410,21 @@ ResourceScope.read.require(
 class ResourceACLRule(Base):
     __tablename__ = "resource_acl_rule"
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    principal_id = sa.Column(sa.ForeignKey(Principal.id), primary_key=True)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
+    principal_id: Mapped[int] = mapped_column(sa.ForeignKey(Principal.id), primary_key=True)
 
-    identity = sa.Column(sa.Unicode, primary_key=True, default="")
-    scope = sa.Column(sa.Unicode, primary_key=True, default="")
-    permission = sa.Column(sa.Unicode, primary_key=True, default="")
-    propagate = sa.Column(sa.Boolean, primary_key=True, default=True)
-    action = sa.Column(sa.Unicode, nullable=False, default=True)
+    identity: Mapped[str] = mapped_column(sa.Unicode, primary_key=True, default="")
+    scope: Mapped[str] = mapped_column(sa.Unicode, primary_key=True, default="")
+    permission: Mapped[str] = mapped_column(sa.Unicode, primary_key=True, default="")
+    propagate: Mapped[bool] = mapped_column(sa.Boolean, primary_key=True, default=True)
+    action: Mapped[str] = mapped_column(sa.Unicode, default=True)
 
-    resource = orm.relationship(Resource, backref=orm.backref("acl", cascade="all, delete-orphan"))
-    principal = orm.relationship(
-        Principal,
+    resource: Mapped[Resource] = orm.relationship(back_populates="acl")
+
+    principal: Mapped[Principal] = orm.relationship(
         backref=orm.backref(
             "__resource_acl_rule",
-            cascade="all, delete-orphan",
-            cascade_backrefs=False,
+            cascade="all,delete-orphan",
         ),
     )
 

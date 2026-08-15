@@ -13,6 +13,7 @@ from sqlalchemy import and_ as sql_and
 from sqlalchemy import or_ as sql_or
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
@@ -139,12 +140,12 @@ class PostgisConnection(Resource):
 
     __scope__ = ConnectionScope
 
-    hostname = sa.Column(sa.Unicode, nullable=False)
-    database = sa.Column(sa.Unicode, nullable=False)
-    username = sa.Column(sa.Unicode, nullable=False)
-    password = sa.Column(sa.Unicode, nullable=False)
-    port = sa.Column(sa.Integer, nullable=True)
-    sslmode = sa.Column(saext.Enum(SSLMode), nullable=True)
+    hostname: Mapped[str] = mapped_column(sa.Unicode)
+    database: Mapped[str] = mapped_column(sa.Unicode)
+    username: Mapped[str] = mapped_column(sa.Unicode)
+    password: Mapped[str] = mapped_column(sa.Unicode)
+    port: Mapped[int | None] = mapped_column(sa.Integer)
+    sslmode: Mapped[SSLMode | None] = mapped_column(saext.Enum(SSLMode))
 
     @classmethod
     def check_parent(cls, parent):
@@ -253,8 +254,8 @@ class PostgisLayerField(LayerField):
     __tablename__ = LayerField.__tablename__ + "_" + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
-    column_name = sa.Column(sa.Unicode, nullable=False)
+    id: Mapped[int] = mapped_column(sa.ForeignKey(LayerField.id), primary_key=True)
+    column_name: Mapped[str] = mapped_column(sa.Unicode)
 
 
 @implementer(IFeatureLayer, IFilterableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
@@ -264,19 +265,18 @@ class PostgisLayer(Resource, FeatureLayerMixin):
 
     __scope__ = DataScope
 
-    connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
-    schema = sa.Column(sa.Unicode, default="public", nullable=False)
-    table = sa.Column(sa.Unicode, nullable=False)
-    column_id = sa.Column(sa.Unicode, nullable=False)
-    column_geom = sa.Column(sa.Unicode, nullable=False)
-    geometry_srid = sa.Column(sa.Integer, nullable=False)
+    connection_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id))
+    schema: Mapped[str] = mapped_column(sa.Unicode, default="public")
+    table: Mapped[str] = mapped_column(sa.Unicode)
+    column_id: Mapped[str] = mapped_column(sa.Unicode)
+    column_geom: Mapped[str] = mapped_column(sa.Unicode)
+    geometry_srid: Mapped[int] = mapped_column(sa.Integer)
 
     __field_class__ = PostgisLayerField
 
-    connection = orm.relationship(
-        Resource,
+    connection: Mapped[Resource] = orm.relationship(
         foreign_keys=connection_id,
-        cascade="save-update, merge",
+        cascade="save-update,merge",
     )
 
     @classmethod

@@ -6,6 +6,7 @@ from msgspec import UNSET, Struct, UnsetType
 from osgeo import gdal
 from sqlalchemy import func
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, DBSession, env, gettext
@@ -37,6 +38,13 @@ class RasterMosaic(Resource, SpatialLayerMixin):
     cls_display_name = gettext("Raster mosaic")
 
     __scope__ = DataScope
+
+    items: Mapped[list["RasterMosaicItem"]] = orm.relationship(
+        order_by="RasterMosaicItem.position",
+        collection_class=ordering_list("position"),
+        cascade="all,delete-orphan",
+        back_populates="resource",
+    )
 
     @classmethod
     def check_parent(cls, parent):
@@ -98,23 +106,16 @@ class RasterMosaicItem(Base):
         sa.Index("idx_raster_mosaic_item_footprint", "footprint", postgresql_using="gist"),
     )
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    resource_id = sa.Column(sa.ForeignKey(RasterMosaic.id), nullable=False)
-    display_name = sa.Column(sa.Unicode, nullable=True)
-    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
-    footprint = sa.Column(saext.Geometry("POLYGON", 4326), nullable=True)
-    position = sa.Column(sa.Integer, nullable=True)
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    resource_id: Mapped[int] = mapped_column(sa.ForeignKey(RasterMosaic.id))
+    display_name: Mapped[str | None] = mapped_column(sa.Unicode)
+    fileobj_id: Mapped[int | None] = mapped_column(sa.ForeignKey(FileObj.id))
+    footprint: Mapped[Geometry | None] = mapped_column(saext.Geometry("POLYGON", 4326))
+    position: Mapped[int | None] = mapped_column(sa.Integer)
 
-    fileobj = orm.relationship(FileObj, lazy="joined")
-    resource = orm.relationship(
-        RasterMosaic,
-        backref=orm.backref(
-            "items",
-            cascade="all, delete-orphan",
-            order_by=position,
-            collection_class=ordering_list("position"),
-        ),
-    )
+    resource: Mapped[RasterMosaic] = orm.relationship(back_populates="items")
+
+    fileobj: Mapped[FileObj | None] = orm.relationship(lazy="joined")
 
     def load_file(self, filename):
         if isinstance(filename, Path):

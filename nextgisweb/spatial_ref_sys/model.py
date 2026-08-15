@@ -4,7 +4,7 @@ import sqlalchemy as sa
 import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
 from msgspec import Meta, Struct
-from sqlalchemy.orm import declared_attr
+from sqlalchemy.orm import Mapped, declared_attr, mapped_column
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base, DBSession, gettext
@@ -44,26 +44,26 @@ class SRS(Base):
         maxvalue=SRID_MAX,
     )
 
-    id = sa.Column(
+    id: Mapped[int] = mapped_column(
         sa.Integer,
         id_seq,
         primary_key=True,
         autoincrement=False,
         server_default=id_seq.next_value(),
     )
-    display_name = sa.Column(sa.Unicode, nullable=False)
-    auth_name = sa.Column(sa.Unicode)  # NULL auth_* used for
-    auth_srid = sa.Column(sa.Integer)  # custom local projection
-    wkt = sa.Column(sa.Unicode, nullable=False)
-    wkt_short = sa.Column(
-        sa.Unicode, nullable=False
+    display_name: Mapped[str] = mapped_column(sa.Unicode)
+    auth_name: Mapped[str | None] = mapped_column(sa.Unicode)  # NULL auth_* used for
+    auth_srid: Mapped[int | None] = mapped_column(sa.Integer)  # custom local projection
+    wkt: Mapped[str] = mapped_column(sa.Unicode)
+    wkt_short: Mapped[str] = mapped_column(
+        sa.Unicode
     )  # https://lists.osgeo.org/pipermail/postgis-users/2025-May/046787.html
-    proj4 = sa.Column(sa.Unicode, nullable=False)
-    minx = sa.Column(sa.Float)
-    miny = sa.Column(sa.Float)
-    maxx = sa.Column(sa.Float)
-    maxy = sa.Column(sa.Float)
-    catalog_id = sa.Column(sa.Integer, unique=True)
+    proj4: Mapped[str] = mapped_column(sa.Unicode)
+    minx: Mapped[float | None] = mapped_column(sa.Float)
+    miny: Mapped[float | None] = mapped_column(sa.Float)
+    maxx: Mapped[float | None] = mapped_column(sa.Float)
+    maxy: Mapped[float | None] = mapped_column(sa.Float)
+    catalog_id: Mapped[int | None] = mapped_column(sa.Integer, unique=True)
 
     class permissions:
         view = Permission("view", gettext("Spatial reference systems"), "view")
@@ -220,11 +220,11 @@ sa_event.listen(SRS.__table__, 'after_drop', sa.DDL("""
 
 class SRSMixin:
     @declared_attr
-    def srs_id(cls):
-        return sa.Column(sa.Integer, sa.ForeignKey(SRS.id), nullable=False)
+    def srs_id(cls) -> Mapped[int]:
+        return mapped_column(sa.ForeignKey(SRS.id))
 
     @declared_attr
-    def srs(cls):
+    def srs(cls) -> Mapped["SRS"]:
         return orm.relationship("SRS", lazy="joined")
 
 

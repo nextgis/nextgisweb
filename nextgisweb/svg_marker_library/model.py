@@ -1,11 +1,13 @@
 import os.path
 import zipfile
+from datetime import datetime
 from typing import Annotated
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from lxml import etree
 from msgspec import UNSET, Meta, Struct, UnsetType
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, gettext, gettextf
 from nextgisweb.lib.datetime import utcnow_naive
@@ -24,8 +26,13 @@ class SVGMarkerLibrary(Resource):
     identity = "svg_marker_library"
     cls_display_name = gettext("SVG marker library")
 
-    stuuid = sa.Column(sa.Unicode(32))
-    tstamp = sa.Column(sa.DateTime())
+    stuuid: Mapped[str | None] = mapped_column(sa.Unicode(32))
+    tstamp: Mapped[datetime | None] = mapped_column(sa.DateTime())
+
+    files: Mapped[list["SVGMarker"]] = orm.relationship(
+        cascade="all,delete-orphan",
+        back_populates="svg_marker_library",
+    )
 
     @classmethod
     def check_parent(cls, parent):
@@ -61,19 +68,18 @@ class SVGMarkerLibrary(Resource):
 class SVGMarker(Base):
     __tablename__ = "svg_marker"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    svg_marker_library_id = sa.Column(sa.ForeignKey(SVGMarkerLibrary.id), nullable=False)
-    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
-    name = sa.Column(sa.Unicode(255), nullable=False)
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    svg_marker_library_id: Mapped[int] = mapped_column(sa.ForeignKey(SVGMarkerLibrary.id))
+    fileobj_id: Mapped[int] = mapped_column(sa.ForeignKey(FileObj.id))
+    name: Mapped[str] = mapped_column(sa.Unicode(255))
 
     __table_args__ = (sa.UniqueConstraint(svg_marker_library_id, name),)
 
-    fileobj = orm.relationship(FileObj, lazy="joined")
+    fileobj: Mapped[FileObj] = orm.relationship(lazy="joined")
 
-    svg_marker_library = orm.relationship(
-        SVGMarkerLibrary,
+    svg_marker_library: Mapped[SVGMarkerLibrary] = orm.relationship(
         foreign_keys=svg_marker_library_id,
-        backref=orm.backref("files", cascade="all,delete-orphan"),
+        back_populates="files",
     )
 
     @property

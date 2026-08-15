@@ -5,7 +5,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
-from sqlalchemy.orm import declared_attr
+from sqlalchemy.orm import Mapped, declared_attr, mapped_column
 
 from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import saext
@@ -37,18 +37,18 @@ _FIELD_TYPE_2_ENUM_REVERSED[FIELD_TYPE.JSON] = ogr.OFTString
 class LayerField(Base):
     __tablename__ = "layer_field"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    layer_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
-    cls = sa.Column(sa.Unicode, nullable=False)
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    layer_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id))
+    cls: Mapped[str] = mapped_column(sa.Unicode)
 
-    idx = sa.Column(sa.Integer, nullable=False)
-    keyname = sa.Column(sa.Unicode, nullable=False)
-    datatype = sa.Column(saext.Enum(*FIELD_TYPE.enum), nullable=False)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-    grid_visibility = sa.Column(sa.Boolean, nullable=False, default=True)
-    text_search = sa.Column(sa.Boolean, nullable=False, default=True)
-    required = sa.Column(sa.Boolean, nullable=False, default=False)
-    lookup_table_id = sa.Column(sa.ForeignKey(LookupTable.id))
+    idx: Mapped[int] = mapped_column(sa.Integer)
+    keyname: Mapped[str] = mapped_column(sa.Unicode)
+    datatype: Mapped[str] = mapped_column(saext.Enum(*FIELD_TYPE.enum))
+    display_name: Mapped[str] = mapped_column(sa.Unicode)
+    grid_visibility: Mapped[bool] = mapped_column(sa.Boolean, default=True)
+    text_search: Mapped[bool] = mapped_column(sa.Boolean, default=True)
+    required: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    lookup_table_id: Mapped[int | None] = mapped_column(sa.ForeignKey(LookupTable.id))
 
     identity = __tablename__
 
@@ -58,12 +58,11 @@ class LayerField(Base):
         sa.UniqueConstraint(layer_id, display_name, deferrable=True, initially="DEFERRED"),
     )
 
-    layer = orm.relationship(Resource, primaryjoin="Resource.id == LayerField.layer_id")
+    layer: Mapped[Resource] = orm.relationship(primaryjoin="Resource.id == LayerField.layer_id")
 
-    lookup_table = orm.relationship(
-        LookupTable,
+    lookup_table: Mapped[LookupTable | None] = orm.relationship(
         primaryjoin="LayerField.lookup_table_id == LookupTable.id",
-        backref=orm.backref("layer_fields", cascade_backrefs=False),
+        backref=orm.backref("layer_fields"),
     )
 
     def __str__(self):
@@ -116,9 +115,9 @@ class FeatureLayerMixin:
             foreign_keys=cls.__field_class__.layer_id,
             order_by=cls.__field_class__.idx,
             collection_class=ordering_list("idx"),
-            cascade="all, delete-orphan",
-            back_populates="layer",
             single_parent=True,
+            cascade="all,delete-orphan",
+            back_populates="layer",
         )
 
     @declared_attr
@@ -132,8 +131,8 @@ class FeatureLayerMixin:
             uselist=False,
             primaryjoin="%s.id == %s.feature_label_field_id"
             % (cls.__field_class__.__name__, cls.__name__),
-            cascade="all",
             post_update=True,
+            cascade="all",
             backref=orm.backref("_feature_label_field_backref"),
         )
 
