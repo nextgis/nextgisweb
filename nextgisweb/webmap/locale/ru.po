@@ -809,15 +809,23 @@ msgstr "Завершить редактирование"
 msgid "Edit on map"
 msgstr "Редактировать на карте"
 
-#: nodepkg/plugin/layer-editor/SnapToggle.tsx:30
-msgid "Disable snapping"
-msgstr "Отключить прилипание"
+#: nodepkg/plugin/layer-editor/SnapToggle.tsx:14
+msgid "Snapping"
+msgstr "Прилипание"
 
-#: nodepkg/plugin/layer-editor/SnapToggle.tsx:30
-msgid "Enable snapping"
-msgstr "Включить прилипание"
+#: nodepkg/plugin/layer-editor/SnapToggle.tsx:15
+msgid "To vertices"
+msgstr "К вершинам"
 
-#: nodepkg/plugin/layer-editor/ToolEditor.tsx:189
+#: nodepkg/plugin/layer-editor/SnapToggle.tsx:16
+msgid "To edges"
+msgstr "К ребрам"
+
+#: nodepkg/plugin/layer-editor/SnapToggle.tsx:17
+msgid "To intersections"
+msgstr "К пересечениям"
+
+#: nodepkg/plugin/layer-editor/ToolEditor.tsx:194
 msgid "Stop editing layer: {layer}"
 msgstr "Завершить редактирование слоя: {layer}"
 

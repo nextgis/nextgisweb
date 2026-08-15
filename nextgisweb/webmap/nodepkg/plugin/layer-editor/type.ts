@@ -10,6 +10,12 @@ export interface FeatureInfo {
   geom: string;
 }
 
+export interface SnapSettings {
+  vertex: boolean;
+  edge: boolean;
+  intersection: boolean;
+}
+
 export interface EditingItem {
   id: number;
   nodeData: LayerItemConfig;

@@ -29,15 +29,16 @@ import { DrawMode } from "./modes/DrawMode";
 import { HoleMode } from "./modes/HoleMode";
 import { ModifyMode } from "./modes/ModifyMode";
 import { MoveMode } from "./modes/MoveMode";
+import type { SnapSettings } from "./type";
 
 export interface EditableResourceProps extends Omit<
   EditableItemProps,
   "geomType" | "geomLayout"
 > {
   resourceId: number;
-  canSnap: boolean;
+  snapSettings: SnapSettings;
   onError: (er: unknown) => void;
-  onCanSnap: (val: boolean) => void;
+  onSnapSettingsChange: (val: SnapSettings) => void;
 }
 
 const FeatureEditorModal = lazy(
@@ -48,10 +49,10 @@ export const EditableResource = observer(
   ({
     editingMode,
     resourceId,
-    canSnap,
+    snapSettings,
     enabled,
     source: outerSource,
-    onCanSnap: setCanSnap,
+    onSnapSettingsChange: setSnapSettings,
     onError,
     onDirtyChange,
     onEditingMode: setEditingMode,
@@ -166,9 +167,11 @@ export const EditableResource = observer(
             {geomConfig.type.includes("Polygon") && <HoleMode order={4} />}
             <AttributeMode order={5} resourceId={resourceId} />
             <DeleteMode order={6} />
-            {!geomConfig.type.includes("Point") && (
-              <SnapToggle order={7} value={canSnap} onChange={setCanSnap} />
-            )}
+            <SnapToggle
+              order={7}
+              value={snapSettings}
+              onChange={setSnapSettings}
+            />
           </EditableItem>
         )}
       </>

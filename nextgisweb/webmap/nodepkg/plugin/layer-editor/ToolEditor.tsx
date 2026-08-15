@@ -15,6 +15,7 @@ import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeIte
 import { EditableResource } from "./EditableResource";
 import { saveChanges } from "./editor-api";
 import { DrawMode } from "./modes/DrawMode";
+import type { SnapSettings } from "./type";
 import { setItemsEditable } from "./util/setItemsEditable";
 
 import ExitIcon from "@nextgisweb/icon/material/save";
@@ -31,7 +32,11 @@ const ToolEditor = observer(
     const { display } = useDisplayContext();
     const { activate, deactivate, isActive } = useToggleGroupItem(groupId);
 
-    const [canSnap, setCanSnap] = useState(true);
+    const [snapSettings, setSnapSettings] = useState<SnapSettings>({
+      vertex: false,
+      edge: true,
+      intersection: false,
+    });
     const [editingMode, setEditingMode] = useState<string | null>(
       DrawMode.displayName
     );
@@ -171,11 +176,11 @@ const ToolEditor = observer(
             <EditableResource
               key={id}
               source={source}
-              canSnap={canSnap}
+              snapSettings={snapSettings}
               enabled={display.item?.id === id}
               resourceId={layerId}
               editingMode={isActive ? editingMode : null}
-              onCanSnap={setCanSnap}
+              onSnapSettingsChange={setSnapSettings}
               onEditingMode={setEditingMode}
               onDirtyChange={(val) => {
                 dirtyRef.current.set(id, val);
