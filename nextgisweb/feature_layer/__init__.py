@@ -10,7 +10,6 @@ from .interface import (
     GEOM_TYPE_OGR_2_GEOM_TYPE,
     FeatureLayerFieldDatatype,
     FeatureLayerGeometryType,
-    FeaureLayerGeometryType,  # FIXME: Drop this after all references are converted
     IAggregatableFeatureQuery,
     IFeatureLayer,
     IFeatureQuery,

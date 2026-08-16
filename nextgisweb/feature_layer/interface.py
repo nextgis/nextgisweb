@@ -109,23 +109,16 @@ class FIELD_TYPE:
 if TYPE_CHECKING:
     FeatureLayerGeometryType = str
     FeatureLayerFieldDatatype = str
-
-    FeaureLayerGeometryType = FeatureLayerGeometryType
 else:
     FeatureLayerGeometryType = Annotated[
         Literal[GEOM_TYPE.enum],
         TSExport("FeatureLayerGeometryType"),
-        # FIXME: Drop this after all references are converted
-        TSExport("FeaureLayerGeometryType"),
     ]
 
     FeatureLayerFieldDatatype = Annotated[
         Literal[FIELD_TYPE.enum],
         TSExport("FeatureLayerFieldDatatype"),
     ]
-
-    # FIXME: Drop this after all references are converted
-    FeaureLayerGeometryType = FeatureLayerGeometryType
 
 
 class IFilterableFeatureLayer(IResourceBase):
