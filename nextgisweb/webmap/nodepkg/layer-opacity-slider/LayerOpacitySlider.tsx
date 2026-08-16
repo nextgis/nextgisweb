@@ -7,24 +7,26 @@ import "./LayerOpacitySlider.less";
 
 const msgTooltip = gettext("Opacity");
 
-export function LayerOpacitySlider({
-  onChange,
-  defaultValue,
-}: {
-  onChange: (opacity: number) => void;
+export interface LayerOpacitySliderProps {
   defaultValue: number;
-}) {
+  onChange: (opacity: number) => void;
+}
+
+export function LayerOpacitySlider({
+  defaultValue,
+  onChange,
+}: LayerOpacitySliderProps) {
   return (
     <div className="ngw-webmap-layer-opacity-slider">
       <Tooltip title={msgTooltip}>
         <OpacityIcon />
       </Tooltip>
       <Slider
-        defaultValue={defaultValue}
-        onChange={onChange}
+        defaultValue={defaultValue * 100}
         min={0}
         max={100}
         step={1}
+        onChange={(value) => onChange(value / 100)}
       />
     </div>
   );

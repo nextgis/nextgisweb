@@ -6,7 +6,7 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
-from msgspec import Meta, Struct
+from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.structs import asdict as struct_asdict
 from sqlalchemy import text
 from sqlalchemy.ext.orderinglist import ordering_list
@@ -121,27 +121,6 @@ class WebMap(Resource):
     def check_social_editable(cls):
         return True
 
-    def to_dict(self):
-        return dict(
-            id=self.id,
-            display_name=self.display_name,
-            editable=self.editable,
-            root_item=self.root_item.to_dict(),
-            bookmark_resource_id=self.bookmark_resource_id,
-            extent=(
-                self.extent_left if self.extent_left is not None else -180,
-                self.extent_bottom if self.extent_bottom is not None else -90,
-                self.extent_right if self.extent_right is not None else +180,
-                self.extent_top if self.extent_top is not None else +90,
-            ),
-            extent_const=(
-                self.extent_const_left,
-                self.extent_const_bottom,
-                self.extent_const_right,
-                self.extent_const_top,
-            ),
-        )
-
 
 def _default_factory(item_type, default):
     def _default(context):
@@ -197,59 +176,24 @@ class WebMapItem(Base):
         ),
     )
 
-    def to_dict(self):
-        data = dict(item_type=self.item_type)
-
-        if self.item_type in ("group", "layer"):
-            data["display_name"] = self.display_name
-
-        if self.item_type == "group":
-            data["group_expanded"] = self.group_expanded
-            data["group_enabled"] = self.group_enabled
-            data["group_exclusive"] = self.group_exclusive
-
-        if self.item_type in ("root", "group"):
-            data["children"] = [i.to_dict() for i in self.children]
-
-        if self.item_type == "layer":
-            style_parent_id = None
-            if self.style and self.style.parent:
-                style = self.style
-                style_parent_id = style.parent.id
-
-            data.update(
-                layer_enabled=self.layer_enabled,
-                layer_identifiable=self.layer_identifiable,
-                layer_transparency=self.layer_transparency,
-                layer_style_id=self.layer_style_id,
-                layer_min_scale_denom=self.layer_min_scale_denom,
-                layer_max_scale_denom=self.layer_max_scale_denom,
-                layer_adapter=self.layer_adapter,
-                draw_order_position=self.draw_order_position,
-                legend_symbols=self.legend_symbols,
-                style_parent_id=style_parent_id,
-            )
-
-        return data
-
     def from_children(self, children, *, defaults=dict()):
         assert self.item_type in ("root", "group")
 
         for child in children:
 
-            def _set(item, k, default=False):
+            def _set(item, k, *, use_defaults=False):
                 if k in child:
                     setattr(item, k, child[k])
-                elif default and k in defaults:
+                elif use_defaults and k in defaults:
                     setattr(item, k, defaults[k])
 
             assert ("style" in child) != ("children" in child)
 
             if "children" in child:
                 item = WebMapItem(item_type="group")
-                _set(item, "group_expanded", True)
-                _set(item, "group_enabled", True)
-                _set(item, "group_exclusive", True)
+                _set(item, "group_expanded", use_defaults=True)
+                _set(item, "group_enabled", use_defaults=True)
+                _set(item, "group_exclusive", use_defaults=True)
 
                 defaults_next = defaults.copy()
                 if "defaults" in child:
@@ -261,13 +205,13 @@ class WebMapItem(Base):
                 for k in (
                     "layer_enabled",
                     "layer_identifiable",
-                    "layer_transparency",
+                    "layer_opacity",
                     "layer_min_scale_denom",
                     "layer_max_scale_denom",
                     "layer_adapter",
                     "legend_symbols",
                 ):
-                    _set(item, k, True)
+                    _set(item, k, use_defaults=True)
 
             _set(item, "display_name")
 
@@ -275,6 +219,15 @@ class WebMapItem(Base):
 
     def scale_range(self):
         return (self.layer_min_scale_denom, self.layer_max_scale_denom)
+
+    @property
+    def layer_opacity(self) -> float | None:
+        transparency = self.layer_transparency
+        return (100 - transparency) / 100 if transparency is not None else None
+
+    @layer_opacity.setter
+    def layer_opacity(self, value: float | None):
+        self.layer_transparency = (1 - value) * 100 if value is not None else None
 
 
 @sa_event.listens_for(WebMapItem, "load")
@@ -326,16 +279,18 @@ def _children_from_model(obj):
 
 class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_type"):
     display_name: str
-    layer_enabled: bool
-    layer_identifiable: bool
-    layer_transparency: float | None
     layer_style_id: int
     style_parent_id: int | None
+    layer_adapter: str
+    layer_enabled: bool
+    layer_identifiable: bool
     layer_min_scale_denom: float | None
     layer_max_scale_denom: float | None
-    layer_adapter: str
-    draw_order_position: int | None
     legend_symbols: LegendSymbolsEnum | None
+    layer_opacity: Annotated[float, Meta(ge=0, le=1)] | None
+    draw_order_position: int | None
+
+    layer_transparency: Annotated[float | None, DEPRECATED]
 
     @classmethod
     def from_model(cls, obj):
@@ -345,33 +300,40 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
 
         return WebMapItemLayerRead(
             display_name=obj.display_name,
+            layer_style_id=obj.layer_style_id,
+            style_parent_id=style_parent_id,
+            layer_adapter=obj.layer_adapter,
             layer_enabled=bool(obj.layer_enabled),
             layer_identifiable=bool(obj.layer_identifiable),
-            layer_transparency=obj.layer_transparency,
-            layer_style_id=obj.layer_style_id,
             layer_min_scale_denom=obj.layer_min_scale_denom,
             layer_max_scale_denom=obj.layer_max_scale_denom,
-            layer_adapter=obj.layer_adapter,
-            draw_order_position=obj.draw_order_position,
             legend_symbols=obj.legend_symbols,
-            style_parent_id=style_parent_id,
+            layer_opacity=obj.layer_opacity,
+            draw_order_position=obj.draw_order_position,
+            layer_transparency=obj.layer_transparency,
         )
 
 
 class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_type"):
     display_name: str
-    layer_enabled: bool = False
-    layer_identifiable: bool = True
-    layer_transparency: float | None = None
     layer_style_id: int
-    layer_min_scale_denom: float | None = None
-    layer_max_scale_denom: float | None = None
     layer_adapter: str
-    draw_order_position: int | None = None
-    legend_symbols: LegendSymbolsEnum | None = None
+    layer_enabled: bool | UnsetType = UNSET
+    layer_identifiable: bool | UnsetType = UNSET
+    layer_min_scale_denom: float | None | UnsetType = UNSET
+    layer_max_scale_denom: float | None | UnsetType = UNSET
+    legend_symbols: LegendSymbolsEnum | None | UnsetType = UNSET
+    layer_opacity: Annotated[float, Meta(ge=0, le=1)] | None | UnsetType = UNSET
+    draw_order_position: int | None | UnsetType = UNSET
+    layer_transparency: Annotated[float | None | UnsetType, DEPRECATED] = UNSET
 
     def to_model(self):
-        return WebMapItem(item_type="layer", **struct_asdict(self))
+        kw = {k: v for k, v in struct_asdict(self).items() if v is not UNSET}
+        layer_opacity = kw.pop("layer_opacity", UNSET)
+        result = WebMapItem(item_type="layer", **kw)
+        if layer_opacity is not UNSET:
+            result.layer_opacity = layer_opacity
+        return result
 
 
 class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_type"):

@@ -502,13 +502,13 @@ class LayerIdentification(Struct, kw_only=True):
     resource: ResourceRef
 
 
-class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
+class LayerItemConfig(BaseItem, kw_only=True, tag="layer", tag_field="type"):
     layerId: int
     styleId: int
     filterable: bool
     visibility: bool
     identifiable: bool
-    transparency: float | None
+    opacity: float | None
     minScaleDenom: float | None
     maxScaleDenom: float | None
     drawOrderPosition: int | None
@@ -629,7 +629,7 @@ def display_config(obj, request) -> DisplayConfig:
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 filterable=IFilterableFeatureLayer.providedBy(layer),
-                transparency=item.layer_transparency,
+                opacity=item.layer_opacity,
                 minScaleDenom=scale_range[0],
                 maxScaleDenom=scale_range[1],
                 drawOrderPosition=item.draw_order_position,

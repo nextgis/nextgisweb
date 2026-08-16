@@ -42,7 +42,7 @@ const msgExclusive = gettext("Exclusive");
 const msgEnabled = gettext("Enabled");
 const msgIdentifiable = gettext("Identifiable");
 const msgResource = gettext("Resource");
-const msgTransparency = gettext("Transparency");
+const msgOpacity = gettext("Opacity");
 const msgMinScaleDenom = gettext("Min scale");
 const msgMaxScaleDenom = gettext("Max scale");
 const msgLegendSymbols = gettext("Legend");
@@ -222,10 +222,9 @@ export const LayerWidget = observer(({ item }: LayerWidgetProps) => {
       />
       <LotMV
         row
-        label={msgTransparency}
-        value={item.layerTransparency}
+        label={msgOpacity}
+        value={item.layerOpacity}
         component={InputOpacity}
-        props={{ alphaMode: "transparency", valuePercent: true }}
       />
     </Area>
   );

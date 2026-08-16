@@ -17,12 +17,10 @@ function parser(value: string | undefined, opts: { valuePercent: boolean }) {
 }
 
 export interface InputOpacityProps extends InputNumberProps {
-  alphaMode?: "opacity" | "transparency";
   valuePercent?: boolean;
 }
 
 export function InputOpacity({
-  alphaMode = "opacity",
   valuePercent = false,
   ...props
 }: InputOpacityProps) {
@@ -34,7 +32,7 @@ export function InputOpacity({
       step={0.05 * scale}
       formatter={(value, opts) => formatter(value, { ...opts, valuePercent })}
       parser={(value) => parser(value, { valuePercent })}
-      placeholder={alphaMode === "transparency" ? "0 %" : "100 %"}
+      placeholder={"100 %"}
       {...props}
     />
   );

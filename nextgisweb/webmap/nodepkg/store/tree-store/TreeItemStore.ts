@@ -164,7 +164,7 @@ export class TreeLayerStore
   @observable.ref accessor filterable: boolean;
   @observable.ref accessor legendInfo: LegendInfoStore;
   @observable.ref accessor identifiable: boolean;
-  @observable.ref accessor transparency: number | null;
+  @observable.ref accessor opacity: number | null;
   @observable.ref accessor minScaleDenom: number | null;
   @observable.ref accessor maxScaleDenom: number | null;
 
@@ -192,7 +192,7 @@ export class TreeLayerStore
     this.layerId = init.layerId;
     this.styleId = init.styleId;
     this.identifiable = !!init.identifiable;
-    this.transparency = init.transparency ?? null;
+    this.opacity = init.opacity;
     this.minScaleDenom = init.minScaleDenom ?? null;
     this.maxScaleDenom = init.maxScaleDenom ?? null;
     this.drawOrderPosition =
@@ -213,7 +213,7 @@ export class TreeLayerStore
     this.styleId = config.styleId;
     this.visibility = !!config.visibility;
     this.identifiable = !!config.identifiable;
-    this.transparency = config.transparency ?? null;
+    this.opacity = config.opacity;
     this.minScaleDenom = config.minScaleDenom ?? null;
     this.maxScaleDenom = config.maxScaleDenom ?? null;
     this.drawOrderPosition =
@@ -248,7 +248,7 @@ export class TreeLayerStore
       filterable: this.filterable,
       visibility: this.visibility,
       identifiable: this.identifiable,
-      transparency: this.transparency,
+      opacity: this.opacity,
       minScaleDenom: this.minScaleDenom,
       maxScaleDenom: this.maxScaleDenom,
       drawOrderPosition: this.drawOrderPosition,
@@ -294,11 +294,6 @@ export class TreeLayerStore
       this.setItemSymbols(intervals);
     }
   };
-
-  @computed
-  get opacity() {
-    return this.transparency !== null ? 1 - this.transparency / 100 : null;
-  }
 
   @action
   setItemSymbols(intervals: string[]) {

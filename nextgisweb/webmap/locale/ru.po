@@ -18,21 +18,21 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:46 model.py:64 nodepkg/control-panel-plugin.tsx:9
+#: model.py:48 model.py:66 nodepkg/control-panel-plugin.tsx:9
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:48
+#: model.py:50
 msgctxt "permission"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: model.py:49
+#: model.py:51
 msgctxt "permission"
 msgid "Draw annotations"
 msgstr "Рисование аннотаций"
 
-#: model.py:50
+#: model.py:52
 msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
@@ -173,8 +173,9 @@ msgid "Resource"
 msgstr "Ресурс"
 
 #: nodepkg/items-widget/ItemsWidget.tsx:45
-msgid "Transparency"
-msgstr "Прозрачность"
+#: nodepkg/layer-opacity-slider/LayerOpacitySlider.tsx:8
+msgid "Opacity"
+msgstr "Непрозрачность"
 
 #: nodepkg/items-widget/ItemsWidget.tsx:46
 msgid "Min scale"
@@ -215,13 +216,9 @@ msgstr "Настроить порядок рисования"
 msgid "Use current map scale"
 msgstr "Использовать текущий масштаб карты"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:316 nodepkg/panel/layers/plugin.tsx:15
+#: nodepkg/items-widget/ItemsWidget.tsx:315 nodepkg/panel/layers/plugin.tsx:15
 msgid "Layers"
 msgstr "Слои"
-
-#: nodepkg/layer-opacity-slider/LayerOpacitySlider.tsx:8
-msgid "Opacity"
-msgstr "Непрозрачность"
 
 #: nodepkg/layer/annotations/AnnotationFeature.ts:51
 msgid "Your annotation text"

@@ -5,17 +5,13 @@ import { PluginBase } from "../PluginBase";
 
 export class LayerOpacityPlugin extends PluginBase {
   render({ nodeData }: PluginState) {
-    const { transparency } = nodeData;
-
-    const defaultValue = 100 - Number(transparency);
-
     return (
       <LayerOpacitySlider
-        defaultValue={defaultValue}
+        defaultValue={nodeData.opacity ?? 1}
         onChange={(val) => {
-          nodeData.update({ transparency: 100 - val });
+          nodeData.update({ opacity: val });
         }}
-      ></LayerOpacitySlider>
+      />
     );
   }
 }

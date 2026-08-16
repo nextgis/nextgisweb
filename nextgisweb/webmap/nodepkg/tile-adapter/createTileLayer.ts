@@ -19,7 +19,7 @@ export function createTileLayer(
       visible: item.visibility,
       maxResolution: item.maxResolution ?? undefined,
       minResolution: item.minResolution ?? undefined,
-      opacity: item.transparency ? 1 - item.transparency / 100 : 1.0,
+      opacity: item.opacity ?? 1.0,
     },
     {
       url: `${routeURL("render.tile")}?z={z}&x={x}&y={y}&resource=${item.styleId}&nd=204`,

@@ -51,7 +51,7 @@ export function createImageLayer(
       maxResolution: item.maxResolution ?? undefined,
       minResolution: item.minResolution ?? undefined,
       visible: item.visibility,
-      opacity: item.transparency ? 1 - item.transparency / 100 : 1.0,
+      opacity: item.opacity ?? 1.0,
     },
     {
       url: routeURL("render.image"),

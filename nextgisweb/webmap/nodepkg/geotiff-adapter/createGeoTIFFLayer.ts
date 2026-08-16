@@ -75,7 +75,7 @@ function getLayerOptions(
     visible: item.visibility,
     maxResolution: item.maxResolution ?? undefined,
     minResolution: item.minResolution ?? undefined,
-    opacity: item.transparency ? 1 - item.transparency / 100 : 1.0,
+    opacity: item.opacity ?? 1.0,
   };
 }
 

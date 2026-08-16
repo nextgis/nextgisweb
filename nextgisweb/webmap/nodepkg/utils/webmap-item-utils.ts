@@ -59,7 +59,7 @@ export function updateTreeLayerFromWebmapItem(
     title: value.display_name,
     visibility: value.layer_enabled,
     identifiable: value.layer_identifiable,
-    transparency: value.layer_transparency,
+    opacity: value.layer_opacity,
     styleId: value.layer_style_id,
     minScaleDenom: value.layer_min_scale_denom,
     maxScaleDenom: value.layer_max_scale_denom,
@@ -108,7 +108,7 @@ export function convertToWebmapItem({
     display_name: item.title,
     layer_enabled: item.visibility,
     layer_identifiable: item.identifiable,
-    layer_transparency: item.transparency,
+    layer_opacity: item.opacity,
     layer_style_id: item.styleId,
     layer_min_scale_denom: item.minScaleDenom,
     layer_max_scale_denom: item.maxScaleDenom,
@@ -118,6 +118,8 @@ export function convertToWebmapItem({
       ? item.legendInfo.visible
       : "disable",
     style_parent_id: null,
+    // Deprecated and unused, type compatibility
+    layer_transparency: null,
   } satisfies WebMapItemLayerRead;
 }
 
@@ -203,8 +205,7 @@ export async function styleToWebmapItem({
           resource: { id: layerId },
         }
       : null,
-
-    transparency: 0,
+    opacity: 1.0,
     minScaleDenom: null,
     maxScaleDenom: null,
     drawOrderPosition: null,

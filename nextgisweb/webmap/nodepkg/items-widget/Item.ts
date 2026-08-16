@@ -123,7 +123,7 @@ export class Group extends BaseItem<"group", WebMapItemGroupWrite> {
 const {
   layer_enabled: layerEnabled,
   layer_identifiable: layerIdentifiable,
-  layer_transparency: layerTransparency,
+  layer_opacity: layerOpacity,
   layer_min_scale_denom: layerMinScaleDenom,
   layer_max_scale_denom: layerMaxScaleDenom,
   layer_adapter: layerAdapter,
@@ -139,7 +139,7 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
 
   readonly layerEnabled = layerEnabled.init(true, this);
   readonly layerIdentifiable = layerIdentifiable.init(true, this);
-  readonly layerTransparency = layerTransparency.init(null, this);
+  readonly layerOpacity = layerOpacity.init(null, this);
   readonly layerMinScaleDenom = layerMinScaleDenom.init(null, this);
   readonly layerMaxScaleDenom = layerMaxScaleDenom.init(null, this);
   readonly layerAdapter = layerAdapter.init("image", this);
@@ -157,7 +157,7 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
       ...super.dump(),
       ...this.layerEnabled.jsonPart(),
       ...this.layerIdentifiable.jsonPart(),
-      ...this.layerTransparency.jsonPart(),
+      ...this.layerOpacity.jsonPart(),
       ...this.layerMinScaleDenom.jsonPart(),
       ...this.layerMaxScaleDenom.jsonPart(),
       ...this.layerAdapter.jsonPart(),
