@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { useMemo } from "react";
 
 import { Checkbox, ConfigProvider, useToken } from "@nextgisweb/gui/antd";
 import type { LegendSymbol as NGWLegendSymbol } from "@nextgisweb/render/type/api";
@@ -66,15 +65,15 @@ export const Legend = observer(({ nodeData, checkable }: LegendProps) => {
 
   const { legendInfo } = nodeData;
 
-  const intervals = useMemo<Record<number, boolean> | "-1" | undefined>(() => {
-    if (nodeData && nodeData.isLayer()) {
-      if (Array.isArray(nodeData.symbols)) {
-        return restoreSymbols(nodeData.symbols);
-      } else if (nodeData.symbols === "-1") {
-        return "-1";
-      }
+  let intervals: Record<number, boolean> | "-1" | undefined;
+
+  if (nodeData.isLayer()) {
+    if (Array.isArray(nodeData.symbols)) {
+      intervals = restoreSymbols(nodeData.symbols);
+    } else if (nodeData.symbols === "-1") {
+      intervals = "-1";
     }
-  }, [nodeData]);
+  }
 
   if (!legendInfo.open) {
     return <></>;
