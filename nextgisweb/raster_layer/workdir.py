@@ -99,4 +99,4 @@ class WorkdirMixin:
 
 @inject()
 def _workdir_path(comp: Component, *, core: CoreComponent) -> Path:
-    return Path(core.gtsdir(comp))  # type: ignore
+    return Path(core.gtsdir(comp))

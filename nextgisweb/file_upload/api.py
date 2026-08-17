@@ -245,7 +245,7 @@ def item_head_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(20
     with fupload.data_path.open("ab") as fd:
         upload_offset = fd.tell()
 
-    return _tus_response(  # type: ignore
+    return _tus_response(
         200,
         upload_offset=upload_offset,
         upload_length=fupload.size,
@@ -317,7 +317,7 @@ def item_patch_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(2
 
         fupload.write_meta()
 
-    return _tus_response(204, upload_offset=upload_offset)  # type: ignore
+    return _tus_response(204, upload_offset=upload_offset)
 
 
 def item_delete(fupload: FileUpload, request) -> Annotated[None, StatusCode(204)]:
@@ -332,7 +332,7 @@ def item_delete(fupload: FileUpload, request) -> Annotated[None, StatusCode(204)
     fupload.data_path.unlink()
     fupload.meta_path.unlink()
 
-    return _tus_response(204)  # type: ignore
+    return _tus_response(204)
 
 
 def _sanitize_name(name: str | None):

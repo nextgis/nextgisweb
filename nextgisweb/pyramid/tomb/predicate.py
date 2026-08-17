@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from pyramid.predicates import RequestMethodPredicate as PyramidRequestMethodPredicate
-from pyramid.predicates import as_sorted_tuple  # type: ignore
+from pyramid.predicates import as_sorted_tuple
 
 from nextgisweb.lib.apitype import PathParam, QueryParam
 

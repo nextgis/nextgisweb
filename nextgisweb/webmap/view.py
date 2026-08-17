@@ -206,7 +206,7 @@ def setup_pyramid(comp, config):
 
     for k, v in csetting.registry[COMP_ID].items():
 
-        def cs_k(comp: WebMapComponent, request, *, cs) -> v.gtype:  # type: ignore
+        def cs_k(comp: WebMapComponent, request, *, cs) -> v.gtype:
             return cs.getter()
 
         cs_k.__name__ = f"cs_{k}"

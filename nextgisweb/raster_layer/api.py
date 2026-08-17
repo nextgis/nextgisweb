@@ -32,7 +32,7 @@ class ExportParams(Struct, kw_only=True):
     format: Annotated[
         Literal[tuple(EXPORT_FORMAT_GDAL)],
         Meta(description="Output format"),
-    ] = "GTiff"  # type: ignore
+    ] = "GTiff"
 
 
 ExportResponse = AnyOf[
@@ -45,7 +45,7 @@ ExportResponse = AnyOf[
         if driver.mime is not None
     )
     + (Annotated[Response, ContentType("application/octet-stream")],)
-]  # type: ignore
+]
 
 
 class VsiFileIter:
@@ -91,7 +91,7 @@ def export(
     request,
     *,
     export_params: Annotated[ExportParams, Query(spread=True)],
-) -> ExportResponse:  # type: ignore
+) -> ExportResponse:
     """Export raster layer
 
     :returns: Raster layer exported in the requested format"""

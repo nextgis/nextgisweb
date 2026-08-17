@@ -75,7 +75,7 @@ class ResourceAttrChildrenCreatable(ResourceAttr, tag="resource.children_creatab
                 # operation along 'Resource.children' will not proceed
                 child.parent = None
 
-            result.append(cls.identity)  # type: ignore
+            result.append(cls.identity)
 
         return result
 

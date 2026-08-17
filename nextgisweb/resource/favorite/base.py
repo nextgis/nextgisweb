@@ -27,7 +27,7 @@ class ResourceFavoriteMeta(type):
 
         fields = [("resource", ResourceRef)]
         if self.route is None:
-            fields.append(("label", str | None, None))  # type: ignore
+            fields.append(("label", str | None, None))
 
         for k, v in ms_utils.get_class_annotations(self).items():
             _, extras = disannotate(v)

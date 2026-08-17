@@ -435,9 +435,9 @@ class ExtentPartAttr(SColumn):
 
         self.required = False
         self.types = CRUTypes(
-            Annotated[None | base, DEPRECATED],  # type: ignore
-            Annotated[None | base, DEPRECATED],  # type: ignore
-            Annotated[None | base, DEPRECATED],  # type: ignore
+            Annotated[None | base, DEPRECATED],
+            Annotated[None | base, DEPRECATED],
+            Annotated[None | base, DEPRECATED],
         )
 
 

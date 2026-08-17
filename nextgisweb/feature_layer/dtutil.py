@@ -107,7 +107,7 @@ class DateConverter(Converter):
 
 class TimeConverter(Converter):
     datatype = FIELD_TYPE.TIME
-    native = Annotated[time, Meta(tz=False)]  # type: ignore
+    native = Annotated[time, Meta(tz=False)]
     iso_format = "HH:MM:SS"
 
     hour: Hour
@@ -117,7 +117,7 @@ class TimeConverter(Converter):
 
 class DateTimeConverter(Converter):
     datatype = FIELD_TYPE.DATETIME
-    native = Annotated[datetime, Meta(tz=False)]  # type: ignore
+    native = Annotated[datetime, Meta(tz=False)]
     iso_format = DateConverter.iso_format + "T" + TimeConverter.iso_format
 
     year: Year

@@ -79,7 +79,7 @@ class Route(Struct, kw_only=True):
 
 def union(t: Sequence[Any]) -> Any:
     assert len(t) > 0
-    return t[0] if len(t) == 1 else Union[tuple(t)]  # type: ignore
+    return t[0] if len(t) == 1 else Union[tuple(t)]
 
 
 def eslint_disable(rules: Sequence[str] | bool) -> list[str]:

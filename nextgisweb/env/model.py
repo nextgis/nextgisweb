@@ -61,7 +61,7 @@ class Base(metaclass=DeclarativeMeta):
             f"Base_{cident.upper()}",
             (cls,),
             {"__abstract__": True, "metadata": metadata},
-        )  # type: ignore
+        )
 
     @classmethod
     def depends_on(cls, *other_component_ids: str) -> None:

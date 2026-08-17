@@ -116,7 +116,7 @@ def get_text_direction(code: str) -> Literal["ltr", "rtl"]:
         locale = Locale.parse(code, sep="-")
     except UnknownLocaleError:
         return "ltr"
-    return locale.text_direction  # ty:ignore[invalid-return-type]
+    return locale.text_direction
 
 
 def set_output_buffering(request, response, value, *, strict=False):

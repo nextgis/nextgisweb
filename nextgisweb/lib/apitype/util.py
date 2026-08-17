@@ -12,7 +12,7 @@ try:
     from msgspec.inspect import is_struct_type as _is_struct_type
 except ImportError:
     # Msgspec < 0.20.0, drop eventually
-    from msgspec.inspect import _is_struct as _is_struct_type  # type: ignore
+    from msgspec.inspect import _is_struct as _is_struct_type
 
 
 get_class_annotations = ms_utils.get_class_annotations
@@ -36,7 +36,7 @@ def annotate(tdef: T, annotations: Sequence[Any]) -> T:
 
     if len(annotations) == 0:
         return tdef
-    return Annotated[(tdef, *annotations)]  # type: ignore
+    return Annotated[(tdef, *annotations)]
 
 
 def unannotate(tdef: T, *, supertype: bool = False) -> T:

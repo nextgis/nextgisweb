@@ -445,7 +445,7 @@ def setup_pyramid_csettings(comp, config):
         read[cid] = {k: v.read for k, v in sitems}
         write[cid] = {k: v.write for k, v in sitems}
 
-        cslit = Literal[("all",) + tuple(stngs)]  # type: ignore
+        cslit = Literal[("all",) + tuple(stngs)]
         cstype = Annotated[
             list[Annotated[cslit, TSExport(f"{basename}CSetting", component=cid)]],
             Meta(description=f"{basename} component settings to read"),

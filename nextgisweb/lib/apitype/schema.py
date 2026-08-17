@@ -18,7 +18,7 @@ DatetimeNaive = Annotated[datetime, Meta(tz=False)]
 
 class _AnyOfRuntime:
     def __class_getitem__(cls, args):
-        result = Annotated[Union[args], _AnyOfRuntime]  # type: ignore
+        result = Annotated[Union[args], _AnyOfRuntime]
         return result
 
 

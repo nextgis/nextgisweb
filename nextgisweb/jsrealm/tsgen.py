@@ -259,7 +259,7 @@ class TSUnion(TSType, kw_only=True):
         args_defined = tuple(a for a in self.args if (unannotate(a) is not UnsetType))
         if len(self.args) != len(args_defined):
             if len(args_defined) > 1:
-                dtype = Union[args_defined]  # type: ignore
+                dtype = Union[args_defined]
                 self.undefided_excluded = TSUnion(
                     args=args_defined,
                     type=dtype,
