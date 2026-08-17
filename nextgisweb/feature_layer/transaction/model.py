@@ -80,7 +80,7 @@ class FeatureLayerTransaction(Base):
         yield from ((sn, val) for sn, val in self.__execute(_sel_result))
 
     def __execute(self, query, **kwargs):
-        session = sa.inspect(self).session
+        session = self.require_session()
         result = session.execute(query, dict(p_transaction_id=self.id, **kwargs))
         if isinstance(query, (sa.sql.Insert, sa.sql.Update, sa.sql.Delete)):
             mark_changed(session)

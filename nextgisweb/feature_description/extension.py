@@ -1,5 +1,3 @@
-import sqlalchemy as sa
-
 from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.feature_layer import FeatureExtension
@@ -17,7 +15,7 @@ class FeatureDescriptionExtension(FeatureExtension):
             obj = Description.filter_by(**filter_by).first()
             return obj.value if obj else None
         else:
-            session = sa.inspect(self.layer).session
+            session = self.layer.require_session()
             query = Description.fversioning_queries.feature_pit
             params = dict(p_rid=self.layer.id, p_fid=feature.id, p_vid=version)
             if row := session.execute(query, params).one_or_none():

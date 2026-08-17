@@ -6,10 +6,13 @@ from sqlalchemy import MetaData as SAMetadata
 from sqlalchemy.orm import (
     DeclarativeMeta,
     InstrumentedAttribute,
+    Session,
+    object_session,
     registry,
     scoped_session,
     sessionmaker,
 )
+from sqlalchemy.orm.exc import DetachedInstanceError
 from zope.sqlalchemy import register
 
 from nextgisweb.lib.logging import logger
@@ -109,6 +112,11 @@ class Base(metaclass=DeclarativeMeta):
     def persist(self):
         DBSession.add(self)
         return self
+
+    def require_session(self) -> Session:
+        if (session := object_session(self)) is None:
+            raise DetachedInstanceError(f"{type(self).__name__} is not attached to a Session")
+        return session
 
 
 _base = component_utility(Base.factory)

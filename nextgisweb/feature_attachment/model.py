@@ -198,9 +198,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
     def fversioning_on_revert(self):
         super().fversioning_on_revert()
 
-        session = sa.inspect(self).session
-        assert session is not None
-
+        session = self.require_session()
         query_fileobj = sa.select(FileObj).where(FileObj.id == self.fileobj_id)
         with session.no_autoflush:
             self.fileobj = session.execute(query_fileobj).scalar_one()

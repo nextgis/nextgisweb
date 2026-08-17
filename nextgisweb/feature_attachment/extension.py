@@ -1,7 +1,5 @@
 from typing import Any
 
-import sqlalchemy as sa
-
 from nextgisweb.feature_layer import FeatureExtension
 
 from . import transaction  # noqa: F401
@@ -12,7 +10,7 @@ class FeatureAttachmentExtension(FeatureExtension):
     identity = "attachment"
 
     def serialize(self, feature, *, version=None) -> Any:
-        session = sa.inspect(self.layer).session
+        session = self.layer.require_session()
         filter_by = dict(resource_id=self.layer.id, feature_id=feature.id)
         if version is None:
             query = Attachment.filter_by(**filter_by)

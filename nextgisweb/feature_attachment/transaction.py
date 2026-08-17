@@ -1,6 +1,5 @@
 from typing import ClassVar
 
-import sqlalchemy as sa
 from msgspec import UNSET, Struct, UnsetType
 from sqlalchemy.exc import NoResultFound
 
@@ -137,7 +136,7 @@ class AttachmentExecutor(OperationExecutor):
             ).persist()
         elif isinstance(operation, AttachmentRestoreOperation):
             obj = Attachment.restore(self.resource, operation.fid, operation.aid)
-            with sa.inspect(obj).session.no_autoflush:
+            with obj.require_session().no_autoflush:
                 obj.fileobj = FileObj.filter_by(id=obj.fileobj_id).one()
         else:
             raise NotImplementedError
@@ -159,7 +158,7 @@ class AttachmentExecutor(OperationExecutor):
         else:
             raise NotImplementedError
 
-        sa.inspect(obj).session.flush()
+        obj.require_session().flush()
 
         if isinstance(operation, AttachmentCreateOperation):
             result = AttachmentCreateResult(

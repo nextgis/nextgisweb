@@ -229,7 +229,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
             for lf in loader.fields.values()
         ]
 
-        session = inspect(self).session
+        session = self.require_session()
         session.flush()
 
         vls = self.vlschema()
@@ -376,7 +376,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
     @fversioning_guard
     def feature_create(self, feature, with_fid=False):
         vls = self.vlschema()
-        session = inspect(self).session
+        session = self.require_session()
 
         data = dict()
         query, bmap = vls.dml_insert(fields=feature.fields.keys(), with_fid=with_fid)
@@ -407,7 +407,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
     @fversioning_guard
     def feature_put(self, feature):
         vls = self.vlschema()
-        session = inspect(self).session
+        session = self.require_session()
 
         data = dict()
         with_geom = False
@@ -441,7 +441,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
     @fversioning_guard
     def feature_delete(self, feature_id):
         vls = self.vlschema()
-        session = inspect(self).session
+        session = self.require_session()
         query = vls.dml_delete(filter_by=dict(fid=feature_id))
 
         if vobj := self.fversioning_vobj:
@@ -460,7 +460,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
     @fversioning_guard
     def feature_restore(self, feature):
         vls = self.vlschema()
-        session = inspect(self).session
+        session = self.require_session()
 
         data = dict(p_fid=feature.id)
         with_geom = False
@@ -493,7 +493,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
     @fversioning_guard
     def feature_delete_all(self):
         vls = self.vlschema()
-        session = inspect(self).session
+        session = self.require_session()
         query = vls.dml_delete(filter_by={})
 
         if vobj := self.fversioning_vobj:
@@ -634,7 +634,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
         delete_query = vls.dml_delete(filter_by=dict(fid=p_fid))
         restore_query, restore_bmap = vls.dml_restore(with_geom=True, geom_raw=True)
 
-        session = sa.inspect(self).session
+        session = self.require_session()
         result = False
         for row in session.execute(query, dict(vid=version)).all():
             if not row.current and row.previous:
@@ -686,7 +686,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
         return saext.Geometry(geometry_type, self.srs.id)
 
     def _reset_seq(self):
-        session = sa.inspect(self).session
+        session = self.require_session()
         session.execute(self.vlschema().dml_reset_seq())
 
 
@@ -834,7 +834,7 @@ def estimate_vector_layer_data(resource):
             fixed += FIELD_TYPE_SIZE[f.datatype]
 
     query = select(text("SUM(" + " + ".join([str(fixed), *dynamic]) + ")")).select_from(ctab)
-    return inspect(resource).session.scalar(query)
+    return resource.require_session().scalar(query)
 
 
 class SourceAttr(SAttribute):
@@ -885,7 +885,7 @@ class SourceAttr(SAttribute):
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
         if srlzr.obj.id is not None:
             srlzr.obj._vlschema_wipe()
-            inspect(srlzr.obj).session.flush()
+            srlzr.obj.require_session().flush()
 
         ogrds = self._ogrds(value())
 
@@ -936,7 +936,7 @@ class FeatureLayerAttr(SAttribute):
         assert create
 
         obj = srlzr.obj
-        session = inspect(obj).session
+        session = obj.require_session()
 
         source = Resource.filter_by(id=value.resource.id).one_or_none()
         if (

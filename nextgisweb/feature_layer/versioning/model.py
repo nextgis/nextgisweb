@@ -10,7 +10,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
 from sqlalchemy import inspect
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, object_session
 from zope.interface import classImplements
 
 from nextgisweb.env import Base, gettext
@@ -44,8 +44,10 @@ class FVersioningMixin:
     def fversioning_configure(self, *, enabled=None, source=None):
         if enabled is not None and enabled != bool(self.fversioning):
             if enabled:
+                session = object_session(self)
+                assert session is not None
+
                 # Assign new epoch from sequence
-                session = inspect(self).session
                 with session.no_autoflush:
                     sql = f"SELECT nextval('{VERSIONING_EPOCH_SEQ}')"
                     epoch = session.scalar(sa.text(sql))
@@ -142,7 +144,7 @@ class FVersioningMeta(Base):
         elif insp.pending or insp.attrs.latest.history.added:
             return self.latest + 1
         else:
-            session = insp.session
+            session = self.require_session()
             with session.no_autoflush:
                 qlast = sa.select(FVersioningMeta.latest)
                 assert self.resource_id
@@ -224,7 +226,7 @@ class FVersioningObj(Base):
         if self.version_id == 1:
             fversioning.started = self.tstamp
 
-        inspect(self.resource).session.add(self)
+        self.resource.require_session().add(self)
         self.has_changes = True
 
     def mark_features_deleted(self, *fid, all=False):

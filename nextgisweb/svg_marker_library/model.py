@@ -117,7 +117,7 @@ class ArchiveAttr(SAttribute):
 
         # Delete all existing files, do flush due to delete before insert
         srlzr.obj.files[:] = []
-        sa.inspect(srlzr.obj).session.flush()
+        srlzr.obj.require_session().flush()
 
         srlzr.obj.from_archive(value().data_path)
 

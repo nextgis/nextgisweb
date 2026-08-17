@@ -9,6 +9,7 @@ import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from msgspec import Struct
 from sqlalchemy import event, inspect
+from sqlalchemy.orm import object_session
 from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import or_ as sql_or
 
@@ -555,7 +556,7 @@ class FVersioningExtensionMixin:
         return instance
 
     def delete(self):
-        if not (session := sa.inspect(self).session):
+        if not (session := orm.object_session(self)):
             raise VersioningContextRequired
 
         session.delete(self)
@@ -567,7 +568,7 @@ class FVersioningExtensionMixin:
 
     @classmethod
     def restore(cls, resource, feature_id: int, id: int | None = None):
-        if not (session := sa.inspect(resource).session):
+        if not (session := orm.object_session(resource)):
             raise VersioningContextRequired
 
         params = dict[str, Any](p_rid=resource.id, p_fid=feature_id)
@@ -610,8 +611,7 @@ class FVersioningExtensionMixin:
 
     @classmethod
     def fversioning_revert_layer(cls, resource, version: int):
-        session = sa.inspect(resource).session
-        assert session is not None
+        session = resource.require_session()
 
         query = cls.fversioning_queries.revert
         params = dict(p_rid=resource.id, p_vid=version)
@@ -661,8 +661,7 @@ class FVersioningExtensionMixin:
 
     @classmethod
     def fversioning_copy(cls, source, dest, *, version: int | None = None) -> bool:
-        session = sa.inspect(source).session
-        assert session is not None
+        session = source.require_session()
 
         if version is None:
             qres = session.execute(
@@ -702,7 +701,7 @@ class FVersioningExtensionMixin:
         if cls.fversioning_has_id and eid is None:
             raise ValueError(f"eid is required for {cls.__name__}")
 
-        session = sa.inspect(resource).session
+        session = object_session(resource)
         if not session:
             raise VersioningContextRequired
 
@@ -861,7 +860,7 @@ class FVersioningExtensionMixin:
         if not IVersionableFeatureLayer.providedBy(resource) or not resource.fversioning:
             return
 
-        session = sa.inspect(resource).session
+        session = object_session(resource)
         if not session or (vobj := resource.fversioning_vobj) is None:
             raise VersioningContextRequired
 
@@ -890,7 +889,7 @@ class FVersioningExtensionMixin:
         if target.fversioning_initializing:
             return
 
-        session = sa.inspect(target).session
+        session = object_session(target)
         resource = target.resource
         assert session and resource
 
