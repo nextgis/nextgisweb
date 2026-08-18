@@ -32,8 +32,8 @@ def test_model(ngw_txn, ngw_env):
     resource.fversioning_close(raise_if_not_enabled=False)
     DBSession.flush()
 
-    with resource.fversioning_context():
+    with resource.feature_transaction():
         fd.value = "bar"
 
-    with resource.fversioning_context():
+    with resource.feature_transaction():
         fd.delete()

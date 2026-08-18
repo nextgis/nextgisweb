@@ -18,7 +18,7 @@ from nextgisweb.lib.apitype import ContentType
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import IFeatureLayer, IVersionableFeatureLayer
-from nextgisweb.feature_layer.api import FeatureID, query_feature_or_not_found, versioning
+from nextgisweb.feature_layer.api import FeatureID, query_feature_or_not_found
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
@@ -152,7 +152,7 @@ def idelete(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(resource, fid, aid)
-    with versioning(resource, request):
+    with resource.feature_transaction(request):
         obj.delete()
 
 
@@ -163,8 +163,8 @@ def iput(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
     request.resource_permission(DataScope.write)
 
     obj = attachment_or_not_found(resource, fid, aid)
-    with versioning(resource, request) as vobj:
-        vinfo = dict(version=vobj.version_id) if vobj else dict()
+    with resource.feature_transaction(request) as ftxn:
+        vinfo = dict(version=ftxn.vobj.version_id) if ftxn.vobj else dict()
         obj.deserialize(request.json_body)
 
     return dict(id=obj.extension_id, **vinfo)
@@ -189,8 +189,8 @@ def cpost(resource, request, fid: FeatureID) -> JSONType:
     request.resource_permission(DataScope.write)
 
     query_feature_or_not_found(resource.feature_query(), resource.id, fid)
-    with versioning(resource, request) as vobj:
-        vinfo = dict(version=vobj.version_id) if vobj else dict()
+    with resource.feature_transaction(request) as ftxn:
+        vinfo = dict(version=ftxn.vobj.version_id) if ftxn.vobj else dict()
         obj = FeatureAttachment(resource=resource, feature_id=fid).persist()
         obj.deserialize(request.json_body)
 
@@ -272,7 +272,7 @@ def import_attachment(resource, request) -> JSONType:
     data = request.json_body
     replace = data.get("replace", False) is True
     fupload = FileUpload(id=data["source"]["id"])
-    with versioning(resource, request):
+    with resource.feature_transaction(request):
         return attachments_import(resource, fupload.data_path, replace=replace)
 
 

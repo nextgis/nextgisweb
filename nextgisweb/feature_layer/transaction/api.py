@@ -10,7 +10,6 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.resource.exception import ResourceInterfaceNotSupported
 
-from ..api import versioning
 from ..interface import IFeatureLayer
 from ..versioning.exception import FVersioningEpochMismatch, FVersioningEpochRequired
 from .exception import TransactionNotCommitted, TransactionNotFound
@@ -164,13 +163,13 @@ def ipost(txn: Transaction, request) -> AsJSON[CommitErrors | CommitSuccess]:
     elif errors := txn.errors():
         return CommitErrors(errors=errors)
 
-    with versioning(txn.resource, request) as vobj:
+    with txn.resource.feature_transaction(request) as ftxn:
         # Set up executors
         executors = dict[Type[OperationExecutor], OperationExecutor]()
         for action in txn.actions():
             cls = OperationExecutor.executors[action]
             if cls not in executors:
-                executors[cls] = cls(txn=txn, vobj=vobj)
+                executors[cls] = cls(txn=txn, vobj=ftxn.vobj)
 
         # Check and lock
         operations, errors = list(), list()

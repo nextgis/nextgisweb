@@ -27,6 +27,11 @@ from .interface import (
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
-from .model import FeatureLayerMixin, FeatureQueryIntersectsMixin, LayerField
+from .model import (
+    FeatureLayerMixin,
+    FeatureLayerTransactionContext,
+    FeatureQueryIntersectsMixin,
+    LayerField,
+)
 from .transaction import FeatureLayerTransaction
 from .versioning import FVersioningMeta, FVersioningObj

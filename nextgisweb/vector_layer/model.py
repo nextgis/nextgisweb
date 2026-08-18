@@ -1,5 +1,4 @@
 import re
-from contextlib import contextmanager
 from functools import partial
 from itertools import chain
 from pathlib import Path
@@ -28,7 +27,6 @@ from nextgisweb.feature_layer import (
     IFieldEditableFeatureLayer,
     IFilterableFeatureLayer,
     IGeometryEditableFeatureLayer,
-    IVersionableFeatureLayer,
     IWritableFeatureLayer,
     LayerField,
 )
@@ -1003,17 +1001,7 @@ class DeleteAllFeaturesAttr(SAttribute):
         if not value:
             return
 
-        obj = srlzr.obj
-
-        @contextmanager
-        def _fversioning_context():
-            if IVersionableFeatureLayer.providedBy(obj) and obj.fversioning:
-                with obj.fversioning_context(srlzr):
-                    yield
-            else:
-                yield
-
-        with _fversioning_context():
+        with srlzr.obj.feature_transaction():
             srlzr.obj.feature_delete_all()
 
 

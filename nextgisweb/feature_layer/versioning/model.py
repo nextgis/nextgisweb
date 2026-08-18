@@ -61,7 +61,7 @@ class FVersioningMixin:
             else:
                 self.fversioning = None
 
-    def fversioning_open(self, source=None, /, **kwargs):
+    def fversioning_open(self, source=None, /, **kwargs) -> FVersioningObj:
         fversioning = self.fversioning
         assert fversioning and fversioning.vobj is None
 
@@ -89,8 +89,9 @@ class FVersioningMixin:
 
     @contextmanager
     def fversioning_context(self, source=None, /, **kwargs):
+        vobj = self.fversioning_open(source, **kwargs)
         try:
-            yield self.fversioning_open(source, **kwargs)
+            yield vobj
         finally:
             # TODO: Discard it on exception?
             self.fversioning_close()

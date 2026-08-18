@@ -46,11 +46,11 @@ def test_model(ngw_txn, ngw_env):
     resource, feature, fa = setup_vector_layer(versioning=True)
 
     fileobj = FileObj().from_content(b"")
-    with resource.fversioning_context():
+    with resource.feature_transaction():
         fa.fileobj = fileobj
         fa.name = "bar"
 
-    with resource.fversioning_context():
+    with resource.feature_transaction():
         fa.delete()
 
 

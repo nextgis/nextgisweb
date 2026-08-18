@@ -29,6 +29,7 @@ from nextgisweb.feature_layer import (
     Feature,
     FeatureLayerGeometryType,
     FeatureLayerMixin,
+    FeatureLayerTransactionContext,
     FeatureQueryIntersectsMixin,
     FeatureSet,
     IAggregatableFeatureQuery,
@@ -94,6 +95,23 @@ GEOM_TYPE_DISPLAY = (
 )
 
 
+class DBConnection:
+    def __init__(self, conn: sa.Connection):
+        self._conn = conn
+        self._has_changes = False
+
+    @property
+    def has_changes(self):
+        return self._has_changes
+
+    def execute(self, *args, update, **kwargs):
+        self._has_changes = self._has_changes or update
+        return self._conn.execute(*args, **kwargs)
+
+    def commit(self, *args, **kwargs):
+        return self._conn.commit(*args, **kwargs)
+
+
 def calculate_extent(layer, where=None, geomcol=None):
     tab = layer._sa_table(True)
 
@@ -117,8 +135,8 @@ def calculate_extent(layer, where=None, geomcol=None):
         st_ymin(sq.c.bbox),
     )
 
-    with layer.connection.get_connection() as conn:
-        maxLon, minLon, maxLat, minLat = conn.execute(select(*fields)).first()
+    with layer.connect() as conn:
+        maxLon, minLon, maxLat, minLat = conn.execute(select(*fields), update=False).first()
 
     extent = dict(minLon=minLon, maxLon=maxLon, minLat=minLat, maxLat=maxLat)
 
@@ -220,19 +238,17 @@ class PostgisConnection(Resource):
         return engine
 
     @contextmanager
-    def get_connection(self):
+    def connect(self):
         try:
             conn = self.get_engine().connect()
         except OperationalError:
             raise ValidationError(gettext("Cannot connect to the database!"))
 
-        try:
-            with conn.begin():
+        with conn:
+            try:
                 yield conn
-        except SQLAlchemyError as exc:
-            raise ExternalDatabaseError(sa_error=exc)
-        finally:
-            conn.close()
+            except SQLAlchemyError as exc:
+                raise ExternalDatabaseError(sa_error=exc)
 
 
 class SSLModeAttr(SColumn):
@@ -297,6 +313,21 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         )
         return source_meta
 
+    @contextmanager
+    def connect(self, tx=False):
+        if getattr(self, "_conn", None) is not None:
+            assert not tx
+            yield self._conn
+        else:
+            with self.connection.connect() as conn:
+                self._conn = DBConnection(conn)
+                try:
+                    yield self._conn
+                    if not tx and self._conn.has_changes:
+                        self._conn.commit()
+                finally:
+                    self._conn = None
+
     def setup(self):
         fdata = dict()
         for f in self.fields:
@@ -314,7 +345,7 @@ class PostgisLayer(Resource, FeatureLayerMixin):
 
         self.feature_label_field = None
 
-        with self.connection.get_connection() as conn:
+        with self.connection.connect() as conn:
             inspector = sa.inspect(conn.engine)
             try:
                 columns = inspector.get_columns(self.table, self.schema)
@@ -509,6 +540,17 @@ class PostgisLayer(Resource, FeatureLayerMixin):
 
         return values
 
+    @contextmanager
+    def _connection_context(self):
+        with self.connect(tx=True) as conn:
+            yield
+            if conn.has_changes:
+                conn.commit()
+
+    def feature_transaction_enter(self, ftxn: FeatureLayerTransactionContext) -> None:
+        super().feature_transaction_enter(ftxn)
+        ftxn.enter_context(self._connection_context())
+
     def feature_put(self, feature):
         """Update existing object
 
@@ -519,8 +561,8 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         tab = self._sa_table(True)
         stmt = sa.update(tab).values(self._makevals(feature)).where(idcol == feature.id)
 
-        with self.connection.get_connection() as conn:
-            conn.execute(stmt)
+        with self.connect() as conn:
+            conn.execute(stmt, update=True)
 
     def feature_create(self, feature):
         """Insert new object to DB which is described in feature
@@ -534,8 +576,9 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         tab = self._sa_table(True)
         stmt = sa.insert(tab).values(self._makevals(feature)).returning(idcol)
 
-        with self.connection.get_connection() as conn:
-            return conn.execute(stmt).scalar()
+        with self.connect() as conn:
+            fid = conn.execute(stmt, update=True).scalar()
+        return fid
 
     def feature_delete(self, feature_id):
         """Remove record with id
@@ -547,16 +590,16 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         tab = self._sa_table()
         stmt = sa.delete(tab).where(idcol == feature_id)
 
-        with self.connection.get_connection() as conn:
-            conn.execute(stmt)
+        with self.connect() as conn:
+            conn.execute(stmt, update=True)
 
     def feature_delete_all(self):
         """Remove all records from a layer"""
         tab = self._sa_table()
         stmt = sa.delete(tab)
 
-        with self.connection.get_connection() as conn:
-            conn.execute(stmt)
+        with self.connect() as conn:
+            conn.execute(stmt, update=True)
 
     # IBboxLayer
     @property
@@ -874,8 +917,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 if len(where) > 0:
                     query = query.where(sa.and_(*where))
 
-                with self.layer.connection.get_connection() as conn:
-                    result = conn.execute(query)
+                with self.layer.connect() as conn:
+                    result = conn.execute(query, update=False)
                     for row in result.mappings():
                         fdict = dict((keyname, row[label]) for keyname, label in selected_fields)
 
@@ -907,11 +950,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def total_count(self):
-                with self.layer.connection.get_connection() as conn:
+                with self.layer.connect() as conn:
                     query = sql.select(func.count(idcol))
                     if len(where) > 0:
                         query = query.where(sa.and_(*where))
-                    result = conn.execute(query)
+                    result = conn.execute(query, update=False)
                     return result.scalar()
 
             @property

@@ -35,46 +35,47 @@ def test_model(ngw_txn):
 
     for _ in range(2):
         vnext = next(vcur)
-        with res.fversioning_context() as vobj:
-            assert vobj.version_id == vnext
+        with res.feature_transaction() as ftxn:
+            assert ftxn.vobj is not None
+            assert ftxn.vobj.version_id == vnext
             assert res.fversioning.latest == vnext - 1
-            vobj.mark_changed()
+            ftxn.vobj.mark_changed()
         assert res.fversioning.latest == vnext
 
-    with res.fversioning_context() as vobj:
+    with res.feature_transaction():
         for _ in range(5):
             feat = Feature()
             feat.geom = Geometry.from_wkt("POINT (0 0 0)")
             res.feature_create(feat)
     assert res.fversioning.latest == next(vcur)
 
-    with res.fversioning_context() as vobj:
+    with res.feature_transaction():
         feat = Feature(id=1)
         feat.geom = Geometry.from_wkt("POINT (0 0 1)")
         res.feature_put(feat)
     vup = next(vcur)
     assert res.fversioning.latest == vup
 
-    with res.fversioning_context():
+    with res.feature_transaction():
         pass
     assert res.fversioning.latest == vup  # No changes at all
 
-    with res.fversioning_context() as vobj:
+    with res.feature_transaction():
         res.feature_put(feat)
     assert res.fversioning.latest == vup  # Geometry hasn't changed
 
-    with res.fversioning_context():
+    with res.feature_transaction():
         feat.fields["foo"] = "1"
         res.feature_put(feat)
     vup = next(vcur)
     assert res.fversioning.latest == vup
 
-    with res.fversioning_context():
+    with res.feature_transaction():
         feat.fields["foo"] = 1
         res.feature_put(feat)
     assert res.fversioning.latest == vup  # Actual value hasn't changed
 
-    with res.fversioning_context():
+    with res.feature_transaction():
         feat.fields["foo"] = 2
         res.feature_put(feat)
     assert res.fversioning.latest == next(vcur)
@@ -92,7 +93,7 @@ def test_model(ngw_txn):
     assert pfeat.fields["foo"] == "1"
 
     # Delete 1st and 2nd
-    with res.fversioning_context() as vobj:
+    with res.feature_transaction():
         for id in (1, 2):
             res.feature_delete(id)
         with pytest.raises(FeatureNotFound):
@@ -100,7 +101,7 @@ def test_model(ngw_txn):
     assert res.fversioning.latest == next(vcur)
 
     # Restore 1st (success), 3rd (not deleted), 9th (never existed)
-    with res.fversioning_context() as vobj:
+    with res.feature_transaction():
         res.feature_restore(Feature(id=1))
         with pytest.raises(RestoreNotDeleted):
             res.feature_restore(Feature(id=3))
@@ -114,7 +115,7 @@ def test_model(ngw_txn):
     assert pfeat.fields["foo"] == "2"
 
     # Delete everything
-    with res.fversioning_context() as vobj:
+    with res.feature_transaction():
         res.feature_delete_all()
     assert res.fversioning.latest == next(vcur)
 
@@ -131,19 +132,19 @@ def test_json_versioning(ngw_txn):
 
     geom = Geometry.from_wkt("POINT (0 0)")
 
-    with res.fversioning_context():
+    with res.feature_transaction():
         res.feature_create(Feature(fields={"j": {"a": 1, "b": 2}}, geom=geom))
     v_after_create = next(vcur)
     assert res.fversioning.latest == v_after_create
 
     (feat,) = res.feature_query()()
 
-    with res.fversioning_context():
+    with res.feature_transaction():
         feat.fields["j"] = {"b": 2, "a": 1}
         res.feature_put(feat)
     assert res.fversioning.latest == v_after_create  # no new version — semantically equal
 
-    with res.fversioning_context():
+    with res.feature_transaction():
         feat.fields["j"] = {"a": 1, "b": 99}
         res.feature_put(feat)
     assert res.fversioning.latest == next(vcur)  # new version — value actually changed
@@ -286,7 +287,7 @@ def test_revert():
     for v in version_all + versions_shuffled:
         with transaction.manager:
             res = VectorLayer.filter_by(id=res_id).one()
-            with res.fversioning_context():
+            with res.feature_transaction():
                 res.fversioning_revert_layer(v)
         with transaction.manager:
             res = VectorLayer.filter_by(id=res_id).one()

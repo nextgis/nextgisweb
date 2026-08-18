@@ -8,7 +8,7 @@ from nextgisweb.lib.geometry import Geometry
 
 import nextgisweb.feature_layer.api as feature_layer_api
 from nextgisweb.feature_layer import Feature, IWritableFeatureLayer
-from nextgisweb.feature_layer.api import query_feature_or_not_found, versioning
+from nextgisweb.feature_layer.api import query_feature_or_not_found
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 
@@ -190,7 +190,7 @@ def create(resource, request) -> JSONType:
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
-            with versioning(c.resource, request):
+            with c.resource.feature_transaction(request):
                 feature = Feature(layer=c.resource)
                 loader = loader_factory(c.resource)
                 feature_from_ogc(loader, feature, request.json_body.copy())
@@ -319,7 +319,7 @@ def iput(resource, request) -> JSONType:
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
-            with versioning(c.resource, request):
+            with c.resource.feature_transaction(request):
                 query = c.resource.feature_query()
                 feature = query_feature_or_not_found(query, c.resource.id, item_id)
                 loader = loader_factory(c.resource)
@@ -336,7 +336,7 @@ def idelete(resource, request) -> JSONType:
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
-            with versioning(c.resource, request):
+            with c.resource.feature_transaction(request):
                 c.resource.feature_delete(item_id)
 
 

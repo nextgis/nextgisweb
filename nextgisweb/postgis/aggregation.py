@@ -1,3 +1,5 @@
+from functools import partial
+
 from nextgisweb.lib.registry import DictRegistry
 
 from nextgisweb.feature_layer.aggregation import (
@@ -34,10 +36,11 @@ def aggregate(feature_query, specs):
         else:
             other_specs.append((idx, impl, spec))
 
-    with resource.connection.get_connection() as conn:
+    with resource.connect() as conn:
         results = {}
+        execute = partial(conn.execute, update=False)
         if scalar_specs:
-            results.update(pg_batch_scalars(col_map, where, scalar_specs, conn.execute))
+            results.update(pg_batch_scalars(col_map, where, scalar_specs, execute))
         for idx, impl, spec in other_specs:
-            results[idx] = impl.execute_aggregate(col_map, where, spec, conn.execute)
+            results[idx] = impl.execute_aggregate(col_map, where, spec, execute)
     return results

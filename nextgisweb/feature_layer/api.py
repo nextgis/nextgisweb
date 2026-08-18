@@ -1,5 +1,4 @@
 import re
-from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
 from typing import Annotated, Any, Literal
@@ -32,7 +31,6 @@ from .interface import (
     IFeatureQueryIlike,
     IFeatureQueryLike,
     IFilterableFeatureLayer,
-    IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
 from .numutil import BIGINT_DUMPERS, BigIntFormat, bigint_loader, bool_loader, int_loader
@@ -274,15 +272,6 @@ def query_feature_or_not_found(query, resource_id, feature_id):
     raise FeatureNotFound(resource_id, feature_id)
 
 
-@contextmanager
-def versioning(resource, request):
-    if IVersionableFeatureLayer.providedBy(resource) and resource.fversioning:
-        with resource.fversioning_context(request) as vobj:
-            yield vobj
-    else:
-        yield None
-
-
 def feature_query_pit(resource, feature_query, version, epoch):
     if version is None:
         return
@@ -334,7 +323,7 @@ def iput(
     loader = Loader(resource, loader_params)
 
     result = FeatureChangeResult(id=feature.id)
-    with versioning(resource, request) as vobj:
+    with resource.feature_transaction(request) as ftxn:
         updated = loader.extensions(feature, request.json_body)
         loader(feature, request.json_body)
         if (
@@ -342,7 +331,7 @@ def iput(
         ) and IWritableFeatureLayer.providedBy(resource):
             updated = resource.feature_put(feature) or updated
         if updated is True:
-            result.version_from(vobj)
+            result.version_from(ftxn.vobj)
 
     return result
 
@@ -353,10 +342,10 @@ def idelete(resource, request, fid: FeatureID) -> FeatureChangeResult:
     :returns: Feature deleted successfully"""
     request.resource_permission(DataScope.write)
 
-    with versioning(resource, request) as vobj:
+    with resource.feature_transaction(request) as ftxn:
         resource.feature_delete(fid)
         result = FeatureChangeResult(id=fid)
-        result.version_from(vobj)
+        result.version_from(ftxn.vobj)
 
     return result
 
@@ -529,13 +518,13 @@ def cpost(
     request.resource_permission(DataScope.write)
 
     loader = Loader(resource, loader_params)
-    with versioning(resource, request) as vobj:
+    with resource.feature_transaction(request) as ftxn:
         feature = Feature(layer=resource)
         loader(feature, request.json_body)
         feature.id = resource.feature_create(feature)
         loader.extensions(feature, request.json_body)
         result = FeatureChangeResult(id=feature.id)
-        result.version_from(vobj)
+        result.version_from(ftxn.vobj)
 
     return result
 
@@ -554,7 +543,7 @@ def cpatch(
     loader = Loader(resource, loader_params)
 
     result: list[FeatureChangeResult] = list()
-    with versioning(resource, request) as vobj:
+    with resource.feature_transaction(request) as ftxn:
         for fdata in request.json_body:
             if "id" not in fdata:
                 # Create new feature
@@ -572,8 +561,8 @@ def cpatch(
                 feature = query_feature_or_not_found(query, resource.id, fdata["id"])
 
                 have_changes = loader.extensions(feature, fdata)
-                if have_changes and vobj:
-                    vobj.mark_changed()
+                if have_changes and ftxn.vobj:
+                    ftxn.vobj.mark_changed()
 
                 loader(feature, fdata)
                 if (
@@ -583,7 +572,7 @@ def cpatch(
 
             assert isinstance(feature.id, int)
             feature_result = FeatureChangeResult(id=feature.id)
-            feature_result.version_from(vobj)
+            feature_result.version_from(ftxn.vobj)
             result.append(feature_result)
 
     return result
@@ -595,7 +584,7 @@ def cdelete(resource, request) -> JSONType:
     :returns: Features deleted successfully"""
     request.resource_permission(DataScope.write)
 
-    with versioning(resource, request):
+    with resource.feature_transaction(request):
         if len(request.body) > 0:
             result = []
             for fdata in request.json_body:

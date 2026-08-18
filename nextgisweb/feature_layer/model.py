@@ -1,4 +1,7 @@
-from typing import Any, Self, cast
+from __future__ import annotations
+
+from contextlib import ExitStack
+from typing import TYPE_CHECKING, Any, Final, Self, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -81,6 +84,27 @@ class LayerField(Base):
         )
 
 
+if TYPE_CHECKING:
+    from .versioning import FVersioningObj
+else:
+    FVersioningObj = Any
+
+
+class FeatureLayerTransactionContext(ExitStack):
+    vobj: FVersioningObj | None = None
+
+    def __init__(self, resource: FeatureLayerMixin, source: Any, **kwargs: Any):
+        super().__init__()
+        self.resource: Final = resource
+        self.source: Final = source
+        self.kwargs: Final = kwargs
+
+    def __enter__(self) -> Self:
+        result = super().__enter__()
+        self.resource.feature_transaction_enter(self)
+        return result
+
+
 class FeatureLayerMixin:
     __field_class__ = LayerField
     __allow_none_geometry__ = False
@@ -135,6 +159,13 @@ class FeatureLayerMixin:
             cascade="all",
             backref=orm.backref("_feature_label_field_backref"),
         )
+
+    def feature_transaction(self, source=None, /, **kwargs) -> FeatureLayerTransactionContext:
+        return FeatureLayerTransactionContext(self, source, **kwargs)
+
+    def feature_transaction_enter(self, ftxn: FeatureLayerTransactionContext) -> None:
+        if IVersionableFeatureLayer.providedBy(self) and self.fversioning:
+            ftxn.vobj = ftxn.enter_context(self.fversioning_context(ftxn.source, **ftxn.kwargs))
 
     def to_ogr(self, ogr_ds, *, name="", fields=None, aliases=None, fid=None):
         if fields is None:
