@@ -8,13 +8,15 @@ from nextgisweb.lib.apitype import EmptyObject
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.file_upload import FileUpload
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, ResourceFactory
 
 from .api_import import descriptions_import
+from .component import FeatureDescriptionComponent
 from .model import FeatureDescription
 
 
-def export(resource, request):
+def export(resource, request: Request):
     request.resource_permission(DataScope.read)
 
     query = FeatureDescription.filter_by(
@@ -46,7 +48,7 @@ def export(resource, request):
         return response
 
 
-def import_description(resource, request) -> EmptyObject:
+def import_description(resource, request: Request) -> EmptyObject:
     """Import feature descriptions"""
     request.resource_permission(DataScope.write)
 
@@ -57,7 +59,7 @@ def import_description(resource, request) -> EmptyObject:
         descriptions_import(resource, fupload.data_path, replace=replace)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureDescriptionComponent, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
     config.add_route(

@@ -1,8 +1,10 @@
 import re
 from datetime import date, datetime
+from functools import cache
 from itertools import product
 from packaging import version as pkg_version
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 import transaction
@@ -41,19 +43,25 @@ def patch_gdal_dates():
     if pkg_version.parse(gdal.__version__.split("-")[0]) >= pkg_version.parse("3.4.1"):
 
         def date_from_iso(value):
-            m = re.match(r"^(\d{4})\/(\d{2})\/(\d{2})$", value)
-            y, mon, d = map(int, m.groups())
-            return date(y, mon, d)
+            if m := re.match(r"^(\d{4})\/(\d{2})\/(\d{2})$", value):
+                y, mon, d = map(int, m.groups())
+                return date(y, mon, d)
+            raise ValueError
 
         def datetime_from_iso(value):
-            m = re.match(r"^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$", value)
-            y, mon, d, h, min, s = map(int, m.groups())
-            return datetime(y, mon, d, h, min, s)
+            if m := re.match(r"^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$", value):
+                y, mon, d, h, min, s = map(int, m.groups())
+                return datetime(y, mon, d, h, min, s)
+            raise ValueError
 
-        mem = wfs_handler.date_from_iso, wfs_handler.datetime_from_iso
-        wfs_handler.date_from_iso, wfs_handler.datetime_from_iso = date_from_iso, datetime_from_iso
+        with (
+            patch.object(wfs_handler, "date_from_iso", date_from_iso),
+            patch.object(wfs_handler, "datetime_from_iso", datetime_from_iso),
+        ):
+            yield
+
+    else:
         yield
-        wfs_handler.date_from_iso, wfs_handler.datetime_from_iso = mem
 
 
 @pytest.fixture(scope="module")
@@ -92,32 +100,29 @@ def features(service, ngw_httptest_app):
     # Module scope doesn't work here because of function scope fixtures.
     # Let's manually cache result in function attribute _cached_result.
 
+    @cache
+    def _factory(version):
+        wfs_ds = ogr.Open(
+            "WFS:{}/api/resource/{}/wfs?VERSION={}".format(
+                ngw_httptest_app.base_url, service, version
+            ),
+            True,
+        )
+        assert wfs_ds is not None, gdal.GetLastErrorMsg()
+
+        wfs_layer = wfs_ds.GetLayerByName("type")
+        assert wfs_layer is not None, gdal.GetLastErrorMsg()
+
+        ref_ds = read_dataset("type.geojson")
+        ref_layer = ref_ds.GetLayer(0)
+
+        return (
+            list(zip(wfs_layer, ref_layer)),
+            (wfs_ds, ref_ds),  # Just for keep GDAL references
+        )
+
     def factory(version):
-        if not hasattr(factory, "_cache"):
-            factory._cache = dict()
-
-        if version not in factory._cache:
-            wfs_ds = ogr.Open(
-                "WFS:{}/api/resource/{}/wfs?VERSION={}".format(
-                    ngw_httptest_app.base_url, service, version
-                ),
-                True,
-            )
-            assert wfs_ds is not None, gdal.GetLastErrorMsg()
-
-            wfs_layer = wfs_ds.GetLayerByName("type")
-            assert wfs_layer is not None, gdal.GetLastErrorMsg()
-
-            ref_ds = read_dataset("type.geojson")
-            ref_layer = ref_ds.GetLayer(0)
-
-            factory._cache[version] = (
-                list(zip(wfs_layer, ref_layer)),
-                wfs_ds,
-                ref_ds,  # Just for keep GDAL references
-            )
-
-        return factory._cache[version][0]
+        return _factory(version)[0]
 
     return factory
 

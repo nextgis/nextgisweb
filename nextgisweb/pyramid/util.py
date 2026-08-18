@@ -15,6 +15,8 @@ from babel.core import UnknownLocaleError
 
 from nextgisweb.lib.logging import logger
 
+from .tomb import Request
+
 
 def viewargs(
     *,
@@ -73,7 +75,7 @@ class StaticSourcePredicate:
 
     phash = __repr__ = text
 
-    def __call__(self, context, request):
+    def __call__(self, context, request: Request):
         subpath = context["match"]["subpath"]
         static_map = request.registry.settings["pyramid.static_map"]
 
@@ -116,14 +118,17 @@ def get_text_direction(code: str) -> Literal["ltr", "rtl"]:
         locale = Locale.parse(code, sep="-")
     except UnknownLocaleError:
         return "ltr"
+    assert locale.text_direction in ("ltr", "rtl")
     return locale.text_direction
 
 
-def set_output_buffering(request, response, value, *, strict=False):
+def set_output_buffering(request: Request, response, value, *, strict=False):
+    from .component import PyramidComponent
+
     if value is None:
         return
 
-    opts = request.env.pyramid.options
+    opts = PyramidComponent.current().options
     default = opts["response_buffering"]
     if value == default:
         return
@@ -137,7 +142,7 @@ def set_output_buffering(request, response, value, *, strict=False):
 
 def restart_delayed(delay: int = 5):
     try:
-        import uwsgi
+        import uwsgi  # ty: ignore[unresolved-import]
     except ImportError:
         uwsgi = None
 

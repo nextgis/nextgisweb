@@ -3,18 +3,20 @@ import sqlalchemy as sa
 from nextgisweb.env import DBSession, gettext
 
 from nextgisweb.gui import react_renderer
+from nextgisweb.pyramid.tomb import Request
 
+from ..component import ResourceComponent
 from ..model import Resource
 from .base import ResourceFavorite
 from .model import ResourceFavoriteModel
 
 
 @react_renderer("@nextgisweb/resource/favorite/FavoritePage")
-def page(request):
+def page(request: Request):
     return dict(title=gettext("Favorites"))
 
 
-def config_value(request):
+def config_value(request: Request):
     if (
         (matched_route := request.matched_route) is None
         or (route := matched_route.name) is None
@@ -46,7 +48,7 @@ def config_value(request):
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: ResourceComponent, config):
     config.add_route(
         "resource.favorite.page",
         "/resource/favorite/",

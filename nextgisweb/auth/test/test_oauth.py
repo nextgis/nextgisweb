@@ -1,6 +1,7 @@
 from contextlib import contextmanager, nullcontext
 from datetime import datetime, timezone
 from secrets import token_hex, token_urlsafe
+from typing import Any
 from unittest.mock import patch
 from urllib.parse import parse_qsl, urlsplit
 from uuid import uuid4
@@ -257,7 +258,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app: We
     state = dict(parse_qsl(ngw_webtest_app.cookies[f"ngw_oas_{state_key}"]))
     assert state["next_url"] == next_url
 
-    ouser1 = dict(
+    ouser1 = dict[str, Any](
         sub=str(uuid4()),
         name="Oauth",
         keyname="oauth_test",
@@ -266,7 +267,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app: We
         family_name="Test",
         active=True,
     )
-    ouser2 = dict(
+    ouser2 = dict[str, Any](
         sub=str(uuid4()),
         name="Oauth2",
         keyname="oauth_test2",

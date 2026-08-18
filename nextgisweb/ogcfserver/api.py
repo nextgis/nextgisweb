@@ -10,8 +10,10 @@ import nextgisweb.feature_layer.api as feature_layer_api
 from nextgisweb.feature_layer import Feature, IWritableFeatureLayer
 from nextgisweb.feature_layer.api import query_feature_or_not_found
 from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 
+from .component import OGCFServerComponent
 from .model import Service
 
 CONFORMANCE = [
@@ -24,7 +26,7 @@ CONFORMANCE = [
 ]
 
 
-def collection_to_ogc(collection, request):
+def collection_to_ogc(collection, request: Request):
     extent = collection.resource.extent
     return dict(
         links=[
@@ -113,7 +115,7 @@ def feature_from_ogc(loader: feature_layer_api.Loader, feature: Feature, data):
     loader(feature, data)
 
 
-def landing_page(resource, request) -> JSONType:
+def landing_page(resource, request: Request) -> JSONType:
     """OGC API Features endpoint
 
     :returns: OGC API Features collection or item response"""
@@ -154,12 +156,12 @@ def landing_page(resource, request) -> JSONType:
     )
 
 
-def conformance(request) -> JSONType:
+def conformance(request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
     return dict(conformsTo=CONFORMANCE)
 
 
-def collections(resource, request) -> JSONType:
+def collections(resource, request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
     collections = [collection_to_ogc(c, request) for c in resource.collections]
     return dict(
@@ -175,7 +177,7 @@ def collections(resource, request) -> JSONType:
     )
 
 
-def collection(resource, request) -> JSONType:
+def collection(resource, request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
     collection_id = request.matchdict["collection_id"]
     for c in resource.collections:
@@ -184,7 +186,7 @@ def collection(resource, request) -> JSONType:
     raise HTTPNotFound()
 
 
-def create(resource, request) -> JSONType:
+def create(resource, request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
     collection_id = request.matchdict["collection_id"]
     for c in resource.collections:
@@ -206,7 +208,7 @@ def create(resource, request) -> JSONType:
     return dict(id=fid)
 
 
-def items(resource, request) -> JSONType:
+def items(resource, request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
     collection_id = request.matchdict["collection_id"]
     for c in resource.collections:
@@ -274,7 +276,7 @@ def items(resource, request) -> JSONType:
     return HTTPNotFound()
 
 
-def iget(resource, request) -> JSONType:
+def iget(resource, request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
     collection_id = request.matchdict["collection_id"]
     item_id = int(request.matchdict["item_id"])
@@ -312,7 +314,7 @@ def iget(resource, request) -> JSONType:
     raise HTTPNotFound()
 
 
-def iput(resource, request) -> JSONType:
+def iput(resource, request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
     collection_id = request.matchdict["collection_id"]
     item_id = int(request.matchdict["item_id"])
@@ -329,7 +331,7 @@ def iput(resource, request) -> JSONType:
     return dict(id=feature.id)
 
 
-def idelete(resource, request) -> JSONType:
+def idelete(resource, request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
     collection_id = request.matchdict["collection_id"]
     item_id = int(request.matchdict["item_id"])
@@ -340,7 +342,7 @@ def idelete(resource, request) -> JSONType:
                 c.resource.feature_delete(item_id)
 
 
-def options(resource, request):
+def options(resource, request: Request):
     request.resource_permission(ServiceScope.connect)
     collection_id = request.matchdict["collection_id"]
     item_id = request.matchdict.get("item_id")
@@ -387,7 +389,7 @@ _PARAM_BBOX = {
 }
 
 
-def openapi(resource, request) -> JSONType:
+def openapi(resource, request: Request) -> JSONType:
     request.resource_permission(ServiceScope.connect)
 
     paths = {}
@@ -548,7 +550,7 @@ def openapi(resource, request) -> JSONType:
     return oas
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: OGCFServerComponent, config):
     service_factory = ResourceFactory(context=Service)
 
     config.add_route(

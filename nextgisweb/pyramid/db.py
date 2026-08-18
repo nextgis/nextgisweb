@@ -2,6 +2,8 @@ import transaction
 
 from nextgisweb.env import DBSession
 
+from .tomb import Request
+
 
 def tween_factory(handler, registry):
     skip_tm_path_info = (
@@ -10,10 +12,10 @@ def tween_factory(handler, registry):
         "/api/component/pyramid/route",
     )
 
-    def activate_hook(request):
+    def activate_hook(request: Request):
         return not request.path_info.startswith(skip_tm_path_info)
 
-    def tween(request):
+    def tween(request: Request):
         if not activate_hook(request):
             return handler(request)
 

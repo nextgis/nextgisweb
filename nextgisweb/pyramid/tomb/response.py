@@ -4,14 +4,18 @@ from mimetypes import guess_type
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse
 
+from .request import Request
+
 
 class StaticFileResponse(FileResponse):
-    def __init__(self, filename, *, cache=True, request) -> None:
+    def __init__(self, filename, *, cache=True, request: Request) -> None:
+        from nextgisweb.pyramid import PyramidComponent
+
         content_type, _ = guess_type(filename)
 
         found_encoding = None
         if (
-            (pref := request.env.pyramid.options["compression.algorithms"])
+            (pref := request.env.component(PyramidComponent).options["compression.algorithms"])
             and (aenc := request.accept_encoding)
             and (match := aenc.best_match(pref))
         ):

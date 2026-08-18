@@ -16,7 +16,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import query_unreferenced
 
-from nextgisweb.core import BackupBase
+from nextgisweb.core import BackupBase, CoreComponent
 
 from .model import FileObj
 
@@ -47,11 +47,11 @@ class FileObjBackup(BackupBase):
 
 class FileStorageComponent(Component):
     def initialize(self):
-        self.path = self.options["path"] or self.env.core.gtsdir(self)
+        self.path = self.options["path"] or self.env.component(CoreComponent).gtsdir(self)
 
     def initialize_db(self):
         if "path" not in self.options:
-            self.env.core.mksdir(self)
+            self.env.component(CoreComponent).mksdir(self)
 
     def backup_objects(self):
         for fileobj in FileObj.query().order_by(FileObj.component, FileObj.uuid):

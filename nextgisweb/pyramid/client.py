@@ -10,12 +10,14 @@ from nextgisweb.env import Component
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.imptool import module_from_stack
 
+from .tomb import Request
+
 TComp = TypeVar("TComp", bound=Component, contravariant=True)
 TStruct = TypeVar("TStruct", bound=Struct)
 
 
 class _CSCallable(Protocol[TComp]):
-    def __call__(self, comp: TComp, request) -> Any: ...
+    def __call__(self, comp: TComp, request: Request) -> Any: ...
 
 
 registry = defaultdict[str, dict[str, _CSCallable]](dict)
@@ -54,7 +56,7 @@ def struct_type(comp: Component) -> type[Struct] | None:
     )
 
 
-def evaluate(comp: Component, request, *, struct_type: type[TStruct]) -> TStruct:
+def evaluate(comp: Component, request: Request, *, struct_type: type[TStruct]) -> TStruct:
     field_values = dict()
     for name, func in registry[comp.identity].items():
         field_values[name] = func(comp, request)

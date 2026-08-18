@@ -4,7 +4,6 @@ from io import BytesIO
 from typing import Annotated, Literal
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
-import PIL
 import requests
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -12,11 +11,12 @@ import sqlalchemy.orm as orm
 from cachetools import LRUCache
 from lxml import etree
 from msgspec import Struct, field
+from PIL import Image
 from requests.exceptions import RequestException
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import Base, env, gettext
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
@@ -107,7 +107,9 @@ class Connection(Resource):
             and self.capcache_tstamp is not None
         )
 
-    def request_wms(self, request, query=None):
+    def request_wms(self, request: str, query=None):
+        from .component import WMSClientComponent
+
         capcache = self.capcache_dict
         url = (capcache.get("urls", {}).get(request) if capcache else None) or self.url
         up = urlparse(url, allow_fragments=False)
@@ -129,7 +131,7 @@ class Connection(Resource):
         else:
             auth = None
 
-        headers = {**env.wmsclient.headers}
+        headers = {**WMSClientComponent.current().headers}
         if self.referer:
             headers["Referer"] = self.referer
 
@@ -138,7 +140,7 @@ class Connection(Resource):
                 url,
                 auth=auth,
                 headers=headers,
-                timeout=env.wmsclient.options["timeout"].total_seconds(),
+                timeout=WMSClientComponent.current().options["timeout"].total_seconds(),
                 verify=not self.insecure,
             )
         except RequestException:
@@ -320,7 +322,7 @@ class Layer(Resource, SpatialLayerMixin):
         if response.status_code == 200:
             data = BytesIO(response.content)
             try:
-                img = PIL.Image.open(data)
+                img = Image.open(data)
             except IOError:
                 if msg := _extract_wms_error(response.content):
                     logger.error("WMS service error: %s", msg)

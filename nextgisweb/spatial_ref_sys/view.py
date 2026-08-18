@@ -4,6 +4,7 @@ from nextgisweb.env import gettext
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import client_setting
+from nextgisweb.pyramid.tomb import Request
 
 from .component import CatalogSource, SpatialRefSysComponent
 from .model import SRS, SRSRef
@@ -11,7 +12,7 @@ from .pyramid import srs_factory
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/srs-browse")
-def srs_browse(request):
+def srs_browse(request: Request):
     request.user.require_permission(any, *SRS.permissions.all)
 
     return dict(
@@ -21,7 +22,7 @@ def srs_browse(request):
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/srs-widget")
-def srs_create(request):
+def srs_create(request: Request):
     request.user.require_permission(SRS.permissions.manage)
 
     return dict(
@@ -30,7 +31,7 @@ def srs_create(request):
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/srs-widget")
-def srs_edit(request):
+def srs_edit(request: Request):
     request.user.require_permission(any, *SRS.permissions.all)
 
     srs = request.context
@@ -42,7 +43,7 @@ def srs_edit(request):
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/catalog-browse")
-def catalog_browse(request):
+def catalog_browse(request: Request):
     request.user.require_permission(SRS.permissions.manage)
 
     return dict(
@@ -51,11 +52,11 @@ def catalog_browse(request):
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/catalog-import")
-def catalog_import(request):
+def catalog_import(request: Request):
     request.user.require_permission(SRS.permissions.manage)
 
     catalog_id = int(request.matchdict["id"])
-    catalog_url = request.env.spatial_ref_sys.options["catalog.url"]
+    catalog_url = request.env.component(SpatialRefSysComponent).options["catalog.url"]
     item_url = (catalog_url + "/srs/" + str(catalog_id)) if catalog_url else None
     return dict(
         title=gettext("Spatial reference system") + " #%d" % catalog_id,
@@ -64,7 +65,7 @@ def catalog_import(request):
 
 
 @client_setting("default")
-def cs_default(comp: SpatialRefSysComponent, request) -> SRSRef:
+def cs_default(comp: SpatialRefSysComponent, request: Request) -> SRSRef:
     return SRSRef(id=3857)
 
 
@@ -75,7 +76,9 @@ class SpatialRefSysCatalogClientSetting(Struct, kw_only=True, rename="camel"):
 
 
 @client_setting("catalog")
-def cs_catalog(comp: SpatialRefSysComponent, request) -> SpatialRefSysCatalogClientSetting:
+def cs_catalog(
+    comp: SpatialRefSysComponent, request: Request
+) -> SpatialRefSysCatalogClientSetting:
     source = comp.catalog_source
     return SpatialRefSysCatalogClientSetting(
         source=source,
@@ -86,7 +89,7 @@ def cs_catalog(comp: SpatialRefSysComponent, request) -> SpatialRefSysCatalogCli
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: SpatialRefSysComponent, config):
     config.add_route("srs.browse", "/srs/", get=srs_browse)
     config.add_route("srs.create", "/srs/create", get=srs_create)
     config.add_route("srs.edit", "/srs/{id}", factory=srs_factory, get=srs_edit)

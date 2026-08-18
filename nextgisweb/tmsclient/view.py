@@ -1,5 +1,6 @@
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Widget
+from nextgisweb.tmsclient.component import TMSClientComponent
 
 from .model import Connection, Layer
 
@@ -16,5 +17,5 @@ class LayerWidget(Widget):
     amdmod = jsentry("@nextgisweb/tmsclient/tmsclient-layer")
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: TMSClientComponent, config):
     pass

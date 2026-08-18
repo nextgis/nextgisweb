@@ -29,6 +29,7 @@ def app():
     config = Configurator(settings=settings)
     config.add_renderer("json", renderer.JSON())
     config.add_request_method(lambda req: "deadbeef", "request_id", property=True)
+    config.add_request_method(lambda req: req.localizer.translate, "translate", property=True)
     config.include(exception)
 
     def view_error(request):

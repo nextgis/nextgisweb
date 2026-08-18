@@ -3,7 +3,7 @@ from nextgisweb.lib.apitype import Gap
 
 from ..component import ResourceComponent
 from ..event import OnChildClasses, OnDeletePrompt
-from ..model import Resource, ResourceCls, ResourceRef
+from ..model import ResourceCls, ResourceRef, resource_registry
 from ..permission import Scope
 from ..scope import ResourceScope
 from .base import ResourceAttr
@@ -51,7 +51,7 @@ class ResourceAttrChildrenCreatable(ResourceAttr, tag="resource.children_creatab
         disabled = self._disabled()
         classes = set(
             cls
-            for cls in Resource.registry.values()
+            for cls in resource_registry.values()
             if (cls.identity not in disabled and cls.check_parent(obj))
         )
 

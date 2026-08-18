@@ -3,13 +3,16 @@ from nextgisweb.env import gettext
 from nextgisweb.basemap.model import BasemapLayer
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.gui import react_renderer
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import IRenderableStyle
 from nextgisweb.resource import DataScope, resource_factory
 
+from .component import LayerPreviewComponent
+
 
 @react_renderer("@nextgisweb/layer-preview/preview-layer")
-def preview_map(request):
+def preview_map(request: Request):
     request.resource_permission(DataScope.read)
     resource = request.context
 
@@ -20,7 +23,7 @@ def preview_map(request):
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: LayerPreviewComponent, config):
     config.add_route(
         "layer_preview.map",
         r"/resource/{id:uint}/preview",

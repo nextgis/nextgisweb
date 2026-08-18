@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from binascii import crc32
 from dataclasses import dataclass
 from functools import lru_cache
@@ -8,6 +10,8 @@ from pyramid.response import Response
 
 from nextgisweb.lib.config import Option, OptionAnnotations, OptionType
 
+from . import component
+from .tomb import Request
 from .util import viewargs
 
 FAMILIES = dict()
@@ -69,7 +73,7 @@ for f in BROWSER_FAMILIES:
 option_annotations = OptionAnnotations(opt_ann_list)
 
 
-def get_header(request):
+def get_header(request: Request):
     return request.user_agent
 
 
@@ -104,6 +108,8 @@ def hash_header(value):
 
 
 def subscriber(event):
+    from .component import PyramidComponent
+
     request = event.request
 
     if request.method != "GET" or request.path_info.startswith(
@@ -116,7 +122,7 @@ def subscriber(event):
     ):
         return
 
-    options = request.env.pyramid.options.with_prefix("uacompat")
+    options = request.env.component(PyramidComponent).options.with_prefix("uacompat")
     if not options["enabled"]:
         return
 
@@ -147,7 +153,9 @@ def subscriber(event):
 
 
 @viewargs(renderer="uacompat.mako")
-def page(request):
+def page(request: Request):
+    from .component import PyramidComponent
+
     arg_next = request.GET.get("next", request.application_url)
     arg_hash = request.GET.get("hash", None)
     arg_bypass = request.GET.get("bypass", "0").lower() == "1"
@@ -171,7 +179,7 @@ def page(request):
     if fam_ver is not None:
         fam_id, cur = fam_ver
         fam = FAMILIES[fam_id]
-        req = request.env.pyramid.options[f"uacompat.{fam_id}"]
+        req = request.env.component(PyramidComponent).options[f"uacompat.{fam_id}"]
         ctx["fargs"] = dict(
             name=fam.alias,
             current=str(cur),
@@ -196,6 +204,6 @@ def page(request):
     return ctx
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: component.PyramidComponent, config):
     config.add_subscriber(subscriber, NewRequest)
     config.add_route("pyramid.uacompat", "/uacompat").add_view(page)

@@ -9,8 +9,10 @@ from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ConnectionScope, ResourceFactory, ResourceScope
 
+from .component import PostgisComponent
 from .diagnostics import Checker, StatusEnum
 from .exception import ExternalDatabaseError
 from .model import PostgisConnection, PostgisLayer
@@ -23,7 +25,7 @@ class SchemaObject(Struct, kw_only=True):
     tables: list[str]
 
 
-def inspect_connection(request) -> AsJSON[list[SchemaObject]]:
+def inspect_connection(request: Request) -> AsJSON[list[SchemaObject]]:
     """Inspect PostGIS connection
 
     :returns: Inspection results for the resource"""
@@ -64,7 +66,7 @@ class ColumnObject(Struct, kw_only=True):
     type: str
 
 
-def inspect_table(request) -> AsJSON[list[ColumnObject]]:
+def inspect_table(request: Request) -> AsJSON[list[ColumnObject]]:
     """Inspect PostGIS table
 
     :returns: Inspection results for the specified table"""
@@ -140,7 +142,7 @@ class CheckResponse(Struct, kw_only=True):
     checks: list[CheckResult]
 
 
-def diagnostics(request, *, body: CheckBody) -> CheckResponse:
+def diagnostics(request: Request, *, body: CheckBody) -> CheckResponse:
     """Run PostGIS diagnostics
 
     :returns: PostGIS connection check result"""
@@ -195,7 +197,7 @@ def diagnostics(request, *, body: CheckBody) -> CheckResponse:
         checks=checks,
     )
 
-    tr = request.localizer.translate
+    tr = request.translate
     for ck in checker.checks:
         messages = list()
         ck_result = CheckResult(status=ck.status, group=ck.group, messages=messages)
@@ -213,7 +215,7 @@ def diagnostics(request, *, body: CheckBody) -> CheckResponse:
     return result
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: PostgisComponent, config):
     postgis_connection_factory = ResourceFactory(context=PostgisConnection)
 
     config.add_route(

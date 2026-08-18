@@ -6,14 +6,7 @@ from typing import TYPE_CHECKING, Annotated, Any, TypeVar, Union, get_args, get_
 from msgspec import Struct
 from msgspec import _utils as ms_utils
 from msgspec.inspect import Metadata, type_info
-
-try:
-    # Msgspec >= 0.20.0
-    from msgspec.inspect import is_struct_type as _is_struct_type
-except ImportError:
-    # Msgspec < 0.20.0, drop eventually
-    from msgspec.inspect import _is_struct as _is_struct_type
-
+from msgspec.inspect import is_struct_type as _is_struct_type
 
 get_class_annotations = ms_utils.get_class_annotations
 NoneType = type(None)

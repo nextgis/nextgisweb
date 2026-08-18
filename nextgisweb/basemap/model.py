@@ -60,12 +60,7 @@ class BasemapWebMap(Base):
 
     webmap: Mapped[WebMap] = orm.relationship(
         foreign_keys=webmap_id,
-        backref=orm.backref(
-            "basemaps",
-            cascade="all,delete-orphan",
-            order_by=position,
-            collection_class=ordering_list("position"),
-        ),
+        back_populates="basemaps",
     )
 
     resource: Mapped[Resource] = orm.relationship(
@@ -83,6 +78,16 @@ class BasemapWebMap(Base):
         )
 
 
+WebMap.basemaps = orm.relationship(
+    "BasemapWebMap",
+    uselist=True,
+    order_by=BasemapWebMap.position,
+    collection_class=ordering_list("position"),
+    cascade="all,delete-orphan",
+    back_populates="webmap",
+)
+
+
 class BasemapWebMapConfig(Base):
     __tablename__ = "basemap_webmap_config"
 
@@ -90,13 +95,15 @@ class BasemapWebMapConfig(Base):
     background_color: Mapped[str | None] = mapped_column(sa.Unicode(6))
     disable: Mapped[bool] = mapped_column(default=False)
 
-    webmap: Mapped[WebMap] = orm.relationship(
-        backref=orm.backref(
-            "basemap_config",
-            cascade="all,delete-orphan",
-            uselist=False,
-        ),
-    )
+    webmap: Mapped[WebMap] = orm.relationship(back_populates="basemap_config")
+
+
+WebMap.basemap_config = orm.relationship(
+    BasemapWebMapConfig,
+    uselist=False,
+    cascade="all,delete-orphan",
+    back_populates="webmap",
+)
 
 
 OpacityFloat = Annotated[float, Meta(gt=0, le=1)]
@@ -118,17 +125,19 @@ class BasemapWebMapItemWrite(Struct, kw_only=True):
 
 class BasemapsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> list[BasemapWebMapItemRead]:
+        assert isinstance(srlzr.obj, WebMap)
         return [
             BasemapWebMapItemRead(
                 resource_id=i.resource_id,
                 display_name=i.display_name,
-                enabled=i.enabled,
+                enabled=bool(i.enabled),
                 opacity=i.opacity,
             )
             for i in srlzr.obj.basemaps
         ]
 
     def set(self, srlzr: Serializer, value: list[BasemapWebMapItemWrite], *, create: bool):
+        assert isinstance(srlzr.obj, WebMap)
         srlzr.obj.basemaps = [BasemapWebMap(**to_builtins(i)) for i in value]
 
 
@@ -142,12 +151,14 @@ class BasemapWebMapConfigAttr(SAttribute):
         super().bind(srlzrcls, attrname)
 
     def get(self, srlzr: Serializer) -> Any:
+        assert isinstance(srlzr.obj, WebMap)
         config = srlzr.obj.basemap_config
         if config is None:
             return self.default
         return getattr(config, self.model_attr)
 
     def set(self, srlzr: Serializer, value: Any, *, create: bool):
+        assert isinstance(srlzr.obj, WebMap)
         if value != self.default or srlzr.obj.basemap_config is not None:
             config = srlzr.obj.basemap_config
             if config is None:

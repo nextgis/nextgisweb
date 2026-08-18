@@ -4,6 +4,8 @@ from time import time
 from nextgisweb.lib.json import dumps as json_dumps
 from nextgisweb.lib.logging import lazy_str
 
+from nextgisweb.pyramid.tomb import Request
+
 
 def clean_user_keyname(value):
     # Replace all invalid chars with underscores
@@ -68,7 +70,7 @@ def log_lazy_data(value):
     return _prepare_data(value, first=True)
 
 
-def sync_ulg_cookie_callback(request, response):
+def sync_ulg_cookie_callback(request: Request, response):
     from nextgisweb.pyramid import WebSession
 
     value = request.environ.pop("auth.ulg_cookie")
@@ -79,7 +81,7 @@ def sync_ulg_cookie_callback(request, response):
         response.set_cookie("ngw_ulg", value, **cs)
 
 
-def sync_ulg_cookie(request, *, user=None):
+def sync_ulg_cookie(request: Request, *, user=None):
     if user is None:
         user = request.user
 
@@ -92,12 +94,12 @@ def sync_ulg_cookie(request, *, user=None):
     request.environ["auth.ulg_cookie"] = user_language
 
 
-def reset_slg_cookie_callback(request, response):
+def reset_slg_cookie_callback(request: Request, response):
     from nextgisweb.pyramid import WebSession
 
     cs = WebSession.cookie_settings(request)
     response.delete_cookie("ngw_slg", path=cs["path"], domain=cs["domain"])
 
 
-def reset_slg_cookie(request):
+def reset_slg_cookie(request: Request):
     request.add_response_callback(reset_slg_cookie_callback)

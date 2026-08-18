@@ -1,8 +1,8 @@
 from io import BytesIO
 
 import numpy
-import PIL
 from osgeo import gdal, gdal_array, gdalconst
+from PIL import Image
 from zope.interface import implementer
 
 from nextgisweb.env import Base, gettext
@@ -58,7 +58,7 @@ class RasterStyle(Resource):
         return RenderRequest(self, srs, cond)
 
     def render_image(self, extent, size):
-        result = PIL.Image.new("RGBA", size, (0, 0, 0, 0))
+        result = Image.new("RGBA", size, (0, 0, 0, 0))
 
         if self.parent.cls == "raster_layer":
             parent_ds = self.parent.gdal_dataset()
@@ -93,7 +93,7 @@ class RasterStyle(Resource):
 
         ds = None
         parent_ds = None
-        wnd = PIL.Image.fromarray(array)
+        wnd = Image.fromarray(array)
         result.paste(wnd)
 
         return result
@@ -101,7 +101,7 @@ class RasterStyle(Resource):
     def render_legend(self):
         # Don't use real preview of raster layer as icon
         # because it may be slow
-        img = PIL.Image.open(module_path("nextgisweb.raster_style") / "iconRaster.png")
+        img = Image.open(module_path("nextgisweb.raster_style") / "iconRaster.png")
         buf = BytesIO()
         img.save(buf, "png")
         buf.seek(0)

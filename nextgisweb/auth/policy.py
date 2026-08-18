@@ -7,7 +7,6 @@ import sqlalchemy as sa
 from msgspec import Struct, convert, to_builtins
 from pyramid.authorization import ACLHelper
 from pyramid.interfaces import ISecurityPolicy
-from pyramid.request import Request
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import load_only
 from zope.event import notify
@@ -18,7 +17,9 @@ from nextgisweb.lib.apitype import declare_enum
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import CoreComponent
 from nextgisweb.pyramid import SessionStore, WebSession
+from nextgisweb.pyramid.tomb import Request
 
 from .exception import (
     InvalidAuthorizationHeader,
@@ -78,7 +79,7 @@ class AuthResult(Struct):
 class OnUserLogin(Struct):
     user: User
     request: Request
-    next_url: str
+    next_url: str | None
 
 
 class AuthMethod(Protocol):
@@ -100,13 +101,13 @@ class SecurityPolicy:
 
     # ISecurityPolicy implementation
 
-    def authenticated_userid(self, request):
+    def authenticated_userid(self, request: Request):
         if aresult := self._authenticate_request(request):
             request.environ["auth.result"] = aresult
             return aresult.uid
         return None
 
-    def remember(self, request, what, **kw):
+    def remember(self, request: Request, what, **kw):
         session = request.session
 
         user_id, tpair = what
@@ -139,9 +140,11 @@ class SecurityPolicy:
 
         return ()
 
-    def forget(self, request, **kw):
-        def forget_callback(request, response):
-            cookie_name = request.env.pyramid.options["session.cookie.name"]
+    def forget(self, request: Request, **kw):
+        from nextgisweb.pyramid import PyramidComponent
+
+        def forget_callback(request: Request, response):
+            cookie_name = request.env.component(PyramidComponent).options["session.cookie.name"]
             cs = WebSession.cookie_settings(request)
             response.delete_cookie(cookie_name, path=cs["path"], domain=cs["domain"])
             response.delete_cookie("ngw_ulg", path=cs["path"], domain=cs["domain"])
@@ -149,12 +152,12 @@ class SecurityPolicy:
         request.add_response_callback(forget_callback)
         return ()
 
-    def permits(self, request, context, permission):
+    def permits(self, request: Request, context, permission):
         return self.acl_helper.permits(context, [], permission)
 
     # Addons
 
-    def login(self, username, password, *, request):
+    def login(self, username, password, *, request: Request):
         user, _, tpair = self._validate_credentials(username, password, return_tpair=True)
 
         if user.id is None:
@@ -166,7 +169,7 @@ class SecurityPolicy:
         headers = self.remember(request, (user.id, tpair))
         return user, headers, event
 
-    def forget_user(self, user_id, request):
+    def forget_user(self, user_id, request: Request):
         SessionStore.filter(
             SessionStore.session_id != request.session.id,
             SessionStore.key == "auth.state",
@@ -184,7 +187,7 @@ class SecurityPolicy:
 
     # Internals
 
-    def _authenticate_request(self, request):
+    def _authenticate_request(self, request: Request):
         now = current_tstamp()
 
         # TODO:  Try headers first!
@@ -193,7 +196,7 @@ class SecurityPolicy:
             if result is not None:
                 return result
 
-    def _try_session(self, request, *, now):
+    def _try_session(self, request: Request, *, now):
         session = request.session
         if (state_dict := session.get("auth.state")) is None:
             if self.refresh_session:
@@ -209,7 +212,7 @@ class SecurityPolicy:
                 # session keys.
 
                 session_id = request.session.id
-                with request.env.core.engine.connect() as con, con.begin():
+                with request.env.component(CoreComponent).engine.connect() as con, con.begin():
                     con.execute(
                         sa.text("SELECT pg_advisory_xact_lock(hashtext((:sid)::text))"),
                         dict(sid=f"auth_oauth_{session_id}"),
@@ -276,7 +279,7 @@ class SecurityPolicy:
 
         raise ValueError("Invalid authentication source")
 
-    def _try_headers(self, request, *, now):
+    def _try_headers(self, request: Request, *, now):
         ahead = request.headers.get("Authorization")
         if ahead is None:
             return None

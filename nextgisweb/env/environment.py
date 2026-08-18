@@ -120,6 +120,10 @@ class Env(Container):
         if set_global:
             setenv(self)
 
+    def component[T: Component](self, cls: type[T], /) -> T:
+        """Get component instance by its class type"""
+        return self.components[cls.identity]
+
     def chain(self, meth, first="core"):
         """Building a sequence of method calls with dependencies.
         ``core`` component dependency gets added automatically for all

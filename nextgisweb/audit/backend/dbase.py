@@ -10,6 +10,9 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib import json
 from nextgisweb.lib.datetime import utcnow_naive
 
+from nextgisweb.core import CoreComponent
+from nextgisweb.pyramid.tomb import Request
+
 from ..component import AuditComponent
 from ..model import tab_journal
 from .base import BackendBase
@@ -22,7 +25,7 @@ class DatabaseBackend(BackendBase):
     def __init__(self, comp: AuditComponent) -> None:
         super().__init__(comp)
         self.engine = create_engine(
-            comp.env.core._engine_url(),
+            comp.env.component(CoreComponent)._engine_url(),
             json_serializer=json.dumps,
             json_deserializer=json.loads,
             isolation_level="AUTOCOMMIT",
@@ -35,7 +38,7 @@ class DatabaseBackend(BackendBase):
         con.execute(self.insert.values(tstamp=tstamp, data=data))
 
     @contextmanager
-    def __call__(self, request):
+    def __call__(self, request: Request):
         con = self.engine.connect()
         try:
             yield partial(self._write, con=con)

@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import ClassVar, Type
 
-from pyramid.request import Request
 from zope.interface import Interface
 
 from nextgisweb.lib.i18n import Translatable
 from nextgisweb.lib.registry import ListRegistry, list_registry
+
+from nextgisweb.pyramid.tomb import Request
 
 from .model import Resource
 

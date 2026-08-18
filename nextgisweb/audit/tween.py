@@ -3,11 +3,13 @@ from zope.event import notify
 from nextgisweb.env import inject
 from nextgisweb.lib.datetime import utcnow_naive
 
+from nextgisweb.pyramid.tomb import Request
+
 from .component import AuditComponent
 
 
 class OnResponse:
-    def __init__(self, request, response, body):
+    def __init__(self, request: Request, response, body):
         self._request = request
         self._response = response
         self._body = body
@@ -45,13 +47,14 @@ def factory(handler, registry, *, comp: AuditComponent):
         f_request_path = tuple(f_request_path)
         filters.append(lambda req: req.path_info.startswith(f_request_path))
 
-    def tween(request):
+    def tween(request: Request):
         for f in filters:
             if not f(request):
                 return handler(request)
 
         ctx = []
         try:
+            assert comp.backends, "Audit backends are not configured"
             for backend in comp.backends.values():
                 cman = backend(request)
                 ctx.append((cman, cman.__enter__()))

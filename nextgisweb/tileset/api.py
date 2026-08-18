@@ -4,14 +4,16 @@ from pyramid.response import FileResponse, Response
 
 from nextgisweb.lib.apitype import ContentType
 
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope
 
+from .component import TilesetComponent
 from .model import Tileset
 
 
 def export(
     resource: Tileset,
-    request,
+    request: Request,
 ) -> Annotated[Response, ContentType("application/vnd.sqlite3")]:
     """Export tileset in internal representation format
 
@@ -27,7 +29,7 @@ def export(
     return response
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: TilesetComponent, config):
     config.add_view(
         export,
         route_name="resource.export",

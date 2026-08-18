@@ -7,15 +7,17 @@ import sqlalchemy as sa
 from msgspec import Meta, Struct
 from msgspec.msgpack import decode as msgspec_decode
 from msgspec.msgpack import encode as msgspec_encode
-from pyramid.response import Response
+from pyramid.httpexceptions import HTTPNoContent
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AnyOf, AsJSON, DatetimeNaive, StatusCode
 
 from nextgisweb.auth.api import UserReadBrief, UserRef, serialize_principal
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, resource_factory
 from nextgisweb.spatial_ref_sys import SRSRef
 
+from ..component import FeatureLayerComponent
 from ..interface import (
     FeatureLayerFieldDatatype,
     FeatureLayerGeometryType,
@@ -86,7 +88,7 @@ if not TYPE_CHECKING:
 
 def change_check(
     resource,
-    request,
+    request: Request,
     *,
     initial: VersionID = 0,
     target: VersionID | None = None,
@@ -124,7 +126,7 @@ def change_check(
         target = resource.fversioning.latest
 
     if initial == target:
-        return Response(status=204)
+        raise HTTPNoContent()
 
     FVersioningInvalidRange.disprove(initial, target)
     tstamp = FVersioningObj.filter_by(resource_id=resource.id, version_id=target).one().tstamp
@@ -179,7 +181,7 @@ if not TYPE_CHECKING:
 
 def change_fetch(
     resource,
-    request,
+    request: Request,
     *,
     epoch: Epoch,
     initial: VersionID,
@@ -329,7 +331,7 @@ class VersionCGetResponse(Struct, kw_only=True):
 
 def version_cget(
     resource,
-    request,
+    request: Request,
     *,
     epoch: Epoch,
     order: VersionCGetOrder,
@@ -464,7 +466,7 @@ class VersionRead(Struct, kw_only=True):
     user: UserReadBrief | None
 
 
-def version_iget(resource, request, vid: VersionID) -> VersionRead:
+def version_iget(resource, request: Request, vid: VersionID) -> VersionRead:
     """Read version metadata
 
     :returns: Feature layer version metadata"""
@@ -486,7 +488,7 @@ def version_iget(resource, request, vid: VersionID) -> VersionRead:
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureLayerComponent, config):
     config.add_route(
         "feature_layer.changes_check",
         "/api/resource/{id:uint}/feature/changes/check",

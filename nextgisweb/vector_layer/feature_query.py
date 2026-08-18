@@ -3,6 +3,7 @@ from msgspec import UNSET
 from shapely.geometry import box
 from sqlalchemy import cast, func
 from sqlalchemy.sql import alias, literal_column, null, select
+from sqlalchemy.sql import operators as sa_operators
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
@@ -183,7 +184,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
                     v = null()
 
-                op = getattr(sa.sql.operators, o)
+                op = getattr(sa_operators, o)
                 column = idcol if k == "id" else fields[k]
                 if o not in ("is_", "isnot"):
                     if isinstance(v, list):

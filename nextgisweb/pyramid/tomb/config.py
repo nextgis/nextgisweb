@@ -29,13 +29,14 @@ from .exception import MalformedJSONBody
 from .helper import RouteHelper
 from .inspect import iter_routes
 from .predicate import ErrorRendererPredicate, RequestMethodPredicate, RouteMeta, ViewMeta
+from .request import Request
 from .util import push_stacklevel
 
 
 def _json_msgspec_factory(typedef):
     decoder = Decoder(typedef)
 
-    def _json_msgspec(request):
+    def _json_msgspec(request: Request):
         try:
             return decoder.decode(request.body)
         except MsgSpecValidationError as exc:
@@ -81,7 +82,7 @@ def _view_driver_factory(
     if convert is None:
         convert = lambda x: x
 
-    def _view(context, request):
+    def _view(context, request: Request):
         try:
             kw = {k: f(request) for k, f in extract}
         except QueryParamError as exc:
@@ -157,7 +158,7 @@ class Configurator(PyramidConfigurator):
     def setup_registry(self, *args, **kwargs):
         super().setup_registry(*args, **kwargs)
 
-        def path_param(request):
+        def path_param(request: Request):
             for p in request.matched_route.predicates:
                 if isinstance(p, RouteMeta):
                     md = request.matchdict
@@ -459,6 +460,6 @@ class Configurator(PyramidConfigurator):
             raise ValueError("Type or pattern required")
 
 
-def _request_path_param(request):
+def _request_path_param(request: Request):
     matchdict = request.matchdict
     return {k: v(matchdict[k]) for k, v in request.path_param_decoders}

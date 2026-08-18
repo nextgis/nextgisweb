@@ -69,7 +69,12 @@ class FontConfig:
         result = []
         root_prefix = str(self.root_path.absolute()) + sep
         for node in root.findall(".//item"):
-            rec = {p: node.find(p).text for p in props}
+            rec = {
+                p: nt
+                for p in props
+                if (nc := node.find(p)) is not None
+                if (nt := nc.text) is not None
+            }
             file = Path(rec["file"])
 
             # Some fonts have multiple families and styles, last ones look

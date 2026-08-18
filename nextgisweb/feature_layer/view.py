@@ -9,6 +9,7 @@ from nextgisweb.feature_layer.api import query_feature_or_not_found
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
@@ -35,7 +36,7 @@ class SettingsWidget(Widget):
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-grid")
-def feature_browse(request):
+def feature_browse(request: Request):
     request.resource_permission(DataScope.read)
 
     readonly = not request.context.has_permission(DataScope.write, request.user)
@@ -50,7 +51,7 @@ def feature_browse(request):
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-display")
-def feature_show(request):
+def feature_show(request: Request):
     request.resource_permission(DataScope.read)
 
     resource_id = request.context.id
@@ -66,7 +67,7 @@ def feature_show(request):
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-editor")
-def feature_update(request):
+def feature_update(request: Request):
     request.resource_permission(DataScope.write)
 
     resource_id = request.context.id
@@ -82,7 +83,7 @@ def feature_update(request):
 
 
 @react_renderer("@nextgisweb/feature-layer/export-form")
-def export(request):
+def export(request: Request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
     return dict(
@@ -94,7 +95,7 @@ def export(request):
 
 
 @react_renderer("@nextgisweb/feature-layer/version-history")
-def history(request):
+def history(request: Request):
     request.resource_permission(DataScope.read)
     if not IVersionableFeatureLayer.providedBy(request.context) or not request.context.fversioning:
         raise FVersioningNotEnabled()
@@ -108,7 +109,7 @@ def history(request):
 
 
 @react_renderer("@nextgisweb/feature-layer/export-form")
-def export_multiple(request):
+def export_multiple(request: Request):
     return dict(
         obj=request.context,
         title=gettext("Save as"),
@@ -127,7 +128,7 @@ class MVTLink(ExternalAccessLink):
     interface = IFeatureLayer
 
     @classmethod
-    def is_applicable(cls, obj, request) -> bool:
+    def is_applicable(cls, obj, request: Request) -> bool:
         return (
             MVT_DRIVER_EXIST
             and super().is_applicable(obj, request)
@@ -135,7 +136,7 @@ class MVTLink(ExternalAccessLink):
         )
 
     @classmethod
-    def url_factory(cls, obj, request) -> str:
+    def url_factory(cls, obj, request: Request) -> str:
         return (
             request.route_url("feature_layer.mvt", _query=dict(resource=obj.id))
             + "&z={z}&x={x}&y={y}"
@@ -148,7 +149,7 @@ def resource_section_fields(obj, **kwargs):
 
 
 @react_renderer("@nextgisweb/feature-layer/versioning-settings")
-def versioning_settings(request):
+def versioning_settings(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Feature versioning"),
@@ -166,7 +167,8 @@ class FeatureLayerExportFormatClientSetting(Struct, kw_only=True):
 
 @client_setting("exportFormats")
 def cs_export_formats(
-    comp: FeatureLayerComponent, request
+    comp: FeatureLayerComponent,
+    request: Request,
 ) -> list[FeatureLayerExportFormatClientSetting]:
     return [FeatureLayerExportFormatClientSetting(**i) for i in OGR_DRIVER_NAME_2_EXPORT_FORMATS]
 
@@ -176,11 +178,13 @@ class FeatureLayerVersioningClientSetting(Struct, kw_only=True):
 
 
 @client_setting("versioning")
-def cs_versioning(comp: FeatureLayerComponent, request) -> FeatureLayerVersioningClientSetting:
+def cs_versioning(
+    comp: FeatureLayerComponent, request: Request
+) -> FeatureLayerVersioningClientSetting:
     return FeatureLayerVersioningClientSetting(default=comp.versioning_default)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureLayerComponent, config):
     config.add_route(
         "feature_layer.export_multiple",
         r"/resource/export_multiple",

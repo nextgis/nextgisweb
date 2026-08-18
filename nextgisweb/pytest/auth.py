@@ -22,10 +22,11 @@ def ngw_disable_oauth(ngw_env):
 def ngw_auth_administrator(ngw_env):
     from nextgisweb.auth import User
     from nextgisweb.auth.policy import AM_SESSION, AP_LOCAL_PW, AuthResult
+    from nextgisweb.pyramid.tomb import Request
 
     auth = ngw_env.auth
 
-    def forever_admin(request, *, now):
+    def forever_admin(request: Request, *, now):
         return AuthResult(
             User.by_keyname("administrator").id,
             AM_SESSION,

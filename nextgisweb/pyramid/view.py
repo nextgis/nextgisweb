@@ -38,8 +38,8 @@ from .client import client_setting
 from .component import PyramidComponent
 from .openapi import openapi
 from .session import WebSession
+from .tomb import Request, StaticFileResponse
 from .tomb.predicate import ErrorRendererPredicate
-from .tomb.response import StaticFileResponse
 from .uacompat import FAMILIES
 from .uacompat import parse_header as ua_parse_header
 from .util import StaticMap, StaticSourcePredicate, set_output_buffering, viewargs
@@ -55,7 +55,7 @@ class ModelFactory:
         self.tdef = tdef
         self.context = context
 
-    def __call__(self, request):
+    def __call__(self, request: Request):
         model_id = request.path_param[self.key]
         try:
             obj = self.context.filter(self.context.id == model_id).one()
@@ -68,7 +68,7 @@ class ModelFactory:
         return {self.key: self.tdef}
 
 
-def asset(request):
+def asset(request: Request):
     component = request.matchdict["component"]
     subpath = request.matchdict["subpath"]
 
@@ -84,14 +84,14 @@ def asset(request):
         raise HTTPNotFound()
 
 
-def static_view(request):
+def static_view(request: Request):
     static_path = request.environ["static_path"]
-    cache = request.matchdict["skey"] == request.env.pyramid.static_key[1:]
+    cache = request.matchdict["skey"] == request.env.component(PyramidComponent).static_key[1:]
     return StaticFileResponse(str(static_path), cache=cache, request=request)
 
 
 @inject()
-def asset_favicon(request, *, pyramid: PyramidComponent):
+def asset_favicon(request: Request, *, pyramid: PyramidComponent):
     fn_favicon = pyramid.options["favicon"]
     if os.path.isfile(fn_favicon):
         return FileResponse(fn_favicon, request=request, content_type="image/x-icon")
@@ -100,7 +100,7 @@ def asset_favicon(request, *, pyramid: PyramidComponent):
 
 
 @inject()
-def asset_css(request, *, ckey: str | None = None, core: CoreComponent):
+def asset_css(request: Request, *, ckey: str | None = None, core: CoreComponent):
     response = Response(
         core.settings_get("pyramid", "custom_css", ""),
         content_type="text/css",
@@ -115,7 +115,7 @@ def asset_css(request, *, ckey: str | None = None, core: CoreComponent):
 
 
 @inject()
-def asset_hlogo(request, *, ckey: str | None = None, core: CoreComponent):
+def asset_hlogo(request: Request, *, ckey: str | None = None, core: CoreComponent):
     if (data := core.settings_get("pyramid", "logo", None)) is None:
         raise HTTPNotFound()
     mime_type, file = data
@@ -130,7 +130,7 @@ def asset_hlogo(request, *, ckey: str | None = None, core: CoreComponent):
 
 @inject()
 def asset_blogo(
-    request,
+    request: Request,
     *,
     ckey: str | None = None,
     core: CoreComponent,
@@ -155,9 +155,9 @@ def asset_blogo(
     return response
 
 
-def home(request):
+def home(request: Request):
     try:
-        home_path = request.env.core.settings_get("pyramid", "home_path")
+        home_path = request.env.component(CoreComponent).settings_get("pyramid", "home_path")
     except KeyError:
         home_path = None
 
@@ -173,26 +173,26 @@ def home(request):
         return HTTPFound(location=request.route_url("resource.show", id=0))
 
 
-def contact_administrator_redirect(request):
-    if nbase := request.env.core.options["contact_administrator_url"]:
-        location = nbase.format(instance_id=request.env.core.instance_id)
+def contact_administrator_redirect(request: Request):
+    if nbase := request.env.component(CoreComponent).options["contact_administrator_url"]:
+        location = nbase.format(instance_id=request.env.component(CoreComponent).instance_id)
         raise HTTPFound(location=location)
     else:
         raise HTTPNotFound()
 
 
-def openapi_json(request) -> JSONType:
+def openapi_json(request: Request) -> JSONType:
     return openapi(request.registry.introspector)
 
 
-def openapi_json_test(request) -> JSONType:
+def openapi_json_test(request: Request) -> JSONType:
     from .test.test_openapi import config
 
     return openapi(config.registry.introspector, prefix="/")
 
 
 @react_renderer("@nextgisweb/pyramid/swagger-ui")
-def swagger(request):
+def swagger(request: Request):
     return dict(
         title=gettext("OpenAPI documentation"),
         props=dict(url=request.route_url("pyramid.openapi_json")),
@@ -201,7 +201,7 @@ def swagger(request):
 
 @react_renderer("@nextgisweb/pyramid/control-panel")
 @inject()
-def control_panel(request, *, comp: PyramidComponent):
+def control_panel(request: Request, *, comp: PyramidComponent):
     if not request.user.is_administrator and len(request.user.effective_permissions) == 0:
         raise ForbiddenError
     return dict(
@@ -209,9 +209,9 @@ def control_panel(request, *, comp: PyramidComponent):
     )
 
 
-def locale(request):
+def locale(request: Request):
     @request.add_response_callback
-    def callback(request, response):
+    def callback(request: Request, response):
         response.set_cookie(
             "ngw_slg",
             request.matchdict["locale"],
@@ -222,7 +222,7 @@ def locale(request):
 
 
 @react_renderer("@nextgisweb/pyramid/system-info")
-def sysinfo(request):
+def sysinfo(request: Request):
     request.require_administrator()
     tr = request.translate
 
@@ -247,13 +247,13 @@ def sysinfo(request):
     for comp in request.env.chain("sys_info"):
         platform.extend((tr(k), tr(v)) for k, v in comp.sys_info())
 
-    def _browser_suppopr(fid, fam):
-        min_ver = request.env.pyramid.options[f"uacompat.{fid}"]
+    def _browser_support(fid, fam):
+        min_ver = request.env.component(PyramidComponent).options[f"uacompat.{fid}"]
         return (fam.alias, min_ver)
 
     ua_parsed = ua_parse_header(ua_header) if (ua_header := request.user_agent) else None
     browser = dict(
-        support=[_browser_suppopr(fid, fam) for fid, fam in FAMILIES.items()],
+        support=[_browser_support(fid, fam) for fid, fam in FAMILIES.items()],
         current=(FAMILIES[ua_parsed[0]].alias, ua_parsed[1]) if ua_parsed else None,
     )
 
@@ -264,7 +264,7 @@ def sysinfo(request):
 
 
 @react_renderer("@nextgisweb/pyramid/fonts")
-def fonts(request):
+def fonts(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Font management"),
@@ -272,10 +272,10 @@ def fonts(request):
 
 
 @react_renderer("@nextgisweb/pyramid/storage-summary")
-def storage(request):
+def storage(request: Request):
     request.require_administrator()
 
-    if not request.env.core.options["storage.enabled"]:
+    if not request.env.component(CoreComponent).options["storage.enabled"]:
         raise NotConfigured
 
     return dict(
@@ -284,12 +284,12 @@ def storage(request):
 
 
 @react_renderer("@nextgisweb/pyramid/backup-browse")
-def backup_browse(request):
-    if not request.env.pyramid.options["backup.download"]:
+def backup_browse(request: Request):
+    if not request.env.component(PyramidComponent).options["backup.download"]:
         raise HTTPNotFound()
 
     request.require_administrator()
-    items = request.env.core.get_backups()
+    items = request.env.component(CoreComponent).get_backups()
 
     return dict(
         title=gettext("Backups"),
@@ -297,16 +297,16 @@ def backup_browse(request):
     )
 
 
-def backup_download(request):
-    if not request.env.pyramid.options["backup.download"]:
+def backup_download(request: Request):
+    if not request.env.component(PyramidComponent).options["backup.download"]:
         raise HTTPNotFound()
     request.require_administrator()
-    fn = request.env.core.backup_filename(request.matchdict["filename"])
+    fn = request.env.component(CoreComponent).backup_filename(request.matchdict["filename"])
     return FileResponse(fn)
 
 
 @react_renderer("@nextgisweb/pyramid/cors-settings")
-def cors(request):
+def cors(request: Request):
     request.user.require_permission(any, *permission.cors)
     return dict(
         title=gettext("Cross-origin resource sharing (CORS)"),
@@ -315,7 +315,7 @@ def cors(request):
 
 
 @react_renderer("@nextgisweb/pyramid/custom-css-form")
-def custom_css(request):
+def custom_css(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Custom CSS"),
@@ -323,7 +323,7 @@ def custom_css(request):
 
 
 @react_renderer("@nextgisweb/pyramid/logo-form")
-def cp_logo(request):
+def cp_logo(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Custom logo"),
@@ -331,7 +331,7 @@ def cp_logo(request):
 
 
 @react_renderer("@nextgisweb/pyramid/system-name-form")
-def system_name(request):
+def system_name(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Web GIS name"),
@@ -339,7 +339,7 @@ def system_name(request):
 
 
 @react_renderer("@nextgisweb/pyramid/home-path")
-def home_path(request):
+def home_path(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Home path"),
@@ -347,15 +347,15 @@ def home_path(request):
 
 
 @react_renderer("@nextgisweb/pyramid/metrics")
-def metrics(request):
+def metrics(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Metrics and analytics"),
     )
 
 
-def test_request(request):
-    comp = request.env.pyramid
+def test_request(request: Request):
+    comp = request.env.component(PyramidComponent)
     handler = comp.test_request_handler
     if handler:
         return handler(request)
@@ -363,7 +363,7 @@ def test_request(request):
         raise ValueError("Invalid test request handler")
 
 
-def test_exception_handled(request):
+def test_exception_handled(request: Request):
     class HandledTestException(UserException):
         title = "Title"
         message = "Message"
@@ -373,14 +373,14 @@ def test_exception_handled(request):
     raise HandledTestException()
 
 
-def test_exception_unhandled(request):
+def test_exception_unhandled(request: Request):
     class UnhandledTestException(Exception):
         pass
 
     raise UnhandledTestException()
 
 
-def test_exception_transaction(request):
+def test_exception_transaction(request: Request):
     request.user
 
     try:
@@ -392,11 +392,11 @@ def test_exception_transaction(request):
 
 
 @viewargs(renderer="mako")
-def test_exception_template(request):
+def test_exception_template(request: Request):
     return dict()
 
 
-def test_timeout(request):
+def test_timeout(request: Request):
     duration = float(request.GET.get("t", "60"))
     interval = float(request.GET["i"]) if "i" in request.GET else None
     buffering = (request.GET["b"].lower() in ("true", "1", "yes")) if "b" in request.GET else None
@@ -429,24 +429,25 @@ def test_timeout(request):
 
 
 @client_setting("urlSafePattern")
-def cs_url_safe_pattern(comp: PyramidComponent, request) -> str:
+def cs_url_safe_pattern(comp: PyramidComponent, request: Request) -> str:
     return URL_PATTERN
 
 
 @client_setting("support_url")
-def cs_support_url(comp: PyramidComponent, request) -> str | None:
-    return request.env.core.support_url_view(request)
+def cs_support_url(comp: PyramidComponent, request: Request) -> str | None:
+    return request.env.component(CoreComponent).support_url_view(request)
 
 
 @client_setting("help_page_url")
-def cs_help_page_url(comp: PyramidComponent, request) -> str | None:
+def cs_help_page_url(comp: PyramidComponent, request: Request) -> str | None:
     return comp.help_page_url_view(request)
 
 
 @client_setting("contactAdministratorUrl")
-def cs_contact_administrator_url(comp: PyramidComponent, request) -> str | None:
-    base = request.env.core.options["contact_administrator_url"]
-    return base.format(instance_id=request.env.core.instance_id) if base else None
+def cs_contact_administrator_url(comp: PyramidComponent, request: Request) -> str | None:
+    core = request.env.component(CoreComponent)
+    base = core.options["contact_administrator_url"]
+    return base.format(instance_id=core.instance_id) if base else None
 
 
 class PyramidCompanyLogoClientSetting(Struct, kw_only=True):
@@ -456,10 +457,10 @@ class PyramidCompanyLogoClientSetting(Struct, kw_only=True):
 
 
 @client_setting("company_logo")
-def cs_company_logo(comp: PyramidComponent, request) -> PyramidCompanyLogoClientSetting:
+def cs_company_logo(comp: PyramidComponent, request: Request) -> PyramidCompanyLogoClientSetting:
     return PyramidCompanyLogoClientSetting(
         enabled=comp.company_logo_enabled(request),
-        ckey=request.env.core.settings_get("pyramid", "company_logo.ckey"),
+        ckey=request.env.component(CoreComponent).settings_get("pyramid", "company_logo.ckey"),
         link=comp.company_url_view(request),
     )
 
@@ -485,13 +486,14 @@ class PyramidI18nClientSetting(Struct, kw_only=True, rename="camel"):
 
 
 @client_setting("i18n")
-def cs_i18n(comp: PyramidComponent, request) -> PyramidI18nClientSetting:
+def cs_i18n(comp: PyramidComponent, request: Request) -> PyramidI18nClientSetting:
+    core = request.env.component(CoreComponent)
     return PyramidI18nClientSetting(
         languages=[
             PyramidI18nClientSetting.Language.from_code(language_code)
-            for language_code in request.env.core.locale_available
+            for language_code in core.locale_available
         ],
-        contribute_url=request.env.core.options["locale.contribute_url"],
+        contribute_url=core.options["locale.contribute_url"],
     )
 
 
@@ -501,10 +503,11 @@ class PyramidStorageClientSetting(Struct, kw_only=True):
 
 
 @client_setting("storage")
-def cs_storage(comp: PyramidComponent, request) -> PyramidStorageClientSetting:
+def cs_storage(comp: PyramidComponent, request: Request) -> PyramidStorageClientSetting:
+    core = request.env.component(CoreComponent)
     return PyramidStorageClientSetting(
-        enabled=request.env.core.options["storage.enabled"],
-        limit=request.env.core.options["storage.limit"],
+        enabled=core.options["storage.enabled"],
+        limit=core.options["storage.limit"],
     )
 
 
@@ -513,7 +516,7 @@ class PyramidBackupClientSetting(Struct, kw_only=True):
 
 
 @client_setting("backup")
-def cs_backup(comp: PyramidComponent, request) -> PyramidBackupClientSetting:
+def cs_backup(comp: PyramidComponent, request: Request) -> PyramidBackupClientSetting:
     return PyramidBackupClientSetting(
         download=comp.options["backup.download"],
     )
@@ -525,7 +528,7 @@ class PyramidLunkwillClientSetting(Struct, kw_only=True):
 
 
 @client_setting("lunkwill")
-def cs_lunkwill(comp: PyramidComponent, request) -> PyramidLunkwillClientSetting:
+def cs_lunkwill(comp: PyramidComponent, request: Request) -> PyramidLunkwillClientSetting:
     enabled = comp.options["lunkwill.enabled"]
     return PyramidLunkwillClientSetting(
         enabled=enabled,
@@ -533,9 +536,10 @@ def cs_lunkwill(comp: PyramidComponent, request) -> PyramidLunkwillClientSetting
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: PyramidComponent, config):
     env = comp.env
-    is_debug = env.core.debug
+    core = comp.env.component(CoreComponent)
+    is_debug = core.debug
 
     # Session factory
     config.set_session_factory(WebSession)
@@ -562,7 +566,7 @@ def setup_pyramid(comp, config):
     comp.error_handlers = list()
 
     @comp.error_handlers.append
-    def error_renderer_handler(request, err_info, exc, exc_info):
+    def error_renderer_handler(request: Request, err_info, exc, exc_info):
         error_renderer = None
 
         mroute = request.matched_route
@@ -576,15 +580,15 @@ def setup_pyramid(comp, config):
             return error_renderer(request, err_info, exc, exc_info, debug=is_debug)
 
     @comp.error_handlers.append
-    def api_error_handler(request, err_info, exc, exc_info):
+    def api_error_handler(request: Request, err_info, exc, exc_info):
         if request.is_api or request.is_xhr:
             return exception.json_error_response(request, err_info, exc, exc_info, debug=is_debug)
 
     @comp.error_handlers.append
-    def html_error_handler(request, err_info, exc, exc_info):
+    def html_error_handler(request: Request, err_info, exc, exc_info):
         return exception.html_error_response(request, err_info, exc, exc_info, debug=is_debug)
 
-    def error_handler(request, err_info, exc, exc_info, **kwargs):
+    def error_handler(request: Request, err_info, exc, exc_info, **kwargs):
         for handler in comp.error_handlers:
             result = handler(request, err_info, exc, exc_info)
             if result is not None:
@@ -601,23 +605,23 @@ def setup_pyramid(comp, config):
     # Substitute localizer from pyramid with our own, original is
     # too tied to translationstring, that works strangely with string
     # interpolation via % operator.
-    def localizer(request, localizer=comp.env.core.localizer):
+    def localizer(request: Request, localizer=core.localizer):
         return localizer(request.locale_name)
 
-    def translate(request):
+    def translate(request: Request):
         return request.localizer.translate
 
     config.add_request_method(localizer, "localizer", property=True)
     config.add_request_method(translate, "translate", property=True)
 
-    lg_default = comp.env.core.locale_default
+    lg_default = core.locale_default
     lg_ordered = sorted(
-        comp.env.core.locale_available,
+        core.locale_available,
         key=lambda lg: (int(lg != lg_default), lg),
     )
 
     @config.set_locale_negotiator
-    def locale_negotiator(request):
+    def locale_negotiator(request: Request):
         # The previous implementation used user and session attributes, but it
         # caused too much ploblems as the locale negotiator could be invoked
         # from an error handler to localize an error message.
@@ -644,10 +648,10 @@ def setup_pyramid(comp, config):
     _setup_pyramid_mako(comp, config)
 
     # Filter for quick translation. Defines function tr, which we can use
-    # instead of request.localizer.translate in mako templates.
+    # instead of request.translate in mako templates.
     def tr_subscriber(event):
         def _tr(msg):
-            return event["request"].localizer.translate(msg)
+            return event["request"].translate(msg)
 
         event["tr"] = _tr
 
@@ -754,14 +758,14 @@ def setup_pyramid(comp, config):
     config.add_route("pyramid.test_timeout", "/test/timeout").add_view(test_timeout)
 
 
-def _setup_static(comp, config):
+def _setup_static(comp: PyramidComponent, config):
     config.registry.settings["pyramid.static_map"] = StaticMap()
     config.add_route_predicate("static_source", StaticSourcePredicate)
 
     if "static_key" in comp.options:
         comp.static_key = "/" + comp.options["static_key"]
         logger.debug("Using static key from options '%s'", comp.static_key[1:])
-    elif comp.env.core.debug:
+    elif comp.env.component(CoreComponent).debug:
         # In debug build static_key from proccess startup time
         rproc = Process(os.getpid())
 
@@ -796,7 +800,7 @@ def _setup_static(comp, config):
         static_source=True,
     ).add_view(static_view)
 
-    def static_url(request, path=""):
+    def static_url(request: Request, path=""):
         return request.route_url("pyramid.static", subpath=path, skey=comp.static_key[1:])
 
     config.add_request_method(static_url, property=False)
@@ -850,7 +854,7 @@ def _m_gettext(_template_filename):
     }
 
 
-def _setup_pyramid_mako(comp, config):
+def _setup_pyramid_mako(comp: PyramidComponent, config):
     mako_imports = [
         "from markupsafe import Markup",
         "from nextgisweb.pyramid.view import json_js",
@@ -872,7 +876,7 @@ def _setup_pyramid_mako(comp, config):
     ]
 
     opts = dict(
-        filesystem_checks=comp.env.core.debug,
+        filesystem_checks=comp.env.component(CoreComponent).debug,
         default_filters=["h"],
         imports=mako_imports,
     )

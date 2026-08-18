@@ -12,6 +12,10 @@ from ..model import WebMap
 class WebmapPlugin:
     registry: ClassVar[ListRegistry[type["WebmapPlugin"]]]
 
+    @classmethod
+    def is_supported(cls, webmap: WebMap) -> tuple[str, dict[str, Any]] | None:
+        return None
+
 
 @list_registry
 class WebmapLayerPlugin:

@@ -6,8 +6,10 @@ from osgeo import gdal
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import Query
 
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, ResourceRef
 
+from .component import RasterLayerComponent
 from .model import RasterLayer
 from .util import band_color_interp
 
@@ -29,7 +31,7 @@ class RasterLayerIdentifyResponse(Struct, kw_only=True):
 
 
 def identify(
-    request,
+    request: Request,
     *,
     resources: list[int],
     point: Annotated[Point, Query(spread=True)],
@@ -95,7 +97,7 @@ def val_at_coord(ds: gdal.Dataset, point: Point):
     return result
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: RasterLayerComponent, config):
     config.add_route(
         "raster_layer.identify",
         "/api/component/raster_layer/identify",

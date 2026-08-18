@@ -9,13 +9,13 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, DBSession, env, gettext
+from nextgisweb.env import COMP_ID, Base, DBSession, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.file_storage import FileObj
+from nextgisweb.file_storage import FileObj, FileStorageComponent
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.raster_layer.util import calc_overviews_levels
@@ -51,6 +51,8 @@ class RasterMosaic(Resource, SpatialLayerMixin):
         return isinstance(parent, ResourceGroup)
 
     def gdal_dataset(self, extent=None, size=None):
+        from .component import RasterMosaicComponent
+
         if extent is not None and size is not None:
             xmin, ymin, xmax, ymax = extent
             width, height = size
@@ -69,7 +71,7 @@ class RasterMosaic(Resource, SpatialLayerMixin):
             )
 
             if len(items) > 0:
-                workdir_path = env.raster_mosaic.workdir_path
+                workdir_path = RasterMosaicComponent.current().workdir_path
                 ds = gdal.BuildVRT(
                     "",
                     [str(workdir_path(item.fileobj, None)) for item in items],
@@ -118,6 +120,8 @@ class RasterMosaicItem(Base):
     fileobj: Mapped[FileObj | None] = orm.relationship(lazy="joined")
 
     def load_file(self, filename):
+        from .component import RasterMosaicComponent
+
         if isinstance(filename, Path):
             filename = str(filename)
 
@@ -179,9 +183,9 @@ class RasterMosaicItem(Base):
         info = gdal.Info(filename, format="json")
         geom = Geometry.from_geojson(info["wgs84Extent"])
         self.footprint = geom
-        self.fileobj = env.file_storage.fileobj(component="raster_mosaic")
+        self.fileobj = FileStorageComponent.current().fileobj(component="raster_mosaic")
 
-        dst_file = env.raster_mosaic.workdir_path(self.fileobj, None, makedirs=True)
+        dst_file = RasterMosaicComponent.current().workdir_path(self.fileobj, None, makedirs=True)
         co = ["COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=YES"]
         if reproject:
             gdal.Warp(
@@ -204,7 +208,9 @@ class RasterMosaicItem(Base):
         self.build_overview()
 
     def build_overview(self, missing_only=False):
-        fn = env.raster_mosaic.workdir_path(self.fileobj, None)
+        from .component import RasterMosaicComponent
+
+        fn = RasterMosaicComponent.current().workdir_path(self.fileobj, None)
         if missing_only and fn.with_suffix(".ovr").exists():
             return
 

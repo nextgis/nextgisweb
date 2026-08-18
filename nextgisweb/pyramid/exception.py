@@ -16,6 +16,7 @@ from nextgisweb.core.exception import UserException, UserExceptionContact
 from nextgisweb.gui import REACT_RENDERER
 from nextgisweb.jsrealm import TSExport, jsentry
 
+from .tomb import Request
 from .tomb.exception import MalformedJSONBody
 
 JSENTRY = jsentry("@nextgisweb/pyramid/error-page")
@@ -45,7 +46,7 @@ def includeme(config):
 def handled_exception_tween_factory(handler, registry):
     err_response = registry.settings["error.err_response"]
 
-    def handled_exception_tween(request):
+    def handled_exception_tween(request: Request):
         try:
             return handler(request)
         except (httpexceptions.HTTPSuccessful, httpexceptions.HTTPRedirection) as exc:
@@ -69,7 +70,7 @@ def handled_exception_tween_factory(handler, registry):
 def unhandled_exception_tween_factory(handler, registry):
     exc_response = registry.settings["error.exc_response"]
 
-    def unhandled_exception_tween(request):
+    def unhandled_exception_tween(request: Request):
         try:
             return handler(request)
         except Exception as exc:
@@ -127,8 +128,8 @@ class ErrorResponse(Struct, kw_only=True):
     data: dict[str, Any]
 
     @classmethod
-    def from_exception(cls, exc: UserException, *, request) -> Self:
-        tr = request.localizer.translate
+    def from_exception(cls, exc: UserException, *, request: Request) -> Self:
+        tr = request.translate
         return cls(
             title=tr(exc.title),
             message=tr(v) if (v := exc.message) else UNSET,
@@ -141,14 +142,14 @@ class ErrorResponse(Struct, kw_only=True):
         )
 
 
-def json_error_response(request, err_info, exc, exc_info, debug=True):
+def json_error_response(request: Request, err_info, exc, exc_info, debug=True):
     err_data = ErrorResponse.from_exception(exc, request=request)
     response = render_to_response("json", err_data, request=request)
     response.status_code = err_data.status_code
     return response
 
 
-def html_error_response(request, err_info, exc, exc_info, debug=True):
+def html_error_response(request: Request, err_info, exc, exc_info, debug=True):
     err_data = ErrorResponse.from_exception(exc, request=request)
     response = render_to_response(
         REACT_RENDERER,

@@ -9,6 +9,7 @@ from nextgisweb.env import gettext, inject
 from nextgisweb.core.exception import NotConfigured
 
 from .component import PyramidComponent
+from .tomb import Request
 
 
 class LunkwillNotConfigured(NotConfigured):
@@ -29,7 +30,7 @@ def ensure_interception(*, comp: PyramidComponent):
         raise LunkwillIntercepionExpected
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: PyramidComponent, config):
     config.add_route(
         "lunkwill.summary",
         "/api/lunkwill/{id:str}/summary",
@@ -61,7 +62,7 @@ def setup_pyramid(comp, config):
         st["lunkwill.url"] = lunkwill_url
         st["lunkwill.pool"] = urllib3.PoolManager()
 
-        def lunkwill(request):
+        def lunkwill(request: Request):
             v = request.headers.get("X-Lunkwill")
             if v is not None:
                 v = v.lower()
@@ -82,7 +83,7 @@ def tween_factory(handler, registry):
     pool = registry.settings["lunkwill.pool"]
     headers_rm = {h.lower() for h in ("X-Lunkwill",)}
 
-    def tween(request):
+    def tween(request: Request):
         if request.lunkwill is not None:
             url = request.registry.settings["lunkwill.url"](
                 path=request.path, query=request.query_string
@@ -103,7 +104,7 @@ def tween_factory(handler, registry):
     return tween
 
 
-def proxy(request):
+def proxy(request: Request):
     ensure_interception()
 
     url = request.registry.settings["lunkwill.url"](path=request.path, query=request.query_string)
@@ -116,6 +117,6 @@ def proxy(request):
     )
 
 
-def hmux(request):
+def hmux(request: Request):
     ensure_interception()
     assert False, "Unreachable"

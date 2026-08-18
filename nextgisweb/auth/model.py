@@ -4,13 +4,13 @@ from datetime import datetime
 from functools import cached_property, lru_cache
 from itertools import chain
 from secrets import token_hex, token_urlsafe
-from typing import TYPE_CHECKING, Callable, ClassVar, Iterable, overload
+from typing import TYPE_CHECKING, Callable, ClassVar, Iterable, Literal, overload
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
-from passlib.hash import sha256_crypt
-from sqlalchemy.orm import Mapped, mapped_column
+from passlib.hash import sha256_crypt  # ty: ignore[unresolved-import]
+from sqlalchemy.orm import Mapped, declared_attr, mapped_column
 from zope.event import notify
 from zope.event.classhandler import handler
 
@@ -74,9 +74,14 @@ class Principal(Base):
 
     @property
     def display_name_i18n(self) -> TrStr | str:
-        if self.system and (value := self.system_display_name.get(self.keyname)):
-            return value
+        if self.system:
+            keyname = getattr(self, "keyname")
+            if value := self.system_display_name.get(keyname):
+                return value
         return self.display_name
+
+
+PermissionAggFn = Literal["all", "any"] | Callable[[Iterable[bool]], bool]
 
 
 class User(Principal):
@@ -124,13 +129,29 @@ class User(Principal):
     def __str__(self):
         return self.display_name
 
+    @declared_attr
+    def is_administrator(cls) -> Mapped[bool]:
+        # Group class isn't defined yet, so construct a table manually to use in the query
+        tab_group = sa.table("auth_group", sa.column("keyname"), sa.column("principal_id"))
+        return orm.column_property(
+            sa.exists()
+            .where(
+                tab_group.c.keyname == sa.text("'administrators'"),
+                tab_group.c.principal_id == tab_group_user.c.group_id,
+                tab_group_user.c.user_id == cls.principal_id,
+            )
+            .correlate_except(tab_group, tab_group_user)
+            .label("is_administrator"),
+            deferred=True,
+        )
+
     @classmethod
     def test_instance(cls, **kwargs):
         """Create and return a test user with randomized attributes"""
 
         if TYPE_CHECKING:
 
-            class UserWithPassword(cls):
+            class UserWithPassword(User):
                 password_plaintext: str
         else:
             UserWithPassword = cls
@@ -192,10 +213,10 @@ class User(Principal):
         )
 
     @overload
-    def has_permission(self, perm: Permission) -> bool: ...
+    def has_permission(self, perm: Permission, /) -> bool: ...
 
     @overload
-    def has_permission(self, fn: Callable[[Iterable[bool]], bool], *perms: Permission) -> bool: ...
+    def has_permission(self, fn: PermissionAggFn, /, *perms: Permission) -> bool: ...
 
     def has_permission(self, *args) -> bool:
         if self.superuser or self.is_administrator:
@@ -203,15 +224,19 @@ class User(Principal):
         if len(effective_permissions := self.effective_permissions) == 0:
             return False
         fn, *perms = (all, *args) if len(args) == 1 else args
+        if fn == "all":
+            fn = all
+        elif fn == "any":
+            fn = any
         return fn(p in effective_permissions for p in perms)
 
     @overload
-    def require_permission(self, perm: Permission): ...
+    def require_permission(self, perm: Permission, /) -> None: ...
 
     @overload
-    def require_permission(self, fn: Callable[[Iterable[bool]], bool], *perms: Permission): ...
+    def require_permission(self, fn: PermissionAggFn, /, *perms: Permission) -> None: ...
 
-    def require_permission(self, *args):
+    def require_permission(self, *args) -> None:
         if not self.has_permission(*args):
             raise ForbiddenError
 
@@ -257,25 +282,6 @@ class Group(Principal):
 
         else:
             return user in self.members
-
-
-auth_group_administrators = Group.__table__.alias("auth_group_administrators")
-User.is_administrator = orm.column_property(
-    sa.select(1)
-    .select_from(
-        tab_group_user.join(
-            auth_group_administrators,
-            sa.and_(
-                auth_group_administrators.c.principal_id == tab_group_user.c.group_id,
-                auth_group_administrators.c.keyname == "administrators",
-            ),
-        )
-    )
-    .where(tab_group_user.c.user_id == User.principal_id)
-    .exists()
-    .label("is_administrator"),
-    deferred=True,
-)
 
 
 class OAuthAToken(Base):

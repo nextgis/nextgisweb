@@ -1,4 +1,3 @@
-import warnings
 from dataclasses import dataclass
 from typing import Annotated
 
@@ -15,14 +14,16 @@ from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
-from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid import JSONType, PyramidComponent
 from nextgisweb.pyramid.breadcrumb import Breadcrumb
+from nextgisweb.pyramid.tomb import Request
+from nextgisweb.resource.component import ResourceComponent
 
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
-from .model import Resource, ResourceID
-from .permission import Permission, Scope
+from .model import Resource, ResourceID, resource_registry
+from .permission import Scope
 from .psection import PageSections
 from .scope import ResourceScope
 
@@ -34,7 +35,7 @@ class ResourceFactory:
         self.key = key
         self.context = context
 
-    def __call__(self, request) -> Resource:
+    def __call__(self, request: Request) -> Resource:
         # First, load base class resource
         res_id = request.path_param[self.key]
         try:
@@ -42,7 +43,7 @@ class ResourceFactory:
         except NoResultFound:
             raise ResourceNotFound(res_id)
 
-        polymorphic = with_polymorphic(Resource, [Resource.registry[res_cls]])
+        polymorphic = with_polymorphic(Resource, [resource_registry[res_cls]])
         obj = (
             DBSession.query(polymorphic)
             .options(
@@ -86,7 +87,7 @@ resource_factory = ResourceFactory()
 
 
 @Breadcrumb.register
-def resource_breadcrumb(obj, request):
+def resource_breadcrumb(obj, request: Request):
     if isinstance(obj, Resource):
         return (
             Breadcrumb(
@@ -99,7 +100,7 @@ def resource_breadcrumb(obj, request):
 
 
 @react_renderer("@nextgisweb/resource/page/show")
-def show(request):
+def show(request: Request):
     request.resource_permission(ResourceScope.read)
     obj = request.context
 
@@ -118,12 +119,12 @@ def show(request):
     )
 
 
-def root(request):
+def root(request: Request):
     return HTTPFound(request.route_url("resource.show", id=0))
 
 
 @react_renderer("@nextgisweb/resource/page/search")
-def search_page(request):
+def search_page(request: Request):
     return dict(
         title=gettext("Resource search"),
         hide_resource_filter=True,
@@ -134,7 +135,7 @@ def search_page(request):
 
 
 @react_renderer("@nextgisweb/resource/json-view")
-def json_view(request):
+def json_view(request: Request):
     request.resource_permission(ResourceScope.read)
     return dict(
         props=dict(id=request.context.id),
@@ -145,7 +146,7 @@ def json_view(request):
 
 
 @react_renderer("@nextgisweb/resource/effective-permissions")
-def effective_permisssions(request):
+def effective_permisssions(request: Request):
     request.resource_permission(ResourceScope.read)
     return dict(
         props=dict(resourceId=request.context.id),
@@ -155,12 +156,12 @@ def effective_permisssions(request):
 
 
 # TODO: Move to API
-def schema(request) -> JSONType:
+def schema(request: Request) -> JSONType:
     tr = request.translate
     resources = dict()
     scopes = dict()
 
-    for identity, cls in Resource.registry.items():
+    for identity, cls in resource_registry.items():
         resources[identity] = dict(
             identity=identity,
             label=tr(cls.cls_display_name),
@@ -188,7 +189,7 @@ class OnResourceCreateView:
 
 
 @react_renderer("@nextgisweb/resource/composite")
-def create(request):
+def create(request: Request):
     request.resource_permission(ResourceScope.manage_children)
     cls = request.GET.get("cls")
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
@@ -202,7 +203,7 @@ def create(request):
 
 
 @react_renderer("@nextgisweb/resource/composite")
-def update(request):
+def update(request: Request):
     request.resource_permission(ResourceScope.update)
     setup = dict(operation="update", id=request.context.id)
     return dict(
@@ -214,7 +215,7 @@ def update(request):
 
 
 @react_renderer("@nextgisweb/resource/delete-page")
-def delete(request):
+def delete(request: Request):
     request.resource_permission(ResourceScope.read)
     return dict(
         # Delete page is universal for multiple resources deletion which is why resources is an array
@@ -226,7 +227,7 @@ def delete(request):
 
 
 @react_renderer("@nextgisweb/resource/export-settings")
-def resource_export(request):
+def resource_export(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Resource export"),
@@ -239,12 +240,12 @@ resource_sections = PageSections("resource_section")
 
 
 @resource_sections("@nextgisweb/resource/resource-section/main", order=-100)
-def resource_section_main(obj, *, request, **kwargs):
+def resource_section_main(obj, **kwargs):
     return {"resourceId": obj.id}
 
 
 @resource_sections("@nextgisweb/resource/resource-section/children", order=-50)
-def resource_section_children(obj, *, request, **kwargs):
+def resource_section_children(obj, **kwargs):
     return {"resourceId": obj.id}
 
 
@@ -254,10 +255,12 @@ def resource_section_description(obj, **kwargs):
 
 
 @resource_sections("@nextgisweb/resource/resource-section/external-access")
-def resource_section_external_access(obj, *, request, **kwargs):
-    tr = request.localizer.translate
+def resource_section_external_access(obj, *, request: Request, **kwargs):
+    tr = request.translate
 
-    external_docs_links = request.env.pyramid.options["nextgis_external_docs_links"]
+    external_docs_links = request.env.component(PyramidComponent).options[
+        "nextgis_external_docs_links"
+    ]
     links = list()
     for link in ExternalAccessLink.registry:
         if itm := link.factory(obj, request):
@@ -272,17 +275,8 @@ def resource_section_external_access(obj, *, request, **kwargs):
     return {"links": links} if len(links) > 0 else None
 
 
-def setup_pyramid(comp, config):
-    def resource_permission(request, permission, resource=None):
-        if isinstance(resource, Permission):
-            warnings.warn(
-                "Deprecated argument order for resource_permission. "
-                "Use request.resource_permission(permission, resource).",
-                stacklevel=2,
-            )
-
-            permission, resource = resource, permission
-
+def setup_pyramid(comp: ResourceComponent, config):
+    def resource_permission(request: Request, permission, resource=None):
         if resource is None:
             resource = request.context
 

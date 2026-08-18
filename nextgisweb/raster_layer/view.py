@@ -6,6 +6,7 @@ from nextgisweb.env import gettext
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
@@ -27,7 +28,7 @@ class RasterLayerWidget(Widget):
 
 
 @react_renderer("@nextgisweb/raster-layer/export-form")
-def export(request):
+def export(request: Request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
     return dict(
@@ -48,7 +49,7 @@ class COGLink(ExternalAccessLink):
     attr_name = "cog"
 
     @classmethod
-    def url_factory(cls, obj, request) -> str:
+    def url_factory(cls, obj, request: Request) -> str:
         return request.route_url("raster_layer.cog", id=obj.id)
 
 
@@ -59,17 +60,17 @@ class RasterLayerExportFormatClientSetting(Struct, kw_only=True):
 
 @client_setting("exportFormats")
 def cs_export_formats(
-    comp: RasterLayerComponent, request
+    comp: RasterLayerComponent, request: Request
 ) -> list[RasterLayerExportFormatClientSetting]:
     return [RasterLayerExportFormatClientSetting(**i) for i in GDAL_DRIVER_NAME_2_EXPORT_FORMATS]
 
 
 @client_setting("cogDefault")
-def cs_cog_default(comp: RasterLayerComponent, request) -> bool:
+def cs_cog_default(comp: RasterLayerComponent, request: Request) -> bool:
     return comp.cog_default
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: RasterLayerComponent, config):
     config.add_view(
         export,
         route_name="resource.export.page",

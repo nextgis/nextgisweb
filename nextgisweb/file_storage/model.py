@@ -10,15 +10,17 @@ import sqlalchemy as sa
 import sqlalchemy.event as sa_event
 from sqlalchemy.orm import Mapped, mapped_column
 
-from nextgisweb.env import Base, env
+from nextgisweb.env import Base
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.imptool import module_from_stack
 
 
 def _size_default(context):
+    from .component import FileStorageComponent
+
     params = context.get_current_parameters()
     if params.get("size") is None:
-        fn = Path(env.file_storage.filename((params["component"], params["uuid"])))
+        fn = Path(FileStorageComponent.current().filename((params["component"], params["uuid"])))
         return fn.stat().st_size
 
 
@@ -54,7 +56,9 @@ class FileObj(Base):
         return comp_id
 
     def filename(self, *, makedirs=False, not_exists=False) -> Path:
-        result = Path(env.file_storage.filename(self, makedirs=makedirs))
+        from .component import FileStorageComponent
+
+        result = Path(FileStorageComponent.current().filename(self, makedirs=makedirs))
         assert not (not_exists and result.exists())
         return result
 

@@ -7,7 +7,7 @@ from threading import Thread
 
 from httpx2 import AsyncClient, Limits, Timeout, TimeoutException, TransportError
 
-from nextgisweb.env import env, gettext
+from nextgisweb.env import gettext
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import ExternalServiceError
@@ -25,7 +25,7 @@ class FetchStatus:
 
 @dataclass
 class FetchResult:
-    status: FetchStatus
+    status: str
 
     data: bytes | None = None
     position: tuple[int, int] | None = None
@@ -41,8 +41,10 @@ class TileFetcher:
     __instance = None
 
     def __init__(self):
+        from .component import TMSClientComponent
+
         if TileFetcher.__instance is None:
-            self._request_timeout = env.tmsclient.options["timeout"].total_seconds()
+            self._request_timeout = TMSClientComponent.current().options["timeout"].total_seconds()
             self._session_timeout = self._request_timeout * 2
 
             self._queue = Queue(maxsize=1)
@@ -110,17 +112,22 @@ class TileFetcher:
             yield await coro
 
     async def _ajob(self):
+        from .component import TMSClientComponent
+
         self._shutdown = False
         atexit.register(self._wait_for_shutdown)
 
-        params = dict(
-            headers=env.tmsclient.headers,
-            limits=Limits(max_keepalive_connections=8),
-            http2=True,
-        )
+        def _client_factory(*, verify: bool) -> AsyncClient:
+            return AsyncClient(
+                verify=verify,
+                headers=TMSClientComponent.current().headers,
+                limits=Limits(max_keepalive_connections=8),
+                http2=True,
+            )
+
         async with (
-            AsyncClient(**params) as client,
-            AsyncClient(verify=False, **params) as client_insecure,
+            _client_factory(verify=True) as client,
+            _client_factory(verify=False) as client_insecure,
         ):
             while True:
                 if self._shutdown:
@@ -155,21 +162,19 @@ class TileFetcher:
         data = dict(
             scheme=connection.scheme,
             url_template=url_template,
+            insecure=connection.insecure,
             query=connection.query_params,
             zoom=zoom,
             xmin=xmin,
             xmax=xmax,
             ymin=ymin,
             ymax=ymax,
+            req_kw=dict(
+                timeout=Timeout(timeout=self._request_timeout),
+                auth=(connection.username, connection.password) if connection.username else None,
+                headers={"Referer": connection.referer} if connection.referer else {},
+            ),
         )
-        data["req_kw"] = dict(
-            timeout=Timeout(timeout=self._request_timeout),
-        )
-        if connection.username is not None:
-            data["req_kw"]["auth"] = (connection.username, connection.password)
-        if connection.referer:
-            data["req_kw"]["headers"] = {"Referer": connection.referer}
-        data["insecure"] = connection.insecure
         answer = data["answer"] = Queue()
 
         self._queue.put_nowait(data)

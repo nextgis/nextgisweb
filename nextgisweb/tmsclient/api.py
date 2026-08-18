@@ -5,7 +5,9 @@ from msgspec import Meta, Struct
 from requests.exceptions import RequestException
 
 from nextgisweb.core.exception import ExternalServiceError
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ConnectionScope, ResourceFactory
+from nextgisweb.tmsclient.component import TMSClientComponent
 
 from .model import NEXTGIS_GEOSERVICES, Connection
 
@@ -27,7 +29,7 @@ class InspectResponse(Struct, kw_only=True):
     layers: list[LayerObject]
 
 
-def inspect_connection(resource, request) -> InspectResponse:
+def inspect_connection(resource, request: Request) -> InspectResponse:
     """Inspect TMS client connection
 
     :returns: TMS client layer inspection result"""
@@ -36,11 +38,12 @@ def inspect_connection(resource, request) -> InspectResponse:
     layers = []
 
     if resource.capmode == NEXTGIS_GEOSERVICES:
+        comp = request.env.component(TMSClientComponent)
         try:
             result = requests.get(
-                request.env.tmsclient.options["nextgis_geoservices.layers"],
-                headers=request.env.tmsclient.headers,
-                timeout=request.env.tmsclient.options["timeout"].total_seconds(),
+                comp.options["nextgis_geoservices.layers"],
+                headers=comp.headers,
+                timeout=comp.options["timeout"].total_seconds(),
             )
             result.raise_for_status()
         except RequestException:
@@ -61,7 +64,7 @@ def inspect_connection(resource, request) -> InspectResponse:
     return InspectResponse(layers=layers)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: TMSClientComponent, config):
     config.add_route(
         "tmsclient.connection.inspect",
         "/api/resource/{id}/tmsclient/inspect",

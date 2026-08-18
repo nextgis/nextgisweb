@@ -86,8 +86,10 @@ def main(global_config=None, **settings):
     from nextgisweb.env import Env
     from nextgisweb.lib.config import load_config
 
+    from nextgisweb.pyramid import PyramidComponent
+
     env = Env(cfg=load_config(None, None), initialize=True, set_global=True)
-    config = env.pyramid.make_app({})
+    config = env.component(PyramidComponent).make_app({})
     app = config.make_wsgi_app()
     _log_startup_time()
     return app

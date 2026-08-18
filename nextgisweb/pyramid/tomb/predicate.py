@@ -9,6 +9,8 @@ from pyramid.predicates import as_sorted_tuple
 
 from nextgisweb.lib.apitype import PathParam, QueryParam
 
+from .request import Request
+
 
 class MetaPredicateBase:
     def text(self):
@@ -16,7 +18,7 @@ class MetaPredicateBase:
 
     phash = text
 
-    def __call__(self, context, request):
+    def __call__(self, context, request: Request):
         return True
 
     @classmethod
@@ -68,7 +70,7 @@ class ErrorRendererPredicate:
 
     phash = __repr__ = text
 
-    def __call__(self, context, request):
+    def __call__(self, context, request: Request):
         return True
 
 

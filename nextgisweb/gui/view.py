@@ -2,6 +2,7 @@ from pyramid.renderers import render_to_response
 
 from nextgisweb.jsrealm import jsentry
 
+from .component import GUIComponent
 from .util import REACT_RENDERER
 
 REACT_BOOT_JSENTRY = jsentry("@nextgisweb/gui/react-boot")
@@ -17,5 +18,5 @@ def react_renderer_factory(info):
     return _render
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: GUIComponent, config):
     config.add_renderer("react", react_renderer_factory)

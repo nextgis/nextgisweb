@@ -9,7 +9,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import Gap, fillgap
 
 from nextgisweb.auth import User
-from nextgisweb.pyramid.tomb import Configurator
+from nextgisweb.pyramid.tomb import Configurator, Request
 
 from ..api import SearchAttrParams, SearchRootParams
 from ..component import ResourceComponent
@@ -30,7 +30,7 @@ class ResourceAttrRequestContext(Struct, kw_only=True):
 
     @property
     def translate(self):
-        return self.request.localizer.translate
+        return self.request.translate
 
 
 class ResourceAttrResourcesSearch(Struct, kw_only=True, tag="search"):
@@ -98,7 +98,7 @@ class ResourceAttrResponse(Struct, kw_only=True):
     items: list[ResourceAttrResponseItem]
 
 
-def attr(request, *, body: ResourceAttrRequest) -> ResourceAttrResponse:
+def attr(request: Request, *, body: ResourceAttrRequest) -> ResourceAttrResponse:
     """Fetch specific resource attributes
 
     :returns: Requested attribute values for the specified resources"""
@@ -147,6 +147,8 @@ def attr(request, *, body: ResourceAttrRequest) -> ResourceAttrResponse:
 
 
 def setup_pyramid(comp: ResourceComponent, config: Configurator):
+    from nextgisweb.pyramid import PyramidComponent
+
     register_sattributess()
 
     fillgap(ResourceAttrRequestAttrGap, ResourceAttr.argument_type())
@@ -157,7 +159,7 @@ def setup_pyramid(comp: ResourceComponent, config: Configurator):
             permissions.append(f"{scope_cls.identity}.{perm.name}")
     fillgap(ResourcePermissionGap, Literal[tuple(permissions)])
 
-    comp.env.pyramid.client_type(ResourceAttr.helper_struct())
+    comp.env.component(PyramidComponent).client_type(ResourceAttr.helper_struct())
 
     config.add_route(
         "resource.attr",

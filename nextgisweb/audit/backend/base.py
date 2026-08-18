@@ -5,6 +5,7 @@ from nextgisweb.env import gettext, gettextf, inject
 from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 from nextgisweb.core.exception import NotConfigured
+from nextgisweb.pyramid.tomb import Request
 
 from ..component import AuditComponent
 
@@ -18,7 +19,7 @@ class BackendBase:
         self.options = comp.options.with_prefix(self.identity)
 
     @contextmanager
-    def __call__(self, request):
+    def __call__(self, request: Request):
         yield None
 
     def maintenance(self):
@@ -31,7 +32,7 @@ registry = BackendBase.registry
 @inject()
 def is_backend_configured(identity, *, comp: AuditComponent):
     assert identity in registry
-    return identity in comp.backends
+    return identity in (comp.backends or ())
 
 
 class AuditBackendNotConfigured(NotConfigured):

@@ -4,11 +4,13 @@ from msgspec import Struct
 from zope.event import notify
 from zope.event.classhandler import handler
 
+from nextgisweb.pyramid.tomb import Request
+
 from .model import Resource
 
 
 class AfterResourcePut:
-    def __init__(self, resource, request):
+    def __init__(self, resource, request: Request):
         self.resource = resource
         self.request = request
 
@@ -17,7 +19,7 @@ class AfterResourcePut:
 
 
 class AfterResourceCollectionPost:
-    def __init__(self, resource, request):
+    def __init__(self, resource, request: Request):
         self.resource = resource
         self.request = request
 

@@ -14,9 +14,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import COMP_ID, Base, DBSession, env, gettext
+from nextgisweb.env import COMP_ID, Base, DBSession, gettext
 from nextgisweb.lib import saext
 
+from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
@@ -245,7 +246,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
         if self.fversioning:
             session.execute(vls.dml_initfill())
 
-        env.core.reserve_storage(
+        CoreComponent.current().reserve_storage(
             COMP_ID,
             VectorLayerData,
             value_data_volume=size,

@@ -13,6 +13,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, Query, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import (
     DataScope,
     Resource,
@@ -24,6 +25,7 @@ from nextgisweb.resource import (
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.api import SRSID
 
+from .component import RenderComponent
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
@@ -131,8 +133,8 @@ def image_response(img, empty_code, size):
     return Response(body_file=buf, content_type="image/png")
 
 
-def check_origin(request):
-    if request.env.render.options["check_origin"]:
+def check_origin(request: Request):
+    if request.env.component(RenderComponent).options["check_origin"]:
         origin = request.headers.get("Origin")
         if (
             origin is not None
@@ -158,7 +160,7 @@ def process_symbols(value: Symbols) -> dict[int, list[int]]:
 
 
 def tile(
-    request,
+    request: Request,
     *,
     resource: RenderResource,
     z: TileZ,
@@ -175,7 +177,7 @@ def tile(
     check_origin(request)
 
     p_symbols = process_symbols(symbols) if symbols else dict()
-    p_cache = cache and request.env.render.tile_cache_enabled
+    p_cache = cache and request.env.component(RenderComponent).tile_cache_enabled
     srs_obj = SRS.filter_by(id=3857).one()
 
     aimg = None
@@ -240,7 +242,7 @@ def tile(
 
 
 def image(
-    request,
+    request: Request,
     *,
     resource: RenderResource,
     srs: SRSID = 3857,
@@ -258,7 +260,7 @@ def image(
     check_origin(request)
 
     p_symbols = process_symbols(symbols) if symbols else dict()
-    p_cache = cache and request.env.render.tile_cache_enabled
+    p_cache = cache and request.env.component(RenderComponent).tile_cache_enabled
     srs_obj = SRS.filter_by(id=srs).one()
     if p_cache:
         cache_zoom = image_zoom(extent, size, srs_obj)
@@ -440,7 +442,7 @@ def image(
     return image_response(aimg, nd, size)
 
 
-def legend(request) -> Annotated[Response, ContentType("image/png")]:
+def legend(request: Request) -> Annotated[Response, ContentType("image/png")]:
     """Get resource legend image
 
     :returns: Legend image for the resource"""
@@ -507,7 +509,7 @@ class ResourceLegendSymbolsResponse(Struct, kw_only=True):
 
 
 def legend_symbols(
-    request, *, icon_size: ResourceLegendSymbolsIconSize = 24
+    request: Request, *, icon_size: ResourceLegendSymbolsIconSize = 24
 ) -> AsJSON[list[LegendSymbol]]:
     """Get resource legend symbols
 
@@ -522,7 +524,7 @@ def legend_symbols(
 
 
 def resource_legend_symbols(
-    request,
+    request: Request,
     *,
     resources: ResourceLegendSymbolsResources,
     icon_size: ResourceLegendSymbolsIconSize = 24,
@@ -561,7 +563,7 @@ def resource_legend_symbols(
     return ResourceLegendSymbolsResponse(items=items)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: RenderComponent, config):
     config.add_route(
         "render.tile",
         "/api/component/render/tile",

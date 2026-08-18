@@ -17,6 +17,7 @@ from nextgisweb.lib.ows import SRSParseError, parse_request, parse_srs
 from nextgisweb.lib.pilhelper import reproject_render
 
 from nextgisweb.core.exception import InsufficientPermissions, ValidationError
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.render import (
     COMPRESSION_DEFAULT,
     COMPRESSION_FAST,
@@ -31,6 +32,7 @@ from nextgisweb.render.api import EMPTY_TILE_256x256
 from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857
+from nextgisweb.wmsserver.component import WMSServerComponent
 
 from .model import Service
 
@@ -57,7 +59,7 @@ def layer_by_keyname(service, keyname):
     )
 
 
-def _wms_auth(request):
+def _wms_auth(request: Request):
     try:
         request.resource_permission(ServiceScope.connect)
     except InsufficientPermissions:
@@ -73,7 +75,7 @@ def _wms_auth(request):
         raise
 
 
-def wms_handler(obj, request):
+def wms_handler(obj, request: Request):
     """WMS/WMTS endpoint"""
     _wms_auth(request)
 
@@ -102,7 +104,7 @@ def wms_handler(obj, request):
     raise HTTPBadRequest(explanation="Invalid SERVICE parameter value.")
 
 
-def _get_capabilities(obj, params, request):
+def _get_capabilities(obj, params, request: Request):
     E = ElementMaker(nsmap={"xlink": NS_XLINK})
 
     OnlineResource = lambda url: E.OnlineResource(
@@ -228,7 +230,7 @@ image_encoder_png = image_encoder_factory(FORMAT_PNG, COMPRESSION_FAST)
 image_encoder_jpeg = image_encoder_factory(FORMAT_JPEG, COMPRESSION_DEFAULT)
 
 
-def _get_map(obj, params, request):
+def _get_map(obj, params, request: Request):
     p_layers = params["LAYERS"].split(",")
     p_bbox = _validate_bbox([float(v) for v in params["BBOX"].split(",", 3)])
     p_width = int(params["WIDTH"])
@@ -323,7 +325,7 @@ def _get_map(obj, params, request):
     return Response(body_file=buf, content_type=p_format)
 
 
-def _get_feature_info(obj, params, request):
+def _get_feature_info(obj, params, request: Request):
     p_bbox = _validate_bbox([float(v) for v in params.get("BBOX").split(",")])
     p_width = int(params.get("WIDTH"))
     p_height = int(params.get("HEIGHT"))
@@ -430,7 +432,7 @@ def _get_feature_info(obj, params, request):
     )
 
 
-def _get_legend_graphic(obj, params, request):
+def _get_legend_graphic(obj, params, request: Request):
     p_layer = params.get("LAYER")
 
     layer = layer_by_keyname(obj, p_layer)
@@ -444,7 +446,7 @@ def _get_legend_graphic(obj, params, request):
     return Response(body_file=img, content_type=IMAGE_FORMAT.PNG)
 
 
-def error_renderer(request, err_info, exc, exc_info, debug=True):
+def error_renderer(request: Request, err_info, exc, exc_info, debug=True):
     params, _ = parse_request(request)
 
     tr = request.translate
@@ -503,14 +505,14 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
     )
 
 
-def wmts_rest_handler(obj, request):
+def wmts_rest_handler(obj, request: Request):
     """WMTS REST endpoint"""
     _wms_auth(request)
 
     return _get_wmts_capabilities(obj, request)
 
 
-def _get_wmts_capabilities(obj, request):
+def _get_wmts_capabilities(obj, request: Request):
     NS_OWS = "http://www.opengis.net/ows/1.1"
     E = ElementMaker(
         nsmap={
@@ -616,7 +618,7 @@ def _get_wmts_capabilities(obj, request):
     )
 
 
-def _get_wmts_tile(obj, params, request):
+def _get_wmts_tile(obj, params, request: Request):
     layer = layer_by_keyname(obj, params["LAYER"])
     z = int(params["TILEMATRIX"])
     x = int(params["TILECOL"])
@@ -640,7 +642,7 @@ def _get_wmts_tile(obj, params, request):
     return Response(body_file=buf, content_type=IMAGE_FORMAT.PNG)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: WMSServerComponent, config):
     service_factory = ResourceFactory(context=Service)
 
     config.add_route(

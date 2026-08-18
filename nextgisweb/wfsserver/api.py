@@ -1,13 +1,15 @@
 from pyramid.response import Response
 
 from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ResourceFactory, ServiceScope
 
+from .component import WFSServerComponent
 from .model import Service
 from .wfs_handler import WFSHandler
 
 
-def wfs(resource, request):
+def wfs(resource, request: Request):
     """WFS endpoint"""
     try:
         request.resource_permission(ServiceScope.connect)
@@ -24,7 +26,7 @@ def wfs(resource, request):
         else:
             raise
 
-    fsv = request.env.wfsserver._force_schema_validation
+    fsv = request.env.component(WFSServerComponent)._force_schema_validation
     xml = WFSHandler(
         resource,
         request,
@@ -33,7 +35,7 @@ def wfs(resource, request):
     return Response(xml, content_type="text/xml", charset="utf-8")
 
 
-def error_renderer(request, err_info, exc, exc_info, debug=True):
+def error_renderer(request: Request, err_info, exc, exc_info, debug=True):
     tr = request.translate
     xml = WFSHandler.exception_response(
         request,
@@ -49,7 +51,7 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: WFSServerComponent, config):
     service_factory = ResourceFactory(context=Service)
 
     config.add_route(

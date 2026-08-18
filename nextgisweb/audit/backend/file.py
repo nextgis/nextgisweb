@@ -3,6 +3,8 @@ from contextlib import contextmanager
 
 from nextgisweb.lib.json import dumps
 
+from nextgisweb.pyramid.tomb import Request
+
 from ..component import AuditComponent
 from .base import BackendBase
 
@@ -19,5 +21,5 @@ class FileBackend(BackendBase):
         print('{"@timestamp":' + dumps(tstamp) + "," + dumps(body)[1:], file=self.fd)
 
     @contextmanager
-    def __call__(self, request):
+    def __call__(self, request: Request):
         yield self._write

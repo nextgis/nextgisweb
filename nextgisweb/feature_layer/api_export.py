@@ -8,16 +8,18 @@ from osgeo import gdal, ogr
 from pyramid.response import FileResponse, Response
 from sqlalchemy.exc import NoResultFound
 
-from nextgisweb.env import env, gettext, gettextf
+from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.apitype import ContentType, Query
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceID
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.api import SRSID
 
+from .component import FeatureLayerComponent
 from .feature import Feature
 from .interface import IFeatureLayer, IFeatureQueryIlike, IFilterableFeatureLayer
 from .model import LayerField
@@ -257,7 +259,7 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
 
     query = resource.feature_query()
 
-    if (export_limit := env.feature_layer.export_limit) is not None:
+    if (export_limit := FeatureLayerComponent.current().export_limit) is not None:
         total_count = query().total_count
 
         if total_count > export_limit:
@@ -331,7 +333,7 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
         raise RuntimeError(gdal.GetLastErrorMsg())
 
 
-def _zip_response(request, directory, filename):
+def _zip_response(request: Request, directory, filename):
     with tempfile.NamedTemporaryFile(suffix=".zip") as tmp_file:
         with zipfile.ZipFile(tmp_file, "w", zipfile.ZIP_DEFLATED) as zipf:
             for root, dirs, files in os.walk(directory):
@@ -348,7 +350,7 @@ ExportZipResponse = Annotated[Response, ContentType("application/zip")]
 
 def export_single(
     resource,
-    request,
+    request: Request,
     *,
     export_params: Annotated[ExportParams, Query(spread=True)],
     zipped: Annotated[
@@ -384,7 +386,10 @@ def export_single(
 GEOJSON_DRIVER = EXPORT_FORMAT_OGR["GeoJSON"]
 
 
-def view_geojson_get(resource, request) -> Annotated[Response, ContentType(GEOJSON_DRIVER.mime)]:
+def view_geojson_get(
+    resource,
+    request: Request,
+) -> Annotated[Response, ContentType(GEOJSON_DRIVER.mime)]:
     """Export feature layer in GeoJSON format
 
     :returns: Feature layer data in GeoJSON format"""
@@ -408,7 +413,7 @@ def view_geojson_get(resource, request) -> Annotated[Response, ContentType(GEOJS
 
 
 def export_multi_get(
-    request,
+    request: Request,
     *,
     resources: Annotated[
         Annotated[list[ResourceID], Meta(min_length=1)],
@@ -431,7 +436,7 @@ def export_multi_get(
 
 
 def export_multi_post(
-    request,
+    request: Request,
     body: ExportParamsPost,
 ) -> ExportZipResponse:
     """Export multiple feature layers
@@ -441,7 +446,7 @@ def export_multi_post(
 
 
 def export_multi(
-    request,
+    request: Request,
     params_resources: list[ResourceParam],
     export_params: ExportParams,
 ):
@@ -476,7 +481,7 @@ def export_multi(
         return _zip_response(request, tmp_dir, "layers")
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureLayerComponent, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
     config.add_route(

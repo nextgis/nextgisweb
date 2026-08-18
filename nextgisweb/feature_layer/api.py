@@ -13,12 +13,15 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 from nextgisweb.lib.json import loads as json_loads
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.llm_core import LLMCoreComponent
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
 from .aggregation import AggregationResult, AggregationSpec
+from .component import FeatureLayerComponent
 from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
@@ -282,7 +285,7 @@ def feature_query_pit(resource, feature_query, version, epoch):
 
 def iget(
     resource,
-    request,
+    request: Request,
     fid: FeatureID,
     *,
     dumper_params: Annotated[DumperParams, Query(spread=True)],
@@ -308,7 +311,7 @@ class FeatureChangeResult(Struct, kw_only=True):
 
 def iput(
     resource,
-    request,
+    request: Request,
     fid: FeatureID,
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
@@ -336,7 +339,7 @@ def iput(
     return result
 
 
-def idelete(resource, request, fid: FeatureID) -> FeatureChangeResult:
+def idelete(resource, request: Request, fid: FeatureID) -> FeatureChangeResult:
     """Delete feature
 
     :returns: Feature deleted successfully"""
@@ -359,7 +362,7 @@ def get_box_bounds(resource, feature_id, srs_id):
     return feature.box.bounds if feature.box else None
 
 
-def geometry_info(resource, request, fid: FeatureID) -> JSONType:
+def geometry_info(resource, request: Request, fid: FeatureID) -> JSONType:
     """Read feature geometry properties
 
     :returns: Geometry properties including type, area, and length"""
@@ -401,7 +404,7 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
     return dict(type=geom_type, area=area, length=length, extent=extent)
 
 
-def apply_fields_filter(query, request):
+def apply_fields_filter(query, request: Request):
     filter_ = []
     for param in request.GET.keys():
         if param.startswith("fld_"):
@@ -445,7 +448,7 @@ def apply_filter_expression(query, resource, filter):
     query.set_filter_program(filter_program)
 
 
-def apply_intersect_filter(query, request, resource):
+def apply_intersect_filter(query, request: Request, resource):
     # Filtering by extent
     if "intersects" in request.GET:
         wkt_intersects = request.GET["intersects"]
@@ -467,7 +470,7 @@ def apply_intersect_filter(query, request, resource):
 
 def cget(
     resource,
-    request,
+    request: Request,
     *,
     dumper_params: Annotated[DumperParams, Query(spread=True)],
     order_by: str | None = None,
@@ -508,7 +511,7 @@ def cget(
 
 def cpost(
     resource,
-    request,
+    request: Request,
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
 ) -> FeatureChangeResult:
@@ -531,7 +534,7 @@ def cpost(
 
 def cpatch(
     resource,
-    request,
+    request: Request,
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
 ) -> AsJSON[list[FeatureChangeResult]]:
@@ -578,7 +581,7 @@ def cpatch(
     return result
 
 
-def cdelete(resource, request) -> JSONType:
+def cdelete(resource, request: Request) -> JSONType:
     """Delete features
 
     :returns: Features deleted successfully"""
@@ -599,7 +602,7 @@ def cdelete(resource, request) -> JSONType:
     return result
 
 
-def has_filters(request, filter):
+def has_filters(request: Request, filter):
     if str_contains_filter(filter):
         return True
     if "intersects" in request.GET:
@@ -623,7 +626,7 @@ class CountResponse(Struct, kw_only=True):
 
 def count(
     resource,
-    request,
+    request: Request,
     *,
     filter: Annotated[str | None, Meta(description="Filter expression (JSON string)")] = None,
 ) -> CountResponse:
@@ -658,7 +661,7 @@ class FeatureItemExtent(Struct, kw_only=True):
     extent: NgwExtent | None
 
 
-def iextent(resource, request, fid: FeatureID) -> FeatureItemExtent:
+def iextent(resource, request: Request, fid: FeatureID) -> FeatureItemExtent:
     """Get feature extent
 
     :returns: Bounding box of the feature geometry"""
@@ -671,7 +674,7 @@ def iextent(resource, request, fid: FeatureID) -> FeatureItemExtent:
     return FeatureItemExtent(extent=extent)
 
 
-def cextent(resource, request) -> NgwExtent:
+def cextent(resource, request: Request) -> NgwExtent:
     """Get extent of features
 
     :returns: Bounding box of all features in the resource"""
@@ -696,7 +699,7 @@ class AggregateResponse(Struct, kw_only=True):
     items: list[AggregationResult]
 
 
-def aggregate(resource, request, *, body: AggregateBody) -> AggregateResponse:
+def aggregate(resource, request: Request, *, body: AggregateBody) -> AggregateResponse:
     """Compute multiple aggregations
 
     :returns: Aggregation results in the same order as the request"""
@@ -793,12 +796,12 @@ class FilterGenerateBody(Struct, kw_only=True):
     prompt: str
 
 
-def filter_generate(resource, request, *, body: FilterGenerateBody) -> JSONType:
+def filter_generate(resource, request: Request, *, body: FilterGenerateBody) -> JSONType:
     """Generate a filter expression from a natural language prompt using LLM"""
     request.resource_permission(DataScope.read)
 
-    llm = request.env.llm_core
-    if not llm.available:
+    llm_core = request.env.component(LLMCoreComponent)
+    if not llm_core.available:
         from pyramid.httpexceptions import HTTPNotFound
 
         raise HTTPNotFound()
@@ -809,9 +812,9 @@ def filter_generate(resource, request, *, body: FilterGenerateBody) -> JSONType:
         for f in resource.fields
     )
 
-    client = llm.make_client()
+    client = llm_core.make_client()
     response = client.chat.completions.create(
-        model=llm.effective_model,
+        model=llm_core.effective_model,
         max_tokens=1024,
         messages=[
             {
@@ -831,7 +834,7 @@ def filter_generate(resource, request, *, body: FilterGenerateBody) -> JSONType:
     return json_loads(tool_call.function.arguments)["expression"]
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureLayerComponent, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
     config.add_route(

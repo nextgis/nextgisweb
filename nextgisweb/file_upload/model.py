@@ -5,7 +5,7 @@ from typing import Annotated, overload
 from msgspec import UNSET, Meta, Struct, UnsetType
 from ulid import ULID
 
-from nextgisweb.env import env, gettext
+from nextgisweb.env import gettext
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
@@ -120,9 +120,11 @@ class FileUpload:
 
 
 def _filenames(id: FileUploadID, makedirs=False) -> tuple[Path, Path]:
+    from .component import FileUploadComponent
+
     ulid = ULID.from_hex(id)
     levels = (ulid.datetime.strftime(r"%Y-%m-%d"), id[-2:], id[-4:-2])
-    level_path = Path(env.file_upload.path, *levels)
+    level_path = Path(FileUploadComponent.current().path, *levels)
 
     # Create folders if needed
     if makedirs and not level_path.is_dir():

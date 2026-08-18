@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 
-def utcnow_naive():
+def utcnow_naive() -> datetime:
     """Get the current UTC datetime as a naive `datetime` object
 
     This function serves as a replacement for `datetime.utcnow()`, which was

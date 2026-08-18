@@ -14,6 +14,7 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, DatetimeNaive
 from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.jsrealm import TSExport
+from nextgisweb.pyramid.tomb import Request
 
 from .backend import require_backend
 from .component import AuditComponent
@@ -79,7 +80,7 @@ def _select_fields(dcol, fields):
 
 @inject()
 def dbase(
-    request,
+    request: Request,
     *,
     format: Annotated[QueryFormat, Meta(description="Response format")],
     eq: Annotated[
@@ -187,7 +188,7 @@ def dbase(
         )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: AuditComponent, config):
     config.add_route(
         "audit.dbase",
         "/api/component/audit/dbase",

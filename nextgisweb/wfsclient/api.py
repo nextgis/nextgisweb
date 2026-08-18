@@ -2,8 +2,10 @@ from typing import Annotated
 
 from msgspec import Meta, Struct
 
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ConnectionScope, ResourceFactory
 
+from .component import WFSClientComponent
 from .model import WFSConnection
 
 Lat = Annotated[float, Meta(ge=-90, le=90)]
@@ -21,7 +23,7 @@ class InspectResponse(Struct, kw_only=True):
     layers: list[LayerObject]
 
 
-def inspect_connection(resource, request) -> InspectResponse:
+def inspect_connection(resource, request: Request) -> InspectResponse:
     """Inspect WFS client connection
 
     :returns: WFS client service inspection result"""
@@ -39,7 +41,7 @@ class InspectLayerResponse(Struct, kw_only=True):
     fields: list[FieldObject]
 
 
-def inspect_layer(resource, request) -> InspectLayerResponse:
+def inspect_layer(resource, request: Request) -> InspectLayerResponse:
     """Inspect WFS client layer
 
     :returns: WFS client layer inspection result"""
@@ -51,7 +53,7 @@ def inspect_layer(resource, request) -> InspectLayerResponse:
     return InspectLayerResponse(fields=fields)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: WFSClientComponent, config):
     wfsconnection_factory = ResourceFactory(context=WFSConnection)
 
     config.add_route(

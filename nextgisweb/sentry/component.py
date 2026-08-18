@@ -4,10 +4,11 @@ from functools import cache
 import sqlalchemy as sa
 from sqlalchemy.exc import SQLAlchemyError
 
-from nextgisweb.env import Component, DBSession, env
+from nextgisweb.env import Component, DBSession
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core.component import CoreComponent
 from nextgisweb.core.model import Setting
 
 
@@ -67,7 +68,7 @@ class SentryComponent(Component):
                     # Transaction may be aborted, so can try a new connection.
                     # Rollback doesn't fit here as it changes the transaction
                     # state.
-                    with env.core.engine.connect() as con:
+                    with CoreComponent.current().engine.connect() as con:
                         instance_id = con.scalar(qs)
             except SQLAlchemyError:
                 logger.warning("Unable to fetch instance ID")

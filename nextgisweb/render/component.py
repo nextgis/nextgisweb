@@ -12,6 +12,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import KindOfData
+from nextgisweb.core.component import CoreComponent
 
 from .model import TIMESTAMP_EPOCH
 from .model import ResourceTileCache as RTC
@@ -26,8 +27,10 @@ class TileCacheData(KindOfData):
 
 class RenderComponent(Component):
     def initialize(self):
+        core = self.env.component(CoreComponent)
+
         self.tile_cache_enabled = self.options["tile_cache.enabled"]
-        self.tile_cache_path = os.path.join(self.env.core.gtsdir(self), "tile_cache")
+        self.tile_cache_path = os.path.join(core.gtsdir(self), "tile_cache")
         if not os.path.isdir(self.tile_cache_path):
             os.makedirs(self.tile_cache_path)
 

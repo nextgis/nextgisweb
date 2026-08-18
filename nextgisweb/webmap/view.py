@@ -10,6 +10,7 @@ from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
 from nextgisweb.pyramid.api import csetting
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import ResourceFactory, ResourceScope, Widget
 
@@ -31,9 +32,9 @@ class SettingsWidget(Widget):
     amdmod = jsentry("@nextgisweb/webmap/settings-widget")
 
 
-def check_origin(request):
+def check_origin(request: Request):
     if (
-        not request.env.webmap.options["check_origin"]
+        not request.env.component(WebMapComponent).options["check_origin"]
         or request.headers.get("Sec-Fetch-Dest") != "iframe"
         or request.headers.get("Sec-Fetch-Site") == "same-origin"
     ):
@@ -65,7 +66,7 @@ def check_origin(request):
     return True
 
 
-def display_view(request, **kwargs):
+def display_view(request: Request, **kwargs):
     is_valid_or_error = check_origin(request)
     if is_valid_or_error is not True:
         return is_valid_or_error
@@ -78,7 +79,7 @@ def display_view(request, **kwargs):
 
 
 @react_renderer("@nextgisweb/webmap/display/DisplayPage")
-def display(request):
+def display(request: Request):
     return display_view(
         request,
         layout_mode="headerOnly",
@@ -88,12 +89,12 @@ def display(request):
 
 
 @react_renderer("@nextgisweb/webmap/display-tiny")
-def display_tiny(request):
+def display_tiny(request: Request):
     return display_view(request, layout_mode="nullSpace")
 
 
 @react_renderer("@nextgisweb/webmap/clone-webmap")
-def clone(request):
+def clone(request: Request):
     request.resource_permission(ResourceScope.read)
     return dict(
         props=dict(id=request.context.id),
@@ -103,7 +104,7 @@ def clone(request):
 
 
 @react_renderer("@nextgisweb/webmap/preview-embedded")
-def preview_embedded(request):
+def preview_embedded(request: Request):
     iframe = None
     if "iframe" in request.POST:
         iframe = unquote(unquote(request.POST["iframe"]))
@@ -118,7 +119,7 @@ def preview_embedded(request):
 
 
 @react_renderer("@nextgisweb/webmap/settings")
-def settings(request):
+def settings(request: Request):
     request.require_administrator()
     return dict(
         title=gettext("Web map settings"),
@@ -130,7 +131,7 @@ class WebMapTMSLink(TMSLink):
     interface = None
 
     @classmethod
-    def url_factory(cls, obj, request) -> str:
+    def url_factory(cls, obj, request: Request) -> str:
         rids = ",".join(map(str, webmap_items_to_tms_ids_list(obj)))
         return request.route_url("render.tile") + "?resource=" + rids + "&nd=204&z={z}&x={x}&y={y}"
 
@@ -140,34 +141,35 @@ class WebMapAdapterCS(Struct, kw_only=True):
 
 
 @client_setting("adapters")
-def cs_adapters(comp: WebMapComponent, request) -> dict[str, WebMapAdapterCS]:
+def cs_adapters(comp: WebMapComponent, request: Request) -> dict[str, WebMapAdapterCS]:
+    tr = request.translate
     return {
-        i.identity: WebMapAdapterCS(display_name=request.localizer.translate(i.display_name))
+        i.identity: WebMapAdapterCS(display_name=tr(i.display_name))
         for i in WebMapAdapter.registry.values()
     }
 
 
 @client_setting("editing")
-def cs_editing(comp: WebMapComponent, request) -> bool:
+def cs_editing(comp: WebMapComponent, request: Request) -> bool:
     return comp.options["editing"]
 
 
 @client_setting("annotation")
-def cs_annotation(comp: WebMapComponent, request) -> bool:
+def cs_annotation(comp: WebMapComponent, request: Request) -> bool:
     return comp.options["annotation"]
 
 
 @client_setting("checkOrigin")
-def cs_check_origin(comp: WebMapComponent, request) -> bool:
+def cs_check_origin(comp: WebMapComponent, request: Request) -> bool:
     return comp.options["check_origin"]
 
 
 @client_setting("nominatimUrl")
-def cs_nominatim_url(comp: WebMapComponent, request) -> str:
+def cs_nominatim_url(comp: WebMapComponent, request: Request) -> str:
     return comp.options["nominatim.url"].rstrip("/")
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: WebMapComponent, config):
     resource_factory = ResourceFactory(context=WebMap)
 
     config.add_route(
@@ -206,7 +208,7 @@ def setup_pyramid(comp, config):
 
     for k, v in csetting.registry[COMP_ID].items():
 
-        def cs_k(comp: WebMapComponent, request, *, cs) -> v.gtype:
+        def cs_k(comp: WebMapComponent, request: Request, *, cs) -> v.gtype:
             return cs.getter()
 
         cs_k.__name__ = f"cs_{k}"

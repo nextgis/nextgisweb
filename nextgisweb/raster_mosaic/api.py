@@ -7,14 +7,16 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import ContentType
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope
 
+from .component import RasterMosaicComponent
 from .model import RasterMosaic, RasterMosaicItem
 
 
 def export(
     resource,
-    request,
+    request: Request,
 ) -> Annotated[FileResponse, ContentType("image/tiff; application=geotiff")]:
     """Export raster mosaic item
 
@@ -41,7 +43,7 @@ def export(
     return response
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: RasterMosaicComponent, config):
     config.add_view(
         export,
         route_name="resource.export",

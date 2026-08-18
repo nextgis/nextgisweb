@@ -6,6 +6,9 @@ from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core.component import CoreComponent
+from nextgisweb.file_upload import FileUploadComponent
+
 from .kind_of_data import RasterLayerData
 from .model import RasterBand, RasterLayer, RasterLayerMeta, estimate_raster_layer_data
 from .util import band_color_interp
@@ -15,12 +18,15 @@ from .workdir import WorkdirMixin
 class RasterLayerComponent(Component, WorkdirMixin):
     @require("file_upload")
     def initialize(self):
-        self.env.core.mksdir(self)
-        self.wdir = self.env.core.gtsdir(self)
+        core = self.env.component(CoreComponent)
+
+        core.mksdir(self)
+        self.wdir = core.gtsdir(self)
         self.cog_default = self.options["cog_default"]
 
         if "size_limit" not in self.options:
-            self.size_limit = 2 * self.env.file_upload.options["max_size"]
+            file_upload = self.env.component(FileUploadComponent)
+            self.size_limit = 2 * file_upload.options["max_size"]
         else:
             self.size_limit = self.options["size_limit"]
 

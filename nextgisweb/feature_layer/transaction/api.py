@@ -7,9 +7,11 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AsJSON
 from nextgisweb.lib.datetime import utcnow_naive
 
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.resource.exception import ResourceInterfaceNotSupported
 
+from ..component import FeatureLayerComponent
 from ..interface import IFeatureLayer
 from ..versioning.exception import FVersioningEpochMismatch, FVersioningEpochRequired
 from .exception import TransactionNotCommitted, TransactionNotFound
@@ -27,7 +29,7 @@ class TransactionFactory(ResourceFactory):
     def __init__(self):
         super().__init__(context=IFeatureLayer)
 
-    def __call__(self, request) -> Transaction:
+    def __call__(self, request: Request) -> Transaction:
         resource = super().__call__(request)
         request.resource_permission(DataScope.write, resource)
 
@@ -63,7 +65,12 @@ class TransactionCreatedResponse(Struct, kw_only=True):
     started: Started
 
 
-def cpost(resource, request, *, body: TransactionCreateBody) -> TransactionCreatedResponse:
+def cpost(
+    resource,
+    request: Request,
+    *,
+    body: TransactionCreateBody,
+) -> TransactionCreatedResponse:
     """Start new transaction
 
     :returns: New transaction details including the transaction ID"""
@@ -103,7 +110,7 @@ if not TYPE_CHECKING:
     ResultType = Union[tuple(OperationExecutor.result_types.values())]
 
 
-def iget(txn: Transaction, request) -> AsJSON[list[tuple[SeqNum, ResultType]]]:
+def iget(txn: Transaction, request: Request) -> AsJSON[list[tuple[SeqNum, ResultType]]]:
     """Read transaction results
 
     :returns: Transaction results and status"""
@@ -115,7 +122,7 @@ def iget(txn: Transaction, request) -> AsJSON[list[tuple[SeqNum, ResultType]]]:
 OperationItem = tuple[SeqNum, Annotated[InputType, Meta(title="Payload")]]
 
 
-def iput(txn: Transaction, request, *, body: AsJSON[list[OperationItem]]) -> AsJSON[None]:
+def iput(txn: Transaction, request: Request, *, body: AsJSON[list[OperationItem]]) -> AsJSON[None]:
     """Update transaction operations
 
     The API client is responsible for managing operation sequential numbers. Any
@@ -127,7 +134,7 @@ def iput(txn: Transaction, request, *, body: AsJSON[list[OperationItem]]) -> AsJ
         txn.put_operation(*item, UNSET)
 
 
-def idelete(txn, request) -> AsJSON[None]:
+def idelete(txn, request: Request) -> AsJSON[None]:
     """Dispose transaction
 
     :returns: Transaction disposed successfully"""
@@ -153,7 +160,7 @@ class CommitSuccess(Struct, kw_only=True, tag="committed", tag_field="status"):
     committed: Commited
 
 
-def ipost(txn: Transaction, request) -> AsJSON[CommitErrors | CommitSuccess]:
+def ipost(txn: Transaction, request: Request) -> AsJSON[CommitErrors | CommitSuccess]:
     """Commit transaction
 
     :returns: Committed transaction results"""
@@ -202,7 +209,7 @@ def ipost(txn: Transaction, request) -> AsJSON[CommitErrors | CommitSuccess]:
     return CommitSuccess(committed=txn.committed)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureLayerComponent, config):
     config.add_route(
         "feature_layer.transaction.collection",
         "/api/resource/{id}/feature/transaction/",

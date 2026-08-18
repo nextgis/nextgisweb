@@ -7,14 +7,16 @@ from pyramid.response import FileResponse, Response
 
 from nextgisweb.lib.apitype import ContentType
 
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ResourceScope
 
+from .component import SVGMarkerLibraryComponent
 from .model import SVGMarkerLibrary
 
 
 def file_download(
     resource,
-    request,
+    request: Request,
     name: Annotated[str, Meta(description="Marker name")],
 ) -> Annotated[Response, ContentType("image/svg+xml")]:
     """Download marker SVG file
@@ -27,7 +29,7 @@ def file_download(
     return FileResponse(svg_marker.path, content_type="image/svg+xml", request=request)
 
 
-def export(resource, request) -> Annotated[Response, ContentType("application/zip")]:
+def export(resource, request: Request) -> Annotated[Response, ContentType("application/zip")]:
     """Export library as ZIP archive
 
     :returns: ZIP archive containing SVG marker library files"""
@@ -45,7 +47,7 @@ def export(resource, request) -> Annotated[Response, ContentType("application/zi
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: SVGMarkerLibraryComponent, config):
     config.add_view(
         file_download,
         route_name="resource.file_download",

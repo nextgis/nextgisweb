@@ -2,19 +2,21 @@ import re
 
 from sqlalchemy import BigInteger, func, select
 
-from nextgisweb.env import DBSession, env, gettext
+from nextgisweb.env import DBSession, gettext
 
 from nextgisweb.auth import OnUserLogin, User
+from nextgisweb.core import CoreComponent
 
+from .component import ResourceComponent
 from .model import ResourceACLRule, ResourceGroup
 
 
 def parent_group(create=False) -> ResourceGroup | None:
-    comp = env.resource
+    comp = ResourceComponent.current()
     res = ResourceGroup.filter_by(keyname=comp.options["home.keyname"]).first()
 
     if res is None and create:
-        translate = env.core.localizer().translate
+        translate = CoreComponent.current().localizer().translate
         res = ResourceGroup(
             parent_id=0,
             keyname=comp.options["home.keyname"],
@@ -40,7 +42,7 @@ def user_group(user, create=False) -> ResourceGroup | None:
     if (parent := parent_group()) is None:
         return None
 
-    if groups := env.resource.options["home.groups"]:
+    if groups := ResourceComponent.current().options["home.groups"]:
         for g in user.member_of:
             if g.keyname in groups:
                 break
@@ -90,7 +92,7 @@ def user_group(user, create=False) -> ResourceGroup | None:
 
 
 def on_user_login(event: OnUserLogin):
-    if not env.resource.options["home.enabled"]:
+    if not ResourceComponent.current().options["home.enabled"]:
         return
 
     if (res := user_group(event.user, create=True)) is None:

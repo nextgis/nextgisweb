@@ -20,7 +20,7 @@ from sqlalchemy import MetaData, Table
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import Base, DBSession, env
+from nextgisweb.env import Base, DBSession
 from nextgisweb.lib import saext
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
@@ -349,7 +349,9 @@ class ResourceTileCache(Base):
 
     @property
     def tilestor_path(self):
-        tcpath = env.render.tile_cache_path
+        from .component import RenderComponent
+
+        tcpath = RenderComponent.current().tile_cache_path
         suuid = self.uuid.hex
 
         return os.path.join(tcpath, suuid[0:2], suuid[2:4], suuid)
@@ -482,7 +484,9 @@ class TileCacheAttr(SAttribute):
             self.types = CRUTypes(type, type, type)
 
     def get(self, srlzr: Serializer) -> Any:
-        if not env.render.tile_cache_enabled or srlzr.obj.tile_cache is None:
+        from .component import RenderComponent
+
+        if not RenderComponent.current().tile_cache_enabled or srlzr.obj.tile_cache is None:
             return self.default
         return getattr(srlzr.obj.tile_cache, self.model_attr)
 

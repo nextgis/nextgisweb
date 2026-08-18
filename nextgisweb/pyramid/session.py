@@ -6,19 +6,23 @@ from zope.interface import implementer
 from nextgisweb.env import DBSession
 from nextgisweb.lib.datetime import utcnow_naive
 
+from .component import PyramidComponent
 from .model import Session, SessionStore
+from .tomb import Request
 from .util import datetime_to_unix, gensecret
 
 
 @implementer(ISession)
 class WebSession(dict):
-    def __init__(self, request):
+    def __init__(self, request: Request):
+        pyramid = request.env.component(PyramidComponent)
+
         self._refreshed = False
         self._updated = list()
         self._cleared = False
         self._deleted = list()
-        self._cookie_name = request.env.pyramid.options["session.cookie.name"]
-        self._cookie_max_age = request.env.pyramid.options["session.cookie.max_age"]
+        self._cookie_name = pyramid.options["session.cookie.name"]
+        self._cookie_max_age = pyramid.options["session.cookie.max_age"]
         self._session_id = request.cookies.get(self._cookie_name)
         self._last_activity = None
 
@@ -38,7 +42,7 @@ class WebSession(dict):
             self.new = True
             self.created = datetime_to_unix(utcnow_naive())
 
-        def check_save(request, response):
+        def check_save(request: Request, response):
             update_cookie = False
 
             with transaction.manager:
@@ -56,7 +60,7 @@ class WebSession(dict):
                             SessionStore.key.in_(self._deleted),
                         ).delete(synchronize_session=False)
 
-                    activity_delta = request.env.pyramid.options["session.activity_delta"]
+                    activity_delta = pyramid.options["session.activity_delta"]
                     if utcnow - self._last_activity > activity_delta:
                         DBSession.query(Session).filter_by(
                             id=self._session_id, last_activity=self._last_activity
@@ -93,7 +97,7 @@ class WebSession(dict):
         request.add_response_callback(check_save)
 
     @staticmethod
-    def cookie_settings(request):
+    def cookie_settings(request: Request):
         is_https = request.scheme == "https"
         return dict(
             path="/",

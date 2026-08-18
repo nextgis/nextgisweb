@@ -11,18 +11,19 @@ from urllib.parse import urlencode
 import requests
 import sqlalchemy as sa
 import zope.event
-from passlib.hash import sha256_crypt
+from passlib.hash import sha256_crypt  # ty: ignore[unresolved-import]
 from pyramid.threadlocal import get_current_request
 from requests.exceptions import ConnectionError, InvalidJSONError, RequestException, Timeout
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import defer, joinedload, load_only
 
-from nextgisweb.env import DBSession, env, gettext, gettextf
+from nextgisweb.env import DBSession, gettext, gettextf
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import lazy_str, logger
 
+from nextgisweb.core.component import CoreComponent
 from nextgisweb.core.exception import UserException
 
 from .exception import UserDisabledException
@@ -303,6 +304,8 @@ class OAuthHelper:
         min_oauth_tstamp=None,
         access_token=None,
     ):
+        from .component import AuthComponent
+
         def _atoken():
             nonlocal atoken
             if callable(atoken):
@@ -337,7 +340,7 @@ class OAuthHelper:
             if user is None:
                 # Register new user with default groups
                 if self.options["register"]:
-                    env.auth.check_user_limit(add=1)
+                    AuthComponent.current().check_user_limit(add=1)
                     user = User(oauth_subject=_atoken().sub).persist()
                     user.member_of = Group.filter_by(register=True).all()
                 else:
@@ -365,6 +368,8 @@ class OAuthHelper:
         return user
 
     def sync_users(self):
+        from .component import AuthComponent
+
         if not self.options["server.sync"]:
             raise OAuthSyncNotEnabled("OAuth user synchronization is not enabled")
 
@@ -373,7 +378,7 @@ class OAuthHelper:
                 f"OAuth user synchronization is not implemented on {st} server"
             )
 
-        params = dict(instance_guid=env.core.instance_id)
+        params = dict(instance_guid=CoreComponent.current().instance_id)
         s = self.options["client.id"] + ":" + self.options["client.secret"]
         token = b64encode(s.encode()).decode("ascii")
         oauth_tstamp = utcnow_naive()
@@ -392,7 +397,7 @@ class OAuthHelper:
                         user.disabled = False
                 else:
                     user = User(oauth_subject=sub).persist()
-                    if lang in env.core.locale_available:
+                    if lang in CoreComponent.current().locale_available:
                         user.language = lang
 
                 self._update_user(user, udata)
@@ -405,7 +410,7 @@ class OAuthHelper:
             ):
                 user.disabled = True
 
-        env.auth.check_user_limit()
+        AuthComponent.current().check_user_limit()
 
     def auth_form_check(self) -> str | None:
         request = get_current_request()
@@ -433,7 +438,7 @@ class OAuthHelper:
     def _server_request(self, endpoint, params, *, default_method="POST", access_token=None):
         url = self.options["server.{}_endpoint".format(endpoint)]
         if endpoint == "sync":
-            url = url.format(uuid=env.core.instance_id)
+            url = url.format(uuid=CoreComponent.current().instance_id)
         method = self.options.get("server.{}_method".format(endpoint), default_method).lower()
         timeout = self.options["timeout"].total_seconds()
 

@@ -9,7 +9,7 @@ import uuid
 
 from sqlalchemy import text
 
-from nextgisweb.models import DBSession
+from nextgisweb.env import DBSession
 
 
 def forward(ctx):

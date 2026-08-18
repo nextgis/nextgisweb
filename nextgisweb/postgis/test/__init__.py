@@ -13,6 +13,7 @@ from nextgisweb.lib.ogrhelper import FIELD_GETTER
 from nextgisweb.lib.saext import postgres_url
 
 from nextgisweb.auth import User
+from nextgisweb.core import CoreComponent
 from nextgisweb.feature_layer import GEOM_TYPE_OGR_2_GEOM_TYPE
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer.util import FIELD_TYPE_2_DB, FIELD_TYPE_2_ENUM
@@ -22,7 +23,7 @@ from .. import PostgisConnection, PostgisLayer
 
 @contextmanager
 def create_feature_layer(ogrlayer, parent_id, **kwargs):
-    opts_db = env.core.options.with_prefix("test.database")
+    opts_db = CoreComponent.current().options.with_prefix("test.database")
 
     for o in ("host", "name", "user"):
         if o not in opts_db:

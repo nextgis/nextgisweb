@@ -10,6 +10,7 @@ from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Group, User
+from nextgisweb.core.component import CoreComponent
 
 from .category import ResourceCategory, ResourceCategoryIdentity
 from .exception import QuotaExceeded, ResourceDisabled
@@ -21,6 +22,7 @@ from .model import (
     ResourceInterfaceIdentity,
     ResourceScope,
     ResourceScopeIdentity,
+    resource_registry,
 )
 from .model import ResourceACLRule as ACLRule
 
@@ -29,7 +31,7 @@ class ResourceComponent(Component):
     def __init__(self, env, settings):
         super().__init__(env, settings)
 
-        fillgap(ResourceCls, Literal[tuple(Resource.registry.keys())])
+        fillgap(ResourceCls, Literal[tuple(resource_registry.keys())])
         fillgap(ResourceInterfaceIdentity, Literal[tuple(i.__name__ for i in interface_registry)])
         fillgap(ResourceScopeIdentity, Literal[tuple(ResourceScope.registry.keys())])
         fillgap(ResourceCategoryIdentity, Literal[tuple(ResourceCategory.registry.keys())])
@@ -45,14 +47,14 @@ class ResourceComponent(Component):
         disabled = []
         for cls in self.options["disabled_cls"]:
             try:
-                Resource.registry[cls]
+                resource_registry[cls]
             except KeyError:
                 logger.error("Resource class '%s' from disabled_cls option not found!", cls)
             else:
                 disabled.append(cls)
 
         opts_disable = self.options.with_prefix("disable")
-        for cls in Resource.registry.keys():
+        for cls in resource_registry.keys():
             if opts_disable[cls] and cls not in disabled:
                 disabled.append(cls)
 
@@ -96,7 +98,7 @@ class ResourceComponent(Component):
                 cls_quota_limit = self.quota_resource_by_cls[cls]
                 if count + required > cls_quota_limit:
                     raise QuotaExceeded(
-                        cls=Resource.registry[cls],
+                        cls=resource_registry[cls],
                         required=required,
                         limit=cls_quota_limit,
                         count=count,
@@ -118,6 +120,8 @@ class ResourceComponent(Component):
 
     @require("auth")
     def initialize_db(self):
+        core = self.env.component(CoreComponent)
+
         adminusr = User.filter_by(keyname="administrator").one()
         admingrp = Group.filter_by(keyname="administrators").one()
 
@@ -127,7 +131,7 @@ class ResourceComponent(Component):
             obj = ResourceGroup(
                 id=0,
                 owner_user=adminusr,
-                display_name=self.env.core.localizer().translate(gettext("Main resource group")),
+                display_name=core.localizer().translate(gettext("Main resource group")),
             )
 
             obj.acl.append(ACLRule(principal=admingrp, action="allow"))

@@ -75,6 +75,7 @@ extras_require = dict(
         "ruff==0.14.*",
         "sqlglot==30.15.0",
         "ty",
+        "types-lxml",
         "webtest",
     ]
 )

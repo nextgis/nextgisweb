@@ -1,16 +1,19 @@
 from pyramid.interfaces import IRoutesMapper
 from pyramid.response import Response
 
+from nextgisweb.core import CoreComponent
+
+from .tomb import Request
 from .tomb.predicate import RouteMeta
 from .util import parse_origin
 
 
-def check_origin(request, origin: str) -> bool:
+def check_origin(request: Request, origin: str) -> bool:
     if origin == "null":
         return False
 
     try:
-        olist = request.env.core.settings_get("pyramid", "cors_allow_origin")
+        olist = request.env.component(CoreComponent).settings_get("pyramid", "cors_allow_origin")
     except KeyError:
         return False
 
@@ -35,7 +38,7 @@ def tween_factory(handler, registry):
     """Tween adds Access-Control-* headers for simple and preflighted
     CORS requests"""
 
-    def cors_tween(request):
+    def cors_tween(request: Request):
         if (
             request.path_info.startswith("/api/")
             and (origin := request.headers.get("Origin")) is not None
@@ -91,7 +94,7 @@ def tween_factory(handler, registry):
                     cors_headerlist.append(("Access-Control-Expose-Headers", ", ".join(resp_ch)))
 
                 @request.add_response_callback
-                def _set_response_cors_headers(request, response):
+                def _set_response_cors_headers(request: Request, response):
                     response.headerlist.extend(cors_headerlist)
 
         # Run default request handler

@@ -1,6 +1,7 @@
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Widget
 
+from .component import WMSClientComponent
 from .model import Connection, Layer
 
 
@@ -16,5 +17,5 @@ class LayerWidget(Widget):
     amdmod = jsentry("@nextgisweb/wmsclient/wmsclient-layer")
 
 
-def setup_pyramid(comp, conf):
+def setup_pyramid(comp: WMSClientComponent, conf):
     pass

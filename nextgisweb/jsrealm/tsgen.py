@@ -3,13 +3,13 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 from datetime import datetime, time
-from importlib.metadata._itertools import unique_everseen
 from itertools import count
 from textwrap import indent
 from types import UnionType
 from typing import (
     TYPE_CHECKING,
     Any,
+    Generator,
     Literal,
     Protocol,
     Type,
@@ -438,6 +438,14 @@ class TSExport:
 def component_tsmodule(component: str, module: str = "type/api") -> str:
     parts = ("@nextgisweb", component.replace("_", "-"), module)
     return "/".join(parts)
+
+
+def unique_everseen[T](iterable: Sequence[T]) -> Generator[T, None, None]:
+    seen = set()
+    for item in iterable:
+        if item not in seen:
+            seen.add(item)
+            yield item
 
 
 def struct_fields_encoded(otype) -> tuple[tuple[str, Any], ...]:

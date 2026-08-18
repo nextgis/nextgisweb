@@ -14,6 +14,7 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import UserException
 from nextgisweb.core.storage import StorageInsufficient
+from nextgisweb.pyramid.tomb import Request
 
 from .component import FileUploadComponent
 from .exception import FileUploadStorageInsufficient
@@ -43,7 +44,11 @@ class FileUploadObject(Struct, kw_only=True):
 
 
 @inject()
-def collection_options(request, *, comp: FileUploadComponent) -> Annotated[None, StatusCode(204)]:
+def collection_options(
+    request: Request,
+    *,
+    comp: FileUploadComponent,
+) -> Annotated[Response, StatusCode(204)]:
     """Query TUS protocol capabilities
 
     See [the specification](https://tus.io/protocols/resumable-upload#options)
@@ -61,7 +66,7 @@ def collection_options(request, *, comp: FileUploadComponent) -> Annotated[None,
 
 @inject()
 def collection_put(
-    request,
+    request: Request,
     *,
     comp: FileUploadComponent,
 ) -> AsJSON[Annotated[FileUploadObject, StatusCode(201)],]:
@@ -121,7 +126,7 @@ class FileUploadFormPost(Struct, kw_only=True):
 
 @inject()
 def collection_post(
-    request,
+    request: Request,
 ) -> AnyOf[
     Annotated[FileUploadFormPost, StatusCode(200)],
     Annotated[None, StatusCode(201)],
@@ -147,7 +152,7 @@ def collection_post(
 
 
 @inject()
-def _collection_post_form(request, *, comp: FileUploadComponent):
+def _collection_post_form(request: Request, *, comp: FileUploadComponent):
     # File is uploaded as object of class cgi.FieldStorage which has properties
     # type(file type) and filename(file name), there is no file size property so
     # let's add our own implementation.
@@ -187,7 +192,7 @@ def _collection_post_form(request, *, comp: FileUploadComponent):
 
 
 @inject()
-def _collection_post_tus(request, *, comp: FileUploadComponent):
+def _collection_post_tus(request: Request, *, comp: FileUploadComponent):
     try:
         upload_length = int(request.headers["Upload-Length"])
     except (KeyError, ValueError):
@@ -220,7 +225,7 @@ class FileUploadFactory:
         self.key = key
         self.incomplete_ok = incomplete_ok
 
-    def __call__(self, request) -> FileUpload:
+    def __call__(self, request: Request) -> FileUpload:
         try:
             return FileUpload(id=request.matchdict[self.key], incomplete_ok=True)
         except FileUploadNotFound as exc:
@@ -232,7 +237,7 @@ class FileUploadFactory:
         return {self.key: FileUploadID}
 
 
-def item_head_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(200)]:
+def item_head_tus(fupload: FileUpload, request: Request) -> Annotated[None, StatusCode(200)]:
     """Read TUS upload metadata
 
     See [the specification](https://tus.io/protocols/resumable-upload#head)
@@ -252,7 +257,7 @@ def item_head_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(20
     )
 
 
-def item_get(fupload: FileUpload, request) -> FileUploadObject:
+def item_get(fupload: FileUpload, request: Request) -> FileUploadObject:
     """Read metadata of uploaded file
 
     :returns: Uploaded file metadata"""
@@ -268,7 +273,7 @@ def item_get(fupload: FileUpload, request) -> FileUploadObject:
     )
 
 
-def item_patch_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(204)]:
+def item_patch_tus(fupload: FileUpload, request: Request) -> Annotated[None, StatusCode(204)]:
     """Append chunk to TUS upload
 
     See [the specification](https://tus.io/protocols/resumable-upload#patch)
@@ -320,7 +325,7 @@ def item_patch_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(2
     return _tus_response(204, upload_offset=upload_offset)
 
 
-def item_delete(fupload: FileUpload, request) -> Annotated[None, StatusCode(204)]:
+def item_delete(fupload: FileUpload, request: Request) -> Annotated[None, StatusCode(204)]:
     """Dispose uploaded file on server
 
     Useful to cancel incomplete TUS uploads or delete files no longer needed.
@@ -342,7 +347,7 @@ def _sanitize_name(name: str | None):
     return name if name else None
 
 
-def _tus_resumable_header(request, *, require=False):
+def _tus_resumable_header(request: Request, *, require=False):
     tr = request.headers.get("Tus-Resumable")
     if tr is None and not require:
         return False
@@ -375,7 +380,7 @@ def _tus_decode_upload_metadata(value):
     return result
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FileUploadComponent, config):
     tus_cors_headers = dict(
         request=(
             "Upload-Offset",

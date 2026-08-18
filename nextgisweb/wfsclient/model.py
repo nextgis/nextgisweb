@@ -8,12 +8,13 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from lxml import etree
 from osgeo import ogr
+from requests.auth import HTTPBasicAuth
 from requests.exceptions import RequestException
 from shapely.geometry import box
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, env, gettext
+from nextgisweb.env import COMP_ID, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
@@ -150,6 +151,8 @@ class WFSConnection(Resource):
         return isinstance(parent, ResourceGroup)
 
     def request_wfs(self, method, xml_root=None, **kwargs):
+        from .component import WFSClientComponent
+
         if method == "GET":
             if "params" not in kwargs:
                 kwargs["params"] = dict()
@@ -164,14 +167,14 @@ class WFSConnection(Resource):
             raise NotImplementedError
 
         if self.username is not None and self.username.strip() != "":
-            kwargs["auth"] = requests.auth.HTTPBasicAuth(self.username, self.password)
+            kwargs["auth"] = HTTPBasicAuth(self.username, self.password)
 
         try:
             response = requests.request(
                 method,
                 self.path,
-                headers=env.wfsclient.headers,
-                timeout=env.wfsclient.options["timeout"].total_seconds(),
+                headers=WFSClientComponent.current().headers,
+                timeout=WFSClientComponent.current().options["timeout"].total_seconds(),
                 **kwargs,
             )
         except RequestException:

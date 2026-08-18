@@ -3,6 +3,8 @@ from io import BytesIO
 
 from lxml import etree
 
+from nextgisweb.pyramid.tomb import Request
+
 _ns_xsd = "http://www.w3.org/2001/XMLSchema"
 
 
@@ -26,7 +28,7 @@ def _ns_trim(value):
     return value[pos + 1 :]
 
 
-def parse_request(request):
+def parse_request(request: Request):
     params = dict()
     root_body = None
 

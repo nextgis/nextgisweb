@@ -1,5 +1,8 @@
 from msgspec import Struct
 
+from nextgisweb.pyramid.tomb import Request
+
+from ..component import WebMapComponent
 from .base import WebMapOption, WebMapOptionCategory
 
 
@@ -22,7 +25,7 @@ class WebMapOptionSchema(Struct, kw_only=True):
     categories: dict[str, WebMapOptionCategoryItem]
 
 
-def schema(request) -> WebMapOptionSchema:
+def schema(request: Request) -> WebMapOptionSchema:
     """Read webmap options schema
 
     :returns: JSON schema for webmap options"""
@@ -51,7 +54,7 @@ def schema(request) -> WebMapOptionSchema:
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: WebMapComponent, config):
     config.add_route(
         "webmap.option.schema",
         "/api/component/webmap/option/schema",

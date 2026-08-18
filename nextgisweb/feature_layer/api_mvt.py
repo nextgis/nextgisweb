@@ -13,14 +13,15 @@ from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.render.api import TileX, TileY, TileZ
 from nextgisweb.resource import DataScope, Resource
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 
 from .api_export import _ogr_layer_from_features
-from .interface import GEOM_TYPE, IFeatureQueryClipByBox, IFeatureQuerySimplify
+from .component import FeatureLayerComponent
+from .interface import GEOM_TYPE, IFeatureLayer, IFeatureQueryClipByBox, IFeatureQuerySimplify
 from .ogrdriver import MVT_DRIVER_EXIST
 
 
@@ -32,7 +33,7 @@ def _ogr_ds(driver, options):
 
 
 def mvt(
-    request,
+    request: Request,
     *,
     resource: Annotated[list[int], Meta(min_length=1)],
     z: TileZ,
@@ -49,7 +50,7 @@ def mvt(
 
     :returns: Mapbox Vector Tile binary data"""
     if not MVT_DRIVER_EXIST:
-        return HTTPNotFound(explanation="MVT GDAL driver not found")
+        raise HTTPNotFound(explanation="MVT GDAL driver not found")
 
     if simplification is UNSET:
         simplification = extent / 512
@@ -128,13 +129,13 @@ def mvt(
                 content_type="application/vnd.mapbox-vector-tile",
             )
         else:
-            return HTTPNoContent()
+            raise HTTPNoContent()
 
     finally:
         gdal.Unlink(vsibuf)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureLayerComponent, config):
     config.add_route(
         "feature_layer.mvt",
         "/api/component/feature_layer/mvt",

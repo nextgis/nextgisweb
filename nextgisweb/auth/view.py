@@ -18,7 +18,8 @@ from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.gui import REACT_RENDERER, react_renderer
 from nextgisweb.jsrealm import jsentry
-from nextgisweb.pyramid import SessionStore, WebSession, client_setting
+from nextgisweb.pyramid import PyramidComponent, SessionStore, WebSession, client_setting
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.pyramid.view import ModelFactory
 
 from . import permission
@@ -36,7 +37,7 @@ LOGIN_JSENTRY = jsentry("@nextgisweb/auth/login-page")
 
 
 class UserFactory(ModelFactory):
-    def __call__(self, request):
+    def __call__(self, request: Request):
         if request.matched_route.name == "auth.user.item" and request.method == "GET":
             model_id = request.path_param[self.key]
             try:
@@ -53,7 +54,7 @@ group_factory = ModelFactory(Group, tdef=GroupID)
 
 
 @react_renderer("@nextgisweb/auth/login-page")
-def login(request):
+def login(request: Request):
     return dict(
         props=dict(reloadAfterLogin=False),
         layout_mode="headerOnly",
@@ -64,7 +65,9 @@ def login(request):
 
 
 @react_renderer("@nextgisweb/auth/session-invite")
-def session_invite(request):
+def session_invite(request: Request):
+    from nextgisweb.pyramid import PyramidComponent
+
     next_url = request.params.get("next", request.application_url)
 
     if request.method == "GET":
@@ -98,7 +101,7 @@ def session_invite(request):
             raise InvalidCredentialsException(message=gettext("Session expired."))
 
         cookie_settings = WebSession.cookie_settings(request)
-        cookie_name = request.env.pyramid.options["session.cookie.name"]
+        cookie_name = request.env.component(PyramidComponent).options["session.cookie.name"]
 
         response = HTTPFound(location=next_url)
         response.set_cookie(cookie_name, value=sid, **cookie_settings)
@@ -106,8 +109,10 @@ def session_invite(request):
         return response
 
 
-def alink(request):
-    if not request.env.auth.options["alink"]:
+def alink(request: Request):
+    from nextgisweb.pyramid import PyramidComponent
+
+    if not request.env.component(PyramidComponent).options["alink"]:
         raise HTTPNotFound()
 
     try:
@@ -134,8 +139,8 @@ def alink(request):
     return HTTPFound(location=next_url)
 
 
-def oauth(request):
-    oaserver = request.env.auth.oauth
+def oauth(request: Request):
+    oaserver = request.env.component(AuthComponent).oauth
 
     if oaserver is None:
         no_oauth = request.params.get("na")
@@ -238,8 +243,8 @@ def oauth(request):
         return response
 
 
-def logout(request):
-    oaserver = request.env.auth.oauth
+def logout(request: Request):
+    oaserver = request.env.component(AuthComponent).oauth
 
     location = request.application_url
 
@@ -264,10 +269,10 @@ def logout(request):
     return response
 
 
-def _login_url(request):
+def _login_url(request: Request):
     """Request method for getting preferred login url (local or OAuth)"""
 
-    auth = request.env.auth
+    auth = request.env.component(AuthComponent)
 
     login_qs = dict()
     if request.matched_route is None or request.matched_route.name not in (
@@ -285,8 +290,8 @@ def _login_url(request):
     return login_url
 
 
-def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
-    oaserver = request.env.auth.oauth
+def forbidden_error_handler(request: Request, err_info, exc, exc_info, **kwargs):
+    oaserver = request.env.component(AuthComponent).oauth
 
     # If user is not authentificated, we can offer him to sign in
     if (
@@ -323,7 +328,7 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
 
 
 @react_renderer("@nextgisweb/auth/settings-form")
-def settings(request):
+def settings(request: Request):
     if request.user.keyname == "guest":
         return HTTPUnauthorized()
 
@@ -331,7 +336,7 @@ def settings(request):
 
 
 @react_renderer("@nextgisweb/auth/user-browse")
-def user_browse(request):
+def user_browse(request: Request):
     request.user.require_permission(any, *permission.auth)
 
     return dict(
@@ -341,14 +346,14 @@ def user_browse(request):
 
 
 @react_renderer("@nextgisweb/auth/user-widget")
-def user_create(request):
+def user_create(request: Request):
     request.user.require_permission(permission.manage)
 
     return dict(title=gettext("Create new user"))
 
 
 @react_renderer("@nextgisweb/auth/user-widget")
-def user_edit(request):
+def user_edit(request: Request):
     request.user.require_permission(any, *permission.auth)
 
     obj = request.context
@@ -360,7 +365,7 @@ def user_edit(request):
 
 
 @react_renderer("@nextgisweb/auth/group-browse")
-def group_browse(request):
+def group_browse(request: Request):
     request.user.require_permission(any, *permission.auth)
 
     return dict(
@@ -370,7 +375,7 @@ def group_browse(request):
 
 
 @react_renderer("@nextgisweb/auth/group-widget")
-def group_create(request):
+def group_create(request: Request):
     request.user.require_permission(permission.manage)
 
     return dict(
@@ -379,7 +384,7 @@ def group_create(request):
 
 
 @react_renderer("@nextgisweb/auth/group-widget")
-def group_edit(request):
+def group_edit(request: Request):
     request.user.require_permission(any, *permission.auth)
 
     obj = request.context
@@ -391,7 +396,7 @@ def group_edit(request):
 
 
 @client_setting("alink")
-def cs_alink(comp: AuthComponent, request) -> bool:
+def cs_alink(comp: AuthComponent, request: Request) -> bool:
     return comp.options["alink"]
 
 
@@ -401,7 +406,7 @@ class AuthUserLimitClientSetting(Struct, kw_only=True):
 
 
 @client_setting("userLimit")
-def cs_user_limit(comp: AuthComponent, request) -> AuthUserLimitClientSetting:
+def cs_user_limit(comp: AuthComponent, request: Request) -> AuthUserLimitClientSetting:
     return AuthUserLimitClientSetting(
         total=comp.options["user_limit"],
         local=comp.options["user_limit_local"],
@@ -420,7 +425,7 @@ class AuthOAuthClientSetting(Struct, kw_only=True, rename="camel"):
 
 
 @client_setting("oauth")
-def cs_oauth(comp: AuthComponent, request) -> AuthOAuthClientSetting:
+def cs_oauth(comp: AuthComponent, request: Request) -> AuthOAuthClientSetting:
     if (comp.oauth is None) or not comp.oauth.authorization_code:
         return AuthOAuthClientSetting(
             enabled=False,
@@ -446,9 +451,9 @@ def cs_oauth(comp: AuthComponent, request) -> AuthOAuthClientSetting:
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: AuthComponent, config):
     # Add it before default pyramid handlers
-    comp.env.pyramid.error_handlers.insert(0, forbidden_error_handler)
+    comp.env.component(PyramidComponent).error_handlers.insert(0, forbidden_error_handler)
 
     config.add_route("auth.login", "/login", get=login)
     config.add_route("auth.session_invite", "/session-invite").add_view(session_invite)

@@ -1,4 +1,5 @@
 from nextgisweb.jsrealm import jsentry
+from nextgisweb.pyramid.tomb import Request
 
 from .model import Resource
 
@@ -13,7 +14,7 @@ class WidgetMeta(type):
 
 
 class WidgetBase:
-    def __init__(self, operation, obj, request):
+    def __init__(self, operation, obj, request: Request):
         self.operation = operation
         self.obj = obj
         self.request = request

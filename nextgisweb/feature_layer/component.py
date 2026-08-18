@@ -1,6 +1,8 @@
 from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option
 
+from nextgisweb.core.component import CoreComponent
+
 from .extension import FeatureExtension
 
 
@@ -23,7 +25,7 @@ class FeatureLayerComponent(Component):
 
     @property
     def versioning_default(self):
-        return self.env.core.settings_get(
+        return self.env.component(CoreComponent).settings_get(
             self.identity,
             "versioning_default",
             self.options["versioning.default"],

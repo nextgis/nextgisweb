@@ -2,8 +2,10 @@ from nextgisweb.env import gettext
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ConnectionScope, DataScope, Widget, resource_factory
 
+from .component import PostgisComponent
 from .model import PostgisConnection, PostgisLayer
 
 
@@ -19,7 +21,7 @@ class PostgisLayerWidget(Widget):
     amdmod = jsentry("@nextgisweb/postgis/layer-widget")
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: PostgisComponent, config):
     config.add_route(
         "postgis.diagnostics_page",
         r"/resource/{id:uint}/postgis-diagnostics",
@@ -30,7 +32,7 @@ def setup_pyramid(comp, config):
 
 
 @react_renderer("@nextgisweb/postgis/diagnostics-widget")
-def diagnostics_page(request):
+def diagnostics_page(request: Request):
     context = request.context
 
     if isinstance(context, PostgisConnection):

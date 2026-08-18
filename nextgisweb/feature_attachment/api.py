@@ -22,11 +22,12 @@ from nextgisweb.feature_layer.api import FeatureID, query_feature_or_not_found
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
-from nextgisweb.pyramid.tomb import UnsafeFileResponse
+from nextgisweb.pyramid.tomb import Request, UnsafeFileResponse
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 
 from .api_import import attachments_import
 from .api_util import AttachmentID, Metadata, MetadataItem
+from .component import FeatureAttachmentComponent
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
@@ -52,7 +53,7 @@ def attachment_or_not_found(resource, feature_id, attachment_id):
 
 def download(
     resource,
-    request,
+    request: Request,
     fid: FeatureID,
     aid: AttachmentID,
     *,
@@ -90,7 +91,7 @@ def download(
 
 def image(
     resource,
-    request,
+    request: Request,
     fid: FeatureID,
     aid: AttachmentID,
     *,
@@ -135,7 +136,7 @@ def image(
     return Response(body_file=buf, content_type=obj.mime_type)
 
 
-def iget(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
+def iget(resource, request: Request, fid: FeatureID, aid: AttachmentID) -> JSONType:
     """Read feature attachment
 
     :returns: Feature attachment details"""
@@ -145,7 +146,7 @@ def iget(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
     return obj.serialize()
 
 
-def idelete(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
+def idelete(resource, request: Request, fid: FeatureID, aid: AttachmentID) -> JSONType:
     """Delete feature attachment
 
     :returns: Feature attachment deleted successfully"""
@@ -156,7 +157,7 @@ def idelete(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
         obj.delete()
 
 
-def iput(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
+def iput(resource, request: Request, fid: FeatureID, aid: AttachmentID) -> JSONType:
     """Update feature attachment
 
     :returns: Updated feature attachment"""
@@ -170,7 +171,7 @@ def iput(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
     return dict(id=obj.extension_id, **vinfo)
 
 
-def cget(resource, request, fid: FeatureID) -> JSONType:
+def cget(resource, request: Request, fid: FeatureID) -> JSONType:
     """Read feature attachments
 
     :returns: List of feature attachments"""
@@ -182,7 +183,7 @@ def cget(resource, request, fid: FeatureID) -> JSONType:
     return result
 
 
-def cpost(resource, request, fid: FeatureID) -> JSONType:
+def cpost(resource, request: Request, fid: FeatureID) -> JSONType:
     """Create feature attachment
 
     :returns: Created feature attachment"""
@@ -198,7 +199,7 @@ def cpost(resource, request, fid: FeatureID) -> JSONType:
     return dict(id=obj.extension_id, **vinfo)
 
 
-def export(resource, request):
+def export(resource, request: Request):
     request.resource_permission(DataScope.read)
 
     query = FeatureAttachment.filter_by(resource_id=resource.id).order_by(
@@ -263,7 +264,7 @@ def export(resource, request):
         return response
 
 
-def import_attachment(resource, request) -> JSONType:
+def import_attachment(resource, request: Request) -> JSONType:
     """Import feature attachments
 
     :returns: Feature attachments imported successfully"""
@@ -285,7 +286,10 @@ class BundleBody(Struct, kw_only=True):
     items: list[BundleItem]
 
 
-def bundle(request, body: BundleBody) -> Annotated[Response, ContentType("application/zip")]:
+def bundle(
+    request: Request,
+    body: BundleBody,
+) -> Annotated[Response, ContentType("application/zip")]:
     """Download specific attachments as ZIP archive
 
     :returns: ZIP archive containing the requested feature attachments"""
@@ -330,7 +334,7 @@ def bundle(request, body: BundleBody) -> Annotated[Response, ContentType("applic
         return response
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureAttachmentComponent, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
     itmurl = "/api/resource/{id}/feature/{fid}/attachment/{aid}"

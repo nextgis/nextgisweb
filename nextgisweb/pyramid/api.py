@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NewType, Ty
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.response import Response
 
-from nextgisweb.env import COMP_ID, Component, DBSession, env, gettext, gettextf, inject
+from nextgisweb.env import COMP_ID, Component, DBSession, gettext, gettextf, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import (
     AnyOf,
@@ -33,7 +33,7 @@ from . import client
 from .client import client_setting
 from .component import PyramidComponent
 from .permission import cors_manage, cors_view
-from .tomb.response import UnsafeFileResponse
+from .tomb import Request, UnsafeFileResponse
 from .util import gensecret, restart_delayed
 
 LOGO_MAX_SIZE = 128 * (1 << 10)  # 128 KB
@@ -49,23 +49,25 @@ SettingsResponseUntyped = NewType("SettingsResponseUntyped", dict[str, Any])
 
 
 def settings(
-    request,
+    request: Request,
     *,
     component: SettingsComponentGap,
 ) -> AsJSON[AnyOf[SettingsResponseTypedGap, SettingsResponseUntyped]]:
     """Read component settings
 
     :returns: Current component settings"""
-    comp = request.env.components[component]
-    if st := request.env.pyramid._client_settings_struct_types.get(component):
+
+    comp = request.env.component(PyramidComponent)
+    if st := comp._client_settings_struct_types.get(component):
         comp = request.env.components[component]
         return client.evaluate(comp, request, struct_type=st)
+
     return comp.client_settings(request)
 
 
-def setup_pyramid_client_settings(comp, config):
+def setup_pyramid_client_settings(comp: PyramidComponent, config):
     struct_types = dict[str, Any]()
-    comp_ids = tuple[str]()
+    comp_ids = tuple[str, ...]()
     for comp_id, comp_obj in comp.env.components.items():
         if comp_struct_type := client.struct_type(comp_obj):
             struct_types[comp_id] = comp_struct_type
@@ -96,14 +98,14 @@ def setup_pyramid_client_settings(comp, config):
     )
 
 
-def route(request) -> AsJSON[dict[str, Annotated[list[str], Meta(min_length=1)]]]:
+def route(request: Request) -> AsJSON[dict[str, Annotated[list[str], Meta(min_length=1)]]]:
     """Read route metadata
 
     :returns: Route metadata including name, path, and parameters"""
-    return request.env.pyramid.route_meta
+    return request.env.component(PyramidComponent).route_meta
 
 
-def pkg_version(request) -> AsJSON[dict[str, str]]:
+def pkg_version(request: Request) -> AsJSON[dict[str, str]]:
     """Read packages versions
 
     :returns: Map of installed package names to their versions"""
@@ -115,7 +117,7 @@ class PingResponse(Struct, kw_only=True):
     started: float
 
 
-def ping(request) -> PingResponse:
+def ping(request: Request) -> PingResponse:
     """Simple but useful request
 
     :returns: Pong response confirming the server is alive"""
@@ -131,7 +133,7 @@ class HealthcheckResponse(Struct, kw_only=True):
 
 
 def healthcheck(
-    request,
+    request: Request,
 ) -> AnyOf[
     Annotated[HealthcheckResponse, StatusCode(200)],
     Annotated[HealthcheckResponse, StatusCode(503)],
@@ -140,7 +142,7 @@ def healthcheck(
 
     :returns: Health check results"""
     result = HealthcheckResponse(success=True, component=dict())
-    components = [comp for comp in env.components.values() if hasattr(comp, "healthcheck")]
+    components = [comp for comp in request.env.components.values() if hasattr(comp, "healthcheck")]
     for comp in components:
         cresult = comp.healthcheck()
         result.success = result.success and cresult["success"]
@@ -152,7 +154,7 @@ def healthcheck(
     return result
 
 
-def statistics(request) -> AsJSON[dict[str, dict[str, Any]]]:
+def statistics(request: Request) -> AsJSON[dict[str, dict[str, Any]]]:
     """Compute and provide per-component statistics
 
     :returns: Per-component statistics"""
@@ -168,7 +170,7 @@ def statistics(request) -> AsJSON[dict[str, dict[str, Any]]]:
 KindOfDataResponse = Gap("KindOfDataResponse", Type[Struct])
 
 
-def kind_of_data(request) -> KindOfDataResponse:
+def kind_of_data(request: Request) -> KindOfDataResponse:
     """Read available kinds of data schema
 
     :returns: Schema describing available data kinds"""
@@ -192,7 +194,7 @@ class StorageEstimateGetResponse(Struct, kw_only=True):
 
 
 @inject()
-def storage_estimate_get(request, *, core: CoreComponent) -> StorageEstimateGetResponse:
+def storage_estimate_get(request: Request, *, core: CoreComponent) -> StorageEstimateGetResponse:
     """Check for storage estimation status
 
     :returns: Current storage estimation status"""
@@ -202,14 +204,14 @@ def storage_estimate_get(request, *, core: CoreComponent) -> StorageEstimateGetR
     return StorageEstimateGetResponse(active=core.estimation_running())
 
 
-def storage_estimate_post(request) -> EmptyObject:
+def storage_estimate_post(request: Request) -> EmptyObject:
     """Start full storage estimation
 
     :returns: Storage estimation job started"""
     request.require_administrator()
     require_storage_enabled()
 
-    request.env.core.start_estimation()
+    request.env.component(CoreComponent).start_estimation()
 
 
 StorageResponse = Gap("StorageResponse", Type[Struct])
@@ -222,7 +224,7 @@ class StorageValue(Struct, kw_only=True):
 
 
 @inject()
-def storage(request, *, core: CoreComponent) -> StorageResponse:
+def storage(request: Request, *, core: CoreComponent) -> StorageResponse:
     """Read storage usage
 
     :returns: Storage usage summary"""
@@ -236,12 +238,12 @@ def storage(request, *, core: CoreComponent) -> StorageResponse:
     return StorageResponse(**{k: StorageValue(**v) for k, v in data.items()})
 
 
-def font_cread(request) -> AsJSON[list[SystemFont | CustomFont]]:
+def font_cread(request: Request) -> AsJSON[list[SystemFont | CustomFont]]:
     """Get information about available fonts
 
     :returns: List of available fonts"""
     request.require_administrator()
-    unordered = request.env.core.fontconfig.enumerate()
+    unordered = request.env.component(CoreComponent).fontconfig.enumerate()
     return sorted(unordered, key=lambda i: (not isinstance(i, CustomFont), i.label))
 
 
@@ -255,7 +257,7 @@ class FontCUpdateResponse(Struct, kw_only=True):
     timestamp: float
 
 
-def font_cupdate(request, *, body: FontCUpdateBody) -> FontCUpdateResponse:
+def font_cupdate(request: Request, *, body: FontCUpdateBody) -> FontCUpdateResponse:
     """Add or remove custom fonts
 
     :returns: Updated list of available fonts"""
@@ -264,7 +266,7 @@ def font_cupdate(request, *, body: FontCUpdateBody) -> FontCUpdateResponse:
 
     if len(body.remove) > 0:
         for font in body.remove:
-            request.env.core.fontconfig.delete_font(font)
+            request.env.component(CoreComponent).fontconfig.delete_font(font)
 
     if len(body.add) > 0:
         add = []
@@ -288,7 +290,7 @@ def font_cupdate(request, *, body: FontCUpdateBody) -> FontCUpdateResponse:
             add.append((fupload.name, fupload.data_path))
 
         for name, path in add:
-            request.env.core.fontconfig.add_font(name, path)
+            request.env.component(CoreComponent).fontconfig.add_font(name, path)
 
     if restarted := (len(body.add) > 0 or len(body.remove) > 0):
         restart_delayed()
@@ -301,7 +303,9 @@ def font_cupdate(request, *, body: FontCUpdateBody) -> FontCUpdateResponse:
 
 @inject()
 def codegen_api_type(
-    request, *, pyramid: PyramidComponent
+    request: Request,
+    *,
+    pyramid: PyramidComponent,
 ) -> Annotated[Response, ContentType("application/typescript")]:
     """Return autogenerated TypeScript API type definitions
 
@@ -411,7 +415,7 @@ class csetting:
             core.settings_set(*cskey, gensecret(8))
 
 
-def setup_pyramid_csettings(comp, config):
+def setup_pyramid_csettings(comp: PyramidComponent, config):
     NoneDefault = Annotated[None, Meta(description="Resets the setting to its default value.")]
     fld_unset = lambda n, t: (n, t | UnsetType, UNSET)
     fld_reset = lambda n, t: (n, t | NoneDefault | UnsetType, UNSET)
@@ -466,7 +470,7 @@ def setup_pyramid_csettings(comp, config):
         CSettingsRead = defstruct("CSettingsRead", rfields)
         CSettingsUpdate = defstruct("CSettingsUpdate", ufields)
 
-    def get(request, **kwargs) -> CSettingsRead:
+    def get(request: Request, **kwargs) -> CSettingsRead:
         """Read component settings
 
         :returns: Current component settings"""
@@ -508,7 +512,7 @@ def setup_pyramid_csettings(comp, config):
         parameters=[get_sig.parameters["request"]] + get_parameters
     )
 
-    def put(request, *, body: CSettingsUpdate) -> EmptyObject:
+    def put(request: Request, *, body: CSettingsUpdate) -> EmptyObject:
         """Update component settings
 
         :returns: Updated component settings"""
@@ -639,11 +643,11 @@ csetting("metrics", Metrics, default={})
 
 
 @client_setting("logoMaxSize")
-def cs_logo_max_size(comp: PyramidComponent, request) -> int:
+def cs_logo_max_size(comp: PyramidComponent, request: Request) -> int:
     return LOGO_MAX_SIZE
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: PyramidComponent, config):
     from . import api_cors
 
     config.include(api_cors)
@@ -745,7 +749,7 @@ def setup_pyramid(comp, config):
         comp.options["help_page.url"] if comp.options["help_page.enabled"] else None
     )
 
-    def preview_link_view(request):
+    def preview_link_view(request: Request):
         defaults = comp.preview_link_default_view(request)
 
         if (

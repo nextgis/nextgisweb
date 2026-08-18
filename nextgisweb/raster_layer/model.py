@@ -19,12 +19,13 @@ from osgeo import gdal, gdalconst, ogr, osr
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf, ngettextf
+from nextgisweb.env import COMP_ID, Base, gettext, gettextf, ngettextf
 from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
 from nextgisweb.lib.saext import Msgspec
 
+from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.core.storage import StorageInsufficient
 from nextgisweb.file_storage import FileObj
@@ -253,6 +254,8 @@ class RasterLayer(Resource, SpatialLayerMixin):
         return isinstance(parent, ResourceGroup)
 
     def load_file(self, filename: str | Path | FileUpload, *, cog=False):
+        from .component import RasterLayerComponent
+
         file_upload = None
         if isinstance(filename, Path):
             filename = str(filename)
@@ -285,8 +288,6 @@ class RasterLayer(Resource, SpatialLayerMixin):
                     )(supported_zip_items=", ".join(supported_zip_items))
                 )
             filename = f"{zip_filename}/{supported_zip_items[0]}"
-
-        comp = env.raster_layer
 
         ds = gdal.OpenEx(filename, gdalconst.GA_ReadOnly, allowed_drivers=SUPPORTED_DRIVERS)
         if not ds:
@@ -378,7 +379,7 @@ class RasterLayer(Resource, SpatialLayerMixin):
             data_type=data_type if gdal.VersionInfo() < "3030300" else None,
         )  # https://github.com/OSGeo/gdal/issues/4469
 
-        size_limit = comp.size_limit
+        size_limit = RasterLayerComponent.current().size_limit
         if size_limit is not None and size_expected > size_limit:
             raise ValidationError(
                 title=gettext("Raster too large"),
@@ -398,7 +399,7 @@ class RasterLayer(Resource, SpatialLayerMixin):
 
         storage_required = size_expected // 2
         try:
-            env.core.check_storage_limit(storage_required)
+            CoreComponent.current().check_storage_limit(storage_required)
         except StorageInsufficient as exc:
             raise RasterLayerUncompressedStorageInsufficient(
                 cause=exc, uncompressed_size=size_expected
@@ -488,7 +489,9 @@ class RasterLayer(Resource, SpatialLayerMixin):
         self.meta = RasterLayerMeta(bands=bands)
 
     def _load_file_local(self, cmd: list) -> gdal.Dataset:
-        comp = env.raster_layer
+        from .component import RasterLayerComponent
+
+        comp = RasterLayerComponent.current()
         fobj = FileObj(component="raster_layer")
         dst_file = str(comp.workdir_path(fobj, None, makedirs=True))
         self.fileobj = fobj
@@ -589,17 +592,21 @@ class RasterLayer(Resource, SpatialLayerMixin):
         self.populate_meta(ds, data_type)
 
     def gdal_dataset(self):
+        from .component import RasterLayerComponent
+
         if self.storage is not None:
             return self._s3_open(self.storage.vsi_path(self.storage_filename))
-        fn = env.raster_layer.workdir_path(self.fileobj, self.fileobj_pam)
+        fn = RasterLayerComponent.current().workdir_path(self.fileobj, self.fileobj_pam)
         return gdal.Open(str(fn), gdalconst.GA_ReadOnly)
 
     def build_overview(self, missing_only=False, fn=None):
+        from .component import RasterLayerComponent
+
         if fn is None and self.cog:
             return
 
         if fn is None:
-            fn = env.raster_layer.workdir_path(self.fileobj, self.fileobj_pam)
+            fn = RasterLayerComponent.current().workdir_path(self.fileobj, self.fileobj_pam)
 
         if missing_only and fn.with_suffix(".ovr").exists():
             return
@@ -753,7 +760,9 @@ class RasterLayerUncompressedStorageInsufficient(StorageInsufficient):
 
 
 def estimate_raster_layer_data(resource):
-    fn = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
+    from .component import RasterLayerComponent
+
+    fn = RasterLayerComponent.current().workdir_path(resource.fileobj, resource.fileobj_pam)
     return fn.stat().st_size + (0 if resource.cog else fn.with_suffix(".ovr").stat().st_size)
 
 
@@ -761,17 +770,23 @@ class SourceAttr(SAttribute):
     ctypes = CRUTypes(FileUploadRef, FileUploadRef, FileUploadRef)
 
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
+        from .component import RasterLayerComponent
+
         use_s3 = srlzr.obj.storage is not None
         cur_size = 0 if create or use_s3 else estimate_raster_layer_data(srlzr.obj)
 
         cog = srlzr.data.cog
         if cog is UNSET or cog is None:
-            cog = env.raster_layer.cog_default if cog is None or create else srlzr.obj.cog
+            cog = (
+                RasterLayerComponent.current().cog_default
+                if cog is None or create
+                else srlzr.obj.cog
+            )
         srlzr.obj.load_file(value(), cog=cog)
 
         if not use_s3:
             new_size = estimate_raster_layer_data(srlzr.obj)
-            env.core.reserve_storage(
+            CoreComponent.current().reserve_storage(
                 COMP_ID,
                 RasterLayerData,
                 value_data_volume=new_size - cur_size,
@@ -783,20 +798,22 @@ class CogAttr(SColumn):
     ctypes = CRUTypes(bool | None, bool, bool | None)
 
     def set(self, srlzr: Serializer, value: bool | None, *, create: bool):
+        from .component import RasterLayerComponent
+
         if srlzr.data.source is not UNSET or create:
             return  # Just do nothing, SourceAttr will set the cog attribute
 
         if value is None:
-            value = env.raster_layer.cog_default
+            value = RasterLayerComponent.current().cog_default
         if srlzr.obj.cog == value:
             return
 
         cur_size = estimate_raster_layer_data(srlzr.obj)
-        fn = env.raster_layer.workdir_path(srlzr.obj.fileobj, srlzr.obj.fileobj_pam)
+        fn = RasterLayerComponent.current().workdir_path(srlzr.obj.fileobj, srlzr.obj.fileobj_pam)
         srlzr.obj.load_file(fn, cog=value)
 
         new_size = estimate_raster_layer_data(srlzr.obj)
-        env.core.reserve_storage(
+        CoreComponent.current().reserve_storage(
             COMP_ID,
             RasterLayerData,
             value_data_volume=new_size - cur_size,

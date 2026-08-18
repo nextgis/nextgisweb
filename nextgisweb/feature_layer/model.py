@@ -10,7 +10,7 @@ from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped, declared_attr, mapped_column
 
-from nextgisweb.env import Base, env, gettext
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Transformer
 
@@ -394,12 +394,14 @@ class FeatureLayerSerializer(Serializer, resource=FeatureLayerMixin, force_creat
     aggregations = AggregationsAttr(read=ResourceScope.read)
 
     def deserialize(self):
+        from .component import FeatureLayerComponent
+
         if self.obj.id is None and IVersionableFeatureLayer.providedBy(self.obj):
             fv = self.data.versioning
             if fv is UNSET:
                 fv = self.data.versioning = FVersioningUpdate()
             if fv.enabled is UNSET:
-                fv.enabled = env.feature_layer.versioning_default
+                fv.enabled = FeatureLayerComponent.current().versioning_default
 
         super().deserialize()
 

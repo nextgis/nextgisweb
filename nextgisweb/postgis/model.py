@@ -6,6 +6,7 @@ from typing import Literal
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
+import sqlalchemy.sql.operators as sa_operators
 from msgspec import UNSET
 from shapely.geometry import box
 from sqlalchemy import alias, bindparam, cast, func, select, sql, text
@@ -16,7 +17,7 @@ from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import Base, env, gettext
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
@@ -170,7 +171,9 @@ class PostgisConnection(Resource):
         return isinstance(parent, ResourceGroup)
 
     def get_engine(self):
-        comp = env.postgis
+        from .component import PostgisComponent
+
+        comp = PostgisComponent.current()
 
         # Need to check connection params to see if
         # they changed for each connection request
@@ -776,7 +779,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
                     v = sa.sql.null()
 
-                op = getattr(sa.sql.operators, o)
+                op = getattr(sa_operators, o)
                 column = (
                     idcol if k == "id" else tab.columns[self.layer.field_by_keyname(k).column_name]
                 )

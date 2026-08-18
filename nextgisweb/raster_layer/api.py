@@ -8,11 +8,12 @@ from osgeo import gdal
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileIter, FileResponse, Response
 
-from nextgisweb.env import env, gettext
+from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AnyOf, ContentType, Query, StatusCode
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import XMLType, client_setting
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.pyramid.util import set_output_buffering
 from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
@@ -88,7 +89,7 @@ class RangeFileWrapper(FileIter):
 
 def export(
     resource,
-    request,
+    request: Request,
     *,
     export_params: Annotated[ExportParams, Query(spread=True)],
 ) -> ExportResponse:
@@ -137,7 +138,9 @@ def export(
         resource.storage.configure_gdal()
         source_filename = resource.storage.vsi_path(resource.storage_filename)
     else:
-        source_filename = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
+        source_filename = request.env.component(RasterLayerComponent).workdir_path(
+            resource.fileobj, resource.fileobj_pam
+        )
     if bands is not None and len(bands) != resource.band_count:
         with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
             gdal.Translate(tmp_file.name, str(source_filename), bandList=bands)
@@ -156,7 +159,10 @@ def cog_file_size(resource: RasterLayer) -> int:
     return resource.fileobj.size
 
 
-def cog_head(resource: RasterLayer, request) -> Annotated[Response, ContentType(COG_CONTENT_TYPE)]:
+def cog_head(
+    resource: RasterLayer,
+    request: Request,
+) -> Annotated[Response, ContentType(COG_CONTENT_TYPE)]:
     """Cloud optimized GeoTIFF endpoint
 
     :returns: COG file metadata headers"""
@@ -173,7 +179,7 @@ def cog_head(resource: RasterLayer, request) -> Annotated[Response, ContentType(
 
 
 def cog_get(
-    resource: RasterLayer, request
+    resource: RasterLayer, request: Request
 ) -> Annotated[
     Response,
     StatusCode(206),
@@ -224,8 +230,8 @@ def cog_get(
 
 
 def download(
-    resource: RasterLayer, request
-) -> Annotated[FileResponse, ContentType("image/tiff; application=geotiff")]:
+    resource: RasterLayer, request: Request
+) -> Annotated[Response, ContentType("image/tiff; application=geotiff")]:
     """Download raster in internal representation format
 
     :returns: Raster file in GeoTIFF format"""
@@ -256,7 +262,7 @@ def download(
     return response
 
 
-def pam_get(resource: RasterLayer, request) -> XMLType:
+def pam_get(resource: RasterLayer, request: Request) -> XMLType:
     """GDAL Persistent Auxiliary Metadata (PAM)
 
     :returns: GDAL PAM XML metadata for the COG resource"""
@@ -271,7 +277,7 @@ def pam_get(resource: RasterLayer, request) -> XMLType:
     return Response(pam_data, content_type="application/xml")
 
 
-def pam_head(resource: RasterLayer, request) -> Response:
+def pam_head(resource: RasterLayer, request: Request) -> Response:
     """GDAL Persistent Auxiliary Metadata (PAM)
 
     :returns: PAM XML file metadata headers"""
@@ -288,12 +294,11 @@ def pam_head(resource: RasterLayer, request) -> Response:
 
 
 @client_setting("msgSupportedFormats")
-def cs_msg_supported_formats(comp: RasterLayerComponent, request) -> str:
-    tr = request.localizer.translate
-    return tr(msg_supported_formats)
+def cs_msg_supported_formats(comp: RasterLayerComponent, request: Request) -> str:
+    return request.translate(msg_supported_formats)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: RasterLayerComponent, config):
     config.add_view(
         export,
         route_name="resource.export",

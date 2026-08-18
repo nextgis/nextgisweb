@@ -19,12 +19,14 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.render import IRenderableScaleRange
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.resource import DataScope, ResourceFactory, ResourceRef, ResourceScope
 
 from .adapter import ImageAdapter, WebMapAdapter
+from .component import WebMapComponent
 from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
 from .option import WebMapOption
 from .plugin import WebmapGroupPlugin, WebmapLayerPlugin, WebmapPlugin
@@ -60,7 +62,7 @@ class AnnotationCreateResponse(Struct, kw_only=True):
     id: AnnotationID
 
 
-def to_annot_read(obj: WebMapAnnotation, request, with_user_info=False) -> AnnotationRead:
+def to_annot_read(obj: WebMapAnnotation, request: Request, with_user_info=False) -> AnnotationRead:
     user_id = request.user.id
 
     annotation_read = AnnotationRead(
@@ -93,12 +95,12 @@ def prepare_annotation(
     obj.description = sanitize(data.description) if data.description is not UNSET else None
 
 
-def check_annotation_enabled(request) -> None:
-    if not request.env.webmap.options["annotation"]:
+def check_annotation_enabled(request: Request) -> None:
+    if not request.env.component(WebMapComponent).options["annotation"]:
         raise HTTPNotFound()
 
 
-def annotation_cget(resource, request) -> AsJSON[list[AnnotationRead]]:
+def annotation_cget(resource, request: Request) -> AsJSON[list[AnnotationRead]]:
     """Read annotations
 
     :returns: List of annotations for the resource"""
@@ -117,7 +119,7 @@ def annotation_cget(resource, request) -> AsJSON[list[AnnotationRead]]:
 
 def annotation_cpost(
     resource,
-    request,
+    request: Request,
     *,
     body: AnnotationCreate,
 ) -> AnnotationCreateResponse:
@@ -138,7 +140,7 @@ def annotation_cpost(
 
 def annotation_iget(
     resource,
-    request,
+    request: Request,
     annotation_id: int,
 ) -> AsJSON[AnnotationRead]:
     """Read annotation
@@ -154,7 +156,7 @@ def annotation_iget(
 
 def annotation_iput(
     resource,
-    request,
+    request: Request,
     annotation_id: int,
     *,
     body: AnnotationUpdate,
@@ -172,7 +174,7 @@ def annotation_iput(
 
 def annotation_idelete(
     resource,
-    request,
+    request: Request,
     annotation_id: int,
 ) -> EmptyObject:
     """Delete annotation
@@ -207,7 +209,7 @@ def add_extent(e1, e2):
     )
 
 
-def get_webmap_extent(resource, request) -> JSONType:
+def get_webmap_extent(resource, request: Request) -> JSONType:
     """Calculate webmap layers' extent
 
     :returns: Combined geographic extent of all webmap layers"""
@@ -312,8 +314,8 @@ def handle_legend_tree(legend: LegendElement) -> list[LegendViewModel]:
     return legend_tree
 
 
-def check_page_max_size(request, body: PrintBody):
-    max_size = request.env.webmap.options["print.max_size"]
+def check_page_max_size(request: Request, body: PrintBody):
+    max_size = request.env.component(WebMapComponent).options["print.max_size"]
     if body.height > max_size:
         raise ValidationError(
             f"Height must be less than or equal to S{max_size}. Provided height: {body.height}"
@@ -324,7 +326,7 @@ def check_page_max_size(request, body: PrintBody):
         )
 
 
-def print(request, *, body: PrintBody) -> Response:
+def print(request: Request, *, body: PrintBody) -> Response:
     """Generate printable webmap document
 
     :returns: Printable webmap document"""
@@ -394,7 +396,7 @@ def print(request, *, body: PrintBody) -> Response:
         )
 
 
-def pdf_to_image(format: PrintFormat, pdf_file: str, temp_dir: TemporaryDirectory):
+def pdf_to_image(format: PrintFormat, pdf_file: Path, temp_dir: Path):
     gs = which("gs")
     if not gs:
         raise RuntimeError("Ghostscript not found")
@@ -429,7 +431,7 @@ def pdf_to_image(format: PrintFormat, pdf_file: str, temp_dir: TemporaryDirector
             "-dDownScaleFactor=1",
             f"-sDEVICE={device}",
             f"-sOutputFile={output_file}",
-            pdf_file,
+            str(pdf_file),
         ]
     )
 
@@ -558,7 +560,7 @@ def _extent_wsen_from_attrs(obj, prefix) -> ExtentWSEN | None:
     return ExtentWSEN(*parts) if None not in parts else None
 
 
-def display_config(obj, request) -> DisplayConfig:
+def display_config(obj, request: Request) -> DisplayConfig:
     """Generate webmap display widget configuration
 
     :returns: Webmap widget display configuration"""
@@ -571,7 +573,9 @@ def display_config(obj, request) -> DisplayConfig:
             p_mid, p_payload = p_mid_data
             plugin[p_mid] = p_payload
 
-    ls_webmap = request.env.webmap.effective_legend_symbols() + obj.legend_symbols
+    ls_webmap = (
+        request.env.component(WebMapComponent).effective_legend_symbols() + obj.legend_symbols
+    )
 
     def _legend(layer, style):
         ls_layer = ls_webmap + obj.legend_symbols + layer.legend_symbols
@@ -721,7 +725,8 @@ def display_config(obj, request) -> DisplayConfig:
         expandedItems=expanded_items,
         mid=mid,
         annotations=AnnotationsConfig(
-            enabled=obj.annotation_enabled and request.env.webmap.options["annotation"],
+            enabled=obj.annotation_enabled
+            and request.env.component(WebMapComponent).options["annotation"],
             default=obj.annotation_default,
             scope=AnnotationsPermissions(
                 read=WebMapScope.annotation_read in permissions,
@@ -735,12 +740,12 @@ def display_config(obj, request) -> DisplayConfig:
         drawOrderEnabled=obj.draw_order_enabled,
         measureSrsId=obj.measure_srs_id,
         bookmarkLayerId=obj.bookmark_resource_id,
-        printMaxSize=request.env.webmap.options["print.max_size"],
+        printMaxSize=request.env.component(WebMapComponent).options["print.max_size"],
         options=options,
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: WebMapComponent, config):
     webmap_factory = ResourceFactory(context=WebMap)
 
     config.add_route(

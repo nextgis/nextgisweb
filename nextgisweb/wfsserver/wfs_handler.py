@@ -8,7 +8,6 @@ from lxml import etree, html
 from lxml.builder import ElementMaker
 from msgspec import UNSET, UnsetType
 from osgeo import ogr
-from pyramid.request import Request
 from shapely.geometry import box
 from sqlalchemy import and_
 from sqlalchemy.exc import NoResultFound
@@ -32,6 +31,7 @@ from nextgisweb.feature_layer import (
     IFeatureLayer,
 )
 from nextgisweb.layer import IBboxLayer
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -234,7 +234,7 @@ def transform(geom, srs_to):
 
 
 class WFSHandler:
-    def __init__(self, resource, request, force_schema_validation=False):
+    def __init__(self, resource, request: Request, force_schema_validation=False):
         self.resource = resource
         self.request = request
 
@@ -270,7 +270,7 @@ class WFSHandler:
         self.service_namespace = self.request.route_url("wfsserver.wfs", id=self.resource.id)
 
     @staticmethod
-    def exception_response(request, err_title, err_message):
+    def exception_response(request: Request, err_title, err_message):
         if err_title is not None and err_message is not None:
             message = "%s: %s" % (err_title, err_message)
         elif err_message is not None:

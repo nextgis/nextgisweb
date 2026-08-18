@@ -10,8 +10,10 @@ from nextgisweb.lib.apitype import AsJSON, EmptyObject
 from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.jsrealm import TSExport
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ResourceCls, ResourceRef
 
+from ..component import ResourceComponent
 from .base import ResourceFavorite
 from .model import ResourceFavoriteModel as Model
 
@@ -23,7 +25,7 @@ class ResourceFavoriteSchemaItem(Struct):
     route: str | None
 
 
-def schema(request) -> AsJSON[dict[str, ResourceFavoriteSchemaItem]]:
+def schema(request: Request) -> AsJSON[dict[str, ResourceFavoriteSchemaItem]]:
     """Read resource favorites schema
 
     :returns: JSON schema for the resource favorite object"""
@@ -48,7 +50,7 @@ class ResourceFavoriteRef(Struct, kw_only=True):
     id: int
 
 
-def cpost(request, body: ResourceFavoriteCreate) -> ResourceFavoriteRef:
+def cpost(request: Request, body: ResourceFavoriteCreate) -> ResourceFavoriteRef:
     """Create resource favorite
 
     :returns: Created resource favorite"""
@@ -97,7 +99,7 @@ class ResourceFavoriteCollectionGetResponse(Struct):
     resources: list[ResourceFavoriteResourceInfo]
 
 
-def cget(request) -> ResourceFavoriteCollectionGetResponse:
+def cget(request: Request) -> ResourceFavoriteCollectionGetResponse:
     """Read resource favorites and related resources summary
 
     :returns: List of resource favorites with resource summaries"""
@@ -137,7 +139,7 @@ class FeatureFavoriteItemPutBody(Struct, kw_only=True):
     label: str | None | UnsetType = UNSET
 
 
-def iput(request, id: int, body: FeatureFavoriteItemPutBody) -> EmptyObject:
+def iput(request: Request, id: int, body: FeatureFavoriteItemPutBody) -> EmptyObject:
     """Update resource favorite
 
     :returns: Updated resource favorite"""
@@ -151,7 +153,7 @@ def iput(request, id: int, body: FeatureFavoriteItemPutBody) -> EmptyObject:
         obj.label = body.label
 
 
-def idelete(request, id: int) -> EmptyObject:
+def idelete(request: Request, id: int) -> EmptyObject:
     """Delete resource favorite
 
     :returns: Resource favorite deleted successfully"""
@@ -161,7 +163,7 @@ def idelete(request, id: int) -> EmptyObject:
         DBSession.delete(obj)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: ResourceComponent, config):
     config.add_route(
         "resource.favorite.schema",
         "/api/component/resource/favorite/schema",

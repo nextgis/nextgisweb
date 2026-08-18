@@ -10,7 +10,7 @@ from PIL import Image
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import Base, env, gettext
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.osrhelper import sr_from_epsg
 
@@ -103,12 +103,16 @@ class CapmodeAttr(SColumn):
     ctypes = CRUTypes(Capmode, Capmode, Capmode)
 
     def set(self, srlzr: Serializer, value: Capmode, *, create: bool):
+        from .component import TMSClientComponent
+
         if value == NEXTGIS_GEOSERVICES:
             if srlzr.obj.id is None or srlzr.obj.capmode != NEXTGIS_GEOSERVICES:
                 apikey = srlzr.data.apikey
                 if apikey is UNSET or apikey is None or len(apikey) == 0:
                     raise ValidationError(message=gettext("API key required."))
-            srlzr.obj.url_template = env.tmsclient.options["nextgis_geoservices.url_template"]
+            srlzr.obj.url_template = TMSClientComponent.current().options[
+                "nextgis_geoservices.url_template"
+            ]
             srlzr.obj.apikey_param = "apikey"
             srlzr.obj.scheme = SCHEME.XYZ
 

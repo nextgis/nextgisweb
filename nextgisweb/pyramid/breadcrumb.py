@@ -2,6 +2,8 @@ from typing import Any, Callable, ClassVar
 
 from msgspec import Struct
 
+from .tomb import Request
+
 BreadcrumbAdapter = Callable[[Any, Any], tuple["Breadcrumb", Any] | None]
 
 
@@ -17,7 +19,7 @@ class Breadcrumb(Struct, kw_only=True):
         cls.adapters.append(func)
 
 
-def breadcrumb_path(obj, request):
+def breadcrumb_path(obj, request: Request):
     result = list()
     while obj is not None:
         for a in Breadcrumb.adapters:

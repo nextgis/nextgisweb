@@ -2,6 +2,7 @@ from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Widget
 from nextgisweb.resource.view import resource_sections
 
+from .component import LookupTableComponent
 from .model import LookupTable
 
 
@@ -16,5 +17,5 @@ def resource_section(obj, **kwargs):
     return isinstance(obj, LookupTable) and len(obj.value) > 0
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: LookupTableComponent, config):
     pass

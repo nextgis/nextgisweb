@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -22,10 +22,12 @@ from nextgisweb.lib.msext import DEPRECATED
 
 from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
+from nextgisweb.core.component import CoreComponent
 from nextgisweb.core.exception import InsufficientPermissions, UserException, ValidationError
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.pyramid import AsJSON, JSONType, client_setting
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
+from nextgisweb.pyramid.tomb import Request
 
 from .category import ResourceCategory, ResourceCategoryIdentity
 from .component import ResourceComponent
@@ -43,6 +45,7 @@ from .model import (
     ResourceID,
     ResourceInterfaceIdentity,
     ResourceScopeIdentity,
+    resource_registry,
 )
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
@@ -84,7 +87,7 @@ class Blueprint(Struct):
     categories: dict[ResourceCategoryIdentity, BlueprintCategory]
 
 
-def blueprint(request) -> Blueprint:
+def blueprint(request: Request) -> Blueprint:
     """Read schema for resources, scopes, and categories
 
     :returns: Resource blueprint including schema, scopes, and categories"""
@@ -108,7 +111,7 @@ def blueprint(request) -> Blueprint:
                 category=cls.cls_category.identity,
                 order=cls.cls_order,
             )
-            for identity, cls in Resource.registry.items()
+            for identity, cls in resource_registry.items()
         },
         scopes={
             sid: BlueprintScope(
@@ -146,7 +149,7 @@ else:
     CompositeUpdate = composite.update
 
 
-def item_get(context, request) -> CompositeRead:
+def item_get(context, request: Request) -> CompositeRead:
     """Read resource
 
     :returns: Resource details"""
@@ -156,7 +159,7 @@ def item_get(context, request) -> CompositeRead:
     return serializer.serialize(context, CompositeRead)
 
 
-def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
+def item_put(context, request: Request, body: CompositeUpdate) -> EmptyObject:
     """Update resource
 
     :returns: Updated resource details"""
@@ -169,7 +172,7 @@ def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
     zope.event.notify(AfterResourcePut(context, request))
 
 
-def item_delete(context, request) -> EmptyObject:
+def item_delete(context, request: Request) -> EmptyObject:
     """Delete resource
 
     :returns: Resource deleted successfully"""
@@ -196,7 +199,7 @@ def item_delete(context, request) -> EmptyObject:
 
 
 def collection_get(
-    request,
+    request: Request,
     *,
     parent: int | None = None,
 ) -> AsJSON[list[CompositeRead]]:
@@ -224,16 +227,17 @@ def collection_get(
 
 
 def collection_post(
-    request, body: CompositeCreate
+    request: Request,
+    body: CompositeCreate,
 ) -> Annotated[ResourceRefWithParent, StatusCode(201)]:
     """Create resource
 
     :returns: Created resource"""
 
-    request.env.core.check_storage_limit()
+    CoreComponent.current().check_storage_limit()
 
     resource_cls = body.resource.cls
-    resource = Resource.registry[resource_cls](owner_user=request.user)
+    resource = resource_registry[resource_cls](owner_user=request.user)
     serializer = CompositeSerializer(user=request.user)
 
     resource.persist()
@@ -279,7 +283,7 @@ class ResourceDeleteGetResponse(Struct, kw_only=True):
     ]
 
 
-def _delete_multiple(request, resource_ids, partial, *, dry_run):
+def _delete_multiple(request: Request, resource_ids, partial, *, dry_run):
     affected = dict()
     unaffected = dict()
 
@@ -338,7 +342,7 @@ def _delete_multiple(request, resource_ids, partial, *, dry_run):
     )
 
 
-def delete_get(request, *, resources: DeleteResources) -> ResourceDeleteGetResponse:
+def delete_get(request: Request, *, resources: DeleteResources) -> ResourceDeleteGetResponse:
     """Simulate deletion of multiple resources
 
     :returns: Dry-run result showing which resources would be deleted"""
@@ -346,7 +350,7 @@ def delete_get(request, *, resources: DeleteResources) -> ResourceDeleteGetRespo
 
 
 def delete_post(
-    request,
+    request: Request,
     *,
     resources: DeleteResources,
     partial: Annotated[
@@ -396,7 +400,7 @@ else:
 
 def permission(
     resource,
-    request,
+    request: Request,
     *,
     user: UserID | None = None,
 ) -> EffectivePermissions:
@@ -420,7 +424,7 @@ def permission(
     )
 
 
-def permission_explain(request) -> JSONType:
+def permission_explain(request: Request) -> JSONType:
     """Explain effective resource permissions
 
     :returns: Detailed explanation of how effective permissions are derived"""
@@ -881,7 +885,7 @@ def _search_order(order: list[str]):
 
 
 def search(
-    request,
+    request: Request,
     *,
     serialization: Annotated[
         Literal["resource", "full"],
@@ -972,7 +976,7 @@ class ResourceVolume(Struct, kw_only=True):
 
 def resource_volume(
     resource,
-    request,
+    request: Request,
     *,
     recursive: Annotated[bool, Meta(description="Include children resources")] = True,
 ) -> ResourceVolume:
@@ -993,7 +997,7 @@ def resource_volume(
     except InsufficientPermissions:
         volume = 0
     else:
-        res = request.env.core.query_storage(dict(resource_id=lambda col: col.in_(ids)))
+        res = CoreComponent.current().query_storage(dict(resource_id=lambda col: col.in_(ids)))
         volume = res.get("", dict()).get("data_volume", 0)
         volume = volume if volume is not None else 0
 
@@ -1021,17 +1025,17 @@ class QuotaCheckFailure(Struct, kw_only=True):
 
 
 def quota_check(
-    request,
+    request: Request,
     body: AsJSON[QuotaCheckBody],
 ) -> AnyOf[
     Annotated[QuotaCheckSuccess, StatusCode.OK],
-    Annotated[QuotaCheckFailure, StatusCode(cast(int, QuotaExceeded.http_status_code))],
+    Annotated[QuotaCheckFailure, StatusCode(QuotaExceeded.http_status_code)],
 ]:
     """Check for resource quota
 
     :returns: Quota check passed"""
     try:
-        request.env.resource.quota_check(body)
+        ResourceComponent.current().quota_check(body)
     except QuotaExceeded as exc:
         request.response.status_code = exc.http_status_code
         return QuotaCheckFailure(**exc.data, message=request.translate(exc.message))
@@ -1066,7 +1070,7 @@ class CompositeOperationUpdate(Struct, kw_only=True, tag="update", tag_field="op
 
 
 def widget(
-    request,
+    request: Request,
     *,
     operation: CompositeWidgetOperation,
     id: ResourceID | None = None,
@@ -1080,14 +1084,14 @@ def widget(
         if id is not None or cls is None or parent is None:
             raise HTTPBadRequest()
 
-        if cls not in Resource.registry._dict:
+        if cls not in resource_registry._dict:
             raise HTTPBadRequest()
 
         parent_obj = with_polymorphic(Resource, "*").filter_by(id=parent).one()
-        tr = request.localizer.translate
+        tr = request.translate
 
         with DBSession.no_autoflush:
-            obj = Resource.registry[cls](parent=parent_obj, owner_user=request.user)
+            obj = resource_registry[cls](parent=parent_obj, owner_user=request.user)
             composite = CompositeWidget(operation=operation, obj=obj, request=request)
             suggested_dn = obj.suggest_display_name(tr)
             members = composite.config()
@@ -1129,11 +1133,11 @@ csetting("resource_export", ResourceExport, default="data_read")
 
 
 @client_setting("resourceExport")
-def cs_resource_export(comp: ResourceComponent, request) -> ResourceExport:
+def cs_resource_export(comp: ResourceComponent, request: Request) -> ResourceExport:
     return csetting.registry[COMP_ID]["resource_export"].getter()
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: ResourceComponent, config):
     config.add_route(
         "resource.blueprint",
         "/api/component/resource/blueprint",

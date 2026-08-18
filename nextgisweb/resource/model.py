@@ -9,7 +9,7 @@ from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy import event, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from nextgisweb.env import Base, DBSession, env, gettext, gettextf
+from nextgisweb.env import Base, DBSession, gettext, gettextf
 from nextgisweb.lib.apitype import Gap
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import TrStr
@@ -17,6 +17,7 @@ from nextgisweb.lib.registry import DictRegistry
 from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.auth import Group, OnFindReferencesData, Principal, User
+from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.jsrealm import TSExport
 
@@ -48,7 +49,7 @@ ResourceScopeIdentity = Annotated[
 
 Base.depends_on("auth")
 
-resource_registry = DictRegistry()
+resource_registry = DictRegistry[type["Resource"]]()
 
 PermissionSets = namedtuple("PermissionSets", ("allow", "deny", "mask"))
 
@@ -68,6 +69,7 @@ class ResourceMeta(orm.DeclarativeMeta):
         nspc.setdefault("__tablename__", identity)
 
         if (id_column := nspc.get("id")) is None:
+            assert bres is not None
             id_column = bres.id_column()
             # Place at the beginning for reasonable column order
             nspc = {"id": id_column, **nspc}
@@ -295,7 +297,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     def has_export_permission(self, user):
         try:
-            value = env.core.settings_get("resource", "resource_export")
+            value = CoreComponent.current().settings_get("resource", "resource_export")
         except KeyError:
             value = "data_read"
 
@@ -633,6 +635,7 @@ class ResourceSerializer(Serializer, resource=Resource):
     scopes = ScopesAttr(read=ResourceScope.read, write=None)
 
     def deserialize(self, *args, **kwargs):
+        from .component import ResourceComponent
         # As the test for uniqueness within group is dependent on two attributes
         # (parent, display_name), it is possible to correctly check its
         # completion after serialization of both attributes.
@@ -656,7 +659,7 @@ class ResourceSerializer(Serializer, resource=Resource):
                 raise DisplayNameNotUnique(conflict.id)
 
         if self.obj.id is None:
-            env.resource.quota_check({self.obj.cls: 1})
+            ResourceComponent.current().quota_check({self.obj.cls: 1})
 
 
 @Principal.on_find_references.handler

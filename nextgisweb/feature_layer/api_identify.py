@@ -5,8 +5,10 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
+from .component import FeatureLayerComponent
 from .interface import IFeatureLayer
 
 
@@ -16,7 +18,7 @@ class IdentifyBody(Struct, kw_only=True):
     layers: list[int]
 
 
-def identify(request, *, body: IdentifyBody) -> JSONType:
+def identify(request: Request, *, body: IdentifyBody) -> JSONType:
     """Find features intersecting geometry
 
     :returns: Features intersecting the specified geometry"""
@@ -74,7 +76,7 @@ def identify(request, *, body: IdentifyBody) -> JSONType:
     return result
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: FeatureLayerComponent, config):
     config.add_route(
         "feature_layer.identify",
         "/api/feature_layer/identify",

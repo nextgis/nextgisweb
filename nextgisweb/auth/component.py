@@ -73,8 +73,9 @@ class AuthComponent(Component):
 
     def setup_pyramid(self, config):
         from nextgisweb.auth import sync_ulg_cookie
+        from nextgisweb.pyramid.tomb import Request
 
-        def user(request):
+        def user(request: Request):
             environ = request.environ
             cached = environ.get("auth.user_obj")
 
@@ -114,7 +115,7 @@ class AuthComponent(Component):
                     user_la is None or (utcnow_naive() - user_la) > delta
                 ) and not request.session.get("invite", False):
 
-                    def update_last_activity(request):
+                    def update_last_activity(request: Request):
                         with transaction.manager:
                             DBSession.query(User).filter_by(
                                 principal_id=user_id,
@@ -137,11 +138,11 @@ class AuthComponent(Component):
             sync_ulg_cookie(request, user=user)
             return user
 
-        def require_administrator(request):
+        def require_administrator(request: Request):
             if not request.user.is_administrator:
                 raise HTTPForbidden(explanation="Membership in group 'administrators' required!")
 
-        def require_authenticated(request):
+        def require_authenticated(request: Request):
             if request.authenticated_userid is None:
                 raise HTTPForbidden(explanation="Authentication required!")
 
@@ -267,10 +268,11 @@ class AuthComponent(Component):
         return dict(success=True)
 
     def maintenance(self):
-        with transaction.manager:
-            if self.options["oauth.server.sync"]:
+        if self.oauth and self.options["oauth.server.sync"]:
+            with transaction.manager:
                 self.oauth.sync_users()
 
+        with transaction.manager:
             # Add additional minute for clock skew
             exp = utcnow_naive() + timedelta(seconds=60)
             tstamp = exp.timestamp()

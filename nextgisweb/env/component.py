@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import sys
 from collections.abc import Mapping
 from importlib.util import find_spec
 from pathlib import Path
-from typing import ClassVar, Type
+from typing import TYPE_CHECKING, Any, ClassVar, Self
 from warnings import warn
 
 from nextgisweb.lib.config import ConfigOptions
@@ -12,6 +14,9 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
 
 from .package import pkginfo
+
+if TYPE_CHECKING:
+    from .environment import Env
 
 
 class ComponentMeta(type):
@@ -62,7 +67,7 @@ class ComponentMeta(type):
 
         return super().__new__(mcls, name, bases, nmspc)
 
-    def __init__(cls: Type["Component"], name, bases, nmspc):
+    def __init__(cls: type[Component], name, bases, nmspc):
         super().__init__(name, bases, nmspc)
 
         # Skip Component base class from processing
@@ -97,7 +102,7 @@ class ComponentMeta(type):
 
 @dict_registry
 class Component(metaclass=ComponentMeta):
-    registry: ClassVar[Mapping[str, Type["Component"]]]
+    registry: ClassVar[Mapping[str, type[Component]]]
     """Component classes registry"""
 
     identity: ClassVar[str]
@@ -116,11 +121,22 @@ class Component(metaclass=ComponentMeta):
     basename: ClassVar[str]
     """Class name with 'Component' suffix removed (CoreComponent -> Core)"""
 
-    def __init__(self, env, settings):
+    def __init__(self, env: Env, settings: Mapping[str, Any]):
         self._env = env
-
         self._settings = settings
         self._options = ConfigOptions(settings, getattr(self, "option_annotations", ()))
+
+    @property
+    def env(self) -> Env:
+        """Environment this component belongs to"""
+        return self._env
+
+    @classmethod
+    def current(cls) -> Self:
+        """Get current component instance from environment"""
+        from .environment import env
+
+        return env.components[cls.identity]
 
     @classmethod
     def resource_path(cls, path: str = ""):
@@ -162,15 +178,6 @@ class Component(metaclass=ComponentMeta):
 
     def stylesheets(self):
         return ()
-
-    @property
-    def env(self):
-        """Environment this component belongs too. Set
-        on class exemplar creation and not changed afterwards.
-        This attribute should be used instead of global environment
-        :py:class:`~nextgisweb.env.env`."""
-
-        return self._env
 
     @property
     def options(self):

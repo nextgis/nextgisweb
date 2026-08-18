@@ -25,6 +25,8 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.config import load_config
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import CoreComponent
+
 from .util import to_gettext_locale, to_http_locale, write_po
 
 
@@ -59,7 +61,7 @@ def catalog_filename(component, locale, ext="po", internal=False, mkdir=False):
     if locale is None:
         locale = ""
 
-    external_path = env.core.options["locale.external_path"]
+    external_path = CoreComponent.current().options["locale.external_path"]
     if internal or locale == "" or locale == "ru":
         cpath = Path(import_module(pkginfo.comp_mod(component)).__path__[0])
         base = cpath / "locale"
@@ -87,7 +89,7 @@ class ComponentMeta(Struct, kw_only=True):
 
 def components_and_locales(args, work_in_progress=False):
     ext_meta = dict()
-    if ext_path := env.core.options["locale.external_path"]:
+    if ext_path := CoreComponent.current().options["locale.external_path"]:
         ext_meta_path = Path(ext_path) / "metadata.json"
         ext_meta = json.loads(ext_meta_path.read_text())
 
@@ -457,7 +459,7 @@ def _poeditor_translation(term: dict, num_plurals: int):
 
 
 def cmd_poeditor_sync(args):
-    opts = env.core.options.with_prefix("locale.poeditor")
+    opts = CoreComponent.current().options.with_prefix("locale.poeditor")
 
     if "project_id" not in opts:
         raise RuntimeError("POEditor project ID isn't set!")

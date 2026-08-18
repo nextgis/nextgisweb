@@ -46,6 +46,10 @@ def sync(
     *,
     auth: AuthComponent,
 ):
+    if not auth.oauth:
+        logger.warning("OAuth server is not configured")
+        exit(1)
+
     try:
         auth.oauth.sync_users()
     except OAuthSyncNotEnabled as exc:

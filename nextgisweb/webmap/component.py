@@ -4,6 +4,7 @@ from nextgisweb.env import Component, DBSession, gettext, require
 from nextgisweb.lib.config import Option
 
 from nextgisweb.auth import User
+from nextgisweb.core.component import CoreComponent
 
 from .model import LegendSymbolsEnum, WebMap, WebMapItem
 
@@ -19,10 +20,12 @@ class WebMapComponent(Component):
 
     @require("resource", "auth")
     def initialize_db(self):
+        core = self.env.component(CoreComponent)
+
         # Create a default web-map if there are none
         # TODO: option to turn this off through settings
         if WebMap.filter_by(parent_id=0).first() is None:
-            dispname = self.env.core.localizer().translate(gettext("Main web map"))
+            dispname = core.localizer().translate(gettext("Main web map"))
             WebMap(
                 parent_id=0,
                 display_name=dispname,
@@ -43,8 +46,10 @@ class WebMapComponent(Component):
         return dict(item_type=dict(query_item_type.all()))
 
     def effective_legend_symbols(self):
+        core = self.env.component(CoreComponent)
+
         result = LegendSymbolsEnum.DISABLE + self.options["legend_symbols"]
-        if s := self.env.core.settings_get("webmap", "legend_symbols", None):
+        if s := core.settings_get("webmap", "legend_symbols", None):
             result += LegendSymbolsEnum(s)
 
         return result

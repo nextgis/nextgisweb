@@ -3,6 +3,7 @@ from msgspec import Struct
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.file_upload.exception import UnsupportedFile
 from nextgisweb.pyramid import client_setting
+from nextgisweb.pyramid.tomb import Request
 
 from .component import VectorLayerComponent
 from .util import msg_supported_formats, read_dataset_vector
@@ -12,7 +13,7 @@ class InspectResponse(Struct, kw_only=True):
     layers: list[str]
 
 
-def inspect(request, *, body: FileUploadRef) -> InspectResponse:
+def inspect(request: Request, *, body: FileUploadRef) -> InspectResponse:
     """Inspect uploaded file for layers
 
     :returns: List of layers detected in the uploaded file"""
@@ -27,12 +28,11 @@ def inspect(request, *, body: FileUploadRef) -> InspectResponse:
 
 
 @client_setting("msgSupportedFormats")
-def cs_msg_supported_formats(comp: VectorLayerComponent, request) -> str:
-    tr = request.localizer.translate
-    return tr(msg_supported_formats)
+def cs_msg_supported_formats(comp: VectorLayerComponent, request: Request) -> str:
+    return request.translate(msg_supported_formats)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: VectorLayerComponent, config):
     config.add_route(
         "vector_layer.inspect",
         "/api/component/vector_layer/inspect",

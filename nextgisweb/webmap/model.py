@@ -1,6 +1,6 @@
 from enum import Enum
 from functools import partial
-from typing import Annotated, Literal, Type
+from typing import TYPE_CHECKING, Annotated, Literal, Type
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -107,6 +107,13 @@ class WebMap(Resource):
         cascade="all,delete-orphan",
         back_populates="webmap",
     )
+
+    if TYPE_CHECKING:
+        from nextgisweb.basemap.model import BasemapWebMap, BasemapWebMapConfig
+
+        # NOTE: Defined in nextgisweb.basemap.model
+        basemaps: Mapped[list[BasemapWebMap]]
+        basemap_config: Mapped[BasemapWebMapConfig | None]
 
     def __init__(self, *args, **kwagrs):
         if "root_item" not in kwagrs:

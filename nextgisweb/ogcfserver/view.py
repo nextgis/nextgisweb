@@ -1,9 +1,11 @@
 from nextgisweb.env import gettext
 
 from nextgisweb.jsrealm import jsentry
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
+from .component import OGCFServerComponent
 from .model import Service
 
 
@@ -23,9 +25,9 @@ class OGCFServerLink(ExternalAccessLink):
     resource = Service
 
     @classmethod
-    def url_factory(cls, obj, request) -> str:
+    def url_factory(cls, obj, request: Request) -> str:
         return request.route_url("ogcfserver.landing_page", id=obj.id)
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: OGCFServerComponent, config):
     pass

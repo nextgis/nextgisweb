@@ -10,6 +10,7 @@ from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.imptool import module_from_stack
 from nextgisweb.lib.registry import DictRegistry, dict_registry
 
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource.sattribute import ResourceRef
 
 T, FM = TypeVar("T"), "ResourceFavoriteField"
@@ -67,7 +68,7 @@ class ResourceFavorite(metaclass=ResourceFavoriteMeta):
         cls.identity = f"{cls.component}.{cls.kind}"
 
     @classmethod
-    def url(cls, instance, *, request):
+    def url(cls, instance, *, request: Request):
         assert cls.route is not None
         return request.route_url(cls.route, id=instance.resource.id)
 

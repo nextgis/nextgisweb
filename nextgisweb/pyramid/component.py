@@ -13,6 +13,8 @@ from nextgisweb.lib.fileutil import update_text_file
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import CoreComponent
+
 from . import uacompat
 from .model import Session, SessionStore
 from .tomb import Configurator, iter_routes
@@ -20,6 +22,8 @@ from .util import StaticMap, gensecret
 
 
 class PyramidComponent(Component):
+    static_key: str
+
     def __init__(self, env, settings):
         self.client_types: list[Any] = list()
         super().__init__(env, settings)
@@ -57,8 +61,9 @@ class PyramidComponent(Component):
         return config
 
     def initialize_db(self):
-        self.env.core.init_settings(self.identity, "custom_css.ckey", gensecret(8))
-        self.env.core.init_settings(self.identity, "company_logo.ckey", gensecret(8))
+        core = self.env.component(CoreComponent)
+        core.init_settings(self.identity, "custom_css.ckey", gensecret(8))
+        core.init_settings(self.identity, "company_logo.ckey", gensecret(8))
 
     @require("resource")
     def setup_pyramid(self, config):
@@ -72,7 +77,7 @@ class PyramidComponent(Component):
         rt_not_set = self.options["request_timeout"] is None
 
         try:
-            import uwsgi
+            import uwsgi  # ty: ignore[unresolved-import]
         except ImportError:
             uwsgi = None
             lunkwill_rpc = False
@@ -162,7 +167,7 @@ class PyramidComponent(Component):
 
     def sys_info(self):
         try:
-            import uwsgi
+            import uwsgi  # ty: ignore[unresolved-import]
 
             yield ("uWSGI", uwsgi.version.decode())
         except ImportError:
@@ -180,17 +185,16 @@ class PyramidComponent(Component):
         config.exclude_table_data("public", SessionStore.__tablename__)
 
     def query_stat(self):
+        core = self.env.component(CoreComponent)
         result = dict()
 
         try:
-            result["cors"] = len(self.env.core.settings_get("pyramid", "cors_allow_origin")) > 0
+            result["cors"] = len(core.settings_get("pyramid", "cors_allow_origin")) > 0
         except KeyError:
             result["cors"] = False
 
         try:
-            result["custom_css"] = (
-                self.env.core.settings_get("pyramid", "custom_css").strip() != ""
-            )
+            result["custom_css"] = core.settings_get("pyramid", "custom_css").strip() != ""
         except KeyError:
             result["custom_css"] = False
 

@@ -4,7 +4,6 @@ import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
 from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
-from pyramid.request import Request
 from pyramid.security import forget
 from sqlalchemy.orm import aliased, undefer
 
@@ -20,6 +19,7 @@ from nextgisweb.lib.apitype import (
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.jsrealm import TSExport
+from nextgisweb.pyramid.tomb import Request
 from nextgisweb.pyramid.util import gensecret
 
 from .component import AuthComponent
@@ -92,7 +92,7 @@ LanguageAutodetect = Annotated[
 Brief = Annotated[bool, Meta(description="Return limited set of attributes")]
 
 
-def brief_or_permission(request, brief: Brief):
+def brief_or_permission(request: Request, brief: Brief):
     if not brief:
         request.user.require_permission(any, *permission_auth)
 
@@ -333,7 +333,7 @@ UserCGetResponse = AnyOf[AsJSON[list[UserRead]], AsJSON[list[UserReadBrief]]]
 UserIGetResponse = AnyOf[UserRead, UserReadBrief]
 
 
-def user_cget(request, *, brief: Brief = False) -> UserCGetResponse:
+def user_cget(request: Request, *, brief: Brief = False) -> UserCGetResponse:
     """Read users
 
     :returns: Array of user objects"""
@@ -348,7 +348,7 @@ def user_cget(request, *, brief: Brief = False) -> UserCGetResponse:
     return [serialize_principal(o, cls, tr=tr) for o in q]
 
 
-def user_cpost(request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(201)]:
+def user_cpost(request: Request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(201)]:
     """Create user
 
     :returns: User reference"""
@@ -361,7 +361,7 @@ def user_cpost(request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(20
     return UserRef(id=obj.id)
 
 
-def user_iget(obj, request, *, brief: Brief = False) -> UserIGetResponse:
+def user_iget(obj, request: Request, *, brief: Brief = False) -> UserIGetResponse:
     """Read user
 
     :returns: User object"""
@@ -371,7 +371,7 @@ def user_iget(obj, request, *, brief: Brief = False) -> UserIGetResponse:
     return serialize_principal(obj, cls, tr=request.translate)
 
 
-def user_iput(obj, request, *, body: UserUpdate) -> UserRef:
+def user_iput(obj, request: Request, *, body: UserUpdate) -> UserRef:
     """Update user
 
     :returns: User reference"""
@@ -389,7 +389,7 @@ def user_iput(obj, request, *, body: UserUpdate) -> UserRef:
     return UserRef(id=obj.id)
 
 
-def user_idelete(obj, request) -> EmptyObject:
+def user_idelete(obj, request: Request) -> EmptyObject:
     """Delete user
 
     :returns: User deleted successfully"""
@@ -451,7 +451,7 @@ GroupCGetResponse = AnyOf[AsJSON[list[GroupRead]], AsJSON[list[GroupReadBrief]]]
 GroupIGetResponse = AnyOf[GroupRead, GroupReadBrief]
 
 
-def group_cget(request, *, brief: Brief = False) -> GroupCGetResponse:
+def group_cget(request: Request, *, brief: Brief = False) -> GroupCGetResponse:
     """Read groups
 
     :returns: Array of group objects"""
@@ -466,7 +466,7 @@ def group_cget(request, *, brief: Brief = False) -> GroupCGetResponse:
     return [serialize_principal(o, cls, tr=tr) for o in q]
 
 
-def group_cpost(request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode(201)]:
+def group_cpost(request: Request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode(201)]:
     """Create group
 
     :returns: Group reference"""
@@ -479,7 +479,7 @@ def group_cpost(request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode
     return GroupRef(id=obj.id)
 
 
-def group_iget(obj, request, *, brief: Brief = False) -> GroupIGetResponse:
+def group_iget(obj, request: Request, *, brief: Brief = False) -> GroupIGetResponse:
     """Read group
 
     :returns: Group object"""
@@ -489,7 +489,7 @@ def group_iget(obj, request, *, brief: Brief = False) -> GroupIGetResponse:
     return serialize_principal(obj, cls, tr=request.translate)
 
 
-def group_iput(obj, request, *, body: GroupUpdate) -> GroupRef:
+def group_iput(obj, request: Request, *, body: GroupUpdate) -> GroupRef:
     """Update group
 
     :returns: Group reference"""
@@ -501,7 +501,7 @@ def group_iput(obj, request, *, body: GroupUpdate) -> GroupRef:
     return GroupRef(id=obj.id)
 
 
-def group_idelete(obj, request) -> EmptyObject:
+def group_idelete(obj, request: Request) -> EmptyObject:
     """Delete group
 
     :returns: Group deleted successfully"""
@@ -521,16 +521,16 @@ class ProfileUpdate(Struct, kw_only=True):
     language: Language | LanguageAutodetect | UnsetType = UNSET
 
 
-def profile_get(request) -> ProfileRead:
+def profile_get(request: Request) -> ProfileRead:
     """Read profile of the current user
 
     :returns: User profile"""
     if request.user.keyname == "guest":
-        return HTTPUnauthorized()
+        raise HTTPUnauthorized()
     return serialize_principal(request.user, ProfileRead, tr=request.translate)
 
 
-def profile_put(request, body: ProfileUpdate) -> EmptyObject:
+def profile_put(request: Request, body: ProfileUpdate) -> EmptyObject:
     """Update profile of the current user
 
     :returns: Updated user profile"""
@@ -551,7 +551,7 @@ class CurrentUser(Struct, kw_only=True):
 
 
 def current_user(
-    request,
+    request: Request,
     *,
     require_authenticated: bool = False,
     refresh_session: bool = False,
@@ -593,7 +593,7 @@ class LoginResponse(Struct, kw_only=True):
     home_url: str | UnsetType = UNSET
 
 
-def login(request) -> LoginResponse:
+def login(request: Request) -> LoginResponse:
     """Log in into session
 
     Parameters `login` and `password` can be passed in a JSON encoded body or as
@@ -627,7 +627,7 @@ def login(request) -> LoginResponse:
     return result
 
 
-def logout(request) -> EmptyObject:
+def logout(request: Request) -> EmptyObject:
     """Log out and close session
 
     :returns: Session closed successfully"""
@@ -635,7 +635,7 @@ def logout(request) -> EmptyObject:
     request.response.headerlist.extend(headers)
 
 
-def permission(request) -> AsJSON[dict[PermissionItem, str]]:
+def permission(request: Request) -> AsJSON[dict[PermissionItem, str]]:
     """Read user permission schema
 
     :returns: List of user permission entries"""
@@ -643,7 +643,7 @@ def permission(request) -> AsJSON[dict[PermissionItem, str]]:
     return {k: tr(v.label) for k, v in Permission.registry.items()}
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: AuthComponent, config):
     config.add_route(
         "auth.user.collection",
         "/api/component/auth/user/",

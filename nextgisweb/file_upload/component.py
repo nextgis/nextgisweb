@@ -8,6 +8,8 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import CoreComponent
+
 from .util import stat_dir
 
 date_format = r"%Y-%m-%d"
@@ -15,13 +17,13 @@ date_format = r"%Y-%m-%d"
 
 class FileUploadComponent(Component):
     def initialize(self):
-        self.path = self.options["path"] or self.env.core.gtsdir(self)
+        self.path = self.options["path"] or self.env.component(CoreComponent).gtsdir(self)
         self.max_size = self.options["max_size"]
         self.chunk_size = self.options["chunk_size"]
 
     def initialize_db(self):
         if "path" not in self.options:
-            self.env.core.mksdir(self)
+            self.env.component(CoreComponent).mksdir(self)
 
         # FIXME: Force migration
         from importlib.machinery import SourceFileLoader

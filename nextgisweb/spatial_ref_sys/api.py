@@ -8,14 +8,15 @@ from pyproj.database import query_crs_info
 from requests.exceptions import RequestException
 from sqlalchemy import sql
 
-from nextgisweb.env import DBSession, env, gettext, gettextf
+from nextgisweb.env import DBSession, gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON, EmptyObject, StatusCode
 from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_length
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
+from nextgisweb.pyramid.tomb import Request
 
-from .component import CatalogSource
+from .component import CatalogSource, SpatialRefSysComponent
 from .model import SRS, WKT_EPSG_4326, SRSRef
 from .pyramid import SRSID, srs_factory
 from .util import SRSFormat, convert_to_wkt
@@ -122,14 +123,14 @@ def deserialize(obj, data: SRSCreate, *, create: bool):
         obj.wkt = wkt
 
 
-def cget(request) -> AsJSON[list[SRSRead]]:
+def cget(request: Request) -> AsJSON[list[SRSRead]]:
     """Read spatial reference systems
 
     :returns: List of spatial reference systems"""
     return [serialize(obj) for obj in SRS.query()]
 
 
-def cpost(request, *, body: SRSCreate) -> Annotated[SRSRef, StatusCode(201)]:
+def cpost(request: Request, *, body: SRSCreate) -> Annotated[SRSRef, StatusCode(201)]:
     """Create spatial reference system
 
     :returns: Created spatial reference system"""
@@ -143,14 +144,14 @@ def cpost(request, *, body: SRSCreate) -> Annotated[SRSRef, StatusCode(201)]:
     return SRSRef(id=obj.id)
 
 
-def iget(srs, request) -> SRSRead:
+def iget(srs, request: Request) -> SRSRead:
     """Read spatial reference system
 
     :returns: Spatial reference system details"""
     return serialize(srs)
 
 
-def iput(srs, request, *, body: SRSUpdate) -> SRSRef:
+def iput(srs, request: Request, *, body: SRSUpdate) -> SRSRef:
     """Update spatial reference system
 
     :returns: Updated spatial reference system"""
@@ -160,7 +161,7 @@ def iput(srs, request, *, body: SRSUpdate) -> SRSRef:
     return SRSRef(id=srs.id)
 
 
-def idelete(srs, request) -> EmptyObject:
+def idelete(srs, request: Request) -> EmptyObject:
     """Delete spatial reference system
 
     :returns: Spatial reference system deleted successfully"""
@@ -182,7 +183,7 @@ class ConvertResponse(Struct, kw_only=True):
     wkt: SRSWKT
 
 
-def convert(request, *, body: ConvertBody) -> ConvertResponse:
+def convert(request: Request, *, body: ConvertBody) -> ConvertResponse:
     """Convert SRS definition into OGC WKT format
 
     :returns: SRS definition in OGC WKT format"""
@@ -202,7 +203,7 @@ class GeomTransformResponse(Struct, kw_only=True):
     geom: SRSWKT
 
 
-def geom_transform(srs_to, request, *, body: GeomTransformBody) -> GeomTransformResponse:
+def geom_transform(srs_to, request: Request, *, body: GeomTransformBody) -> GeomTransformResponse:
     """Transform geometry from one SRS to another
 
     :returns: Geometry reprojected into the target SRS"""
@@ -227,7 +228,7 @@ class GeomTransformBatchResponse(Struct, kw_only=True):
 
 
 def geom_transform_batch(
-    request,
+    request: Request,
     *,
     body: GeomTransformBatchBody,
 ) -> AsJSON[list[GeomTransformBatchResponse]]:
@@ -291,7 +292,7 @@ SRSIDCalculation = Annotated[SRSID, Meta(description="ID of SRS to make calculat
 
 def geom_length_post(
     srs,
-    request,
+    request: Request,
     *,
     body: GeometryPropertyBody,
 ) -> GeometryPropertyResponse:
@@ -303,7 +304,7 @@ def geom_length_post(
 
 def geom_area_post(
     srs,
-    request,
+    request: Request,
     *,
     body: GeometryPropertyBody,
 ) -> GeometryPropertyResponse:
@@ -335,7 +336,7 @@ QueryLon = Annotated[float | None, Meta(description="Longitude", examples=[86.92
 
 
 def catalog_collection(
-    request,
+    request: Request,
     *,
     q: QueryStr = None,
     lat: QueryLat = None,
@@ -346,7 +347,9 @@ def catalog_collection(
     :returns: List of matching spatial reference systems from the catalog"""
     request.require_administrator()
 
-    if env.spatial_ref_sys.catalog_source == CatalogSource.PROJ:
+    comp = request.env.component(SpatialRefSysComponent)
+
+    if comp.catalog_source == CatalogSource.PROJ:
         return [
             SRSCatalogRecord(
                 id=int(r.code),
@@ -362,15 +365,15 @@ def catalog_collection(
     if q is not None:
         query["q"] = q
 
-    if request.env.spatial_ref_sys.options["catalog.coordinates_search"]:
+    if comp.options["catalog.coordinates_search"]:
         if lat is not None and lon is not None:
             query["intersects"] = json.dumps(
                 dict(type="Point", coordinates=(lon, lat)),
             )
 
-    catalog_url = env.spatial_ref_sys.options["catalog.url"]
+    catalog_url = comp.options["catalog.url"]
     url = catalog_url + "/api/v1/spatial_ref_sys/"
-    timeout = env.spatial_ref_sys.options["catalog.timeout"].total_seconds()
+    timeout = comp.options["catalog.timeout"].total_seconds()
     try:
         res = requests.get(url, query, timeout=timeout)
         res.raise_for_status()
@@ -388,7 +391,7 @@ def catalog_collection(
     ]
 
 
-def catalog_item(request, id: Annotated[CatalogID, CatalogIDMeta]) -> SRSCatalogItem:
+def catalog_item(request: Request, id: Annotated[CatalogID, CatalogIDMeta]) -> SRSCatalogItem:
     """Read SRS from catalog
 
     :returns: Spatial reference system details from the catalog"""
@@ -396,7 +399,7 @@ def catalog_item(request, id: Annotated[CatalogID, CatalogIDMeta]) -> SRSCatalog
 
     entry = (
         proj_catalog_item(id)
-        if env.spatial_ref_sys.catalog_source == CatalogSource.PROJ
+        if request.env.component(SpatialRefSysComponent).catalog_source == CatalogSource.PROJ
         else remote_catalog_item(id)
     )
     return SRSCatalogItem(display_name=entry.display_name, wkt=entry.wkt)
@@ -410,7 +413,7 @@ class SRSCatalogImportResponse(Struct, kw_only=True):
     id: Annotated[int, Meta(description="Identifier for newly imported SRS", examples=[3395])]
 
 
-def catalog_import(request, *, body: SRSCatalogImportBody) -> SRSCatalogImportResponse:
+def catalog_import(request: Request, *, body: SRSCatalogImportBody) -> SRSCatalogImportResponse:
     """Import SRS from catalog
 
     :returns: Imported spatial reference system"""
@@ -418,7 +421,7 @@ def catalog_import(request, *, body: SRSCatalogImportBody) -> SRSCatalogImportRe
 
     entry = (
         proj_catalog_item(int(body.catalog_id))
-        if env.spatial_ref_sys.catalog_source == CatalogSource.PROJ
+        if request.env.component(SpatialRefSysComponent).catalog_source == CatalogSource.PROJ
         else remote_catalog_item(int(body.catalog_id))
     )
 
@@ -454,9 +457,9 @@ def catalog_import(request, *, body: SRSCatalogImportBody) -> SRSCatalogImportRe
 
 
 def remote_catalog_item(catalog_id: int) -> CatalogEntry:
-    catalog_url = env.spatial_ref_sys.options["catalog.url"]
+    catalog_url = SpatialRefSysComponent.current().options["catalog.url"]
     url = catalog_url + "/api/v1/spatial_ref_sys/" + str(catalog_id)
-    timeout = env.spatial_ref_sys.options["catalog.timeout"].total_seconds()
+    timeout = SpatialRefSysComponent.current().options["catalog.timeout"].total_seconds()
     try:
         res = requests.get(url, timeout=timeout)
         res.raise_for_status()
@@ -473,7 +476,7 @@ def remote_catalog_item(catalog_id: int) -> CatalogEntry:
     )
 
 
-def setup_pyramid(comp, config):
+def setup_pyramid(comp: SpatialRefSysComponent, config):
     config.add_route(
         "spatial_ref_sys.collection",
         "/api/component/spatial_ref_sys/",

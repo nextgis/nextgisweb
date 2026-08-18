@@ -107,7 +107,9 @@ def parse_pg_dump_version(output):
 
 
 def pg_connection_options(env):
-    con_args = env.core._db_connection_args()
+    from nextgisweb.core import CoreComponent
+
+    con_args = CoreComponent.current()._db_connection_args()
     return [
         "--host",
         con_args["host"],

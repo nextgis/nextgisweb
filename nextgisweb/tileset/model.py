@@ -15,11 +15,11 @@ from PIL import Image, UnidentifiedImageError
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
+from nextgisweb.env import COMP_ID, Base, gettext, gettextf
 from nextgisweb.lib.osrhelper import sr_from_epsg
 from nextgisweb.lib.registry import ListRegistry, list_registry
 
-from nextgisweb.core import KindOfData
+from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
@@ -330,7 +330,7 @@ def read_file(fn):
 class SourceAttr(SAttribute):
     def set(self, srlzr, value: FileUploadRef, *, create: bool):
         if srlzr.obj.id is not None:
-            env.core.reserve_storage(
+            CoreComponent.current().reserve_storage(
                 COMP_ID,
                 TilesetData,
                 value_data_volume=-srlzr.obj.fileobj.size,
@@ -392,7 +392,7 @@ class SourceAttr(SAttribute):
                 cursor.execute("VACUUM")
 
             srlzr.obj.fileobj = FileObj().copy_from(tf.name)
-            env.core.reserve_storage(
+            CoreComponent.current().reserve_storage(
                 COMP_ID,
                 TilesetData,
                 value_data_volume=srlzr.obj.fileobj.size,
@@ -408,6 +408,7 @@ class SourceAttr(SAttribute):
                     zmin = z
                 elif z > zmax:
                     zmax = z
+        assert zmin is not None and zmax is not None
 
         srlzr.obj.tileset_zmin = zmin
         srlzr.obj.tileset_zmax = zmax
