@@ -104,6 +104,12 @@ class FeatureLayerTransactionContext(ExitStack):
         self.resource.feature_transaction_enter(self)
         return result
 
+    def __exit__(self, *exc_details):
+        assert isinstance(self.resource, Resource)
+        # Ensure that feature extensions are valid
+        self.resource.require_session().flush()
+        return super().__exit__(*exc_details)
+
 
 class FeatureLayerMixin:
     __field_class__ = LayerField
