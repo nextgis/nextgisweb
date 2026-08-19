@@ -9,6 +9,7 @@ import transaction
 from osgeo import gdal
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.spatial_ref_sys import SRS
 
 from ..model import (
@@ -166,3 +167,19 @@ def test_storage(limit, ok, prepare_storage, ngw_env, ngw_data_path):
         else:
             with pytest.raises(RasterLayerUncompressedStorageInsufficient):
                 res.load_file(filename)
+
+
+def test_fileupload_per_dataset_mask(ngw_data_path, ngw_env, ngw_commit):
+    source = ngw_data_path / "per-dataset-mask.tif"
+
+    ds = gdal.Open(str(source))
+    assert ds.RasterCount == 3
+    ds = None
+
+    fu = FileUpload(size=source.stat().st_size, name="test.tif", mime_type="image/tiff")
+    fu.data_path.write_bytes(source.read_bytes())
+
+    res = RasterLayer(srs=SRS.filter_by(id=3857).one()).persist()
+    res.load_file(fu)
+    assert res.band_count == 4
+    assert res.meta.bands[3].color_interp == gdal.GetColorInterpretationName(gdal.GCI_AlphaBand)

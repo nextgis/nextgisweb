@@ -256,12 +256,11 @@ class RasterLayer(Resource, SpatialLayerMixin):
     def load_file(self, filename: str | Path | FileUpload, *, cog=False):
         from .component import RasterLayerComponent
 
-        file_upload = None
+        file_upload = filename if isinstance(filename, FileUpload) else None
+        if isinstance(filename, FileUpload):
+            filename = filename.data_path
         if isinstance(filename, Path):
             filename = str(filename)
-        elif isinstance(filename, FileUpload):
-            file_upload = filename
-            filename = filename.data_path
 
         if is_zipfile(filename):
             zip_filename = "/vsizip/{%s}" % filename
