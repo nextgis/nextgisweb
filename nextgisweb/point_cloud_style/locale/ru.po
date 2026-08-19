@@ -13,6 +13,11 @@ msgstr "Размер точки должен быть больше нуля."
 msgid "Opacity must be between 0 and 100."
 msgstr "Непрозрачность должна быть от 0 до 100."
 
+#: model.py:68
+#, server
+msgid "Point budget must be between 1000 and 1000000."
+msgstr "Бюджет точек должен быть от 1000 до 1000000."
+
 #: model.py:67
 #, server
 msgid "Minimum elevation percentile must be between 0 and 100."
@@ -65,6 +70,11 @@ msgstr "Непрозрачность"
 
 #: nodepkg/editor-widget/EditorWidget.tsx:31
 #, jsrealm
+msgid "Point budget"
+msgstr "Бюджет точек"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:31
+#, jsrealm
 msgid "Use percentile clipping"
 msgstr "Использовать отсечение по процентилям"
 
@@ -112,6 +122,11 @@ msgstr "Задаёт отображаемый размер каждой точк
 #, jsrealm
 msgid "Controls overall transparency of the point cloud."
 msgstr "Управляет общей прозрачностью облака точек."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:56
+#, jsrealm
+msgid "Maximum number of points rendered in the current view."
+msgstr "Максимальное количество точек, отображаемых в текущей области просмотра."
 
 #: nodepkg/editor-widget/EditorWidget.tsx:55
 #, jsrealm

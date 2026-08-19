@@ -11,12 +11,14 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 import { ColorInput } from "@nextgisweb/sld/style-editor/field/ColorInput";
 
+import { MAX_POINT_BUDGET, MIN_POINT_BUDGET } from "./EditorStore";
 import type { EditorStore } from "./EditorStore";
 
 const [
   msgMode,
   msgPointSize,
   msgOpacity,
+  msgPointBudget,
   msgPercentileClip,
   msgElevationMin,
   msgElevationMax,
@@ -28,6 +30,7 @@ const [
   gettext("Mode"),
   gettext("Point size"),
   gettext("Opacity"),
+  gettext("Point budget"),
   gettext("Use percentile clipping"),
   gettext("Elevation min percentile"),
   gettext("Elevation max percentile"),
@@ -41,6 +44,7 @@ const [
   msgModeHelp,
   msgPointSizeHelp,
   msgOpacityHelp,
+  msgPointBudgetHelp,
   msgPercentileClipHelp,
   msgElevationMinHelp,
   msgElevationMaxHelp,
@@ -52,6 +56,7 @@ const [
   gettext("Choose how point cloud colors are calculated."),
   gettext("Sets the rendered size of each point."),
   gettext("Controls overall transparency of the point cloud."),
+  gettext("Maximum number of points rendered in the current view."),
   gettext("Ignore extreme elevation outliers when coloring points."),
   gettext("Lower elevation percentile used for color ramp scaling."),
   gettext("Upper elevation percentile used for color ramp scaling."),
@@ -63,6 +68,10 @@ const [
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
   ({ store }) => {
+    const showIntensityModulation =
+      store.capabilities.hasIntensity &&
+      (store.mode === "rgb" || store.mode === "classification");
+
     return (
       <Area pad>
         <Lot label={msgMode} help={msgModeHelp}>
@@ -92,6 +101,19 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             min={0}
             max={100}
             onChange={(opacity) => store.update({ opacity: opacity ?? 100 })}
+            style={{ width: "100%" }}
+          />
+        </Lot>
+
+        <Lot label={msgPointBudget} help={msgPointBudgetHelp}>
+          <InputNumber
+            value={store.pointBudget}
+            min={MIN_POINT_BUDGET}
+            max={MAX_POINT_BUDGET}
+            step={10000}
+            onChange={(pointBudget) =>
+              store.update({ pointBudget: pointBudget ?? MIN_POINT_BUDGET })
+            }
             style={{ width: "100%" }}
           />
         </Lot>
@@ -169,18 +191,18 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                 placeholder={"2=#8c510a\n5=#4daf4a\n6=#bdbdbd"}
               />
             </Lot>
-            <Lot
-              label={msgIntensityModulation}
-              help={msgIntensityModulationHelp}
-            >
-              <CheckboxValue
-                value={store.intensityModulation}
-                onChange={(intensityModulation) =>
-                  store.update({ intensityModulation })
-                }
-              />
-            </Lot>
           </>
+        )}
+
+        {showIntensityModulation && (
+          <Lot label={msgIntensityModulation} help={msgIntensityModulationHelp}>
+            <CheckboxValue
+              value={store.intensityModulation}
+              onChange={(intensityModulation) =>
+                store.update({ intensityModulation })
+              }
+            />
+          </Lot>
         )}
       </Area>
     );

@@ -30,6 +30,7 @@ class PointCloudStyleConfig(Struct, kw_only=True):
     mode: PointCloudStyleMode = "elevation"
     point_size: float = 2.0
     opacity: int = 100
+    point_budget: int = 120000
     use_percentile_clip: bool = True
     elevation_min_percent: float = 2.0
     elevation_max_percent: float = 98.0
@@ -62,6 +63,10 @@ class PointCloudStyle(Resource):
             raise ValidationError(message=gettext("Point size must be greater than zero."))
         if not 0 <= value.opacity <= 100:
             raise ValidationError(message=gettext("Opacity must be between 0 and 100."))
+        if not 1000 <= value.point_budget <= 1000000:
+            raise ValidationError(
+                message=gettext("Point budget must be between 1000 and 1000000.")
+            )
         if not 0 <= value.elevation_min_percent <= 100:
             raise ValidationError(
                 message=gettext("Minimum elevation percentile must be between 0 and 100.")

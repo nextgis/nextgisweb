@@ -7,6 +7,7 @@ export interface PointCloudStyleConfig {
   mode: "elevation" | "classification" | "intensity" | "rgb" | "return_number";
   point_size: number;
   opacity: number;
+  point_budget?: number;
   use_percentile_clip: boolean;
   elevation_min_percent: number;
   elevation_max_percent: number;
