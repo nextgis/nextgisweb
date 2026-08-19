@@ -28,6 +28,11 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
+function normalizeRgbChannel(value: number) {
+  const normalized = value > 255 ? Math.round(value / 257) : value;
+  return clamp(normalized, 0, 255);
+}
+
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
@@ -47,6 +52,21 @@ function percentile(values: number[], percent: number) {
   const hi = Math.ceil(idx);
   const frac = idx - lo;
   return lerp(sorted[lo], sorted[hi], frac);
+}
+
+function minMax(values: number[], fallbackMin: number, fallbackMax: number) {
+  if (!values.length) {
+    return [fallbackMin, fallbackMax] as const;
+  }
+
+  let min = Infinity;
+  let max = -Infinity;
+  for (const value of values) {
+    min = Math.min(min, value);
+    max = Math.max(max, value);
+  }
+
+  return [min, max] as const;
 }
 
 function rgba(color: string, alpha = 1) {
@@ -93,20 +113,15 @@ export function createFeatureColors(
   const intensityValues = points
     .map((point) => point.intensity)
     .filter((value): value is number => value !== null);
+  const [zmin, zmax] = minMax(zValues, 0, 1);
+  const [intensityMin, intensityMax] = minMax(intensityValues, 0, 1);
 
   const elevationMin = style.use_percentile_clip
     ? percentile(zValues, style.elevation_min_percent)
-    : (stats?.zmin ?? Math.min(...zValues));
+    : (stats?.zmin ?? zmin);
   const elevationMax = style.use_percentile_clip
     ? percentile(zValues, style.elevation_max_percent)
-    : (stats?.zmax ?? Math.max(...zValues));
-
-  const intensityMin = intensityValues.length
-    ? Math.min(...intensityValues)
-    : 0;
-  const intensityMax = intensityValues.length
-    ? Math.max(...intensityValues)
-    : 1;
+    : (stats?.zmax ?? zmax);
 
   return points.map((point) => {
     switch (style.mode) {
@@ -115,7 +130,11 @@ export function createFeatureColors(
           return rgba("#9e9e9e");
         }
 
-        let [r, g, b] = point.rgb;
+        let [r, g, b] = point.rgb.map(normalizeRgbChannel) as [
+          number,
+          number,
+          number,
+        ];
         if (style.intensity_modulation && point.intensity !== null) {
           const intensityRatio =
             (point.intensity - intensityMin) /

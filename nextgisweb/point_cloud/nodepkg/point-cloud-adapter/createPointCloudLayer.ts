@@ -39,16 +39,12 @@ import type {
   RawPoint,
 } from "./type";
 
-const POINT_BUDGET = 15000;
-const PAGE_LOAD_LIMIT = 32;
+const DEFAULT_POINT_BUDGET = 120000;
+const PAGE_LOAD_LIMIT = 64;
 const HIERARCHY_NODE_CACHE_LIMIT = 8192;
 const MIN_VIEWPORT_FRACTION = 0.02;
 const VIEW_REFRESH_DEBOUNCE_MS = 120;
-const DEBUG_MIN_POINT_SIZE = 4;
-const DEBUG_MIN_OPACITY = 0.85;
 const DEBUG_Z_INDEX = 10;
-const DEBUG_STROKE_WIDTH = 1;
-const DEBUG_STROKE_COLOR = "#ffffff";
 
 let lazPerfPromise: Promise<Awaited<ReturnType<typeof createLazPerf>>> | null =
   null;
@@ -95,8 +91,8 @@ function roundNumber(value: number, digits = 3) {
 
 function getWebGLStyleVariables(styleConfig: PointCloudStyleConfig) {
   return {
-    pointSize: Math.max(styleConfig.point_size, DEBUG_MIN_POINT_SIZE),
-    pointOpacity: Math.max(styleConfig.opacity / 100, DEBUG_MIN_OPACITY),
+    pointSize: styleConfig.point_size,
+    pointOpacity: styleConfig.opacity / 100,
   };
 }
 
@@ -111,8 +107,6 @@ function createWebGLPointStyle(): FlatStyle {
       ["var", "pointOpacity"],
     ],
     "circle-opacity": ["var", "pointOpacity"],
-    "circle-stroke-color": DEBUG_STROKE_COLOR,
-    "circle-stroke-width": DEBUG_STROKE_WIDTH,
   };
 }
 
@@ -121,20 +115,37 @@ function summarizePoints(points: RawPoint[]) {
     return { count: 0 };
   }
 
-  const xs = points.map((point) => point.x);
-  const ys = points.map((point) => point.y);
-  const zs = points.map((point) => point.z);
-  const invalidCount = points.filter(
-    (point) =>
+  let invalidCount = 0;
+  let outsideWebMercatorCount = 0;
+  let minx = Infinity;
+  let miny = Infinity;
+  let maxx = -Infinity;
+  let maxy = -Infinity;
+  let zmin = Infinity;
+  let zmax = -Infinity;
+
+  for (const point of points) {
+    if (
       !Number.isFinite(point.x) ||
       !Number.isFinite(point.y) ||
       !Number.isFinite(point.z)
-  ).length;
-  const outsideWebMercatorCount = points.filter(
-    (point) =>
+    ) {
+      invalidCount += 1;
+    }
+    if (
       Math.abs(point.x) > WEB_MERCATOR_LIMIT ||
       Math.abs(point.y) > WEB_MERCATOR_LIMIT
-  ).length;
+    ) {
+      outsideWebMercatorCount += 1;
+    }
+
+    minx = Math.min(minx, point.x);
+    miny = Math.min(miny, point.y);
+    maxx = Math.max(maxx, point.x);
+    maxy = Math.max(maxy, point.y);
+    zmin = Math.min(zmin, point.z);
+    zmax = Math.max(zmax, point.z);
+  }
 
   return {
     count: points.length,
@@ -150,12 +161,12 @@ function summarizePoints(points: RawPoint[]) {
       rgb: point.rgb,
     })),
     extent: {
-      minx: roundNumber(Math.min(...xs)),
-      miny: roundNumber(Math.min(...ys)),
-      maxx: roundNumber(Math.max(...xs)),
-      maxy: roundNumber(Math.max(...ys)),
-      zmin: roundNumber(Math.min(...zs)),
-      zmax: roundNumber(Math.max(...zs)),
+      minx: roundNumber(minx),
+      miny: roundNumber(miny),
+      maxx: roundNumber(maxx),
+      maxy: roundNumber(maxy),
+      zmin: roundNumber(zmin),
+      zmax: roundNumber(zmax),
     },
   };
 }
@@ -518,8 +529,8 @@ class PointCloudLayer extends CoreLayer<
       source: options.source,
       style: createWebGLPointStyle(),
       variables: {
-        pointSize: DEBUG_MIN_POINT_SIZE,
-        pointOpacity: DEBUG_MIN_OPACITY,
+        pointSize: 1,
+        pointOpacity: 1,
       },
       visible: options.visible,
       opacity: options.opacity,
@@ -686,6 +697,7 @@ class PointCloudLayer extends CoreLayer<
           mode: styleConfig.mode,
           point_size: styleConfig.point_size,
           opacity: styleConfig.opacity,
+          point_budget: styleConfig.point_budget,
           use_percentile_clip: styleConfig.use_percentile_clip,
           elevation_min_percent: styleConfig.elevation_min_percent,
           elevation_max_percent: styleConfig.elevation_max_percent,
@@ -847,11 +859,13 @@ class PointCloudLayer extends CoreLayer<
     force: boolean
   ) {
     const viewState = this.getCurrentViewState(bootstrap);
+    const pointBudget =
+      bootstrap.styleConfig.point_budget ?? DEFAULT_POINT_BUDGET;
     const selection = selectHierarchyNodesForView(
       bootstrap.hierarchyNodes,
       viewState.extent,
       viewState.size,
-      POINT_BUDGET
+      pointBudget
     );
 
     if (!force && selection.signature === this.loadedViewSignature) {
@@ -874,6 +888,7 @@ class PointCloudLayer extends CoreLayer<
       targetLevel: selection.targetLevel,
       targetSpacing: roundNumber(selection.targetSpacing, 6),
       sourceResolution: roundNumber(selection.sourceResolution, 6),
+      pointBudget,
       fallbackNodeCount: selection.fallbackNodeCount,
       selectedLevelCounts: selection.selectedLevelCounts,
       selectedNodeCount: selection.selectedNodes.length,
@@ -904,18 +919,18 @@ class PointCloudLayer extends CoreLayer<
     const rawPoints: RawPoint[] = [];
     const nodeBudgets = computeNodeBudgets(
       selection.selectedNodes,
-      POINT_BUDGET,
+      pointBudget,
       viewState.extent
     );
 
     for (const [index, entry] of selection.selectedNodes.entries()) {
-      if (rawPoints.length >= POINT_BUDGET || signal.aborted) {
+      if (rawPoints.length >= pointBudget || signal.aborted) {
         break;
       }
 
       const nodeResult = await loadRawPoints(
         entry,
-        Math.min(POINT_BUDGET - rawPoints.length, nodeBudgets[index])
+        Math.min(pointBudget - rawPoints.length, nodeBudgets[index])
       );
       rawPoints.push(...nodeResult.points);
 
