@@ -174,7 +174,7 @@ def test_session_lifetime(
         pytest.param("k" * 1024, "v" * 1024, id="long"),
     ),
 )
-def test_serialization(key, value, ngw_webtest_app: WebTestApp, webapp_handler):
+def test_serialization(key, value, ngw_webtest_app: WebTestApp, ngw_request_handler):
     def _set(request):
         request.session[key] = value
         return Response()
@@ -203,17 +203,17 @@ def test_serialization(key, value, ngw_webtest_app: WebTestApp, webapp_handler):
             request.session[key]
         return Response()
 
-    with webapp_handler(_set):
+    with ngw_request_handler(_set):
         ngw_webtest_app.get("/test/request/")
 
-    with webapp_handler(_get):
+    with ngw_request_handler(_get):
         ngw_webtest_app.get("/test/request/")
 
-    with webapp_handler(_del):
+    with ngw_request_handler(_del):
         ngw_webtest_app.get("/test/request/")
 
 
-def test_set_del(ngw_webtest_app: WebTestApp, webapp_handler):
+def test_set_del(ngw_webtest_app: WebTestApp, ngw_request_handler):
     def _set(request):
         request.session["foo"] = 1
         request.session["bar"] = 1
@@ -234,11 +234,11 @@ def test_set_del(ngw_webtest_app: WebTestApp, webapp_handler):
         return Response()
 
     for req in (_set, _del, _check):
-        with webapp_handler(req):
+        with ngw_request_handler(req):
             ngw_webtest_app.get("/test/request/")
 
 
-def test_exception(ngw_webtest_app: WebTestApp, webapp_handler):
+def test_exception(ngw_webtest_app: WebTestApp, ngw_request_handler):
     def _handler(request):
         with pytest.raises(KeyError):
             request.session["invalid"]
@@ -248,7 +248,7 @@ def test_exception(ngw_webtest_app: WebTestApp, webapp_handler):
 
         return Response()
 
-    with webapp_handler(_handler):
+    with ngw_request_handler(_handler):
         ngw_webtest_app.get("/test/request/")
 
 
@@ -263,7 +263,7 @@ def test_exception(ngw_webtest_app: WebTestApp, webapp_handler):
         ("clear", False),
     ),
 )
-def test_session_start(handler, expect, ngw_webtest_app: WebTestApp, webapp_handler, ngw_env):
+def test_session_start(handler, expect, ngw_webtest_app: WebTestApp, ngw_request_handler, ngw_env):
     def _handler(request):
         if handler == "empty":
             pass
@@ -284,7 +284,7 @@ def test_session_start(handler, expect, ngw_webtest_app: WebTestApp, webapp_hand
             raise ValueError("Invalid handler: " + handler)
         return Response()
 
-    with webapp_handler(_handler):
+    with ngw_request_handler(_handler):
         ngw_webtest_app.get("/test/request/")
         cookie_name = ngw_env.pyramid.options["session.cookie.name"]
         assert (cookie_name in ngw_webtest_app.cookies) == expect

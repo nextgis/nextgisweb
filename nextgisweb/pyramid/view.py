@@ -355,12 +355,11 @@ def metrics(request: Request):
 
 
 def test_request(request: Request):
-    comp = request.env.component(PyramidComponent)
-    handler = comp.test_request_handler
-    if handler:
-        return handler(request)
-    else:
-        raise ValueError("Invalid test request handler")
+    raise RuntimeError("!!!")
+
+
+def test_request_view(request: Request):
+    return test_request(request)
 
 
 def test_exception_handled(request: Request):
@@ -728,8 +727,7 @@ def setup_pyramid(comp: PyramidComponent, config):
 
     config.add_route("pyramid.locale", "/locale/{locale:str}").add_view(locale)
 
-    comp.test_request_handler = None
-    config.add_route("pyramid.test_request", "/test/request/").add_view(test_request)
+    config.add_route("pyramid.test_request", "/test/request/").add_view(test_request_view)
 
     config.add_route(
         "pyramid.test_exception_handled",

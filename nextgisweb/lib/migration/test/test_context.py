@@ -88,9 +88,11 @@ class Context:
     def operation(self, operation):
         if isinstance(operation, (InstallOperation, UninstallOperation)):
             m = globals().get("{}_{}".format(operation.component, operation.opname))
+            assert m is not None
             m(self)
         elif isinstance(operation, (ForwardOperation, RewindOperation)):
             m = getattr(operation.migration, "{}_callable".format(operation.opname))
+            assert m is not None
             m(self)
 
     def dump(self):

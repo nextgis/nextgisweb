@@ -59,6 +59,7 @@ def test_load_file(source, band_count, srs_id, cog, ngw_data_path, ngw_env, ngw_
         )
     assert res.meta == RasterLayerMeta(bands=bands)
 
+    assert res.fileobj
     fd = res.fileobj.filename()
     assert fd.exists() and not fd.is_symlink()
 
@@ -116,6 +117,7 @@ def test_all_nodata_band_stats(ngw_env, ngw_commit):
         ds = None
         res.load_file(f.name)
 
+    assert res.meta
     for band in res.meta.bands:
         assert band.min is None
         assert band.max is None
@@ -181,5 +183,5 @@ def test_fileupload_per_dataset_mask(ngw_data_path, ngw_env, ngw_commit):
 
     res = RasterLayer(srs=SRS.filter_by(id=3857).one()).persist()
     res.load_file(fu)
-    assert res.band_count == 4
+    assert res.meta and res.band_count == 4
     assert res.meta.bands[3].color_interp == gdal.GetColorInterpretationName(gdal.GCI_AlphaBand)

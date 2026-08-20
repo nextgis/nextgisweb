@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from contextlib import contextmanager
-from typing import Any, Literal, Self, TypedDict, Unpack, overload
+from typing import TYPE_CHECKING, Any, Literal, Self, TypedDict, Unpack, overload
 from urllib.parse import quote
 from warnings import warn
 
@@ -32,7 +32,7 @@ class WSGITestHelper:
         return self
 
     def __exit__(self, *args):
-        if self.http_server is not None:
+        if self._http_server is not None:
             self._http_server.shutdown()
             self._http_server = None
 
@@ -70,8 +70,8 @@ class WebTestApp(BaseTestApp):
     Status = int | tuple[int, ...] | list[int] | Literal["*"] | None
 
     class KW(TypedDict, total=False):
-        query: Mapping[str, Any] | str
-        headers: Mapping[str, str]
+        query: Mapping[str, Any] | str | None
+        headers: Mapping[str, str] | None
 
     class KWStatus(KW, total=False):
         status: WebTestApp.Status
@@ -198,25 +198,25 @@ class WebTestApp(BaseTestApp):
         clone.prefix = url if url.startswith("/") else self._url_with_prefix(url)
         return clone
 
-    def get(self, url: Url = "", *args, **kw) -> TestResponse:
+    def get(self, url: Url = "", *args, **kw) -> TestResponse:  # ty: ignore[invalid-method-override]
         return self._meth("get", url, *args, **kw)
 
-    def head(self, url: Url = "", *args, **kw) -> TestResponse:
+    def head(self, url: Url = "", *args, **kw) -> TestResponse:  # ty: ignore[invalid-method-override]
         return self._meth("head", url, *args, **kw)
 
-    def options(self, url: Url = "", *args, **kw) -> TestResponse:
+    def options(self, url: Url = "", *args, **kw) -> TestResponse:  # ty: ignore[invalid-method-override]
         return self._meth("options", url, *args, **kw)
 
-    def post(self, url: Url = "", *args, **kw) -> TestResponse:
+    def post(self, url: Url = "", *args, **kw) -> TestResponse:  # ty: ignore[invalid-method-override]
         return self._meth("post", url, *args, **kw)
 
-    def put(self, url: Url = "", *args, **kw) -> TestResponse:
+    def put(self, url: Url = "", *args, **kw) -> TestResponse:  # ty: ignore[invalid-method-override]
         return self._meth("put", url, *args, **kw)
 
-    def patch(self, url: Url = "", *args, **kw) -> TestResponse:
+    def patch(self, url: Url = "", *args, **kw) -> TestResponse:  # ty: ignore[invalid-method-override]
         return self._meth("patch", url, *args, **kw)
 
-    def delete(self, url: Url = "", *args, **kw) -> TestResponse:
+    def delete(self, url: Url = "", *args, **kw) -> TestResponse:  # ty: ignore[invalid-method-override]
         return self._meth("delete", url, *args, **kw)
 
     # Helpers

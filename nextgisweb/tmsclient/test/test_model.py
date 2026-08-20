@@ -38,7 +38,7 @@ def tms_server(request):
 
 
 @pytest.fixture
-def connection(ngw_httptest_app, webapp_handler):
+def connection(ngw_httptest_app, ngw_request_handler):
     with transaction.manager:
         resource = Connection(
             url_template="%s/test/request/?layer={layer}&z={z}&x={x}&y={y}&custom=custom"
@@ -46,7 +46,7 @@ def connection(ngw_httptest_app, webapp_handler):
             apikey="test-apikey",
         ).persist()
 
-    with webapp_handler(tms_server):
+    with ngw_request_handler(tms_server):
         yield resource.id
 
 

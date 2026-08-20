@@ -72,18 +72,20 @@ def test_wkt_long(ngw_txn):
     ),
 )
 def test_postgis_transform(ngw_txn, x, y, src, dst):
-    px, py = (
-        DBSession.connection()
-        .execute(
-            sa.text(
-                "SELECT ST_X(pt), ST_Y(pt) "
-                "FROM ST_Transform(ST_Transform("
-                "   ST_SetSRID(ST_MakePoint(:x, :y), :src) ,:dst), :src) AS pt"
+    sql = """
+        SELECT ST_X(pt), ST_Y(pt)
+        FROM ST_Transform(
+            ST_Transform(
+                ST_SetSRID(ST_MakePoint(:x, :y), :src),
+                :dst
             ),
-            dict(x=x, y=y, src=src, dst=dst),
-        )
-        .fetchone()
-    )
+            :src
+        ) AS pt
+    """
+
+    params = dict(x=x, y=y, src=src, dst=dst)
+    px, py = DBSession.connection().execute(sa.text(sql), params).one()
+
     assert abs(px - x) < 1e-6
     assert abs(py - y) < 1e-6
 

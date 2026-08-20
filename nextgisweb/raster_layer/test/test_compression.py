@@ -23,6 +23,7 @@ def test_cog_rgb_overview_jpeg_compression(
         res = RasterLayer(srs=SRS.filter_by(id=3857).one()).persist()
         res.load_file(ngw_data_path / "rounds.tif", cog=True)
 
+    assert res.fileobj
     fwork = comp.workdir_path(res.fileobj, res.fileobj_pam)
 
     main_ds = gdal.Open(str(fwork))
@@ -46,6 +47,7 @@ def test_external_rgb_overview_jpeg_compression(
         res = RasterLayer(srs=SRS.filter_by(id=3857).one()).persist()
         res.load_file(ngw_data_path / "rounds.tif", cog=False)
 
+    assert res.fileobj
     fwork = comp.workdir_path(res.fileobj, res.fileobj_pam)
 
     main_ds = gdal.Open(str(fwork))

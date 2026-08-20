@@ -26,7 +26,7 @@ def test_super_init_subclass():
         pass
 
     assert Sub in Base.registry
-    assert Sub._Base__marker is True
+    assert getattr(Sub, "_Base__marker") is True
 
     assert Grand in Base.registry
-    assert Grand._Sub__marker is True
+    assert getattr(Grand, "_Sub__marker") is True

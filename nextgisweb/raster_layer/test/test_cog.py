@@ -29,6 +29,7 @@ def test_cog(
         res = RasterLayer(srs=SRS.filter_by(id=srs_id).one()).persist()
         res.load_file(ngw_data_path / "sochi-aster-dem.tif", cog=False)
 
+    assert res.fileobj
     fdata = res.fileobj.filename()
     assert fdata.exists() and not fdata.is_symlink()
 

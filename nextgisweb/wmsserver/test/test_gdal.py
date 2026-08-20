@@ -34,14 +34,18 @@ def service_id():
     yield service.id
 
 
-def _read_image(ds, x1, y1, x2, y2, srs):
+def _read_image(ds, bounds, srs):
     band_count = ds.RasterCount
     width = height = 500
     ds_img = gdal.Warp(
         "",
         ds,
         options=gdal.WarpOptions(
-            width=width, height=height, outputBounds=(x1, y1, x2, y2), dstSRS=srs, format="MEM"
+            width=width,
+            height=height,
+            outputBounds=bounds,
+            dstSRS=srs,
+            format="MEM",
         ),
     )
     array = numpy.zeros((height, width, band_count), numpy.uint8)
@@ -81,8 +85,8 @@ def _test_data(alpha):
 def _test_rounds_dataset(ds, alpha=True):
     tolerance = None if alpha else 1
 
-    for bbox, crs, expected in _test_data(alpha):
-        img = _read_image(ds, *bbox, crs)
+    for bounds, srs, expected in _test_data(alpha):
+        img = _read_image(ds, bounds, srs)
         c = _color(img, tolerance)
         if tolerance is not None:
             expected = pytest.approx(expected, abs=tolerance)

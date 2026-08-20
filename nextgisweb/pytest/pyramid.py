@@ -1,11 +1,13 @@
+from unittest.mock import patch
+
 __all__ = [
     "ngw_httptest_app",
     "ngw_httptest_factory",
     "ngw_pyramid_config",
+    "ngw_request_handler",
     "ngw_webtest_app",
     "ngw_webtest_factory",
     "ngw_wsgi_test_helper",
-    "webapp_handler",
 ]
 
 from contextlib import contextmanager
@@ -56,17 +58,15 @@ def ngw_httptest_app(ngw_wsgi_test_helper):
 
 
 @pytest.fixture()
-def webapp_handler(ngw_env):
-    pyramid = ngw_env.pyramid
-
+def ngw_request_handler(ngw_env):
     @contextmanager
-    def _decorator(handler):
-        assert pyramid.test_request_handler is None
-        try:
-            pyramid.test_request_handler = handler
+    def mock(handler):
+        with patch(
+            "nextgisweb.pyramid.view.test_request",
+            autospec=True,
+            side_effect=handler,
+        ) as mock:
             yield
-        finally:
-            pyramid.test_request_handler = None
+            mock.assert_called()
 
-    yield _decorator
-    pyramid.test_request_handler = None
+    return mock

@@ -187,7 +187,10 @@ def test_import_export(
             attachments = resp.json
             att_idx = 0
         else:
+            assert att_idx is not None
             att_idx += 1
+
+        assert attachments is not None
 
         f = files[file_idx]
         size = f["size"] if "size" in f else len(f["content"])

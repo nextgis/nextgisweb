@@ -14,6 +14,7 @@ def test_s3_storage(s3_storage_creds, ngw_commit, ngw_data_path, request):
     layer = RasterLayer(srs=SRS.filter_by(id=3857).one(), storage=storage).persist()
     layer.load_file(ngw_data_path / "sochi-aster-dem.tif")
 
+    assert layer.storage_filename
     s3_path = storage.vsi_path(layer.storage_filename)
     vsi_creds = storage.vsi_credentials()
 
