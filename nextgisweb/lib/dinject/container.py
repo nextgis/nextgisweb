@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Callable, Hashable
 from dataclasses import dataclass
 from inspect import formatannotationrelativeto
-from typing import Any, Callable, Hashable, Type, TypeVar
+from typing import Any, TypeVar
 
 KeyType = tuple[Hashable, ...]
 TContainer = TypeVar("TContainer", bound="Container")
@@ -86,7 +87,7 @@ class Container:
 
 @dataclass(frozen=True)
 class Argument:
-    cnt: Type[Container]
+    cnt: type[Container]
     selector: KeyType = ()
 
     def bind(self, name: str, tdef: Hashable) -> BoundArgument:
@@ -95,7 +96,7 @@ class Argument:
 
 @dataclass(frozen=True)
 class BoundArgument:
-    cnt: Type[Container]
+    cnt: type[Container]
     name: str
     key: KeyType
 

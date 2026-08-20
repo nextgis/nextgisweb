@@ -2,7 +2,7 @@ from collections import defaultdict, deque
 from contextlib import contextmanager
 from functools import cache
 from pathlib import Path
-from typing import Any, Type
+from typing import Any
 from unittest.mock import PropertyMock, patch
 
 import pytest
@@ -96,7 +96,7 @@ class CleanupHelper:
 
         self.preserve = preserve
         self.pending: dict[Session, list] = defaultdict(list)
-        self.commited: deque[tuple[Type, tuple[Any, ...]]] = deque()
+        self.commited: deque[tuple[type, tuple[Any, ...]]] = deque()
         self.disabled = 0
 
     def __enter__(self):

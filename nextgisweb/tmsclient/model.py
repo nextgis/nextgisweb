@@ -260,7 +260,7 @@ class TMSLayer(Resource, SpatialLayerMixin):
                 continue
             try:
                 tile_image = Image.open(BytesIO(tile_data))
-            except IOError:
+            except OSError:
                 raise ExternalServiceError(message="Image processing error.")
             if image is None:
                 image = Image.new("RGBA", (width, height))

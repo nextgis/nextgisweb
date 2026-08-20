@@ -1,7 +1,8 @@
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from collections.abc import Generator
 from datetime import datetime, timedelta
 from itertools import islice
-from typing import TYPE_CHECKING, Annotated, Generator, Literal, Union
+from typing import TYPE_CHECKING, Annotated, Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Meta, Struct

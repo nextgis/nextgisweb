@@ -1,6 +1,6 @@
 from enum import Enum
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Literal, Type
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -456,7 +456,7 @@ class ExtentWSEN(Struct, array_like=True, forbid_unknown_fields=True):
 
 
 class ExtentAttr(SAttribute):
-    def bind(self, srlzrcls: Type[Serializer], attrname: str):
+    def bind(self, srlzrcls: type[Serializer], attrname: str):
         super().bind(srlzrcls, attrname)
         if attrname == "initial_extent":
             self.attrs = tuple(f"extent_{i}" for i in ("left", "bottom", "right", "top"))

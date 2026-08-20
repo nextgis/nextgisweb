@@ -1,9 +1,8 @@
-import io
 import sys
 from setuptools import find_packages, setup
 from subprocess import CalledProcessError, check_output
 
-with io.open("VERSION", "r") as fd:
+with open("VERSION") as fd:
     VERSION = fd.read().rstrip()
 
 try:

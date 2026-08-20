@@ -114,12 +114,12 @@ def deserialize(obj, data: SRSCreate, *, create: bool):
         with DBSession.no_autoflush:
             existing = SRS.filter_by(display_name=display_name).filter(SRS.id != obj.id).first()
             if existing:
-                raise ValidationError(("SRS display name is not unique."))
+                raise ValidationError("SRS display name is not unique.")
         obj.display_name = display_name
 
     if (wkt := data.wkt) is not UNSET and wkt != obj.wkt:
         if not create and obj.protected:
-            raise ValidationError(("OGC WKT definition cannot be changed for this SRS."))
+            raise ValidationError("OGC WKT definition cannot be changed for this SRS.")
         obj.wkt = wkt
 
 

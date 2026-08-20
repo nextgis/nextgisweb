@@ -1,7 +1,8 @@
 import os
 import tempfile
 import zipfile
-from typing import TYPE_CHECKING, Annotated, Iterable, Literal
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Annotated, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal, ogr

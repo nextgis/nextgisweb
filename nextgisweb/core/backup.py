@@ -1,11 +1,10 @@
-import io
 import json
 import os
 import re
 from collections import namedtuple
 from contextlib import contextmanager
 from datetime import datetime
-from functools import lru_cache
+from functools import cache
 from packaging.version import Version
 from subprocess import check_call, check_output
 from typing import ClassVar
@@ -31,7 +30,7 @@ class IndexFile:
     def writer(self):
         def write(record):
             if write.fp is None:
-                write.fp = io.open(self.filename, "w", newline="\n", encoding="utf-8")
+                write.fp = open(self.filename, "w", newline="\n", encoding="utf-8")
 
             fp = write.fp
             fp.write(json.dumps(dict(zip(IR_FIELDS, record)), ensure_ascii=False))
@@ -46,7 +45,7 @@ class IndexFile:
 
     @contextmanager
     def reader(self):
-        with io.open(self.filename, "r", newline="\n", encoding="utf-8") as fp:
+        with open(self.filename, newline="\n", encoding="utf-8") as fp:
 
             def read():
                 for line in fp:
@@ -175,7 +174,7 @@ def backup(env, dst):
 
     pg_listing = check_output(["/usr/bin/pg_restore", "--list", pg_dir]).decode("utf-8")
 
-    @lru_cache(maxsize=None)
+    @cache
     def get_cls_relname(oid):
         (relname,) = con.execute(
             sa.text("SELECT relname FROM pg_catalog.pg_class WHERE oid = :oid"), dict(oid=oid)
@@ -221,7 +220,7 @@ def backup(env, dst):
         skip_prev = skip
 
     pg_restore_list = os.path.join(pg_dir, "restore")
-    with io.open(pg_restore_list, "w") as fd:
+    with open(pg_restore_list, "w") as fd:
         fd.write("\n".join(restore_list))
 
     # CUSTOM COMPONENT DATA
@@ -242,7 +241,7 @@ def backup(env, dst):
                 record = IndexRecord(id=seq, identity=itm.identity, payload=itm.payload)
                 if itm.blob:
                     binfn = os.path.join(comp_dir, "{:08d}".format(seq))
-                    with io.open(binfn, "wb") as fd:
+                    with open(binfn, "wb") as fd:
                         itm.backup(fd)
 
                 idx_write(record)
@@ -301,6 +300,6 @@ def restore(env, src):
                         itm.bind(comp)
                         if itm.blob:
                             binfn = os.path.join(comp_dir, "{:08d}".format(record.id))
-                            with io.open(binfn, "rb") as fd:
+                            with open(binfn, "rb") as fd:
                                 itm.restore(fd)
         mark_changed(DBSession())

@@ -1,4 +1,5 @@
-from typing import Any, Callable, Literal, overload
+from collections.abc import Callable
+from typing import Any, Literal, overload
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.i18n import TranslatableOrStr

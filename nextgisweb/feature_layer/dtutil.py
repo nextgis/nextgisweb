@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from datetime import date, datetime, time
-from typing import Annotated, Any, Callable, ClassVar, Literal, Type, TypedDict
+from typing import Annotated, Any, ClassVar, Literal, TypedDict
 
 from msgspec import Meta, Struct, convert, to_builtins
 from msgspec import ValidationError as MsgspecValidationError
@@ -47,7 +48,7 @@ class IsoFormatDateTimeValidationError(ValidationError):
 
 class Converter(Struct, kw_only=True, forbid_unknown_fields=True):
     datatype: ClassVar[str]
-    native: ClassVar[Type]
+    native: ClassVar[type]
     iso_format: ClassVar[str]
     legacy_attrs: ClassVar[tuple[str, ...]]
 

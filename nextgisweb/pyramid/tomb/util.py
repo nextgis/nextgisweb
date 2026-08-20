@@ -1,7 +1,6 @@
 import re
 from inspect import isclass
 from sys import _getframe
-from typing import Type
 
 from msgspec import Struct
 
@@ -29,7 +28,7 @@ def push_stacklevel(kwargs, push, ainfo=False):
     return result
 
 
-def is_json_type(t: Type) -> bool:
+def is_json_type(t: type) -> bool:
     if isclass(t) and issubclass(t, Struct):
         return True
 

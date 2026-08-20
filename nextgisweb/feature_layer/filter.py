@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, time
-from typing import Any, Callable, Iterable
+from typing import Any
 
 import sqlalchemy as sa
 
@@ -59,9 +59,7 @@ class FilterNode:
             cls.registry[op] = cls
 
     @classmethod
-    def from_json(
-        cls, operator: str, operands: Sequence[Any], parser: "FilterParser"
-    ) -> FilterNode:
+    def from_json(cls, operator: str, operands: Sequence[Any], parser: FilterParser) -> FilterNode:
         raise NotImplementedError  # pragma: no cover
 
     @property

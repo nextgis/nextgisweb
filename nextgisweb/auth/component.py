@@ -1,5 +1,5 @@
+from collections.abc import Iterator
 from datetime import timedelta
-from typing import Iterator
 from urllib.parse import urlencode, urlparse
 
 import sqlalchemy as sa

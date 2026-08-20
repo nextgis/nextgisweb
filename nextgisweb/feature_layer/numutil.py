@@ -1,4 +1,5 @@
-from typing import Any, Callable, ClassVar, Literal
+from collections.abc import Callable
+from typing import Any, ClassVar, Literal
 
 from nextgisweb.env import gettextf
 from nextgisweb.lib.json import dumps

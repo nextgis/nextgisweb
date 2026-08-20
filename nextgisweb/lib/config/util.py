@@ -129,7 +129,7 @@ def load_config(filenames, include, environ=os.environ, environ_prefix="NEXTGISW
 
     if filenames is not None:
         for fn in filenames:
-            with io.open(fn, "r") as fp:
+            with open(fn) as fp:
                 load_fp(fp)
 
     if include is not None:

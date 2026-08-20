@@ -999,7 +999,7 @@ class WFSHandler:
         if len(__filters) == 1:
             result = self._parse_filter(__filters[0], layer)
             if len(result["fids"]) > 0:
-                query.filter(("id", "in", ",".join((str(fid) for fid in result["fids"]))))
+                query.filter(("id", "in", ",".join(str(fid) for fid in result["fids"])))
             if result["intersects"] is not None:
                 if self.p_bbox is not None:
                     raise ValidationError("Parameters conflict: BBOX, Intersects")

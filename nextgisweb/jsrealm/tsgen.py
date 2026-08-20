@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
 from datetime import datetime, time
 from itertools import count
 from textwrap import indent
@@ -9,10 +9,8 @@ from types import UnionType
 from typing import (
     TYPE_CHECKING,
     Any,
-    Generator,
     Literal,
     Protocol,
-    Type,
     TypeVar,
     Union,
     cast,
@@ -333,7 +331,7 @@ KEYWORDS = frozenset(
 
 
 class TSStruct(TSType, kw_only=True):
-    cls: Type[Struct]
+    cls: type[Struct]
     auto_export = True
 
     if TYPE_CHECKING:
@@ -345,7 +343,7 @@ class TSStruct(TSType, kw_only=True):
         super().__tstype_init__()
         fields: list[TSStructField] = list()
         for k, v in struct_fields_encoded(self.cls):
-            if all(((unannotate(s) is UnsetType) for s in decompose_union(v))):
+            if all((unannotate(s) is UnsetType) for s in decompose_union(v)):
                 continue
 
             ts, undefined = self.generator.add(v), False

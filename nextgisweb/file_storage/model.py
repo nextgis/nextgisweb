@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import uuid
 from pathlib import Path
 from shutil import copyfile, copyfileobj
@@ -67,13 +66,13 @@ class FileObj(Base):
         if isinstance(source, (str, Path)):
             copyfile(source, dest)
         else:
-            with io.open(dest, "wb") as fd:
+            with open(dest, "wb") as fd:
                 copyfileobj(source, fd)
         self.size = dest.stat().st_size
         return self
 
     def from_content(self, content: bytes) -> FileObj:
-        with io.open(self.filename(makedirs=True, not_exists=True), "wb") as fd:
+        with open(self.filename(makedirs=True, not_exists=True), "wb") as fd:
             fd.write(content)
         self.size = len(content)
         return self

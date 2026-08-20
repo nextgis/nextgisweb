@@ -72,7 +72,7 @@ class LayerField(Base):
         return self.display_name
 
     @classmethod
-    def copy_from(cls, source: "LayerField") -> Self:
+    def copy_from(cls, source: LayerField) -> Self:
         return cls(
             keyname=source.keyname,
             datatype=source.datatype,

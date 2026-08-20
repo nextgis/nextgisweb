@@ -1,8 +1,8 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Hashable, Sequence
 from functools import partial, update_wrapper
 from inspect import Signature, signature
 from types import MethodType
-from typing import Any, Callable, Hashable, Type
+from typing import Any
 
 from .container import Argument, BoundArgument, Container
 
@@ -11,7 +11,7 @@ TAutoProvide = Callable[[Hashable], bool]
 
 
 def inject(
-    auto_provide: dict[Type[Container], TAutoProvide] | None = None,
+    auto_provide: dict[type[Container], TAutoProvide] | None = None,
 ) -> Callable[[TFunc], TFunc]:
     def _auto_provide(annotation: Hashable) -> Argument | None:
         if auto_provide is None:
@@ -101,5 +101,5 @@ class inject_wrapper:
 
 
 class UnresolvedDependency(Exception):
-    def __init__(self, cnt: Type[Container], barg: BoundArgument) -> None:
+    def __init__(self, cnt: type[Container], barg: BoundArgument) -> None:
         super().__init__(f"unable to resolve {barg} in {cnt}")

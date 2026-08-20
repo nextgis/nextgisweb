@@ -18,7 +18,7 @@ ResourceCategoryIdentity = Annotated[
 
 @dict_registry
 class ResourceCategory:
-    registry: ClassVar[DictRegistry[type["ResourceCategory"]]]
+    registry: ClassVar[DictRegistry[type[ResourceCategory]]]
 
     identity: ClassVar[str]
     label: ClassVar[TrStr]

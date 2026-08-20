@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from functools import cached_property, partial
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Self, Type, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Self, cast
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -58,7 +58,7 @@ class ExtensionQueries:
     p_fid_max = sa.bindparam("p_fid_max", type_=sa.Integer())
     p_fid_limit = sa.bindparam("p_fid_limit", type_=sa.Integer())
 
-    def __init__(self, mapper: Type[FVersioningExtensionMixin]):
+    def __init__(self, mapper: type[FVersioningExtensionMixin]):
         self.mapper = mapper
         self.has_id = hasattr(mapper, "extension_id")
         self.cols = mapper.fversioning_columns
@@ -526,7 +526,7 @@ class ExtensionQueries:
 
 
 class FVersioningExtensionMixin:
-    fversioning_registry: ClassVar[dict[str, Type[FVersioningExtensionMixin]]] = dict()
+    fversioning_registry: ClassVar[dict[str, type[FVersioningExtensionMixin]]] = dict()
 
     # Class attributes, descendants must define them
     fversioning_metadata_version: ClassVar[int]
@@ -746,7 +746,7 @@ class FVersioningExtensionMixin:
         eid: None,
         vid: int,
         values: dict[str, Any],
-    ) -> Type[Struct]:
+    ) -> type[Struct]:
         raise NotImplementedError
 
     @classmethod

@@ -1,5 +1,5 @@
 import re
-from typing import ClassVar, Type
+from typing import ClassVar
 
 from nextgisweb.env import gettext
 from nextgisweb.env.package import pkginfo
@@ -54,7 +54,7 @@ class WebMapOption:
 
     name: ClassVar[str]
     label: ClassVar[TrStr]
-    category: ClassVar[Type[WebMapOptionCategory]] = MiscellaneousCategory
+    category: ClassVar[type[WebMapOptionCategory]] = MiscellaneousCategory
     order: ClassVar[int] = 0
 
     def __init_subclass__(cls) -> None:

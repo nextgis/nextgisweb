@@ -1,10 +1,10 @@
 from collections import namedtuple
-from collections.abc import Mapping
+from collections.abc import Callable, Iterable, Mapping
 from datetime import datetime
 from functools import cached_property, lru_cache
 from itertools import chain
 from secrets import token_hex, token_urlsafe
-from typing import TYPE_CHECKING, Callable, ClassVar, Iterable, Literal, overload
+from typing import TYPE_CHECKING, ClassVar, Literal, overload
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg

@@ -1,7 +1,8 @@
 import dataclasses as dc
 import re
+from collections.abc import Iterable
 from functools import cached_property, lru_cache
-from typing import Iterable, Literal
+from typing import Literal
 
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.ext.compiler import compiles

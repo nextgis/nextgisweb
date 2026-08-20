@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NewType, Type, Union
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NewType, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.response import Response
@@ -44,7 +44,7 @@ SettingsComponentGap = Annotated[
     Meta(description="Component identity"),
 ]
 
-SettingsResponseTypedGap = Gap("SettingsResponseTypedGap", Type[Struct])
+SettingsResponseTypedGap = Gap("SettingsResponseTypedGap", type[Struct])
 SettingsResponseUntyped = NewType("SettingsResponseUntyped", dict[str, Any])
 
 
@@ -167,7 +167,7 @@ def statistics(request: Request) -> AsJSON[dict[str, dict[str, Any]]]:
     return result
 
 
-KindOfDataResponse = Gap("KindOfDataResponse", Type[Struct])
+KindOfDataResponse = Gap("KindOfDataResponse", type[Struct])
 
 
 def kind_of_data(request: Request) -> KindOfDataResponse:
@@ -214,7 +214,7 @@ def storage_estimate_post(request: Request) -> EmptyObject:
     request.env.component(CoreComponent).start_estimation()
 
 
-StorageResponse = Gap("StorageResponse", Type[Struct])
+StorageResponse = Gap("StorageResponse", type[Struct])
 
 
 class StorageValue(Struct, kw_only=True):
@@ -319,7 +319,7 @@ def codegen_api_type(
 
 # Component settings machinery
 
-SType = Type
+SType = type
 SValue = Any
 
 

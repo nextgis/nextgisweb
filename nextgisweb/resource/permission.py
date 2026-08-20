@@ -1,6 +1,6 @@
 from collections import UserList
 from functools import reduce
-from typing import ClassVar, Type
+from typing import ClassVar
 
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
@@ -45,7 +45,7 @@ class Requirement:
         dst: "Permission",
         src: "Permission",
         attr: str | None = None,
-        cls: Type | None = None,
+        cls: type | None = None,
         attr_empty: bool = False,
     ):
         self.dst = dst
@@ -82,7 +82,7 @@ class Permission:
     def is_bound(self):
         return self.name is not None and self.scope is not None
 
-    def bind(self, name: str, scope: Type["Scope"]):
+    def bind(self, name: str, scope: type["Scope"]):
         assert isinstance(name, str) and issubclass(scope, Scope)
         assert self.name is None and self.scope is None
         self.name = name

@@ -324,7 +324,7 @@ class WMSLayer(Resource, SpatialLayerMixin):
             data = BytesIO(response.content)
             try:
                 img = Image.open(data)
-            except IOError:
+            except OSError:
                 if msg := _extract_wms_error(response.content):
                     logger.error("WMS service error: %s", msg)
                 raise ExternalServiceError("Image processing error.")

@@ -1,4 +1,3 @@
-import io
 import multiprocessing
 import os
 import os.path
@@ -102,7 +101,7 @@ class CoreComponent(StorageComponentMixin, Component):
             try:
                 sa_url = self._engine_url(error_on_pwfile=True)
                 break
-            except IOError as exc:
+            except OSError as exc:
                 yield "File [{}] is missing!".format(exc.filename)
 
         sa_engine = create_engine(
@@ -144,12 +143,12 @@ class CoreComponent(StorageComponentMixin, Component):
         try:
             with tempfile.TemporaryFile(dir=self.options["sdir"]):
                 pass
-        except IOError:
+        except OSError:
             return dict(success=False, message="Could not create a file on file storage.")
 
         try:
             sa_url = self._engine_url(error_on_pwfile=True)
-        except IOError:
+        except OSError:
             return dict(success=False, message="Database password file is missing!")
 
         sa_engine = create_engine(
@@ -208,7 +207,7 @@ class CoreComponent(StorageComponentMixin, Component):
 
     def bmakedirs(self, base, path):
         if not os.path.isdir(base):
-            raise IOError("Invalid base directory path")
+            raise OSError("Invalid base directory path")
 
         fpath = os.path.join(base, path)
         os.makedirs(fpath, exist_ok=True)
@@ -407,9 +406,9 @@ class CoreComponent(StorageComponentMixin, Component):
             con_args["password"] = opt_db["password"]
         elif opt_db["pwfile"] is not None:
             try:
-                with io.open(opt_db["pwfile"]) as fd:
+                with open(opt_db["pwfile"]) as fd:
                     con_args["password"] = fd.read().rstrip()
-            except IOError:
+            except OSError:
                 if error_on_pwfile:
                     raise
         return con_args

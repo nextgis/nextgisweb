@@ -97,7 +97,7 @@ class Context:
 
     def dump(self):
         return "\n".join(
-            (line for line in self._conn.iterdump() if not line.startswith(("BEGIN ", "COMMIT")))
+            line for line in self._conn.iterdump() if not line.startswith(("BEGIN ", "COMMIT"))
         )
 
     def install(self):

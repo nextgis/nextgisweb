@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Type
+from typing import ClassVar
 
 from zope.interface import Interface
 
@@ -14,14 +14,14 @@ from .model import Resource
 
 @list_registry
 class ExternalAccessLink:
-    registry: ClassVar[ListRegistry[type["ExternalAccessLink"]]]
+    registry: ClassVar[ListRegistry[type[ExternalAccessLink]]]
 
     title: Translatable
     help: Translatable | None = None
     docs_url: str | None = None
 
-    resource: Type[Resource] | None = None
-    interface: Type[Interface] | None = None
+    resource: type[Resource] | None = None
+    interface: type[Interface] | None = None
     attr_name: str | None = None
 
     url: str

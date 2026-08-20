@@ -2,7 +2,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from itertools import chain, count
 from json import dumps as json_dumps
-from typing import Any, Literal, Type, Union, cast
+from typing import Any, Literal, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
 from pyramid.response import Response
@@ -35,7 +35,7 @@ class Operation(Struct, kw_only=True):
     def is_empty(self):
         return not self.has_types and len(self.query) == 0
 
-    def struct(self) -> Type[Struct]:
+    def struct(self) -> type[Struct]:
         fields = list()
         if len(self.query) > 0:
             query_struct = defstruct(f"{self.basename}Query", list(self.query.items()))
@@ -58,7 +58,7 @@ class Route(Struct, kw_only=True):
 
     basename: str = field(default_factory=lambda: f"_Route{counter()}")
 
-    def field(self, name: str) -> tuple[str, Type[Struct], Any]:
+    def field(self, name: str) -> tuple[str, type[Struct], Any]:
         fields = list()
         fields.append(("path_obj", self.type_path_obj(), field(name="pathObj")))
         fields.append(("path_arr", self.type_path_arr(), field(name="pathArr")))
@@ -67,10 +67,10 @@ class Route(Struct, kw_only=True):
                 fields.append((a, union([t.struct() for t in val])))
         return (f"f{id(name)}", defstruct(self.basename, fields), field(name=name))
 
-    def type_path_obj(self) -> Type[Struct]:
+    def type_path_obj(self) -> type[Struct]:
         return defstruct(f"{self.basename}PathObj", list(self.path.items()))
 
-    def type_path_arr(self) -> Type[Struct]:
+    def type_path_arr(self) -> type[Struct]:
         return defstruct(f"{self.basename}PathArr", list(self.path.items()), array_like=True)
 
     def is_empty(self):

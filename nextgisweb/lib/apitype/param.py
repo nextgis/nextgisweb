@@ -57,7 +57,7 @@ class Param:
         if spread is not None:
             self.spread = spread
 
-    def replace(self, *others: Any) -> "Param":
+    def replace(self, *others: Any) -> Param:
         new = super().__new__(self.__class__)
         new.__dict__.update(self.__dict__)
         for other in others:

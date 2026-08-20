@@ -1,5 +1,3 @@
-import io
-
 from babel.core import get_locale_identifier
 from babel.core import parse_locale as babel_parse_locale
 from babel.messages.pofile import write_po as babel_write_po
@@ -8,7 +6,7 @@ from babel.messages.pofile import write_po as babel_write_po
 def write_po(path, catalog, ignore_obsolete=False):
     path.touch(exist_ok=True)
 
-    with io.open(path, "+rb") as fd:
+    with open(path, "+rb") as fd:
         fd.truncate()
 
         babel_write_po(

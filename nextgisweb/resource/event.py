@@ -1,5 +1,3 @@
-from typing import Type
-
 from msgspec import Struct
 from zope.event import notify
 from zope.event.classhandler import handler
@@ -29,14 +27,14 @@ class AfterResourceCollectionPost:
 
 class OnChildClasses(Struct, kw_only=True):
     parent: Resource
-    classes: set[Type[Resource]]
+    classes: set[type[Resource]]
 
     @classmethod
     def handler(cls, fn):
         handler(cls, fn)
 
     @classmethod
-    def apply(cls, parent: Resource, classes: set[Type[Resource]]) -> set[Type[Resource]]:
+    def apply(cls, parent: Resource, classes: set[type[Resource]]) -> set[type[Resource]]:
         obj = cls(parent=parent, classes=classes)
         notify(obj)
         return obj.classes

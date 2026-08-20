@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Type
-
 from msgspec import UNSET, Struct, UnsetType, convert, defstruct
 
 from nextgisweb.auth import User
@@ -14,13 +12,13 @@ from .serialize import CRUTypes, Serializer
 class CompositeSerializer:
     def __init__(self, *, keys: tuple[str, ...] | None = None, user: User):
         self.user = user
-        self.members: tuple[tuple[str, Type[Serializer]], ...] = tuple(
+        self.members: tuple[tuple[str, type[Serializer]], ...] = tuple(
             (identity, srlzrcls)
             for identity, srlzrcls in Serializer.registry.items()
             if (keys is None or identity in keys)
         )
 
-    def serialize(self, obj: Resource, cls: Type[Struct]) -> Struct:
+    def serialize(self, obj: Resource, cls: type[Struct]) -> Struct:
         result = dict()
         for identity, srlzrcls in self.members:
             if srlzrcls.is_applicable(obj):

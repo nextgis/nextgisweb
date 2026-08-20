@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Any, Type, Union
+from typing import TYPE_CHECKING, Annotated, Any, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert
 
@@ -143,7 +143,7 @@ def idelete(txn, request: Request) -> AsJSON[None]:
     return None
 
 
-ErrorType = Type[Struct]
+ErrorType = type[Struct]
 if not TYPE_CHECKING:
     ErrorType = Union[tuple(OperationError.registry)]
 
@@ -172,7 +172,7 @@ def ipost(txn: Transaction, request: Request) -> AsJSON[CommitErrors | CommitSuc
 
     with txn.resource.feature_transaction(request) as ftxn:
         # Set up executors
-        executors = dict[Type[OperationExecutor], OperationExecutor]()
+        executors = dict[type[OperationExecutor], OperationExecutor]()
         for action in txn.actions():
             cls = OperationExecutor.executors[action]
             if cls not in executors:

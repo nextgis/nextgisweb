@@ -76,7 +76,7 @@ class Env(Container):
             packages=cfg_packages, components=cfg_components, enable_disabled=enable_disabled
         )
 
-        self.packages = dict(((name, pkginfo.packages[name]) for name in loaded_packages))
+        self.packages = dict((name, pkginfo.packages[name]) for name in loaded_packages)
 
         not_found_packages = set(cfg_packages) - set(pkginfo.packages.keys())
         if len(not_found_packages) > 0:

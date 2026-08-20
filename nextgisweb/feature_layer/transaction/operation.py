@@ -1,7 +1,7 @@
 import abc
 import dataclasses as dc
 from functools import cached_property
-from typing import Annotated, Any, ClassVar, Literal, Type, TypeVar
+from typing import Annotated, Any, ClassVar, Literal, TypeVar
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
@@ -44,9 +44,9 @@ FeatureIDOrSeqNum = Annotated[
 
 class OperationExecutor(abc.ABC):
     # FIXME: Overcomplicated registries, simplify me please!
-    executors: ClassVar[dict[str, Type["OperationExecutor"]]] = dict()
-    input_types: ClassVar[dict[str, Type[Struct]]] = dict()
-    result_types: ClassVar[dict[str, Type[Struct]]] = dict()
+    executors: ClassVar[dict[str, type["OperationExecutor"]]] = dict()
+    input_types: ClassVar[dict[str, type[Struct]]] = dict()
+    result_types: ClassVar[dict[str, type[Struct]]] = dict()
 
     def __init__(self, *, txn: FeatureLayerTransaction, vobj: FVersioningMeta | None):
         self.txn = txn
@@ -54,7 +54,7 @@ class OperationExecutor(abc.ABC):
         self.vobj = vobj
 
     @classmethod
-    def register(cls, itype: Type[Struct], rtype: Type[Struct]):
+    def register(cls, itype: type[Struct], rtype: type[Struct]):
         insp = type_info(itype)
         assert isinstance(insp, StructType)
         assert insp.tag_field == "action"
@@ -112,12 +112,12 @@ class OperationExecutor(abc.ABC):
         return result
 
 
-S = TypeVar("S", bound=Type[Struct])
+S = TypeVar("S", bound=type[Struct])
 
 
 @dc.dataclass
 class OperationError(Exception):
-    registry: ClassVar[list[Type[Struct]]] = list()
+    registry: ClassVar[list[type[Struct]]] = list()
     value: Struct
 
     @classmethod

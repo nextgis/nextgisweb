@@ -78,8 +78,7 @@ def _test_data(alpha):
         yield *rest, colour
 
     if alpha:
-        for v in (((-20037508, 20037400, -20037400, 20037508), "EPSG:3857", (0, 0, 0, 0)),):
-            yield v
+        yield ((-20037508, 20037400, -20037400, 20037508), "EPSG:3857", (0, 0, 0, 0))
 
 
 def _test_rounds_dataset(ds, alpha=True):

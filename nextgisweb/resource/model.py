@@ -1,7 +1,7 @@
 from collections import namedtuple
 from datetime import datetime
 from types import MappingProxyType
-from typing import Annotated, ClassVar, Literal, Type
+from typing import Annotated, ClassVar, Literal
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -112,7 +112,7 @@ class ResourceMeta(orm.DeclarativeMeta):
         resource_registry.register(cls)
 
 
-ResourceScopeType = tuple[Type[Scope], ...] | Type[Scope]
+ResourceScopeType = tuple[type[Scope], ...] | type[Scope]
 
 
 class Resource(Base, metaclass=ResourceMeta):
@@ -120,7 +120,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     identity: ClassVar[str] = "resource"
     cls_display_name: ClassVar[TrStr] = gettext("Resource")
-    cls_category: ClassVar[Type[category.ResourceCategory]] = category.MiscellaneousCategory
+    cls_category: ClassVar[type[category.ResourceCategory]] = category.MiscellaneousCategory
     cls_order: ClassVar[int] = 100
 
     __scope__: ClassVar[ResourceScopeType] = (ResourceScope,)

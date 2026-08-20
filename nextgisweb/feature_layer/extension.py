@@ -9,7 +9,7 @@ from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 @dict_registry
 class FeatureExtension(abc.ABC):
-    registry: ClassVar[DictRegistry[type["FeatureExtension"]]]
+    registry: ClassVar[DictRegistry[type[FeatureExtension]]]
 
     def __init__(self, layer):
         self._layer = layer

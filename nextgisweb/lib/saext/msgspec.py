@@ -1,5 +1,3 @@
-from typing import Type
-
 import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import convert, to_builtins
 from sqlalchemy import TypeDecorator, null
@@ -9,7 +7,7 @@ class Msgspec(TypeDecorator):
     impl = sa_pg.JSONB
     cache_ok = True
 
-    def __init__(self, typedef: Type):
+    def __init__(self, typedef: type):
         super().__init__()
         self.typedef = typedef
 

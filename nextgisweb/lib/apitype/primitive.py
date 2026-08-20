@@ -1,9 +1,9 @@
 from builtins import type as builtins_type
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import date, datetime
 from functools import partial
 from re import escape
-from typing import Annotated, Any, Callable, Literal, get_args, get_origin
+from typing import Annotated, Any, Literal, get_args, get_origin
 from urllib.parse import unquote_plus
 
 from msgspec import Meta, convert

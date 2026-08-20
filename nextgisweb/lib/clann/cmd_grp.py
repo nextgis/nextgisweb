@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from inspect import signature
-from typing import Callable
 
 from docstring_parser import parse as docstring_parse
 

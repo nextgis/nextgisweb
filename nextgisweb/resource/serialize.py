@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, ClassVar, Literal, Type, cast, get_type_hints
+from typing import Any, ClassVar, Literal, cast, get_type_hints
 from warnings import warn
 
 from msgspec import UNSET, Struct, UnsetType, defstruct
@@ -26,9 +26,9 @@ class CRUTypes(Struct, frozen=True):
 
 @dict_registry
 class Serializer:
-    registry: ClassVar[DictRegistry[type["Serializer"]]]
+    registry: ClassVar[DictRegistry[type[Serializer]]]
     identity: ClassVar[str]
-    resclass: ClassVar[Type[model.Resource]]
+    resclass: ClassVar[type[model.Resource]]
     proptab: ClassVar[tuple[tuple[str, SAttribute], ...]]
     model_prefix: ClassVar[str | None]
     create: ClassVar[bool]
@@ -36,7 +36,7 @@ class Serializer:
     def __init_subclass__(
         cls,
         *,
-        resource: Type[model.Resource],
+        resource: type[model.Resource],
         model_prefix: str | None = None,
         force_create: Literal[True] | None = None,
     ):
@@ -142,7 +142,7 @@ class Serializer:
 class SAttribute:
     ctypes: ClassVar[CRUTypes | None] = None
 
-    srlzrcls: Type[Serializer]
+    srlzrcls: type[Serializer]
     attrname: str
     model_attr: str
     types: CRUTypes
@@ -174,7 +174,7 @@ class SAttribute:
             assert read is None or ct.read is not None
             assert write is None or ct.update is not None
 
-    def bind(self, srlzrcls: Type[Serializer], attrname: str):
+    def bind(self, srlzrcls: type[Serializer], attrname: str):
         self.srlzrcls = srlzrcls
         self.attrname = attrname
         if self.model_attr is None:

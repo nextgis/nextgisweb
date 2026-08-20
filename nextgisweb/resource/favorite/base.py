@@ -1,5 +1,5 @@
 import re
-from typing import Annotated, ClassVar, Type, TypeVar
+from typing import Annotated, ClassVar, TypeVar
 
 from msgspec import Struct, defstruct
 from msgspec import _utils as ms_utils
@@ -22,7 +22,7 @@ class ResourceFavoriteMeta(type):
     route: str | None
 
     @property
-    def ctype(self) -> Type[Struct]:
+    def ctype(self) -> type[Struct]:
         if result := getattr(self, "_types", None):
             return result
 

@@ -1,4 +1,3 @@
-import io
 import json
 import logging
 import re
@@ -167,7 +166,7 @@ def cmd_update(args):
         for locale in meta.locales:
             po_path = catalog_filename(meta.comp, locale, mkdir=True)
 
-            with io.open(pot_path, "r") as pot_fd:
+            with open(pot_path) as pot_fd:
                 pot = read_po(pot_fd, locale=to_gettext_locale(locale))
                 pot_is_empty = len(pot) == 0 and len(pot.obsolete) == 0
 
@@ -185,7 +184,7 @@ def cmd_update(args):
                 po_path.unlink()
                 continue
 
-            with io.open(po_path, "r") as po_fd:
+            with open(po_path) as po_fd:
                 po = read_po(po_fd, locale=to_gettext_locale(locale))
 
             not_found, _, obsolete = compare_catalogs(pot, po)

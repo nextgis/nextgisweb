@@ -1,5 +1,6 @@
+from collections.abc import Generator
 from datetime import datetime
-from typing import Any, Generator
+from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm

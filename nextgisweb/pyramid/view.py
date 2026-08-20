@@ -783,10 +783,8 @@ def _setup_static(comp: PyramidComponent, config):
         # In production mode build static_key from nextgisweb_* package versions
         package_hash = md5(
             "\n".join(
-                (
-                    "{}=={}+{}".format(pobj.name, pobj.version, pobj.commit)
-                    for pobj in comp.env.packages.values()
-                )
+                "{}=={}+{}".format(pobj.name, pobj.version, pobj.commit)
+                for pobj in comp.env.packages.values()
             ).encode("utf-8")
         )
         comp.static_key = "/" + package_hash.hexdigest()[:8]
