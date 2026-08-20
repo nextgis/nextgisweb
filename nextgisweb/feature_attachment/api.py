@@ -10,6 +10,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from msgspec import Meta, Struct
 from msgspec.json import encode as msgspec_dumpb
 from PIL import Image
+from PIL.Image import Resampling
 from pyramid.response import FileResponse, Response
 from sqlalchemy.sql import select
 
@@ -61,20 +62,19 @@ def download(
 ):
     request.resource_permission(DataScope.read)
 
-    fileobj_id, mime_type, name = None, None, None
-    search_tables = [FeatureAttachment.__table__]
+    search = [FeatureAttachment]
     if IVersionableFeatureLayer.providedBy(resource) and resource.fversioning:
-        search_tables.append(FeatureAttachment.fversioning_htab)
+        search.append(FeatureAttachment.fversioning_htab.c)
 
-    for tab in search_tables:
-        query = select(tab.c.fileobj_id, tab.c.mime_type, tab.c.name)
+    for tab in search:
+        query = select(tab.fileobj_id, tab.mime_type, tab.name)
         query = query.where(
-            tab.c.extension_id == aid,
-            tab.c.resource_id == resource.id,
-            tab.c.feature_id == fid,
+            tab.extension_id == aid,
+            tab.resource_id == resource.id,
+            tab.feature_id == fid,
         )
         if fileobj:
-            query = query.where(tab.c.fileobj_id == fileobj)
+            query = query.where(tab.fileobj_id == fileobj)
         if row := DBSession.execute(query).first():
             fileobj_id, mime_type, name = row
             break
@@ -121,13 +121,13 @@ def image(
         if exif is not None:
             otag = exif.get(EXIF_ORIENTATION_TAG)
             if otag in (3, 6, 8):
-                orientation = ORIENTATIONS.get(otag)
+                orientation = ORIENTATIONS[otag]
                 image = image.transpose(orientation.degrees)
 
     if crop:
         aspect_ratio = width / height
         image = crop_to_aspect_ratio(image, aspect_ratio)
-    image.thumbnail((width, height), Image.LANCZOS)
+    image.thumbnail((width, height), Resampling.LANCZOS)
 
     buf = BytesIO()
     image.save(buf, ext)
@@ -228,12 +228,12 @@ def export(resource, request: Request):
                     name = f"{att_idx:010d}{extension}"
 
                 if name in feature_anames:
-                    # Make attachment's name unique
-                    (base, suffix) = re.match(
-                        r"(.*?)((?:\.[a-z0-9_]+)+)?$", name, re.IGNORECASE
-                    ).groups()
-                    if suffix is None:
-                        suffix = ""
+                    # Make attachment's name unique by adding a numeric suffix before the extension
+                    if m := re.match(r"(.*?)((?:\.[a-z0-9_]+)+)?$", name, re.IGNORECASE):
+                        base, suffix = m.groups()
+                    else:
+                        base, suffix = name, ""
+
                     for idx in count(1):
                         candidate = f"{base}.{idx}{suffix}"
                         if candidate not in feature_anames:

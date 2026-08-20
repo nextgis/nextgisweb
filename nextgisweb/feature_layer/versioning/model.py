@@ -23,7 +23,7 @@ from ..interface import IVersionableFeatureLayer
 from .exception import VersioningException
 from .util import fversioning_guard
 
-ActColValue = Literal["C", "U", "D"]
+ActColValue = Literal["C", "U", "D", "R"]
 
 
 class FVersioningMixin:

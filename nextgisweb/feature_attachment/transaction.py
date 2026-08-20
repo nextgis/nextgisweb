@@ -10,6 +10,7 @@ from nextgisweb.feature_layer.transaction import (
     OperationExecutor,
     SeqNum,
     VIDCompare,
+    action_tag_factory,
 )
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
@@ -18,7 +19,8 @@ from .model import FeatureAttachment as Attachment
 
 AttachmentID = int
 
-action_tag = lambda base: dict(tag=f"attachment.{base}", tag_field="action")
+
+action_tag = action_tag_factory("attachment")
 
 
 class CopyToMixin:

@@ -8,11 +8,12 @@ from nextgisweb.feature_layer.transaction import (
     OperationExecutor,
     SeqNum,
     VIDCompare,
+    action_tag_factory,
 )
 
 from .model import FeatureDescription as Description
 
-action_tag = lambda base: dict(tag=f"description.{base}", tag_field="action")
+action_tag = action_tag_factory("description")
 
 
 class DescriptionPutOperation(Struct, kw_only=True, **action_tag("put")):

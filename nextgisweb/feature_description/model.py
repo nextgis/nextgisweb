@@ -40,18 +40,19 @@ class FeatureDescription(Base, FVersioningExtensionMixin):
     @classmethod
     def fversioning_change_from_query(
         cls,
-        act: ActColValue,
+        action: ActColValue,
         fid: int,
-        eid: None,
+        eid: int | None,
         vid: int,
         values: dict[str, Any],
     ) -> DescriptionPut:
-        if act in ("C", "U"):
+        assert eid is None
+        if action in ("C", "U"):
             return DescriptionPut(fid=fid, vid=vid, **values)
-        elif act == "D":
+        elif action == "D":
             return DescriptionPut(fid=fid, vid=vid, value=None)
         else:
-            raise NotImplementedError(f"{act=}")
+            raise NotImplementedError(f"{action=}")
 
 
 @register_change

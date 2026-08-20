@@ -1,7 +1,7 @@
 import abc
 import dataclasses as dc
 from functools import cached_property
-from typing import Annotated, Any, ClassVar, Literal, TypeVar
+from typing import Annotated, Any, Callable, ClassVar, Literal, TypedDict
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
@@ -65,11 +65,11 @@ class OperationExecutor(abc.ABC):
         cls.result_types[insp.tag] = rtype
 
     @abc.abstractmethod
-    def prepare(self, seqnum: SeqNum, operation: Struct):
+    def prepare(self, seqnum: SeqNum, operation: Any):
         pass
 
     @abc.abstractmethod
-    def execute(self, seqnum: SeqNum, operation: Struct) -> Struct:
+    def execute(self, seqnum: SeqNum, operation: Any) -> Any:
         pass
 
     @cached_property
@@ -112,16 +112,13 @@ class OperationExecutor(abc.ABC):
         return result
 
 
-S = TypeVar("S", bound=type[Struct])
-
-
 @dc.dataclass
 class OperationError(Exception):
     registry: ClassVar[list[type[Struct]]] = list()
     value: Struct
 
     @classmethod
-    def register(cls, struct: S) -> S:
+    def register[S: type[Struct]](cls, struct: S) -> S:
         cls.registry.append(struct)
         return struct
 
@@ -151,7 +148,17 @@ class RevertResult(Struct, kw_only=True, tag="revert", tag_field="action"):
 
 # Feature operations
 
-action_tag = lambda base: dict(tag=f"feature.{base}", tag_field="action")
+
+class ActionTagDict(TypedDict):
+    tag: str
+    tag_field: str
+
+
+def action_tag_factory(comp: str) -> Callable[[str], ActionTagDict]:
+    return lambda base: ActionTagDict(tag=f"{comp}.{base}", tag_field="action")
+
+
+action_tag = action_tag_factory("feature")
 
 
 Geom = Annotated[

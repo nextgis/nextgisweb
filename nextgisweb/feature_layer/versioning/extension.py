@@ -746,7 +746,7 @@ class FVersioningExtensionMixin:
         eid: None,
         vid: int,
         values: dict[str, Any],
-    ) -> type[Struct]:
+    ) -> Struct:
         raise NotImplementedError
 
     @classmethod

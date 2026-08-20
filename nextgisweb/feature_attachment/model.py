@@ -173,10 +173,11 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         cls,
         action: ActColValue,
         fid: int,
-        aid: int,
+        eid: int | None,
         vid: int,
         values: dict[str, Any],
     ) -> AttachmentCreate | AttachmentUpdate | AttachmentDelete | AttachmentRestore:
+        assert eid is not None
         if action in ("C", "U", "R"):
             if action == "C":
                 cid = AttachmentCreate
@@ -189,9 +190,9 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
                 values = dict(values)
             if fileobj := values.pop("fileobj_id", None):
                 values["fileobj"] = fileobj
-            return cid(fid=fid, aid=aid, vid=vid, **values)
+            return cid(fid=fid, aid=eid, vid=vid, **values)
         elif action == "D":
-            return AttachmentDelete(fid=fid, aid=aid, vid=vid)
+            return AttachmentDelete(fid=fid, aid=eid, vid=vid)
         else:
             raise NotImplementedError(f"{action=}")
 

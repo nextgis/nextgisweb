@@ -7,4 +7,5 @@ from .operation import (
     OperationExecutor,
     SeqNum,
     VIDCompare,
+    action_tag_factory,
 )
