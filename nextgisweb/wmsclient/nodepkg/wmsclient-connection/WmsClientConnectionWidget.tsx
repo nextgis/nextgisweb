@@ -10,11 +10,11 @@ import { LotMV } from "@nextgisweb/gui/arm";
 import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget } from "@nextgisweb/resource/type";
-import type { ConnectionCreate } from "@nextgisweb/wmsclient/type/api";
+import type { WMSConnectionCreate } from "@nextgisweb/wmsclient/type/api";
 
 import type { WmsClientConnectionStore } from "./WmsClientConnectionStore";
 
-export type UICapcache = NonNullable<ConnectionCreate["capcache"]> | "";
+export type UICapcache = NonNullable<WMSConnectionCreate["capcache"]> | "";
 
 export interface Option {
   label: string;

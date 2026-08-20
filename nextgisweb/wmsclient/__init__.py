@@ -1,2 +1,2 @@
 from .component import WMSClientComponent
-from .model import WMS_VERSIONS, Connection, Layer
+from .model import WMS_VERSIONS, WMSConnection, WMSLayer

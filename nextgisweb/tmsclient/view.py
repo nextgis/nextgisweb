@@ -2,17 +2,17 @@ from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Widget
 from nextgisweb.tmsclient.component import TMSClientComponent
 
-from .model import Connection, Layer
+from .model import TMSConnection, TMSLayer
 
 
 class ClientWidget(Widget):
-    resource = Connection
+    resource = TMSConnection
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/tmsclient/tmsclient-connection")
 
 
 class LayerWidget(Widget):
-    resource = Layer
+    resource = TMSLayer
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/tmsclient/tmsclient-layer")
 

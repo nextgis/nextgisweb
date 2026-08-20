@@ -2,17 +2,17 @@ from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Widget
 
 from .component import WMSClientComponent
-from .model import Connection, Layer
+from .model import WMSConnection, WMSLayer
 
 
 class ClientWidget(Widget):
-    resource = Connection
+    resource = WMSConnection
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/wmsclient/wmsclient-connection")
 
 
 class LayerWidget(Widget):
-    resource = Layer
+    resource = WMSLayer
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/wmsclient/wmsclient-layer")
 

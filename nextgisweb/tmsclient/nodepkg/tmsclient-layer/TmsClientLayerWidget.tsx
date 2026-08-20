@@ -18,15 +18,15 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 import type {
-  ConnectionRead,
   InspectResponse,
+  TMSConnectionRead,
 } from "@nextgisweb/tmsclient/type/api";
 
 import type { TmsClientLayerStore } from "./TmsClientLayerStore";
 
 import CloudIcon from "@nextgisweb/icon/material/cloud";
 
-type Capmode = ConnectionRead["capmode"];
+type Capmode = TMSConnectionRead["capmode"];
 
 const capmodeHints: Record<Capmode & string, string> = {
   "nextgis_geoservices": gettext(

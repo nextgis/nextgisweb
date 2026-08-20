@@ -79,7 +79,7 @@ url_pattern = re.compile(
 _capcache_cache: LRUCache = LRUCache(maxsize=64)
 
 
-class Connection(Resource):
+class WMSConnection(Resource):
     identity = "wmsclient_connection"
     cls_display_name = gettext("WMS connection")
 
@@ -243,7 +243,7 @@ class CapCacheAttr(SAttribute):
             srlzr.obj.capcache_clear()
 
 
-class ConnectionSerializer(Serializer, resource=Connection):
+class WMSConnectionSerializer(Serializer, resource=WMSConnection):
     url = UrlAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -269,7 +269,7 @@ class RenderRequest:
 
 
 @implementer(IRenderableStyle, IBboxLayer)
-class Layer(Resource, SpatialLayerMixin):
+class WMSLayer(Resource, SpatialLayerMixin):
     identity = "wmsclient_layer"
     cls_display_name = gettext("WMS layer")
 
@@ -281,7 +281,8 @@ class Layer(Resource, SpatialLayerMixin):
     vendor_params: Mapped[dict] = mapped_column(sa_pg.JSONB, default=dict)
     remote_srs_id: Mapped[int] = mapped_column(sa.ForeignKey(SRS.id))
 
-    connection: Mapped[Resource] = orm.relationship(
+    connection: Mapped[WMSConnection] = orm.relationship(
+        Resource,
         foreign_keys=connection_id,
         cascade="save-update,merge",
     )
@@ -370,14 +371,14 @@ class Layer(Resource, SpatialLayerMixin):
         )
 
 
-DataScope.read.require(ConnectionScope.connect, attr="connection", cls=Layer)
+DataScope.read.require(ConnectionScope.connect, attr="connection", cls=WMSLayer)
 
 
 class VendorParamsAttr(SColumn):
     ctypes = CRUTypes(dict[str, str], dict[str, str], dict[str, str])
 
 
-class LayerSerializer(Serializer, resource=Layer):
+class WMSLayerSerializer(Serializer, resource=WMSLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     wmslayers = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     imgformat = SColumn(read=ResourceScope.read, write=ResourceScope.update)

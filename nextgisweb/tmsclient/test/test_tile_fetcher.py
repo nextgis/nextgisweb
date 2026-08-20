@@ -6,7 +6,7 @@ import transaction
 
 from nextgisweb.core.exception import ExternalServiceError
 
-from ..model import Connection
+from ..model import TMSConnection
 from ..tile_fetcher import TimeoutError as FetcherTimeoutError
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -24,7 +24,7 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 )
 def test_httpx_exception_mapped(exc_class, mapped_to):
     with transaction.manager:
-        conn = Connection(
+        conn = TMSConnection(
             url_template="http://invalid.test/{z}/{x}/{y}",
         ).persist()
 

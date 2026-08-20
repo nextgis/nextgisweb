@@ -9,7 +9,7 @@ from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ConnectionScope, ResourceFactory
 from nextgisweb.tmsclient.component import TMSClientComponent
 
-from .model import NEXTGIS_GEOSERVICES, Connection
+from .model import NEXTGIS_GEOSERVICES, TMSConnection
 
 Zoom = Annotated[int, Meta(ge=0, le=30)]
 Lat = Annotated[float, Meta(ge=-90, le=90)]
@@ -68,6 +68,6 @@ def setup_pyramid(comp: TMSClientComponent, config):
     config.add_route(
         "tmsclient.connection.inspect",
         "/api/resource/{id}/tmsclient/inspect",
-        factory=ResourceFactory(context=Connection),
+        factory=ResourceFactory(context=TMSConnection),
         get=inspect_connection,
     )

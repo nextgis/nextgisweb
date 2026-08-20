@@ -7,8 +7,8 @@ import type {
   EditorStoreOptions,
 } from "@nextgisweb/resource/type";
 import type {
-  ConnectionCreate,
-  ConnectionUpdate,
+  TMSConnectionCreate,
+  TMSConnectionUpdate,
 } from "@nextgisweb/tmsclient/type/api";
 
 const {
@@ -25,7 +25,7 @@ const {
   $load: mapperLoad,
   $dirty: mapperDirty,
   $error: mapperError,
-} = mapper<TmsClientConnectionStore, ConnectionCreate>({
+} = mapper<TmsClientConnectionStore, TMSConnectionCreate>({
   validateIf: (o) => o.validate,
 });
 
@@ -46,9 +46,9 @@ apikey.validate((v, store) => {
 });
 
 export class TmsClientConnectionStore implements EditorStore<
-  ConnectionCreate,
-  ConnectionCreate,
-  ConnectionUpdate
+  TMSConnectionCreate,
+  TMSConnectionCreate,
+  TMSConnectionUpdate
 > {
   readonly identity = "tmsclient_connection";
   readonly composite: CompositeStore;
@@ -70,7 +70,7 @@ export class TmsClientConnectionStore implements EditorStore<
   }
 
   @action
-  load(val: ConnectionCreate) {
+  load(val: TMSConnectionCreate) {
     mapperLoad(this, val);
   }
 
@@ -78,7 +78,7 @@ export class TmsClientConnectionStore implements EditorStore<
     if (this.dirty) {
       const { referer, password, username, apikey, apikey_param, ...rest } =
         mapperDump(this);
-      const result: ConnectionCreate | ConnectionUpdate = {
+      const result: TMSConnectionCreate | TMSConnectionUpdate = {
         referer: referer || null,
         username: username || null,
         password: password || null,

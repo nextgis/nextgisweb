@@ -5,17 +5,17 @@ import type { NullableProps } from "@nextgisweb/gui/type";
 import { assert } from "@nextgisweb/jsrealm/error";
 import type { EditorStore } from "@nextgisweb/resource/type";
 import type {
-  ConnectionCreate,
-  ConnectionRead,
+  WMSConnectionCreate,
+  WMSConnectionRead,
 } from "@nextgisweb/wmsclient/type/api";
 
 import type { UICapcache } from "./WmsClientConnectionWidget";
 
 type MapperConnectionCreate = Omit<
-  ConnectionCreate,
+  WMSConnectionCreate,
   "url" | "username" | "password" | "referer" | "capcache"
 > & { capcache: UICapcache } & NullableProps<
-    Pick<ConnectionCreate, "url" | "username" | "password" | "referer">
+    Pick<WMSConnectionCreate, "url" | "username" | "password" | "referer">
   >;
 
 const {
@@ -38,9 +38,9 @@ const {
 });
 
 export class WmsClientConnectionStore implements EditorStore<
-  ConnectionRead,
-  ConnectionCreate,
-  ConnectionCreate
+  WMSConnectionRead,
+  WMSConnectionCreate,
+  WMSConnectionCreate
 > {
   readonly identity = "wmsclient_connection";
 
@@ -59,7 +59,7 @@ export class WmsClientConnectionStore implements EditorStore<
   @observable.ref accessor validate = false;
 
   @action
-  load(val: ConnectionRead) {
+  load(val: WMSConnectionRead) {
     const { capcache, ...value_ } = val;
     mapperLoad(this, { capcache: "", ...value_ });
   }
@@ -71,7 +71,7 @@ export class WmsClientConnectionStore implements EditorStore<
 
     assert(url && version);
 
-    const payload: ConnectionCreate = {
+    const payload: WMSConnectionCreate = {
       url,
       version,
       referer: referer || null,

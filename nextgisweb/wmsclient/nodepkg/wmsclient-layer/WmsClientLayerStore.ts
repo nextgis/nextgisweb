@@ -10,13 +10,13 @@ import type {
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type {
-  LayerCreate,
-  LayerRead,
-  LayerUpdate,
+  WMSLayerCreate,
+  WMSLayerRead,
+  WMSLayerUpdate,
 } from "@nextgisweb/wmsclient/type/api";
 
 type MapperLayerCreate = NullableProps<
-  LayerCreate,
+  WMSLayerCreate,
   "connection" | "imgformat" | "vendor_params" | "remote_srs"
 >;
 
@@ -41,9 +41,9 @@ const {
 });
 
 export class WmsClientLayerStore implements EditorStore<
-  LayerRead,
-  LayerCreate,
-  LayerUpdate
+  WMSLayerRead,
+  WMSLayerCreate,
+  WMSLayerUpdate
 > {
   readonly identity = "wmsclient_layer";
   readonly composite: CompositeStore;
@@ -61,7 +61,7 @@ export class WmsClientLayerStore implements EditorStore<
   }
 
   @action
-  load(val: LayerRead) {
+  load(val: WMSLayerRead) {
     mapperLoad(this, val);
   }
 

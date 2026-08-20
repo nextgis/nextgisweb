@@ -10,11 +10,11 @@ import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget } from "@nextgisweb/resource/type";
-import type { ConnectionRead } from "@nextgisweb/tmsclient/type/api";
+import type { TMSConnectionRead } from "@nextgisweb/tmsclient/type/api";
 
 import type { TmsClientConnectionStore } from "./TmsClientConnectionStore";
 
-const schemas: { value: ConnectionRead["scheme"]; label: string }[] = [
+const schemas: { value: TMSConnectionRead["scheme"]; label: string }[] = [
   { value: "xyz", label: "XYZ" },
   { value: "tms", label: "TMS" },
 ];

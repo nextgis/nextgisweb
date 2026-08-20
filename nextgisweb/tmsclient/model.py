@@ -43,7 +43,7 @@ url_template_pattern = re.compile(
 )
 
 
-class Connection(Resource):
+class TMSConnection(Resource):
     identity = "tmsclient_connection"
     cls_display_name = gettext("TMS connection")
 
@@ -123,7 +123,7 @@ class SchemeAttr(SColumn):
     ctypes = CRUTypes(Scheme | None, Scheme, Scheme | None)
 
 
-class ConnectionSerializer(Serializer, resource=Connection):
+class TMSConnectionSerializer(Serializer, resource=TMSConnection):
     url_template = UrlTemplateAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     apikey = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     apikey_param = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -159,13 +159,13 @@ class RenderRequest:
 
 
 @implementer(IRenderableStyle, IBboxLayer)
-class Layer(Resource, SpatialLayerMixin):
+class TMSLayer(Resource, SpatialLayerMixin):
     identity = "tmsclient_layer"
     cls_display_name = gettext("TMS layer")
 
     __scope__ = DataScope
 
-    connection_id: Mapped[int] = mapped_column(sa.ForeignKey(Connection.id))
+    connection_id: Mapped[int] = mapped_column(sa.ForeignKey(TMSConnection.id))
     layer_name: Mapped[str | None] = mapped_column(sa.Unicode)
     tilesize: Mapped[int] = mapped_column(sa.Integer, default=256)
     minzoom: Mapped[int] = mapped_column(sa.Integer, default=0)
@@ -175,7 +175,7 @@ class Layer(Resource, SpatialLayerMixin):
     extent_bottom: Mapped[float | None] = mapped_column(sa.Float, default=-90.0)
     extent_top: Mapped[float | None] = mapped_column(sa.Float, default=+90.0)
 
-    connection: Mapped[Connection] = orm.relationship(
+    connection: Mapped[TMSConnection] = orm.relationship(
         foreign_keys=connection_id,
         cascade="save-update,merge",
     )
@@ -293,7 +293,7 @@ class Layer(Resource, SpatialLayerMixin):
 DataScope.read.require(
     ConnectionScope.connect,
     attr="connection",
-    cls=Layer,
+    cls=TMSLayer,
 )
 
 
@@ -310,7 +310,7 @@ class LayerNameAttr(SColumn):
         super().set(srlzr, value, create=create)
 
 
-class LayerSerializer(Serializer, resource=Layer):
+class TMSLayerSerializer(Serializer, resource=TMSLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     layer_name = LayerNameAttr(read=ResourceScope.read, write=ResourceScope.update)
     tilesize = SColumn(read=ResourceScope.read, write=ResourceScope.update)

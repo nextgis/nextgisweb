@@ -11,13 +11,13 @@ import type {
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type {
-  LayerCreate,
-  LayerRead,
-  LayerUpdate,
+  TMSLayerCreate,
+  TMSLayerRead,
+  TMSLayerUpdate,
 } from "@nextgisweb/tmsclient/type/api";
 
 type MapperLayerCreate = NullableProps<
-  LayerCreate,
+  TMSLayerCreate,
   "connection" | "minzoom" | "maxzoom"
 > & {
   extent: {
@@ -52,9 +52,9 @@ const {
 });
 
 export class TmsClientLayerStore implements EditorStore<
-  LayerRead,
-  LayerCreate,
-  LayerUpdate
+  TMSLayerRead,
+  TMSLayerCreate,
+  TMSLayerUpdate
 > {
   readonly identity = "tmsclient_layer";
   readonly composite: CompositeStore;
@@ -74,7 +74,7 @@ export class TmsClientLayerStore implements EditorStore<
   }
 
   @action
-  load(val: LayerRead) {
+  load(val: TMSLayerRead) {
     const value: MapperLayerCreate = {
       ...val,
       extent: {
@@ -98,7 +98,7 @@ export class TmsClientLayerStore implements EditorStore<
         mapperDump(this);
       assert(connection);
 
-      const result: LayerCreate | LayerUpdate = {
+      const result: TMSLayerCreate | TMSLayerUpdate = {
         connection,
         extent_left: extent?.left,
         extent_bottom: extent?.bottom,

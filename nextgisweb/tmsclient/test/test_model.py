@@ -10,7 +10,7 @@ from pyramid.response import Response
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857, SRS
 
-from ..model import Connection, Layer
+from ..model import TMSConnection, TMSLayer
 from ..tile_fetcher import FetchResult, FetchStatus, TileFetcher
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -40,7 +40,7 @@ def tms_server(request):
 @pytest.fixture
 def connection(ngw_httptest_app, ngw_request_handler):
     with transaction.manager:
-        resource = Connection(
+        resource = TMSConnection(
             url_template="%s/test/request/?layer={layer}&z={z}&x={x}&y={y}&custom=custom"
             % ngw_httptest_app.base_url,
             apikey="test-apikey",
@@ -53,7 +53,7 @@ def connection(ngw_httptest_app, ngw_request_handler):
 @pytest.fixture
 def layer(connection):
     with transaction.manager:
-        resource = Layer(
+        resource = TMSLayer(
             connection_id=connection,
             layer_name="ngw",
             minzoom=0,
@@ -66,7 +66,7 @@ def layer(connection):
 def test_layer(layer, ngw_webtest_app: WebTestApp, ngw_resource_group):
     ngw_webtest_app.get(f"/api/component/render/tile?z={4}&x=0&y=0&resource={layer}", status=422)
 
-    res = Layer.filter_by(id=layer).one()
+    res = TMSLayer.filter_by(id=layer).one()
     srs = SRS.filter_by(id=3857).one()
     req = res.render_request(srs)
 
@@ -83,7 +83,7 @@ def test_layer(layer, ngw_webtest_app: WebTestApp, ngw_resource_group):
 @pytest.mark.parametrize("referer", [None, "http://example.com"])
 def test_connection_referer(referer, ngw_resource_defaults):
     with transaction.manager:
-        conn = Connection(
+        conn = TMSConnection(
             url_template="http://example.com/{z}/{x}/{y}",
             referer=referer,
         ).persist()

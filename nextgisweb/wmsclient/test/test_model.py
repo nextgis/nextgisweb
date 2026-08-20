@@ -3,13 +3,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 import transaction
 
-from ..model import Connection
+from ..model import WMSConnection
 
 
 @pytest.mark.parametrize("insecure", [False, True])
 def test_request_wms_verify(insecure, ngw_resource_defaults):
     with transaction.manager:
-        conn = Connection(
+        conn = WMSConnection(
             url="http://example.com/wms",
             version="1.1.1",
             insecure=insecure,
@@ -26,7 +26,7 @@ def test_request_wms_verify(insecure, ngw_resource_defaults):
 @pytest.mark.parametrize("referer", [None, "http://example.com"])
 def test_request_wms_referer(referer, ngw_resource_defaults):
     with transaction.manager:
-        conn = Connection(
+        conn = WMSConnection(
             url="http://example.com/wms",
             version="1.1.1",
             referer=referer,
