@@ -12,13 +12,11 @@ from subprocess import check_output
 
 import requests
 import sqlalchemy as sa
-import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import UNSET
 from requests.exceptions import JSONDecodeError, RequestException
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import NoResultFound, OperationalError
 from sqlalchemy.orm import configure_mappers
-from sqlalchemy.schema import CreateTable
 
 from nextgisweb.env import Component, DBSession, gettext
 from nextgisweb.env.package import enable_qualifications, pkginfo
@@ -28,6 +26,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import postgres_url
 
+from nextgisweb.core.integrity import check_table
 from nextgisweb.i18n import Localizer, Translations
 
 from .backup import BackupMetadata
@@ -444,81 +443,9 @@ class CoreComponent(StorageComponentMixin, Component):
         metadata = self.env.metadata()
         metadata.bind = self.engine
 
-        prefix = "temp_"
-        seq_pattern = re.compile(rf"^nextval\('{prefix}(\w+)'::regclass\)$")
-
         for tab in list(metadata.tables.values()):
-            # if tab.name != "resource":
-            #    continue
-            tab_name, tab_schema = tab.name, tab.schema
-            tab_repr = (f"{tab_schema}." if tab_schema else "") + tab_name
-            tab_msg = f"Table '{tab_repr}'"
-
-            temp_tab = tab.to_metadata(
-                metadata,
-                name=prefix + tab_name,
-            )
-
-            for constraint in temp_tab.constraints:
-                if constraint.name is not None:
-                    constraint.name = prefix + constraint.name
-
-            DBSession.execute(CreateTable(temp_tab))
-
-            # Columns
-
-            q = sa.text("""
-WITH attr_exp AS (
-	SELECT a.atttypid, a.atttypmod, a.attname, a.attnotnull, pg_get_expr(d.adbin, d.adrelid) AS defval
-	FROM pg_attribute a
-    LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
-	WHERE a.attrelid = CAST(:temp_name AS regclass) AND attnum > 0 AND NOT attisdropped
-),
-attr_act AS (
-	SELECT a.atttypid, a.atttypmod, a.attname, a.attnotnull, pg_get_expr(d.adbin, d.adrelid) AS defval
-	FROM pg_attribute a
-    LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
-	WHERE attrelid = CAST(:name AS regclass) AND attnum > 0 AND NOT attisdropped
-)
-SELECT
-    format_type(a.atttypid, a.atttypmod) AS t_exp,
-    format_type(b.atttypid, b.atttypmod) AS t_act,
-    a.attname AS name_exp,
-    b.attname AS name_act,
-    a.attnotnull AS notnull_exp,
-    b.attnotnull AS notnull_act,
-    a.defval AS defval_exp,
-    b.defval AS defval_act
-FROM attr_exp a
-FULL OUTER JOIN attr_act b ON b.attname = a.attname
-""")
-            result = DBSession.execute(q, dict(temp_name=temp_tab.name, name=tab_name))
-
-            extra = set()
-
-            for r in result.mappings():
-                col_msg = f"{tab_msg}, column '{r.name_exp}'"
-                if r.name_exp is None:
-                    extra.add(r.name_act)
-                elif r.name_act is None:
-                    yield f"{col_msg}: not found."
-                elif r.t_exp != r.t_act:
-                    yield f"{col_msg}: type mismatch ({r.t_exp} <> {r.t_act})."
-                elif r.notnull_exp is not r.notnull_act:
-                    yield f"{col_msg}: {'should' if r.notnull_exp else 'should not'} be nullable."
-                elif (
-                    defval_exp := seq_pattern.sub(
-                        lambda m: f"nextval('{m.group(1)}'::regclass)", r.defval_exp
-                    )
-                    if r.defval_exp is not None
-                    else None
-                ) != r.defval_act:
-                    yield f"{col_msg}: default mismatch ({defval_exp} <> {r.defval_act})."
-
-            if len(extra) > 0:
-                yield f"{tab_msg}: extra columns found ({', '.join(extra)})."
-
-            # Constraints
+            for message in check_table(tab):
+                yield message
 
     def backup_objects(self):
         yield from self.fontconfig.backup_objects()
