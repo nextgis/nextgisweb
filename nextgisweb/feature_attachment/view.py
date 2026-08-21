@@ -12,7 +12,7 @@ from nextgisweb.resource import DataScope, resource_factory
 from .component import FeatureAttachmentComponent
 
 
-@react_renderer("@nextgisweb/feature-attachment/attachment-form")
+@react_renderer("@nextgisweb/feature-attachment/attachment-manage")
 def attachment(request: Request):
     request.resource_permission(DataScope.read)
 
