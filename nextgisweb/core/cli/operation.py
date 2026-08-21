@@ -144,7 +144,7 @@ def check_integrity(self: EnvCommand):
     with DBSession.connection(
         execution_options=dict(
             isolation_level="SERIALIZABLE",
-            postgresql_readonly=True,
+            # postgresql_readonly=True,
             postgresql_deferrable=True,
         )
     ) as con:
@@ -156,7 +156,7 @@ def check_integrity(self: EnvCommand):
                         for error in citer:
                             logger.error(f"Fault for [{comp.identity}]: {error}")
                             fail = True
-                except Exception as exc:
+                except ZeroDivisionError as exc:
                     logger.error(f"Error for [{comp.identity}]: {str(exc)}")
                     fail = True
     if fail:
