@@ -31,10 +31,12 @@ class OnResponse:
 def factory(handler, registry, *, comp: AuditComponent):
     fopts = comp.options.with_prefix("filter")
     filters = [
-        lambda req: not req.path_info.startswith(
-            (
-                "/static/",
-                "/favicon.ico",
+        lambda req: (
+            not req.path_info.startswith(
+                (
+                    "/static/",
+                    "/favicon.ico",
+                )
             )
         )
     ]

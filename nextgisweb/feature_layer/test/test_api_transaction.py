@@ -60,7 +60,7 @@ def test_workflow(versioning, fdict, mkres):
     (res, epoch, fld) = mkres(versioning, fdict)
 
     fapi = FeatureLayerAPI(res)
-    vid = lambda v: ({"vid": v} if versioning else {})
+    vid = lambda v: {"vid": v} if versioning else {}
 
     with fapi.transaction(epoch=epoch) as txn:
         # Repeats of the same data should also report 200 OK
@@ -156,7 +156,7 @@ def test_errors(versioning, fdict, mkres):
     (res, epoch, fld) = mkres(versioning, fdict)
 
     fapi = FeatureLayerAPI(res)
-    vid = lambda v: ({"vid": v} if versioning else {})
+    vid = lambda v: {"vid": v} if versioning else {}
 
     with fapi.transaction(epoch=epoch) as txn:
         txn.put(1, _update(fid=10, fields=fld("Updated")))

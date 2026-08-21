@@ -293,14 +293,16 @@ class EnvDependency:
 inject = partial(
     _inject,
     auto_provide={
-        Env: lambda a: isclass(a)
-        and issubclass(
-            a,
-            (
-                Env,
-                EnvDependency,
-                Component,
-            ),
+        Env: lambda a: (
+            isclass(a)
+            and issubclass(
+                a,
+                (
+                    Env,
+                    EnvDependency,
+                    Component,
+                ),
+            )
         ),
     },
 )

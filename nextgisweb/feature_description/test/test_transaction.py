@@ -29,7 +29,7 @@ def mkres():
 def test_workflow(versioning, mkres):
     res = mkres(versioning)
     fapi = FeatureLayerAPI(res, extensions=["description"])
-    vid = lambda v: ({"vid": v} if versioning else {})
+    vid = lambda v: {"vid": v} if versioning else {}
 
     with fapi.transaction() as txn:  # Version 2
         for _ in range(2):

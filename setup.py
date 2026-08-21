@@ -71,7 +71,7 @@ extras_require = dict(
         "pre-commit",
         "pytest-cov",
         "pytest==9.0.*",
-        "ruff==0.14.*",
+        "ruff==0.16.*",
         "sqlglot==30.15.0",
         "ty",
         "types-lxml",

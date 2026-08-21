@@ -75,7 +75,7 @@ class PermissionResolver:
         if len(perm_rest) == 0:
             return
 
-        req_list = tuple(filter(lambda req: (result.get(req.dst) is True), req_list))
+        req_list = tuple(filter(lambda req: result.get(req.dst) is True, req_list))
 
         # Apply requirement dependencies
 
