@@ -18,8 +18,8 @@ export type ImageThumbnailProps = {
   previewSize?: string;
   width?: number;
   height?: number;
-  onClick?: (attachment: DataSource) => void;
   preview?: GetProp<typeof Image, "preview">;
+  index?: number;
 };
 
 export function ImageThumbnail({
@@ -29,6 +29,7 @@ export function ImageThumbnail({
   featureId,
   resourceId,
   attachment,
+  index,
 }: ImageThumbnailProps) {
   const [thumbUrl, setThumbUrl] = useState<string>();
   const [selfImageOpen, setSelfImageOpen] = useState(false);
@@ -81,8 +82,12 @@ export function ImageThumbnail({
         "_feature_attachment",
         `location=${window.location.href}`
       );
+      return;
     }
-  }, [imageUrl, isCtrlMode]);
+    if (typeof index === "number") {
+      ctx?.onThumbnailClick?.(index);
+    }
+  }, [ctx, imageUrl, index, isCtrlMode]);
 
   return (
     <Image

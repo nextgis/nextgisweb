@@ -6,6 +6,7 @@ export class PanoramaStore {
 
   @action
   add(id: number, viewer: Viewer) {
+    if (this.viewers.get(id) === viewer) return;
     const viewers = new Map(this.viewers);
     viewers.set(id, viewer);
     this.viewers = viewers;

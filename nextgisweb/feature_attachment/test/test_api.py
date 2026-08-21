@@ -6,6 +6,8 @@ from zipfile import ZipFile
 
 import pytest
 import transaction
+from msgspec import UNSET
+from PIL import Image
 
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.json import dumpb
@@ -16,6 +18,7 @@ from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import FeatureAttachment
+from ..model import PanoramaMarker, PanoramaMeta
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -289,6 +292,150 @@ def test_import_image(
         assert obj.file_meta == {
             "timestamp": "2020-02-21T20:33:54",
             "panorama": {"ProjectionType": "equirectangular"},
+        }
+
+
+def _jpeg_with_xmp(xml: str) -> bytes:
+    header = '<?xpacket begin="\ufeff" id="W5M0MpCehiHzreSzNTczkc9d"?>'
+    footer = '<?xpacket end="w"?>'
+    img = Image.new("RGB", (360, 180), color="blue")
+    buf = BytesIO()
+    img.save(buf, "JPEG", xmp=(header + xml + footer).encode("utf-8"))
+    return buf.getvalue()
+
+
+def _get_xmp(panorama_nav: PanoramaMeta) -> str:
+    markers_xml = ""
+    if panorama_nav.markers != UNSET:
+        markers_xml = "".join(
+            f"""
+            <rdf:li rdf:parseType="Resource">
+                <ngw:target>{marker.target}</ngw:target>
+                <ngw:yaw>{marker.yaw}</ngw:yaw>
+                <ngw:pitch>{marker.pitch}</ngw:pitch>
+            </rdf:li>
+            """
+            for marker in panorama_nav.markers
+        )
+
+    return f"""
+        <x:xmpmeta xmlns:x="adobe:ns:meta/">
+            <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:Description rdf:about=""
+                    xmlns:GPano="http://ns.google.com/photos/1.0/panorama/"
+                    xmlns:ngw="https://nextgis.com/ns/ngw/panorama/1.0/"
+                >
+                    <GPano:ProjectionType>{panorama_nav.ProjectionType}</GPano:ProjectionType>
+                    <GPano:UsePanoramaViewer>True</GPano:UsePanoramaViewer>
+                    <GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels>
+                    <GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels>
+                    <GPano:CroppedAreaImageWidthPixels>360</GPano:CroppedAreaImageWidthPixels>
+                    <GPano:CroppedAreaImageHeightPixels>180</GPano:CroppedAreaImageHeightPixels>
+                    <GPano:FullPanoWidthPixels>360</GPano:FullPanoWidthPixels>
+                    <GPano:FullPanoHeightPixels>180</GPano:FullPanoHeightPixels>
+                    <ngw:id>{panorama_nav.id}</ngw:id>
+                    <ngw:markers>
+                        <rdf:Bag>
+                            {markers_xml}
+                        </rdf:Bag>
+                    </ngw:markers>
+                </rdf:Description>
+            </rdf:RDF>
+        </x:xmpmeta>
+    """
+
+
+def test_import_image_panorama_marker_single(
+    layer_id, clear, ngw_file_upload, ngw_webtest_app: WebTestApp
+):
+    markers = [
+        PanoramaMarker(
+            target="8d3073bb-73c1-42c1-9a16-19dcfbd60b31", yaw=-0.016862, pitch=0.000000
+        )
+    ]
+    xmp_data = _get_xmp(
+        PanoramaMeta(
+            ProjectionType="equirectangular",
+            id="9272cfae-80e2-42f6-909d-65e91a167865",
+            markers=markers,
+        )
+    )
+    img_data = _jpeg_with_xmp(xmp_data)
+
+    files = (dict(name="00003/image", content=img_data),)
+    upload_meta = generate_archive(files, ngw_file_upload)
+    resp = ngw_webtest_app.put(
+        f"/api/resource/{layer_id}/feature_attachment/import",
+        json={"source": upload_meta},
+        status=200,
+    )
+    assert resp.json == dict(imported=1, skipped=0)
+
+    with transaction.manager:
+        obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
+        assert obj.file_meta == {
+            "panorama": {
+                "ProjectionType": "equirectangular",
+                "id": "9272cfae-80e2-42f6-909d-65e91a167865",
+                "markers": [
+                    {
+                        "target": "8d3073bb-73c1-42c1-9a16-19dcfbd60b31",
+                        "yaw": -0.016862,
+                        "pitch": 0.0,
+                    },
+                ],
+            }
+        }
+
+
+def test_import_image_panorama_marker_multi(
+    layer_id, clear, ngw_file_upload, ngw_webtest_app: WebTestApp
+):
+    markers = [
+        PanoramaMarker(
+            target="eed2e59e-4cda-4390-9ef2-ce79a6d52e23", yaw=-3.251199, pitch=-0.110654
+        ),
+        PanoramaMarker(
+            target="de2f958d-da38-4b3f-8f99-2ee1d01b156f", yaw=-2.787465, pitch=-0.068417
+        ),
+    ]
+    xmp_data = _get_xmp(
+        PanoramaMeta(
+            ProjectionType="equirectangular",
+            id="75be5210-2f7a-4453-b3c2-cc0ede3b9b24",
+            markers=markers,
+        )
+    )
+    img_data = _jpeg_with_xmp(xmp_data)
+
+    files = (dict(name="00003/image", content=img_data),)
+    upload_meta = generate_archive(files, ngw_file_upload)
+    resp = ngw_webtest_app.put(
+        f"/api/resource/{layer_id}/feature_attachment/import",
+        json={"source": upload_meta},
+        status=200,
+    )
+    assert resp.json == dict(imported=1, skipped=0)
+
+    with transaction.manager:
+        obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
+        assert obj.file_meta == {
+            "panorama": {
+                "ProjectionType": "equirectangular",
+                "id": "75be5210-2f7a-4453-b3c2-cc0ede3b9b24",
+                "markers": [
+                    {
+                        "target": "eed2e59e-4cda-4390-9ef2-ce79a6d52e23",
+                        "yaw": -3.251199,
+                        "pitch": -0.110654,
+                    },
+                    {
+                        "target": "de2f958d-da38-4b3f-8f99-2ee1d01b156f",
+                        "yaw": -2.787465,
+                        "pitch": -0.068417,
+                    },
+                ],
+            }
         }
 
 

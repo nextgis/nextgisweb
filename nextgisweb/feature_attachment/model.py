@@ -7,7 +7,7 @@ from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-from msgspec import UNSET, Struct, UnsetType
+from msgspec import UNSET, Struct, UnsetType, to_builtins
 from PIL import Image, UnidentifiedImageError
 from PIL.Image import DecompressionBombError
 from sqlalchemy.dialects import postgresql as pg
@@ -31,6 +31,34 @@ Base.depends_on("resource", "feature_layer")
 
 
 KEYNAME_RE = re.compile(r"[a-z_][a-z0-9_]*", re.IGNORECASE)
+
+
+class PanoramaMarker(Struct, kw_only=True):
+    target: str
+    yaw: float
+    pitch: float
+
+
+class PanoramaMeta(Struct, kw_only=True):
+    ProjectionType: str
+    id: str | UnsetType = UNSET
+    markers: list[PanoramaMarker] | UnsetType = UNSET
+
+
+def _parse_panorama_markers(xmp_desc: dict) -> list[PanoramaMarker] | UnsetType:
+    raw_markers = xmp_desc.get("markers")
+    if not isinstance(raw_markers, dict):
+        return UNSET
+
+    items = raw_markers.get("Bag", {}).get("li", [])
+    if isinstance(items, dict):
+        items = [items]
+
+    markers = [
+        PanoramaMarker(target=item["target"], yaw=float(item["yaw"]), pitch=float(item["pitch"]))
+        for item in items
+    ]
+    return markers if markers else UNSET
 
 
 class FeatureAttachment(Base, FVersioningExtensionMixin):
@@ -114,7 +142,13 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
                     if isinstance(xmp_desc, list):
                         xmp_desc = xmp_desc[0] if len(xmp_desc) > 0 else {}
                     if projection := xmp_desc.get("ProjectionType"):
-                        _file_meta["panorama"] = {"ProjectionType": projection}
+                        _file_meta["panorama"] = to_builtins(
+                            PanoramaMeta(
+                                ProjectionType=projection,
+                                id=xmp_desc.get("id") or UNSET,
+                                markers=_parse_panorama_markers(xmp_desc),
+                            )
+                        )
         self.file_meta = _file_meta
 
     @property
