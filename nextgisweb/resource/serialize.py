@@ -25,7 +25,7 @@ class CRUTypes(Struct, frozen=True):
 
 
 @dict_registry
-class Serializer:
+class Serializer[R: model.Resource]:
     registry: ClassVar[DictRegistry[type[Serializer]]]
     identity: ClassVar[str]
     resclass: ClassVar[type[model.Resource]]
@@ -33,13 +33,17 @@ class Serializer:
     model_prefix: ClassVar[str | None]
     create: ClassVar[bool]
 
+    obj: R
+    user: User
+    data: Any
+
     def __init_subclass__(
         cls,
         *,
         resource: type[model.Resource],
         model_prefix: str | None = None,
         force_create: Literal[True] | None = None,
-    ):
+    ) -> None:
         super().__init_subclass__()
 
         cls.resclass = resource
@@ -60,14 +64,14 @@ class Serializer:
         cls.proptab = tuple(proptab)
         cls.create = create
 
-    @classmethod
-    def is_applicable(cls, obj: model.Resource) -> bool:
-        return isinstance(obj, cls.resclass)
-
-    def __init__(self, obj: model.Resource, user: User, data=None):
+    def __init__(self, obj: R, user: User, data: Any = None) -> None:
         self.obj = obj
         self.user = user
         self.data = dict() if data is None else data
+
+    @classmethod
+    def is_applicable(cls, obj: model.Resource) -> bool:
+        return isinstance(obj, cls.resclass)
 
     def serialize(self) -> None:
         for _, pv in self.proptab:
@@ -130,7 +134,7 @@ class Serializer:
         )
 
     @classmethod
-    def check_class_name(cls):
+    def check_class_name(cls) -> None:
         id_camel = re.sub(r"(?:^|_)(\w)", lambda m: m.group(1).upper(), cls.identity)
         expected = {f"{cls.resclass.__name__}Serializer", f"{id_camel}Serializer"}
 
@@ -139,10 +143,10 @@ class Serializer:
             warn(f"{cls_name} should have one of the following names: {', '.join(expected)}")
 
 
-class SAttribute:
+class SAttribute[S: Serializer]:
     ctypes: ClassVar[CRUTypes | None] = None
 
-    srlzrcls: type[Serializer]
+    srlzrcls: type[S]
     attrname: str
     model_attr: str
     types: CRUTypes
@@ -165,7 +169,7 @@ class SAttribute:
         write: Permission | None = None,
         required: bool | None = None,
         model_attr: str | None = None,
-    ):
+    ) -> None:
         self.read = read
         self.write = write
         self.required = required
@@ -174,31 +178,31 @@ class SAttribute:
             assert read is None or ct.read is not None
             assert write is None or ct.update is not None
 
-    def bind(self, srlzrcls: type[Serializer], attrname: str):
+    def bind(self, srlzrcls: type[S], attrname: str) -> None:
         self.srlzrcls = srlzrcls
         self.attrname = attrname
         if self.model_attr is None:
             self.model_attr = (srlzrcls.model_prefix or "") + attrname
         self.setup_types()
 
-    def setup_types(self):
+    def setup_types(self) -> None:
         if self.ctypes:
             self.types = self.ctypes
         else:
             self.types = CRUTypes(Any, Any, Any)
 
-    def readperm(self, srlzr: Serializer) -> bool:
+    def readperm(self, srlzr: S) -> bool:
         return False if ((perm := self.read) is None) else srlzr.has_permission(perm)
 
-    def writeperm(self, srlzr: Serializer) -> bool:
+    def writeperm(self, srlzr: S) -> bool:
         return False if ((perm := self.write) is None) else srlzr.has_permission(perm)
 
-    def serialize(self, srlzr: Serializer) -> None:
+    def serialize(self, srlzr: S) -> None:
         if self.readperm(srlzr):
             if (value := self.get(srlzr)) is not UNSET:
                 srlzr.data[self.attrname] = value
 
-    def deserialize(self, srlzr: Serializer) -> None:
+    def deserialize(self, srlzr: S) -> None:
         if self.writeperm(srlzr):
             value = getattr(srlzr.data, self.attrname)
             assert value is not UNSET
@@ -206,15 +210,25 @@ class SAttribute:
         else:
             raise AttributeUpdateForbidden(self)
 
-    def get(self, srlzr: Serializer) -> Any:
+    def get(self, srlzr: S) -> Any:
         return getattr(srlzr.obj, self.model_attr)
 
-    def set(self, srlzr: Serializer, value: Any, *, create: bool):
+    def set(self, srlzr: S, value: Any, *, create: bool) -> None:
         setattr(srlzr.obj, self.model_attr, value)
 
 
-def _type_from_signature(fn, param: Literal["value", "return"]) -> Any:
-    hints = get_type_hints(fn)
-    type = hints.get(param)
-    assert type is not None, f"type annotation missing: {param}"
-    return type
+def _type_from_signature(fn: object, param: Literal["value", "return"]) -> Any:
+    # We only need to resolve a single type annotation; other parameters,
+    # especially 'srlzr', may be unresolvable in this context. Therefore, we
+    # create a dummy function and copy the annotation of the parameter we need
+    # to resolve.
+
+    dummy = lambda value: None
+    dummy.__annotations__ = {"result": fn.__annotations__[param]}
+
+    globalns: dict[str, Any] = getattr(fn, "__globals__")
+    hints = get_type_hints(dummy, globalns=globalns)
+    result = hints.get("result")
+
+    assert result is not None, f"type annotation missing: {param}"
+    return result

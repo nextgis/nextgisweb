@@ -1,7 +1,7 @@
 from collections import namedtuple
+from collections.abc import Mapping
 from datetime import datetime
-from types import MappingProxyType
-from typing import Annotated, ClassVar, Literal
+from typing import TYPE_CHECKING, Annotated, ClassVar, Literal
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -31,20 +31,25 @@ from .serialize import CRUTypes, SAttribute, Serializer
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
-ResourceCls = Annotated[
-    Gap("ResourceCls", str),
-    TSExport("ResourceCls"),
-]
+if TYPE_CHECKING:
+    ResourceCls = str
+    ResourceInterfaceIdentity = str
+    ResourceScopeIdentity = str
+else:
+    ResourceCls = Annotated[
+        Gap("ResourceCls", str),
+        TSExport("ResourceCls"),
+    ]
 
-ResourceInterfaceIdentity = Annotated[
-    Gap("ResourceInterfaceIdentity", str),
-    TSExport("ResourceInterface"),
-]
+    ResourceInterfaceIdentity = Annotated[
+        Gap("ResourceInterfaceIdentity", str),
+        TSExport("ResourceInterface"),
+    ]
 
-ResourceScopeIdentity = Annotated[
-    Gap("ResourceScopeIdentity", str),
-    TSExport("ResourceScope"),
-]
+    ResourceScopeIdentity = Annotated[
+        Gap("ResourceScopeIdentity", str),
+        TSExport("ResourceScope"),
+    ]
 
 
 Base.depends_on("auth")
@@ -106,24 +111,23 @@ class ResourceMeta(orm.DeclarativeMeta):
             for s in bscope:
                 scope[s.identity] = s
 
-        setattr(cls, "scope", MappingProxyType(scope))
+        setattr(cls, "scope", scope)
         super().__init__(name, bases, nspc)
 
-        resource_registry.register(cls)
+        resource_registry.register(cls)  # ty: ignore[invalid-argument-type]
 
 
 ResourceScopeType = tuple[type[Scope], ...] | type[Scope]
 
 
 class Resource(Base, metaclass=ResourceMeta):
-    registry = resource_registry
-
     identity: ClassVar[str] = "resource"
     cls_display_name: ClassVar[TrStr] = gettext("Resource")
     cls_category: ClassVar[type[category.ResourceCategory]] = category.MiscellaneousCategory
     cls_order: ClassVar[int] = 100
 
     __scope__: ClassVar[ResourceScopeType] = (ResourceScope,)
+    scope: ClassVar[Mapping[str, Scope]]
 
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     cls: Mapped[str] = mapped_column(sa.Unicode)
@@ -450,30 +454,36 @@ class ResourceACLRule(Base):
         )
 
 
-class ClsAttr(SColumn):
+class ClsAttr(SColumn["ResourceSerializer"]):
     ctypes = CRUTypes(ResourceCls, ResourceCls, UnsetType)
 
-    def writeperm(self, srlzr):
+    def writeperm(self, srlzr: "ResourceSerializer") -> bool:
         return True
 
-    def get(self, srlzr) -> ResourceCls:
+    def get(self, srlzr: "ResourceSerializer") -> ResourceCls:
         return super().get(srlzr)
 
-    def set(self, srlzr, value: ResourceCls | UnsetType, *, create: bool):
+    def set(
+        self,
+        srlzr: "ResourceSerializer",
+        value: ResourceCls | UnsetType,
+        *,
+        create: bool,
+    ) -> None:
         assert create and value is not UNSET
         assert srlzr.obj.cls == value
 
 
-class ParentAttr(SResource):
-    def setup_types(self):
-        # Only the root has an empty parent, thus it cannot be set empty
+class ParentAttr(SResource["ResourceSerializer"]):
+    def setup_types(self) -> None:
         super().setup_types()
+        # Only the root has an empty parent, thus it cannot be set empty
         self.types = CRUTypes(ResourceRef, self.types.read, ResourceRef)
 
-    def writeperm(self, srlzr):
+    def writeperm(self, srlzr: "ResourceSerializer") -> bool:
         return True
 
-    def set(self, srlzr: Serializer, value, *, create: bool):
+    def set(self, srlzr: "ResourceSerializer", value, *, create: bool) -> None:
         old_parent = srlzr.obj.parent
         super().set(srlzr, value, create=create)
         new_parent = srlzr.obj.parent
@@ -513,11 +523,11 @@ class PrincipalRef(Struct, kw_only=True):
     id: int
 
 
-class OwnerUserAttr(SRelationship):
-    def get(self, srlzr) -> PrincipalRef:
+class OwnerUserAttr(SRelationship["ResourceSerializer"]):
+    def get(self, srlzr: "ResourceSerializer") -> PrincipalRef:
         return PrincipalRef(id=srlzr.obj.owner_user_id)
 
-    def set(self, srlzr, value: PrincipalRef, *, create: bool):
+    def set(self, srlzr: "ResourceSerializer", value: PrincipalRef, *, create: bool) -> None:
         if not srlzr.user.is_administrator:
             raise ForbiddenError("Membership in group 'administrators' required!")
         super().set(srlzr, value, create=create)
@@ -550,11 +560,11 @@ class ACLRule(Struct, kw_only=True):
         )
 
 
-class ACLAttr(SAttribute):
-    def get(self, srlzr) -> list[ACLRule]:
+class ACLAttr(SAttribute["ResourceSerializer"]):
+    def get(self, srlzr: "ResourceSerializer") -> list[ACLRule]:
         return [ACLRule.from_model(itm) for itm in srlzr.obj.acl]
 
-    def set(self, srlzr, value: list[ACLRule], *, create: bool):
+    def set(self, srlzr: "ResourceSerializer", value: list[ACLRule], *, create: bool) -> None:
         for r in list(srlzr.obj.acl):
             srlzr.obj.acl.remove(r)
 
@@ -591,31 +601,31 @@ class ACLAttr(SAttribute):
                     assert False
 
 
-class DescriptionAttr(SColumn):
+class DescriptionAttr(SColumn["ResourceSerializer"]):
     ctypes = CRUTypes(str | None, str | None, str | None)
 
-    def set(self, srlzr: Serializer, value: str | None, *, create: bool):
+    def set(self, srlzr: "ResourceSerializer", value: str | None, *, create: bool) -> None:
         if value is not None:
             value = sanitize(value)
         super().set(srlzr, value, create=create)
 
 
-class ChildrenAttr(SAttribute):
-    def get(self, srlzr) -> bool:
+class ChildrenAttr(SAttribute["ResourceSerializer"]):
+    def get(self, srlzr: "ResourceSerializer") -> bool:
         return len(srlzr.obj.children) > 0
 
 
-class InterfacesAttr(SAttribute):
-    def get(self, srlzr) -> list[ResourceInterfaceIdentity]:
+class InterfacesAttr(SAttribute["ResourceSerializer"]):
+    def get(self, srlzr: "ResourceSerializer") -> list[ResourceInterfaceIdentity]:
         return [i.getName() for i in srlzr.obj.provided_interfaces()]
 
 
-class ScopesAttr(SAttribute):
-    def get(self, srlzr) -> list[ResourceScopeIdentity]:
+class ScopesAttr(SAttribute["ResourceSerializer"]):
+    def get(self, srlzr: "ResourceSerializer") -> list[ResourceScopeIdentity]:
         return list(srlzr.obj.scope.keys())
 
 
-class ResourceSerializer(Serializer, resource=Resource):
+class ResourceSerializer(Serializer[Resource], resource=Resource):
     id = SColumn(read=ResourceScope.read, write=None)
     cls = ClsAttr(read=ResourceScope.read, write=ResourceScope.update, required=True)
     creation_date = SColumn(read=ResourceScope.read, write=None)
