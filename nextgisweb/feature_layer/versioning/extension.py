@@ -14,6 +14,7 @@ from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import or_ as sql_or
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.saext import mapper_table
 
 from ..interface import IVersionableFeatureLayer
 from .exception import VersioningContextRequired
@@ -63,7 +64,7 @@ class ExtensionQueries:
         self.has_id = hasattr(mapper, "extension_id")
         self.cols = mapper.fversioning_columns
         self.tables = VersioningTables(
-            mapper.__table__,
+            mapper_table(mapper),
             mapper.fversioning_etab,
             mapper.fversioning_htab,
         )
@@ -775,7 +776,7 @@ class FVersioningExtensionMixin:
 
         data_columns = [
             sa.Column(c.name, c.type, key=c.key, nullable=True)
-            for c in cls.__table__.columns
+            for c in mapper_table(cls).columns
             if c.key in cls.fversioning_columns
         ]
 

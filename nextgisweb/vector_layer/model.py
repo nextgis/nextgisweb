@@ -691,7 +691,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
 
 # Create vector_layer schema on table creation
 sa_event.listen(
-    VectorLayer.__table__,
+    saext.mapper_table(VectorLayer),
     "after_create",
     sa.DDL(f"CREATE SCHEMA {SCHEMA}"),
     propagate=True,
@@ -699,7 +699,7 @@ sa_event.listen(
 
 # Drop vector_layer schema on table creation
 sa_event.listen(
-    VectorLayer.__table__,
+    saext.mapper_table(VectorLayer),
     "after_drop",
     sa.DDL(f"DROP SCHEMA IF EXISTS {SCHEMA} CASCADE"),
     propagate=True,

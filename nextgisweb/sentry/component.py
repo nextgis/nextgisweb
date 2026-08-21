@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from nextgisweb.env import Component, DBSession
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
+from nextgisweb.lib.saext import mapper_table
 
 from nextgisweb.core.component import CoreComponent
 from nextgisweb.core.model import Setting
@@ -44,7 +45,7 @@ class SentryComponent(Component):
             send_default_pii=True,
         )
 
-        sc = Setting.__table__.columns
+        sc = mapper_table(Setting).columns
         qs = sa.select(sc.value).where(
             sc.component == "core",
             sc.name == "instance_id",

@@ -22,32 +22,33 @@ COMMENT ON TABLE core_storage_stat_delta IS 'core';
 
 CREATE INDEX ix_core_storage_stat_delta_resource_id ON core_storage_stat_delta(resource_id);
 
-CREATE FUNCTION core_storage_stat_delta_after_insert() RETURNS trigger
-        LANGUAGE 'plpgsql' AS $BODY$
-        BEGIN
-            PERFORM pg_advisory_xact_lock('core_storage_stat_delta_total'::regclass::int, 0);
+CREATE OR REPLACE FUNCTION core_storage_stat_delta_after_insert() RETURNS TRIGGER
+LANGUAGE 'plpgsql' AS $$
+BEGIN
+    PERFORM pg_advisory_xact_lock('core_storage_stat_delta_total'::regclass::int, 0);
 
-            UPDATE core_storage_stat_delta_total
-            SET tstamp = NEW.tstamp, value_data_volume = value_data_volume + NEW.value_data_volume
-            WHERE kind_of_data = NEW.kind_of_data;
+    UPDATE core_storage_stat_delta_total SET
+        tstamp = NEW.tstamp,
+        value_data_volume = value_data_volume + NEW.value_data_volume
+    WHERE kind_of_data = NEW.kind_of_data;
 
-            IF NOT found THEN
-                INSERT INTO core_storage_stat_delta_total (tstamp, kind_of_data, value_data_volume)
-                VALUES (NEW.tstamp, NEW.kind_of_data, NEW.value_data_volume);
-            END IF;
+    IF NOT found THEN
+        INSERT INTO core_storage_stat_delta_total (tstamp, kind_of_data, value_data_volume)
+        VALUES (NEW.tstamp, NEW.kind_of_data, NEW.value_data_volume);
+    END IF;
 
-            UPDATE core_storage_stat_delta_total
-            SET tstamp = NEW.tstamp, value_data_volume = value_data_volume + NEW.value_data_volume
-            WHERE kind_of_data = '';
+    UPDATE core_storage_stat_delta_total SET
+        tstamp = NEW.tstamp,
+        value_data_volume = value_data_volume + NEW.value_data_volume
+    WHERE kind_of_data = '';
 
-            IF NOT found THEN
-                INSERT INTO core_storage_stat_delta_total (tstamp, kind_of_data, value_data_volume)
-                VALUES (NEW.tstamp, '', NEW.value_data_volume);
-            END IF;
+    IF NOT found THEN
+        INSERT INTO core_storage_stat_delta_total (tstamp, kind_of_data, value_data_volume)
+        VALUES (NEW.tstamp, '', NEW.value_data_volume);
+    END IF;
 
-            RETURN NEW;
-        END
-        $BODY$;
+    RETURN NEW;
+END $$;
 
 CREATE TRIGGER after_insert AFTER INSERT
 ON

@@ -6,6 +6,7 @@ import sqlalchemy.orm as orm
 from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env.test import sql_compare
+from nextgisweb.lib.saext import mapper_table
 
 from nextgisweb.resource.test import ResourceAPI
 
@@ -51,7 +52,7 @@ def configure_mappers():
 @pytest.mark.parametrize("cls", [Simple, Complex])
 def test_ref_create_table(cls):
     sql = list()
-    for t in (cls.__table__, cls.fversioning_etab, cls.fversioning_htab):
+    for t in (mapper_table(cls), cls.fversioning_etab, cls.fversioning_htab):
         sql.append(sa.schema.CreateTable(t))
         for idx in t.indexes:
             sql.append(sa.schema.CreateIndex(idx))

@@ -24,6 +24,7 @@ from nextgisweb.env import Base, DBSession
 from nextgisweb.lib import saext
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
+from nextgisweb.lib.saext import mapper_table
 
 from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SAttribute, Serializer
 
@@ -446,14 +447,14 @@ class ResourceTileCache(Base):
 
 
 sa_event.listen(
-    ResourceTileCache.__table__,
+    mapper_table(ResourceTileCache),
     "after_create",
     sa.DDL("CREATE SCHEMA IF NOT EXISTS tile_cache"),
     propagate=True,
 )
 
 sa_event.listen(
-    ResourceTileCache.__table__,
+    mapper_table(ResourceTileCache),
     "after_drop",
     sa.DDL("DROP SCHEMA IF EXISTS tile_cache CASCADE"),
     propagate=True,

@@ -1,3 +1,4 @@
+from textwrap import dedent
 from typing import Annotated
 
 import sqlalchemy as sa
@@ -9,6 +10,7 @@ from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base, DBSession, gettext
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_wkt
+from nextgisweb.lib.saext import mapper_table
 
 from nextgisweb.auth import Permission
 from nextgisweb.core.exception import ValidationError
@@ -174,16 +176,17 @@ class SRS(Base):
         return bool(self.auth_name or self.auth_srid or self.catalog_id)
 
 
-# fmt: off
-sa_event.listen(SRS.__table__, "after_create", sa.DDL("""
+_sql_after_create = dedent("""
     CREATE OR REPLACE FUNCTION srs_spatial_ref_sys_sync() RETURNS TRIGGER
-    LANGUAGE 'plpgsql' AS $BODY$
+    LANGUAGE 'plpgsql' AS $$
     BEGIN
         IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
             -- Update existing spatial_ref_sys row
             UPDATE spatial_ref_sys SET
-            auth_name = NEW.auth_name, auth_srid = NEW.auth_srid,
-            srtext = NEW.wkt_short, proj4text = NEW.proj4
+                auth_name = NEW.auth_name,
+                auth_srid = NEW.auth_srid,
+                srtext = NEW.wkt_short,
+                proj4text = NEW.proj4
             WHERE srid = NEW.id;
 
             -- Insert if missing
@@ -199,23 +202,29 @@ sa_event.listen(SRS.__table__, "after_create", sa.DDL("""
             DELETE FROM spatial_ref_sys WHERE srid = OLD.id;
             RETURN OLD;
         END IF;
-
-    END
-    $BODY$;
+    END $$;
 
     TRUNCATE TABLE spatial_ref_sys;
 
     DROP TRIGGER IF EXISTS spatial_ref_sys ON srs;
     CREATE TRIGGER spatial_ref_sys AFTER INSERT OR UPDATE OR DELETE ON srs
         FOR EACH ROW EXECUTE PROCEDURE srs_spatial_ref_sys_sync();
+""")
 
-"""), propagate=True)
+sa_event.listen(
+    mapper_table(SRS),
+    "after_create",
+    sa.DDL(_sql_after_create),
+    propagate=True,
+)
 
 
-sa_event.listen(SRS.__table__, 'after_drop', sa.DDL("""
-    DROP FUNCTION IF EXISTS srs_spatial_ref_sys_sync();
-"""), propagate=True)
-# fmt: on
+sa_event.listen(
+    mapper_table(SRS),
+    "after_drop",
+    sa.DDL("DROP FUNCTION IF EXISTS srs_spatial_ref_sys_sync()"),
+    propagate=True,
+)
 
 
 class SRSMixin:

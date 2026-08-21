@@ -15,6 +15,7 @@ from zope.interface import classImplements
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib.datetime import utcnow_naive
+from nextgisweb.lib.saext import mapper_table
 
 from nextgisweb.auth import OnFindReferencesData, Principal, User
 from nextgisweb.resource import Resource
@@ -159,7 +160,7 @@ class FVersioningMeta(Base):
 # Sequence for versioning epoch, piggyback on LayerField's table
 VERSIONING_EPOCH_SEQ = "feature_layer_vmeta_epoch_seq"
 sa_event.listen(
-    FVersioningMeta.__table__,
+    mapper_table(FVersioningMeta),
     "after_create",
     sa.DDL(f"CREATE SEQUENCE {VERSIONING_EPOCH_SEQ}"),
     propagate=True,
