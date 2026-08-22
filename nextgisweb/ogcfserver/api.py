@@ -14,7 +14,7 @@ from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 
 from .component import OGCFServerComponent
-from .model import Service
+from .model import OGCFService
 
 CONFORMANCE = [
     "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
@@ -77,7 +77,7 @@ def dumper_factory(
     params=feature_layer_api.DumperParams(
         geom_format="geojson",
         dt_format="iso",
-        extensions="",
+        extensions=[],
         srs=4326,
     ),
 ):
@@ -551,7 +551,7 @@ def openapi(resource, request: Request) -> JSONType:
 
 
 def setup_pyramid(comp: OGCFServerComponent, config):
-    service_factory = ResourceFactory(context=Service)
+    service_factory = ResourceFactory(context=OGCFService)
 
     config.add_route(
         "ogcfserver.landing_page",

@@ -1,2 +1,2 @@
 from .component import OGCFServerComponent
-from .model import Collection, Service
+from .model import OGCFCollection, OGCFService

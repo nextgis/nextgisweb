@@ -4,7 +4,7 @@ from osgeo import gdal, gdalconst
 
 from nextgisweb.vector_layer import VectorLayer
 
-from ..model import Collection, Service
+from ..model import OGCFCollection, OGCFService
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
@@ -21,9 +21,9 @@ def vlayer_id(ngw_resource_group, ngw_data_path):
 @pytest.fixture(scope="module")
 def service_id(vlayer_id, ngw_resource_group):
     with transaction.manager:
-        obj = Service(
+        obj = OGCFService(
             collections=[
-                Collection(
+                OGCFCollection(
                     resource_id=vlayer_id,
                     keyname="test",
                     display_name="test",

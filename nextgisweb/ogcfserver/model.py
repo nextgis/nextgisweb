@@ -12,13 +12,13 @@ from nextgisweb.resource import Resource, ResourceGroup, SAttribute, Serializer,
 Base.depends_on("resource", "feature_layer")
 
 
-class Service(Resource):
+class OGCFService(Resource):
     identity = "ogcfserver_service"
     cls_display_name = gettext("OGC API Features service")
 
     __scope__ = ServiceScope
 
-    collections: Mapped[list["Collection"]] = orm.relationship(
+    collections: Mapped[list["OGCFCollection"]] = orm.relationship(
         cascade="all,delete-orphan",
         back_populates="service",
     )
@@ -28,7 +28,7 @@ class Service(Resource):
         return isinstance(parent, ResourceGroup)
 
 
-class Collection(Base):
+class OGCFCollection(Base):
     __tablename__ = "ogcfserver_collection"
 
     service_id: Mapped[int] = mapped_column(
@@ -41,7 +41,7 @@ class Collection(Base):
 
     __table_args__ = (sa.UniqueConstraint(service_id, keyname),)
 
-    service: Mapped[Service] = orm.relationship(
+    service: Mapped[OGCFService] = orm.relationship(
         foreign_keys=service_id,
         back_populates="collections",
     )
@@ -79,7 +79,7 @@ class CollectionsAttr(SAttribute):
                 co = m[cv.resource_id]
                 keep.add(cv.resource_id)
             else:
-                co = Collection(resource_id=cv.resource_id)
+                co = OGCFCollection(resource_id=cv.resource_id)
                 srlzr.obj.collections.append(co)
 
             for a in ("keyname", "display_name", "maxfeatures"):
@@ -90,5 +90,5 @@ class CollectionsAttr(SAttribute):
                 srlzr.obj.collections.remove(co)
 
 
-class ServiceSerializer(Serializer, resource=Service):
+class OGCFServiceSerializer(Serializer, resource=OGCFService):
     collections = CollectionsAttr(read=ServiceScope.connect, write=ServiceScope.configure)

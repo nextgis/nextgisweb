@@ -6,11 +6,11 @@ from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
 from .component import OGCFServerComponent
-from .model import Service
+from .model import OGCFService
 
 
 class ServiceWidget(Widget):
-    resource = Service
+    resource = OGCFService
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/ogcfserver/service-widget")
 
@@ -22,7 +22,7 @@ class OGCFServerLink(ExternalAccessLink):
     )
     docs_url = "docs_ngweb/source/layers.html#ogcfserver-service"
 
-    resource = Service
+    resource = OGCFService
 
     @classmethod
     def url_factory(cls, obj, request: Request) -> str:
