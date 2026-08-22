@@ -1,13 +1,13 @@
+from abc import ABC, abstractmethod
 from functools import partial
 from itertools import product
-from typing import Literal
+from typing import ClassVar, Literal
 
 import sqlalchemy as sa
 from msgspec import DecodeError, Struct
 from msgspec import field as msgspec_field
 from osgeo import ogr, osr
 from sqlalchemy.dialects.postgresql import JSONB
-from zope.interface import Attribute, Interface, implementer
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.json import dumps, loads
@@ -93,15 +93,15 @@ STRING_CAST_TYPES = (
 )
 
 
-class IExplorer(Interface):
-    identity = Attribute("Explorer identity")
+class FeatureExplorer(ABC):
+    identity: ClassVar[str]
 
-    def explore(self, feature):
+    @abstractmethod
+    def visit(self, feature) -> bool:
         """Explore feature and returns True if done"""
 
 
-@implementer(IExplorer)
-class GeomTypeExplorer:
+class GeomTypeExplorer(FeatureExplorer):
     identity = "geom_type"
 
     def __init__(self, geom_filter, params):
@@ -112,7 +112,7 @@ class GeomTypeExplorer:
         self.found_any = False
         self._params = params
 
-    def explore(self, feature):
+    def visit(self, feature) -> bool:
         self.explored_any = True
         geom = feature.GetGeometryRef()
         if geom is None:
@@ -165,15 +165,14 @@ class GeomTypeExplorer:
         return len(self.geom_filter) <= 1
 
 
-@implementer(IExplorer)
-class Int32RangeExplorer:
+class Int32RangeExplorer(FeatureExplorer):
     identity = "int32_range"
 
     def __init__(self, field_index):
         self.result_ok = True
         self._field_index = field_index
 
-    def explore(self, feature):
+    def visit(self, feature) -> bool:
         i = self._field_index
         if feature.IsFieldSet(i) and not feature.IsFieldNull(i):
             fid = feature.GetFieldAsInteger64(i)
@@ -183,8 +182,7 @@ class Int32RangeExplorer:
         return False
 
 
-@implementer(IExplorer)
-class UniquenessExplorer:
+class UniquenessExplorer(FeatureExplorer):
     identity = "unique"
 
     def __init__(self, field_index, field_type):
@@ -193,7 +191,7 @@ class UniquenessExplorer:
         self._field_getter = FIELD_GETTER[field_type]
         self._values = set()
 
-    def explore(self, feature):
+    def visit(self, feature) -> bool:
         i = self._field_index
         if not feature.IsFieldSet(i) or feature.IsFieldNull(i):
             self.result_ok = False
@@ -225,10 +223,16 @@ class OGRLoader:
 
         defn = ogrlayer.GetLayerDefn()
 
-        explorers = dict()
+        explorers = dict[str, FeatureExplorer]()
 
-        def add_explorer(cls, *args):
-            explorers[cls.identity] = cls(*args)
+        def add_explorer(explorer: FeatureExplorer) -> None:
+            explorers[explorer.identity] = explorer
+
+        def get_explorer[T: FeatureExplorer](cls: type[T]) -> T | None:
+            if not (result := explorers.get(cls.identity)):
+                return None
+            assert isinstance(result, cls)
+            return result
 
         # Geom type
 
@@ -262,7 +266,7 @@ class OGRLoader:
             geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ltype]
         elif len(geom_filter) > 1:
             # Can't determine single geometry type, need exploration
-            add_explorer(GeomTypeExplorer, geom_filter, params)
+            add_explorer(GeomTypeExplorer(geom_filter, params))
 
         # FID field
 
@@ -278,11 +282,11 @@ class OGRLoader:
                     if fld_type in (ogr.OFTInteger, ogr.OFTInteger64):
                         fid_field_index = idx
                         # Found FID field, should check for uniqueness
-                        add_explorer(UniquenessExplorer, fid_field_index, fld_type)
+                        add_explorer(UniquenessExplorer(fid_field_index, fld_type))
 
                         if fld_type == ogr.OFTInteger64:
                             # FID is int64, should check values for int32 range
-                            add_explorer(Int32RangeExplorer, fid_field_index)
+                            add_explorer(Int32RangeExplorer(fid_field_index))
                         break
 
         # Explore layer
@@ -292,7 +296,7 @@ class OGRLoader:
             for feature in ogrlayer:
                 _done_explore = set()
                 for explorer in _to_explore:
-                    if explorer.explore(feature):
+                    if explorer.visit(feature):
                         _done_explore.add(explorer)
                 if len(_to_explore) == len(_done_explore):
                     break
@@ -302,7 +306,7 @@ class OGRLoader:
 
         # Geom type
 
-        if gt_explorer := explorers.get(GeomTypeExplorer.identity):
+        if gt_explorer := get_explorer(GeomTypeExplorer):
             geom_filter = gt_explorer.geom_filter
 
             if params.cast_is_multi == TOGGLE.AUTO and not gt_explorer.is_multi:
@@ -315,7 +319,7 @@ class OGRLoader:
                 geometry_type = geom_filter.pop()
 
         if geometry_type is None:
-            gt_explorer = explorers.get(GeomTypeExplorer.identity)
+            gt_explorer = get_explorer(GeomTypeExplorer)
             if gt_explorer is not None and gt_explorer.explored_any and not gt_explorer.found_any:
                 geometry_type = GEOM_TYPE.NONE
             else:
@@ -325,7 +329,7 @@ class OGRLoader:
                         "The source layer contains no suitable features, or "
                         "contains features of different geometry types."
                     )
-                raise VE(message=err_msg)
+                raise VE(err_msg)
 
         # FID field
 
@@ -335,22 +339,19 @@ class OGRLoader:
             fid_defn = defn.GetFieldDefn(fid_field_index)
             fid_field_name = fid_defn.GetName()
 
-            if range_explorer := explorers.get(Int32RangeExplorer.identity):
+            if range_explorer := get_explorer(Int32RangeExplorer):
                 if not range_explorer.result_ok:
                     fid_field_ok = False
                     if params.fix_errors == FIX_ERRORS.NONE:
-                        raise VE(
-                            message=gettext("Field '%s' is out of int32 range.") % fid_field_name
-                        )
+                        m = gettext("Field '%s' is out of int32 range.")
+                        raise VE(m % fid_field_name)
 
-            if uniqueness_explorer := explorers.get(UniquenessExplorer.identity):
+            if uniqueness_explorer := get_explorer(UniquenessExplorer):
                 if not uniqueness_explorer.result_ok:
                     fid_field_ok = False
                     if params.fix_errors == FIX_ERRORS.NONE:
-                        raise VE(
-                            message=gettext("Field '%s' contains non-unique or empty values.")
-                            % fid_field_name
-                        )
+                        m = gettext("Field '%s' contains non-unique or empty values.")
+                        raise VE(m % fid_field_name)
 
             if fid_field_ok:
                 fid_field = LoaderField(
@@ -365,12 +366,11 @@ class OGRLoader:
             and params.fix_errors == FIX_ERRORS.NONE
         ):
             if len(params.fid_field) == 0:
-                raise VE(message=gettext("Parameter 'fid_field' is missing."))
+                raise VE(gettext("Parameter 'fid_field' is missing."))
+            elif not fid_field_found:
+                raise VE(gettext("Fields %s not found.") % str(params.fid_field))
             else:
-                if not fid_field_found:
-                    raise VE(message=gettext("Fields %s not found.") % params.fid_field)
-                else:
-                    raise VE(message=gettext("None of fields %s are integer.") % params.fid_field)
+                raise VE(gettext("None of fields %s are integer.") % str(params.fid_field))
 
         # Fields
 
@@ -384,7 +384,7 @@ class OGRLoader:
             fixed_fld_name = fix_encoding(fld_name)
 
             if fld_name != fixed_fld_name and params.fix_errors != FIX_ERRORS.LOSSY:
-                raise VE(message=gettext("Field '%s(?)' encoding is broken.") % fixed_fld_name)
+                raise VE(gettext("Field '%s(?)' encoding is broken.") % fixed_fld_name)
 
             if fixed_fld_name == "":
                 fixed_fld_name = "fld_1"
@@ -402,9 +402,7 @@ class OGRLoader:
                 try:
                     fld_type = FIELD_TYPE_2_ENUM[fld_type_ogr]
                 except KeyError:
-                    raise VE(
-                        message=gettext("Unsupported field type: %r.") % fld_defn.GetTypeName()
-                    )
+                    raise VE(gettext("Unsupported field type: %r.") % fld_defn.GetTypeName())
 
             fields[i] = LoaderField(i, fld_name, fld_type_ogr, fld_type)
 
@@ -415,7 +413,7 @@ class OGRLoader:
     def write(
         self,
         *,
-        srs: SRS | None,
+        srs: SRS,
         schema: str,
         table: str,
         sequence: str,
@@ -458,11 +456,11 @@ class OGRLoader:
 
         tab_sn = f"{schema}.{table}"
         seq_sn = f"{schema}.{sequence}"
-        nextval = sa.text(f"nextval('{seq_sn}')")
+        nextval = sa.literal_column(f"nextval('{seq_sn}')")
 
         fields = []
         vcolumns = [sa.column("id")]
-        qparams = dict(id=sa.bindparam("id") if self.fid_field else nextval)
+        qparams = dict[str, sa.ColumnElement](id=sa.bindparam("id") if self.fid_field else nextval)
 
         if not none_geom:
             vcolumns.append(sa.column("geom"))
@@ -574,9 +572,7 @@ class OGRLoader:
                 if detail != "":
                     detail += "\n"
                 detail += "* " + err
-            raise VE(
-                message=gettext("Vector layer cannot be written due to errors."), detail=detail
-            )
+            raise VE(gettext("Vector layer cannot be written due to errors."), detail=detail)
 
         insert_feature(flush=True)
         size = static_size * feature_count + dynamic_size
@@ -754,6 +750,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                     geom.RemoveGeometry(part_idx)
                 else:
                     geom = None
+                    break
 
     return geom
 

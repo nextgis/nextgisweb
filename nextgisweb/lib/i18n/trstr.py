@@ -27,7 +27,7 @@ class Translator(Protocol):
 
 TranslatableOrStr = Translatable | str
 ModScalar = int | float | TranslatableOrStr
-ModArgument = ModScalar | tuple[ModScalar] | Mapping[str, ModScalar]
+ModArgument = ModScalar | tuple[ModScalar, ...] | Mapping[str, ModScalar]
 
 
 class TrStr(Translatable):
