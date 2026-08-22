@@ -4,7 +4,7 @@ from contextlib import closing
 from functools import lru_cache
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-from typing import ClassVar
+from typing import ClassVar, Self
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
@@ -230,48 +230,57 @@ class Tileset(Resource, SpatialLayerMixin):
 
 @list_registry
 class FileFormat:
-    registry: ClassVar[ListRegistry[type["FileFormat"]]]
+    registry: ClassVar[ListRegistry[type[Self]]]
 
-    pattern: re.Pattern
-    offset_z: int = 0
+    pattern: ClassVar[str]
+    z_offset: ClassVar[int] = 0
+
+    pattern_re: ClassVar[re.Pattern]
+    pattern_ext: ClassVar[bool]
+
+    filename: str
+    prefix: str
+    ext: tuple[str, ...] | None
 
     def __init_subclass__(cls):
-        cls.pattern = re.compile(cls.pattern)
+        cls.pattern_re = re.compile(cls.pattern)
+        cls.pattern_ext = "ext" in cls.pattern_re.groupindex
 
-    def __new__(cls, filename):
-        if match := cls.pattern.match(filename):
-            obj = super().__new__(cls)
-            obj.filename = filename
-            obj.prefix = match["prefix"]
-            if "ext" in cls.pattern.groupindex:
-                ext = match["ext"].lower()
-                if ext in JPEG_EXTS:
-                    obj.ext = JPEG_EXTS
-                else:
-                    obj.ext = (ext,)
+    @classmethod
+    def try_file(cls, filename: str) -> Self | None:
+        if not (match := cls.pattern_re.match(filename)):
+            return
+
+        obj = super().__new__(cls)
+        obj.filename = filename
+        obj.prefix = match["prefix"]
+        if cls.pattern_ext:
+            ext = match["ext"].lower()
+            if ext in JPEG_EXTS:
+                obj.ext = JPEG_EXTS
             else:
-                obj.ext = None
-            return obj
+                obj.ext = (ext,)
+        else:
+            obj.ext = None
+        return obj
 
-    def get_tile(self, filename):
-        if match := self.pattern.match(filename):
-            if match["prefix"] != self.prefix:
-                raise ValidationError(
-                    message=gettextf(
-                        "Tiles '{}' and '{}' are located in different subdirectories."
-                    )(self.filename, filename)
-                )
-            if self.ext is not None and match["ext"].lower() not in self.ext:
-                raise ValidationError(
-                    message=gettextf("Tiles '{}' and '{}' have different extensions.")(
-                        self.filename, filename
-                    )
-                )
-            return (
-                int(match["z"]) + self.offset_z,
-                int(match["x"]),
-                int(match["y"]),
-            )
+    def get_tile(self, filename: str) -> tuple[int, int, int] | None:
+        if not (match := self.pattern_re.match(filename)):
+            return
+
+        if match["prefix"] != self.prefix:
+            mf = gettextf("Tiles '{}' and '{}' are located in different subdirectories.")
+            raise ValidationError(message=mf(self.filename, filename))
+
+        if self.ext is not None and match["ext"].lower() not in self.ext:
+            mf = gettextf("Tiles '{}' and '{}' have different extensions.")
+            raise ValidationError(message=(mf(self.filename, filename)))
+
+        return (
+            int(match["z"]) + self.z_offset,
+            int(match["x"]),
+            int(match["y"]),
+        )
 
 
 class XYZ(FileFormat):
@@ -280,7 +289,7 @@ class XYZ(FileFormat):
 
 class SASPlanet(FileFormat):
     pattern = r"^(?P<prefix>.*/)?z(?P<z>\d+)/\d+/x(?P<x>\d+)/\d+/y(?P<y>\d+)\.(?:png)$"
-    offset_z = -1
+    z_offset = -1
 
 
 def read_file(fn):
@@ -293,7 +302,7 @@ def read_file(fn):
                 filename = info.filename.replace("\\", "/")  # Fix wrong separator issues
                 if fmt is None:
                     for candidate in FileFormat.registry:
-                        if _fmt := candidate(filename):
+                        if _fmt := candidate.try_file(filename):
                             fmt = _fmt
                             break
                     else:
@@ -327,8 +336,8 @@ def read_file(fn):
     raise ValidationError(message=gettext("Unsupported data format."))
 
 
-class SourceAttr(SAttribute):
-    def set(self, srlzr, value: FileUploadRef, *, create: bool):
+class SourceAttr(SAttribute["TilesetSerializer"]):
+    def set(self, srlzr: "TilesetSerializer", value: FileUploadRef, *, create: bool):
         if srlzr.obj.id is not None:
             CoreComponent.current().reserve_storage(
                 COMP_ID,
@@ -412,7 +421,7 @@ class SourceAttr(SAttribute):
 
         srlzr.obj.tileset_zmin = zmin
         srlzr.obj.tileset_zmax = zmax
-        srlzr.obj.tileset_ntiles = tuple(
+        srlzr.obj.tileset_ntiles = list(
             (stat[z][4] if z in stat else 0) for z in range(zmin, zmax + 1)
         )
 
@@ -430,7 +439,7 @@ class SourceAttr(SAttribute):
         srlzr.obj.maxy = _maxy
 
 
-class TilesetSerializer(Serializer, resource=Tileset):
+class TilesetSerializer(Serializer[Tileset], resource=Tileset):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
     source = SourceAttr(write=DataScope.write)
     zmin = SColumn(read=ResourceScope.read, model_attr="tileset_zmin")
