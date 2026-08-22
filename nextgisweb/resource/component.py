@@ -122,19 +122,36 @@ class ResourceComponent(Component):
     def initialize_db(self):
         core = self.env.component(CoreComponent)
 
-        adminusr = User.filter_by(keyname="administrator").one()
-        admingrp = Group.filter_by(keyname="administrators").one()
+        user_administrator = User.filter_by(keyname="administrator").one()
+        user_authenticated = User.filter_by(keyname="authenticated").one()
+        group_administrators = Group.filter_by(keyname="administrators").one()
 
         try:
             ResourceGroup.filter_by(id=0).one()
         except NoResultFound:
             obj = ResourceGroup(
                 id=0,
-                owner_user=adminusr,
+                owner_user=user_administrator,
                 display_name=core.localizer().translate(gettext("Main resource group")),
             )
 
-            obj.acl.append(ACLRule(principal=admingrp, action="allow"))
+            obj.acl.extend(
+                (
+                    ACLRule(
+                        action="allow",
+                        principal=group_administrators,
+                        permission="",
+                        propagate=True,
+                    ),
+                    ACLRule(
+                        principal=user_authenticated,
+                        action="allow",
+                        scope=ResourceScope.identity,
+                        permission=ResourceScope.read.name,
+                        propagate=False,
+                    ),
+                )
+            )
 
             obj.persist()
 

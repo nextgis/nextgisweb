@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Table } from "@nextgisweb/gui/antd";
+import { Alert, Button, Table, Typography } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { isAbortError } from "@nextgisweb/gui/error";
@@ -23,17 +23,31 @@ import { RenderActions } from "./component/RenderActions";
 import type { ChildrenResource } from "./type";
 import { prepareResourceChildren } from "./util/prepareResourceChildren";
 
+import FeedbackIcon from "@nextgisweb/icon/material/feedback";
+import LockPersonIcon from "@nextgisweb/icon/material/lock_person";
+
 import "./ResourceSectionChildren.less";
 
+/* prettier-ignore */ const
+msgNoAccessTitle = gettext("No access to resources"),
+msgNoAccessAuthDesc = gettext("You do not have permission to view resources here. Access may have been intentionally restricted or configured incorrectly. If you believe you should have access, please contact Web GIS administrator."),
+msgNoAccessGuestDesc = gettext("You are not authorized. Sign in to check whether you have access to resources here, or contact Web GIS administrator for more information."),
+msgContactAdministrator = gettext("Contact Web GIS administrator");
+
 const { Column } = Table;
+const { Paragraph } = Typography;
 
 const storageEnabled = pyramidSettings.storage.enabled;
 
-export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
+export function ResourceSectionChildren({
+  resourceId,
+  resourceData,
+}: ResourceSectionProps) {
   const [volumeVisible, setVolumeVisible] = useState(false);
   const [creationDateVisible, setCreationDateVisible] = useState(false);
   const [batchDeletingInProgress, setBatchDeletingInProgress] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const [hasVisible, setHasVisible] = useState(false);
   const [allowBatch, setAllowBatch] = useState(false);
   const [volumeValues, setVolumeValues] = useState<Record<number, number>>({});
   const [dataSource, setDataSource] = useState<ChildrenResource[]>([]);
@@ -67,6 +81,7 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
         })) as DefaultResourceAttrItem[];
 
         setAttrItems(items);
+        setHasVisible(!!items.length);
       } catch (err) {
         if (isAbortError(err)) {
           return;
@@ -119,8 +134,36 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
       : undefined;
   }, [allowBatch, selected, batchDeletingInProgress]);
 
-  if (!dataSource.length) {
-    return;
+  const hasChildren = resourceData.resource.children;
+
+  if (isDataLoading || (!hasVisible && !hasChildren && resourceId !== 0)) {
+    return <></>;
+  } else if (hasChildren && !hasVisible) {
+    return (
+      <Alert
+        type="warning"
+        icon={<LockPersonIcon />}
+        showIcon={true}
+        title={msgNoAccessTitle}
+        description={
+          <>
+            <Paragraph>
+              {ngwConfig.isGuest ? msgNoAccessGuestDesc : msgNoAccessAuthDesc}
+            </Paragraph>
+            {(!ngwConfig.isAdministrator || ngwConfig.isGuest) &&
+              pyramidSettings.contactAdministratorUrl && (
+                <Button
+                  icon={<FeedbackIcon />}
+                  href={pyramidSettings.contactAdministratorUrl}
+                  target="_blank"
+                >
+                  {msgContactAdministrator}
+                </Button>
+              )}
+          </>
+        }
+      />
+    );
   }
 
   return (
