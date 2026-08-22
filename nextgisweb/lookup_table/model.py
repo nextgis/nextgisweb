@@ -1,11 +1,12 @@
 from enum import Enum
-from typing import Literal
+from typing import TYPE_CHECKING
 
 from msgspec import UNSET, UnsetType
 from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
+from nextgisweb.lib.apitype import make_literal
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.resource import (
@@ -75,7 +76,7 @@ def sort_items(items, sort, order):
     return sorted(items, key=lambda p: p[idx], reverse=reverse)
 
 
-Sort = Literal[tuple(i.value for i in SortEnum)]
+Sort = str if TYPE_CHECKING else make_literal(i.value for i in SortEnum)
 
 
 class SortAttr(SColumn):

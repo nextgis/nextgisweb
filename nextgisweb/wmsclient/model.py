@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import requests
@@ -18,6 +18,7 @@ from zope.interface import implementer
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
+from nextgisweb.lib.apitype import make_literal
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.pilhelper import reproject_render
@@ -204,10 +205,14 @@ class UrlAttr(SColumn):
         return super().set(srlzr, value, create=create)
 
 
-VersionEnum = Annotated[
-    Literal[tuple(WMS_VERSIONS)],
-    TSExport("VersionEnum"),
-]
+VersionEnum = (
+    str
+    if TYPE_CHECKING
+    else Annotated[
+        make_literal(WMS_VERSIONS),
+        TSExport("VersionEnum"),
+    ]
+)
 
 
 class VersionAttr(SColumn):

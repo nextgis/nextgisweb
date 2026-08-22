@@ -5,4 +5,12 @@ from .primitive import StringDecoder
 from .query_string import QueryString
 from .schema import AnyOf, AsJSON, DatetimeNaive, Gap, JSONType, XMLType, fillgap, iter_anyof
 from .struct import struct_items
-from .util import EmptyObject, annotate, disannotate, msgspec_metadata, unannotate
+from .util import (
+    EmptyObject,
+    annotate,
+    disannotate,
+    make_literal,
+    make_union,
+    msgspec_metadata,
+    unannotate,
+)

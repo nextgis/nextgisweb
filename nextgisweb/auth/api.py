@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated
 
 import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
@@ -14,6 +14,7 @@ from nextgisweb.lib.apitype import (
     DatetimeNaive,
     EmptyObject,
     StatusCode,
+    make_literal,
     struct_items,
 )
 
@@ -263,11 +264,14 @@ def deserialize_principal(
     return updated
 
 
-if TYPE_CHECKING:
-    PermissionItem = str
-else:
-    identities = Permission.registry.keys()
-    PermissionItem = Annotated[Literal[tuple(identities)], TSExport("Permission")]
+PermissionItem = (
+    str
+    if TYPE_CHECKING
+    else Annotated[
+        make_literal(Permission.registry.keys()),
+        TSExport("Permission"),
+    ]
+)
 
 
 class UserRef(Struct, kw_only=True):

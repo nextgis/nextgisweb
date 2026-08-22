@@ -1,7 +1,7 @@
 import re
 from datetime import date, datetime, time
 from io import BytesIO
-from typing import Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import requests
 import sqlalchemy as sa
@@ -16,6 +16,7 @@ from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, gettext
 from nextgisweb.lib import saext
+from nextgisweb.lib.apitype import make_literal
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.ows import FIELD_TYPE_WFS
@@ -454,10 +455,14 @@ class PathAttr(SColumn):
         return super().set(srlzr, value, create=create)
 
 
-VersionEnum = Annotated[
-    Literal[tuple(WFS_VERSIONS_SUPPORTED)],
-    TSExport("VersionEnum"),
-]
+VersionEnum = (
+    str
+    if TYPE_CHECKING
+    else Annotated[
+        make_literal(WFS_VERSIONS_SUPPORTED),
+        TSExport("VersionEnum"),
+    ]
+)
 
 
 class VersionAttr(SColumn):

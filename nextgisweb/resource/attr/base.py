@@ -1,7 +1,9 @@
-from typing import TYPE_CHECKING, Any, ClassVar, Protocol, Self, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, Self
 
 from msgspec import Struct, UnsetType, defstruct
 from typing_extensions import get_annotations
+
+from nextgisweb.lib.apitype import make_union
 
 from nextgisweb.auth import User
 from nextgisweb.resource.scope import ResourceScope
@@ -41,7 +43,7 @@ class ResourceAttr(Struct, array_like=True):
     @staticmethod
     def argument_type() -> Any:
         """Union of all registered attribute types"""
-        return Union[tuple(ResourceAttr.registry)]
+        return make_union(ResourceAttr.registry)
 
     @staticmethod
     def helper_struct() -> type[Struct]:

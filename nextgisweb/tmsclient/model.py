@@ -1,6 +1,6 @@
 import re
 from io import BytesIO
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -12,6 +12,7 @@ from zope.interface import implementer
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
+from nextgisweb.lib.apitype import make_literal
 from nextgisweb.lib.osrhelper import sr_from_epsg
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
@@ -96,7 +97,7 @@ class UrlTemplateAttr(SColumn):
 
 
 Capmode = Literal["nextgis_geoservices"] | None
-Scheme = Literal[tuple(SCHEME.enum)]
+Scheme = str if TYPE_CHECKING else make_literal(SCHEME.enum)
 
 
 class CapmodeAttr(SColumn):

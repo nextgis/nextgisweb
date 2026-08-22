@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import Struct
 
+from nextgisweb.lib.apitype import make_literal
 from nextgisweb.lib.apitype.util import is_enum_type
 from nextgisweb.lib.msext import DEPRECATED
 
@@ -38,7 +39,7 @@ class SColumn[S: Serializer](SAttribute[S]):
 
                 col_type = self.column.type
                 if isinstance(col_type, sa.Enum):
-                    type = Literal[tuple(col_type.enums)]  # ty: ignore[invalid-type-form]
+                    type = make_literal(col_type.enums)
 
             if self.column.nullable:
                 type = type | None

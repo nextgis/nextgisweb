@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Annotated, ClassVar
+from typing import TYPE_CHECKING, Annotated, ClassVar
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import Gap
@@ -10,10 +10,14 @@ from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 from nextgisweb.jsrealm import TSExport
 
-ResourceCategoryIdentity = Annotated[
-    Gap("ResourceCategoryIdentity", str),
-    TSExport("ResourceCategoryIdentity"),
-]
+ResourceCategoryIdentity = (
+    str
+    if TYPE_CHECKING
+    else Annotated[
+        Gap("ResourceCategoryIdentity", str),
+        TSExport("ResourceCategoryIdentity"),
+    ]
+)
 
 
 @dict_registry

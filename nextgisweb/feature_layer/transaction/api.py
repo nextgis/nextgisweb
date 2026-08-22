@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Any, Union
+from typing import TYPE_CHECKING, Annotated, Any
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.apitype import AsJSON
+from nextgisweb.lib.apitype import AsJSON, make_union
 from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.pyramid.tomb import Request
@@ -102,12 +102,18 @@ NullOperation = Annotated[
     ),
 ]
 
-InputType = Any
-ResultType = Any
+InputType = (
+    Any
+    if TYPE_CHECKING
+    else make_union(
+        (
+            *OperationExecutor.input_types.values(),
+            NullOperation,
+        )
+    )
+)
 
-if not TYPE_CHECKING:
-    InputType = Union[tuple(OperationExecutor.input_types.values()) + (NullOperation,)]
-    ResultType = Union[tuple(OperationExecutor.result_types.values())]
+ResultType = Any if TYPE_CHECKING else make_union(OperationExecutor.result_types.values())
 
 
 def iget(txn: Transaction, request: Request) -> AsJSON[list[tuple[SeqNum, ResultType]]]:
@@ -143,9 +149,7 @@ def idelete(txn, request: Request) -> AsJSON[None]:
     return None
 
 
-ErrorType = type[Struct]
-if not TYPE_CHECKING:
-    ErrorType = Union[tuple(OperationError.registry)]
+ErrorType = Struct if TYPE_CHECKING else make_union(OperationError.registry)
 
 
 class CommitErrors(Struct, kw_only=True, tag="errors", tag_field="status"):

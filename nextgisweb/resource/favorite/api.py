@@ -1,12 +1,11 @@
 from datetime import datetime
 from inspect import Parameter, signature
-from typing import Annotated, Union
 
 from msgspec import UNSET, Struct, UnsetType, to_builtins
 from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.apitype import AsJSON, EmptyObject
+from nextgisweb.lib.apitype import AsJSON, EmptyObject, annotate, make_union
 from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.jsrealm import TSExport
@@ -170,10 +169,10 @@ def setup_pyramid(comp: ResourceComponent, config):
         get=schema,
     )
 
-    cpost_body = Annotated[
-        Union[tuple(v.ctype for v in ResourceFavorite.registry.values())],
-        TSExport(ResourceFavoriteCreate.__name__),
-    ]
+    cpost_body = annotate(
+        make_union(v.ctype for v in ResourceFavorite.registry.values()),
+        [TSExport(ResourceFavoriteCreate.__name__)],
+    )
 
     cpost_sig = signature(cpost)
     cpost.__signature__ = cpost_sig.replace(

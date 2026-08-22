@@ -1,11 +1,10 @@
 import re
-from typing import Literal
 
 import sqlalchemy as sa
 from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext, require
-from nextgisweb.lib.apitype import fillgap
+from nextgisweb.lib.apitype import fillgap, make_literal
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
@@ -31,10 +30,25 @@ class ResourceComponent(Component):
     def __init__(self, env, settings):
         super().__init__(env, settings)
 
-        fillgap(ResourceCls, Literal[tuple(resource_registry.keys())])
-        fillgap(ResourceInterfaceIdentity, Literal[tuple(i.__name__ for i in interface_registry)])
-        fillgap(ResourceScopeIdentity, Literal[tuple(ResourceScope.registry.keys())])
-        fillgap(ResourceCategoryIdentity, Literal[tuple(ResourceCategory.registry.keys())])
+        fillgap(
+            ResourceCls,
+            make_literal(resource_registry.keys()),
+        )
+
+        fillgap(
+            ResourceInterfaceIdentity,
+            make_literal(i.__name__ for i in interface_registry),
+        )
+
+        fillgap(
+            ResourceScopeIdentity,
+            make_literal(ResourceScope.registry.keys()),
+        )
+
+        fillgap(
+            ResourceCategoryIdentity,
+            make_literal(ResourceCategory.registry.keys()),
+        )
 
     def initialize(self):
         super().initialize()

@@ -1,7 +1,7 @@
 import os
 import tempfile
 from io import DEFAULT_BUFFER_SIZE
-from typing import Annotated, Literal
+from typing import TYPE_CHECKING, Annotated
 
 from msgspec import Meta, Struct
 from osgeo import gdal
@@ -9,7 +9,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileIter, FileResponse, Response
 
 from nextgisweb.env import gettext
-from nextgisweb.lib.apitype import AnyOf, ContentType, Query, StatusCode
+from nextgisweb.lib.apitype import AnyOf, ContentType, Query, StatusCode, make_literal
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import XMLType, client_setting
@@ -23,6 +23,8 @@ from .gdaldriver import EXPORT_FORMAT_GDAL
 from .model import RasterLayer
 from .util import msg_supported_formats
 
+ExportFormat = str if TYPE_CHECKING else make_literal(EXPORT_FORMAT_GDAL.keys())
+
 
 class ExportParams(Struct, kw_only=True):
     srs: Annotated[int | None, Meta(description="SRS ID")] = None
@@ -31,7 +33,7 @@ class ExportParams(Struct, kw_only=True):
         Meta(description="list of bands"),
     ] = None
     format: Annotated[
-        Literal[tuple(EXPORT_FORMAT_GDAL)],
+        ExportFormat,
         Meta(description="Output format"),
     ] = "GTiff"
 

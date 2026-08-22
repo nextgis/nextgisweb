@@ -1,12 +1,12 @@
 from collections import defaultdict
-from typing import TYPE_CHECKING, Annotated, Any, Literal, cast
+from typing import TYPE_CHECKING, Annotated, Any, cast
 
 import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, defstruct
 from typing_extensions import get_annotations
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.apitype import Gap, fillgap
+from nextgisweb.lib.apitype import Gap, fillgap, make_literal
 
 from nextgisweb.auth import User
 from nextgisweb.pyramid.tomb import Configurator, Request
@@ -157,7 +157,7 @@ def setup_pyramid(comp: ResourceComponent, config: Configurator):
     for scope_cls in Scope.registry.values():
         for perm in scope_cls.values():
             permissions.append(f"{scope_cls.identity}.{perm.name}")
-    fillgap(ResourcePermissionGap, Literal[tuple(permissions)])
+    fillgap(ResourcePermissionGap, make_literal(permissions))
 
     comp.env.component(PyramidComponent).client_type(ResourceAttr.helper_struct())
 

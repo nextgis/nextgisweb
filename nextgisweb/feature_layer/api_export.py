@@ -10,7 +10,7 @@ from pyramid.response import FileResponse, Response
 from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import gettext, gettextf
-from nextgisweb.lib.apitype import ContentType, Query
+from nextgisweb.lib.apitype import ContentType, Query, make_literal
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 
 from nextgisweb.core.exception import ValidationError
@@ -130,13 +130,14 @@ class ExportOptions(Struct):
         return opts
 
 
-if TYPE_CHECKING:
-    ExportFormat = Literal["GPKG", "GeoJSON"]
-else:
-    ExportFormat = Annotated[
-        Literal[tuple(EXPORT_FORMAT_OGR.keys())],
+ExportFormat = (
+    Literal["GPKG", "GeoJSON"]
+    if TYPE_CHECKING
+    else Annotated[
+        make_literal(EXPORT_FORMAT_OGR.keys()),
         Meta(description="Output format"),
     ]
+)
 
 
 class ExportParams(Struct, kw_only=True):

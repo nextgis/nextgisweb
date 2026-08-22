@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NewType, Union
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, NewType
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.response import Response
@@ -16,7 +16,10 @@ from nextgisweb.lib.apitype import (
     EmptyObject,
     Gap,
     StatusCode,
+    annotate,
     fillgap,
+    make_literal,
+    make_union,
 )
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.imptool import module_from_stack
@@ -39,12 +42,16 @@ from .util import gensecret, restart_delayed
 LOGO_MAX_SIZE = 128 * (1 << 10)  # 128 KB
 
 
-SettingsComponentGap = Annotated[
-    Gap("SettingsComponentGap", str),
-    Meta(description="Component identity"),
-]
+SettingsComponentGap = (
+    str
+    if TYPE_CHECKING
+    else Annotated[
+        Gap("SettingsComponentGap", str),
+        Meta(description="Component identity"),
+    ]
+)
 
-SettingsResponseTypedGap = Gap("SettingsResponseTypedGap", type[Struct])
+SettingsResponseTypedGap = Struct if TYPE_CHECKING else Gap("SettingsResponseTypedGap", Struct)
 SettingsResponseUntyped = NewType("SettingsResponseUntyped", dict[str, Any])
 
 
@@ -78,15 +85,15 @@ def setup_pyramid_client_settings(comp: PyramidComponent, config):
 
     fillgap(
         SettingsComponentGap,
-        Literal[comp_ids],
+        make_literal(comp_ids),
     )
 
     fillgap(
         SettingsResponseTypedGap,
-        Annotated[
-            Union[tuple(struct_types.values())],
-            TSExport("PyramidSettingsResponseTyped"),
-        ],
+        annotate(
+            make_union(struct_types.values()),
+            [TSExport("PyramidSettingsResponseTyped")],
+        ),
     )
 
     comp._client_settings_struct_types = struct_types
@@ -449,7 +456,7 @@ def setup_pyramid_csettings(comp: PyramidComponent, config):
         read[cid] = {k: v.read for k, v in sitems}
         write[cid] = {k: v.write for k, v in sitems}
 
-        cslit = Literal[("all",) + tuple(stngs)]
+        cslit = make_literal(("all", *stngs))
         cstype = Annotated[
             list[Annotated[cslit, TSExport(f"{basename}CSetting", component=cid)]],
             Meta(description=f"{basename} component settings to read"),

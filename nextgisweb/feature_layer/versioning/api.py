@@ -2,7 +2,7 @@ from base64 import urlsafe_b64decode, urlsafe_b64encode
 from collections.abc import Generator
 from datetime import datetime, timedelta
 from itertools import islice
-from typing import TYPE_CHECKING, Annotated, Literal, Union
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import sqlalchemy as sa
 from msgspec import Meta, Struct
@@ -11,7 +11,14 @@ from msgspec.msgpack import encode as msgspec_encode
 from pyramid.httpexceptions import HTTPNoContent
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.apitype import AnyOf, AsJSON, DatetimeNaive, StatusCode
+from nextgisweb.lib.apitype import (
+    AnyOf,
+    AsJSON,
+    DatetimeNaive,
+    StatusCode,
+    make_literal,
+    make_union,
+)
 
 from nextgisweb.auth.api import UserReadBrief, UserRef, serialize_principal
 from nextgisweb.pyramid.tomb import Request
@@ -81,10 +88,14 @@ class ChangesCursor(Struct, kw_only=True, array_like=True):
         return msgspec_decode(mp, type=ChangesCursor)
 
 
-Extension = str
-if not TYPE_CHECKING:
-    ext_classes = list(FVersioningExtensionMixin.fversioning_registry.values())
-    Extension = Literal[tuple(ext.fversioning_extension for ext in ext_classes)]
+Extension = (
+    str
+    if TYPE_CHECKING
+    else make_literal(
+        ext.fversioning_extension
+        for ext in FVersioningExtensionMixin.fversioning_registry.values()
+    )
+)
 
 
 def change_check(
@@ -175,9 +186,9 @@ ChangesContinue.__doc__ = (
     "fetched. Repeat until receive a response without a marker."
 )
 
-ChangeTypes = FeatureCreate | FeatureUpdate | FeatureDelete
-if not TYPE_CHECKING:
-    ChangeTypes = Union[tuple(registry)]
+ChangeTypes = (
+    (FeatureCreate | FeatureUpdate | FeatureDelete) if TYPE_CHECKING else make_union(registry)
+)
 
 
 def change_fetch(
