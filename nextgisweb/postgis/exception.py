@@ -1,3 +1,4 @@
+from psycopg import errors as pg_errors
 from sqlalchemy.exc import StatementError
 
 from nextgisweb.env import gettext, gettextf
@@ -24,7 +25,12 @@ class ExternalDatabaseError(ExternalServiceError):
                 and (dbapi_error := sa_error.orig) is not None
                 and (dbapi_diag := dbapi_error.diag) is not None
             ):
-                # TODO: Add human-readable error name after psycopg upgrade
-                self.detail = self._detail_sqlstate(dbapi_diag.sqlstate)
+                sqlstate = dbapi_diag.sqlstate
+                try:
+                    name = pg_errors.lookup(sqlstate).__name__ if sqlstate else None
+                except KeyError:
+                    name = None
+
+                self.detail = self._detail_sqlstate(f"{sqlstate} ({name})" if name else sqlstate)
             else:
                 self.detail = "SQLAlchemy error code: %s." % sa_error.code
