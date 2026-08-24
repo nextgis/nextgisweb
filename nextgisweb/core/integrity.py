@@ -102,22 +102,19 @@ WHERE conrelid = CAST(:name AS regclass)
     data_exp = _group_constraints(result_exp)
     data_act = _group_constraints(result_act)
 
-    def colnames(keys):
-        return [_colname(tab_name, k) for k in keys]
-
     for contype in ("p", "u", "f", "c"):
 
         def conlabel(key):
             match contype:
                 case "p" | "u":
-                    columns = ", ".join(colnames(key))
-                    return f"{'unique' if contype == 'u' else 'primary key'} constraint for column(s) ({columns})"
+                    fmtcols = ", ".join(key)
+                    return f"{'unique' if contype == 'u' else 'primary key'} constraint for column(s) ({fmtcols})"
                 case "f":
-                    keys, ft_oid, fkeys = key
-                    columns = ", ".join(colnames(keys))
+                    columns, ft_oid, fcolumns = key
                     ft_name = _tname(ft_oid)
-                    fcolumns = ", ".join(colnames(fkeys))
-                    return f"foreign key constraint from '{tab_name}' ({columns}) to '{ft_name}' ({fcolumns})"
+                    fmtcols = ", ".join(columns)
+                    fmtfcols = ", ".join(fcolumns)
+                    return f"foreign key constraint from '{tab_name}' ({fmtcols}) to '{ft_name}' ({fmtfcols})"
                 case "c":
                     return f"check constraint ({key})"
             raise NotImplementedError
@@ -144,14 +141,18 @@ WHERE conrelid = CAST(:name AS regclass)
             yield f"{tab_msg}: extra constraint found ({conlabel(key)})."
 
 
+def _colnames(toid, keys):
+    return tuple(_colname(toid, k) for k in keys)
+
+
 @cache
-def _colname(tname: str, key: int):
+def _colname(toid: int, key: int):
     return DBSession.execute(
         sa.text("""
 SELECT attname FROM pg_attribute
-WHERE attrelid = CAST(:name AS regclass) AND attnum = :attnum AND NOT attisdropped
+WHERE attrelid = :toid AND attnum = :attnum AND NOT attisdropped
 """),
-        dict(name=tname, attnum=key),
+        dict(toid=toid, attnum=key),
     ).scalar()
 
 
@@ -160,13 +161,20 @@ def _tname(oid: int):
     return DBSession.execute(sa.text("SELECT CAST(:oid AS regclass)"), dict(oid=oid)).scalar()
 
 
+@cache
+def _toid(name: str):
+    return DBSession.execute(
+        sa.text("SELECT CAST(:name AS regclass)::oid"), dict(name=name)
+    ).scalar()
+
+
 _conmap = dict(
-    p=lambda r: tuple(r.conkey),
-    u=lambda r: tuple(r.conkey),
+    p=lambda r: _colnames(r.conrelid, r.conkey),
+    u=lambda r: _colnames(r.conrelid, r.conkey),
     f=lambda r: (
-        tuple(r.conkey),
+        _colnames(r.conrelid, r.conkey),
         r.confrelid if r.confrelid != r.conrelid else None,  # check self-relation
-        tuple(r.confkey),
+        _colnames(r.confrelid, r.confkey),
     ),
     c=lambda r: r.expr,
 )
