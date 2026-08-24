@@ -39,9 +39,9 @@ msgstr "Вложение с id = %d не найдено в объекте с id 
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
-#: nodepkg/attachment-bundle/ol-control/plugin.ts:10
-#: nodepkg/attachment-bundle/ol-control/plugin.ts:12
-#: nodepkg/attachment-editor/plugin.ts:8
+#: nodepkg/attachment-bundle/ol-control/plugin.ts:16
+#: nodepkg/attachment-bundle/ol-control/plugin.ts:18
+#: nodepkg/attachment-editor/plugin.ts:12
 #: nodepkg/attachment-table-view/AttachmentTableView.tsx:23
 msgid "Attachments"
 msgstr "Вложения"
@@ -85,7 +85,11 @@ msgstr "Размер"
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:54
+#: nodepkg/attachment-manage/AttachmentManageWidget.tsx:4
+msgid "Export attachments to ZIP archive"
+msgstr "Экспортировать вложения в ZIP-архив"
+
+#: nodepkg/attachment-manage/AttachmentManageWidget.tsx:5
 msgid ""
 "Use export to copy feature attachments between different layers or to create "
 "a backup. The resulting ZIP archive will contain all of the attachments put "
@@ -97,27 +101,11 @@ msgstr ""
 " директориях с именами объектов. Метаданные вложений сохраняются в отдельном "
 "JSON-файле."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:64
-msgid "Export attachments to ZIP archive"
-msgstr "Экспортировать вложения в ZIP-архив"
+#: nodepkg/attachment-manage/AttachmentManageWidget.tsx:8
+msgid "Import attachments from ZIP archive"
+msgstr "Импортировать вложения из ZIP-архива"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:82
-msgid "Back to resource"
-msgstr "Назад к ресурсу"
-
-#: nodepkg/attachment-form/AttachmentForm.tsx:84
-msgid "Close"
-msgstr "Закрыть"
-
-#: nodepkg/attachment-form/AttachmentForm.tsx:87
-msgid "The archive has been successfully imported."
-msgstr "Импорт архива выполнен успешно."
-
-#: nodepkg/attachment-form/AttachmentForm.tsx:89
-msgid "Attachments imported - {i}, skipped - {s}."
-msgstr "Импортировано вложений - {i}, пропущено - {s}."
-
-#: nodepkg/attachment-form/AttachmentForm.tsx:124
+#: nodepkg/attachment-manage/AttachmentManageWidget.tsx:9
 msgid ""
 "Upload a ZIP archive to batch append attachments to existing features. An "
 "archive must contain directories named after feature IDs. Each directory can "
@@ -128,21 +116,13 @@ msgstr ""
 "объектов. Каждая директория может содержать одно или несколько вложений. "
 "Дубликаты будут пропущены."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:133
+#: nodepkg/attachment-manage/AttachmentManageWidget.tsx:12
 msgid "Delete existing attachments"
 msgstr "Удалить существующие вложения"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:158
-msgid "Import attachments from ZIP archive"
-msgstr "Импортировать вложения из ZIP-архива."
-
-#: nodepkg/attachment-form/AttachmentForm.tsx:170
-msgid "Export"
-msgstr "Экспорт"
-
-#: nodepkg/attachment-form/AttachmentForm.tsx:175
-msgid "Import"
-msgstr "Импорт"
+#: nodepkg/attachment-manage/AttachmentManageWidget.tsx:13
+msgid "Attachments imported - {i}, skipped - {s}."
+msgstr "Импортировано вложений - {i}, пропущено - {s}."
 
 #: nodepkg/attachment-table/AttachmentTable.tsx:51
 msgid "Unnamed"
@@ -156,6 +136,6 @@ msgstr "Тип MIME"
 msgid "Toggle panorama viewer"
 msgstr "Переключить просмотр панорам"
 
-#: nodepkg/resource-action-plugin.tsx:12 view.py:23
+#: nodepkg/resource-action-plugin.tsx:12 view.py:24
 msgid "Manage attachments"
 msgstr "Управление вложениями"

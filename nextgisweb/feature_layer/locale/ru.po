@@ -1,68 +1,68 @@
-#: api.py:120 api_identify.py:27
+#: api.py:121 api_identify.py:29
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:388
+#: api.py:380
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:475 api_export.py:214
+#: api.py:467 api_export.py:217
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:718
+#: api.py:710
 msgid "Aggregation is not supported for this layer."
 msgstr "Агрегация не поддерживается для этого слоя."
 
-#: api.py:727
+#: api.py:719
 msgid "Aggregation '{}' is not supported for this layer."
 msgstr "Агрегация '{}' не поддерживается для этого слоя."
 
-#: api.py:733 api.py:740
+#: api.py:725 api.py:732
 msgid "Field '{}' not found."
 msgstr "Поле '{}' не найдено."
 
-#: api_export.py:108
+#: api_export.py:111
 msgid "Couldn't add FID field '{}'. Such field already exists."
 msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
-#: api_export.py:253
+#: api_export.py:256
 msgid "The selected format does not support {} geometry type."
 msgstr "Выбранный формат не поддерживает тип геометрии {}."
 
-#: api_export.py:266
+#: api_export.py:269
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:279
+#: api_export.py:282
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:290
+#: api_export.py:293
 msgid "Filter expressions are not supported."
 msgstr "Выражения фильтра не поддерживаются."
 
-#: api_export.py:461
+#: api_export.py:467
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
-#: api_mvt.py:95
+#: api_mvt.py:96
 msgid "Resource (ID={}) has no geometry, MVT tiles are not available."
 msgstr "Ресурс (ID={}) не имеет геометрии, MVT-тайлы недоступны."
 
-#: dtutil.py:28
+#: dtutil.py:29
 msgid "Got an invalid date-time value in the legacy format: {}."
 msgstr "Получено некорректное значение даты-времени в устаревшем формате: {}."
 
-#: dtutil.py:29
+#: dtutil.py:30
 msgid "Please use dt_format=iso and ISO-8601 based format."
 msgstr "Пожалуйста, используйте dt_format=iso и формат, основанный на ISO-8601."
 
-#: dtutil.py:37
+#: dtutil.py:38
 msgid "Got an invalid date-time value in ISO-8601 format: {}."
 msgstr "Получено некорректное значение даты-времени в формате ISO-8601: {}."
 
-#: dtutil.py:38
+#: dtutil.py:39
 msgid "Value should be in RFC 3339 {} format without timezone and leap seconds."
 msgstr ""
 "Значение должно быть в формате RFC 3339 {} без часового пояса и секунд "
@@ -88,7 +88,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:28 view.py:45
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:28 view.py:46
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -96,17 +96,37 @@ msgstr "Таблица объектов"
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
-#: model.py:109
+#: model.py:138
 msgid "Spatial reference system"
 msgstr "Система координат"
 
-#: model.py:266
+#: model.py:302
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:336
+#: model.py:372
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
+
+#: nodepkg/archive-manage/ArchiveImportModal.tsx:13
+msgid "The archive has been successfully imported."
+msgstr "Импорт архива выполнен успешно."
+
+#: nodepkg/archive-manage/ArchiveImportModal.tsx:14
+msgid "Back to resource"
+msgstr "Назад к ресурсу"
+
+#: nodepkg/archive-manage/ArchiveImportModal.tsx:15
+msgid "Close"
+msgstr "Закрыть"
+
+#: nodepkg/archive-manage/ArchiveManageWidget.tsx:35
+msgid "Export"
+msgstr "Экспорт"
+
+#: nodepkg/archive-manage/ArchiveManageWidget.tsx:36
+msgid "Import"
+msgstr "Импорт"
 
 #: nodepkg/attribute-editor/AttributeEditor.tsx:39
 msgid "Set field value to NULL (No data)"
@@ -121,66 +141,66 @@ msgid "Attributes"
 msgstr "Атрибуты"
 
 #: nodepkg/control-panel-plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:106
-#: view.py:152
+#: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:111
+#: view.py:155
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
-#: nodepkg/export-form/ExportForm.tsx:267
+#: nodepkg/export-form/ExportForm.tsx:269
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/export-form/ExportForm.tsx:289
+#: nodepkg/export-form/ExportForm.tsx:291
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:302
+#: nodepkg/export-form/ExportForm.tsx:304
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:308
+#: nodepkg/export-form/ExportForm.tsx:310
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.tsx:322
+#: nodepkg/export-form/ExportForm.tsx:324
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.tsx:326
+#: nodepkg/export-form/ExportForm.tsx:328
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.tsx:332
-#: nodepkg/fields-widget/FieldsWidget.tsx:215
+#: nodepkg/export-form/ExportForm.tsx:334
+#: nodepkg/fields-widget/FieldsWidget.tsx:218
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.tsx:338
+#: nodepkg/export-form/ExportForm.tsx:340
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.tsx:345
+#: nodepkg/export-form/ExportForm.tsx:347
 msgid "Filter text"
 msgstr "Текстовый фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:355
+#: nodepkg/export-form/ExportForm.tsx:357
 msgid "Filter applied"
 msgstr "Фильтр применен"
 
-#: nodepkg/export-form/ExportForm.tsx:356
+#: nodepkg/export-form/ExportForm.tsx:358
 msgid "Set filter"
 msgstr "Установить фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:359
+#: nodepkg/export-form/ExportForm.tsx:361
 msgid "Filter"
 msgstr "Фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:364
+#: nodepkg/export-form/ExportForm.tsx:366
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExportForm.tsx:420
+#: nodepkg/export-form/ExportForm.tsx:422
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:36
 #: nodepkg/versioning-settings/VersioningSettings.tsx:71
 msgid "Save"
@@ -554,7 +574,7 @@ msgid "Last changed"
 msgstr "Последнее изменение"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:27
-#: nodepkg/resource-action-plugin.tsx:63 view.py:90 view.py:114
+#: nodepkg/resource-action-plugin.tsx:63 view.py:91 view.py:115
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -731,7 +751,7 @@ msgstr "Объекты"
 msgid "Table"
 msgstr "Таблица"
 
-#: nodepkg/resource-action-plugin.tsx:45 view.py:103
+#: nodepkg/resource-action-plugin.tsx:45 view.py:104
 msgid "Version history"
 msgstr "История изменений"
 
@@ -959,19 +979,19 @@ msgstr "Отключить версионирование объектов по 
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: numutil.py:28
+#: numutil.py:29
 msgid "The value must be within the inclusive range of {min} to {max}."
 msgstr "Значение должно находиться в диапазоне от {min} до {max} включительно."
 
-#: numutil.py:42
+#: numutil.py:43
 msgid "Got an invalid INTEGER value: {}."
 msgstr "Получено некорректное значение INTEGER: {}."
 
-#: numutil.py:48
+#: numutil.py:49
 msgid "Got an invalid BIGINT value: {}."
 msgstr "Получено некорректное значение BIGINT: {}."
 
-#: numutil.py:92
+#: numutil.py:93
 msgid "Got an invalid BOOLEAN value: {}."
 msgstr "Получено некорректное значение BOOLEAN: {}."
 
@@ -1028,15 +1048,15 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:63 view.py:79
+#: view.py:64 view.py:80
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:121
+#: view.py:122
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:123
+#: view.py:124
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."

@@ -9,11 +9,47 @@ msgstr "Файлы должны иметь имена в формате '{0}.htm
 #: api_import.py:36
 msgid "{feature ID}"
 msgstr "{ID объекта}"
+
 #: api_import.py:64
 msgid "The file '{0}' does not contain a <body> element and cannot be processed."
 msgstr "Файл '{0}' не содержит элемента <body> и не может быть обработан."
 
-#: nodepkg/description-editor/plugin.ts:8
+#: nodepkg/description-editor/plugin.ts:12
 #: nodepkg/description-view/DescriptionView.tsx:16
 msgid "Description"
 msgstr "Описание"
+
+#: nodepkg/description-manage/DescriptionManageWidget.tsx:4
+msgid "Export descriptions to ZIP archive"
+msgstr "Экспортировать описания в ZIP-архив"
+
+#: nodepkg/description-manage/DescriptionManageWidget.tsx:5
+msgid ""
+"Use export to copy feature descriptions between different layers or to create"
+" a backup. The resulting ZIP archive will contain one HTML file per feature, "
+"named after the feature ID."
+msgstr ""
+"Используйте экспорт для копирования описаний между разными слоями или для "
+"создания резервной копии. Полученный ZIP-архив будет содержать по одному HTML"
+" файлу для каждого объекта, названному по идентификатору объекта."
+
+#: nodepkg/description-manage/DescriptionManageWidget.tsx:8
+msgid "Import descriptions from ZIP archive"
+msgstr "Импортировать описания из ZIP-архива"
+
+#: nodepkg/description-manage/DescriptionManageWidget.tsx:9
+msgid ""
+"Upload a ZIP archive to batch update feature descriptions. An archive must "
+"contain one HTML file per feature, named after the feature ID."
+msgstr ""
+"Загрузите ZIP-архив, чтобы массово обновить описания объектов. Архив должен "
+"содержать по одному HTML файлу для каждого объекта, названному по "
+"идентификатору объекта."
+
+#: nodepkg/description-manage/DescriptionManageWidget.tsx:12
+msgid "Delete existing descriptions"
+msgstr "Удалить существующие описания"
+
+#: nodepkg/resource-action-plugin.tsx:12 view.py:22
+msgid "Manage descriptions"
+msgstr "Управление описаниями"
