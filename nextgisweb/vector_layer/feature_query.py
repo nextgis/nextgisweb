@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING, ClassVar
+
 import sqlalchemy as sa
 from msgspec import UNSET
 from shapely.geometry import box
@@ -43,6 +45,11 @@ from . import aggregation
     IAggregatableFeatureQuery,
 )
 class FeatureQueryBase(FeatureQueryIntersectsMixin):
+    if TYPE_CHECKING:
+        from .model import VectorLayer
+
+        layer: ClassVar[VectorLayer]
+
     def __init__(self):
         super().__init__()
 

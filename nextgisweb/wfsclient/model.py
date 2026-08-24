@@ -1,7 +1,7 @@
 import re
 from datetime import date, datetime, time
 from io import BytesIO
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, ClassVar, Literal
 
 import requests
 import sqlalchemy as sa
@@ -662,6 +662,8 @@ class WFSLayerSerializer(Serializer, resource=WFSLayer):
     IFeatureQueryIntersects,
 )
 class FeatureQueryBase(FeatureQueryIntersectsMixin):
+    layer: ClassVar[WFSLayer]
+
     def __init__(self):
         self._srs = None
         self._geom = False

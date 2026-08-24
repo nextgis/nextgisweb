@@ -1,7 +1,7 @@
 import re
 from contextlib import contextmanager
 from enum import Enum
-from typing import Literal
+from typing import ClassVar, Literal
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -665,6 +665,8 @@ class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     IAggregatableFeatureQuery,
 )
 class FeatureQueryBase(FeatureQueryIntersectsMixin):
+    layer: ClassVar[PostgisLayer]
+
     def __init__(self):
         super().__init__()
 
