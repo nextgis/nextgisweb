@@ -144,7 +144,6 @@ def check_integrity(self: EnvCommand):
     with DBSession.connection(
         execution_options=dict(
             isolation_level="SERIALIZABLE",
-            postgresql_readonly=True,
             postgresql_deferrable=True,
         )
     ) as con:

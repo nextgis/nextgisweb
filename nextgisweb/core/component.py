@@ -12,7 +12,6 @@ from subprocess import check_output
 
 import requests
 import sqlalchemy as sa
-import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import UNSET
 from requests.exceptions import JSONDecodeError, RequestException
 from sqlalchemy import create_engine, text
@@ -27,6 +26,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import postgres_url
 
+from nextgisweb.core.integrity import check_table
 from nextgisweb.i18n import Localizer, Translations
 
 from .backup import BackupMetadata
@@ -442,41 +442,10 @@ class CoreComponent(StorageComponentMixin, Component):
     def check_integrity(self):
         metadata = self.env.metadata()
         metadata.bind = self.engine
-        inspector = sa.inspect(self.engine)
 
-        def ct_compile(coltype, _dialect=sa_pg.dialect()):
-            return coltype.compile(_dialect)
-
-        for tab in metadata.tables.values():
-            tab_name, tab_schema = tab.name, tab.schema
-            tab_repr = (f"{tab_schema}." if tab_schema else "") + tab_name
-            tab_msg = f"Table '{tab_repr}'"
-
-            if not inspector.has_table(tab_name, tab_schema):
-                yield f"Table '{tab_repr}' not found."
-                continue
-
-            cols_act = {c["name"]: c for c in inspector.get_columns(tab_name, tab_schema)}
-            type_remap = {"FLOAT": "DOUBLE PRECISION", "DECIMAL": "NUMERIC"}
-
-            for col_exp in tab.columns:
-                col_msg = f"{tab_msg}, column '{col_exp.name}'"
-
-                if col_act := cols_act.pop(col_exp.name, None):
-                    type_exp = col_exp.type
-                    type_act = col_act["type"]
-
-                    sql_exp = ct_compile(type_exp)
-                    sql_exp = type_remap.get(sql_exp, sql_exp)
-                    sql_act = ct_compile(type_act)
-
-                    if sql_act != sql_exp:
-                        yield f"{col_msg}: type mismatch ({sql_exp} <> {sql_act})."
-                else:
-                    yield f"{col_msg}: not found."
-
-            if len(cols_act) > 0:
-                yield f"{tab_msg}: extra columns found ({', '.join(cols_act.keys())})."
+        for tab in list(metadata.tables.values()):
+            for message in check_table(tab):
+                yield message
 
     def backup_objects(self):
         yield from self.fontconfig.backup_objects()
