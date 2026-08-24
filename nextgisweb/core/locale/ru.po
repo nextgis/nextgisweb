@@ -1,68 +1,72 @@
-#: component.py:94
+#: component.py:93
 msgid "NextGIS geoinformation system"
 msgstr "Геоинформационная система NextGIS"
 
-#: component.py:289
+#: component.py:288
 msgid "CPU"
 msgstr "Процессор"
 
-#: component.py:291
+#: component.py:290
 msgid "RAM"
 msgstr "ОЗУ"
 
-#: component.py:293
+#: component.py:292
 msgid "Linux kernel"
 msgstr "Ядро Linux"
 
-#: component.py:295
+#: component.py:294
 msgid "OS distribution"
 msgstr "Дистрибутив ОС"
 
-#: component.py:323
+#: component.py:322
 msgid "Instance ID"
 msgstr "ID инстанса"
 
-#: component.py:327
+#: component.py:326
 msgid "Last backup"
 msgstr "Последняя резервная копия"
 
-#: component.py:331
+#: component.py:330
 msgid "Last maintenance"
 msgstr "Последнее обслуживание"
 
-#: exception.py:113
+#: exception.py:68
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
-#: exception.py:118
+#: exception.py:73
 msgid "Forbidden"
 msgstr "Запрещено"
 
-#: exception.py:123
+#: exception.py:79
 msgid "Insufficient permissions"
 msgstr "Недостаточно прав"
 
-#: exception.py:128
+#: exception.py:85
 msgid "Operational error"
 msgstr "Операционная ошибка"
 
-#: exception.py:133
+#: exception.py:90
 msgid "External service error"
 msgstr "Ошибка внешнего сервиса"
 
-#: exception.py:142
+#: exception.py:91
+msgid "An error occurred while accessing an external service."
+msgstr "Произошла ошибка при обращении к внешнему сервису."
+
+#: exception.py:100
 msgid "Not configured"
 msgstr "Не сконфигурировано"
 
-#: fontconfig.py:111
+#: fontconfig.py:116
 msgid "Font not found: {}!"
 msgstr "Шрифт не найден: {}!"
 
-#: storage.py:310
+#: storage.py:309
 msgid "Storage full"
 msgstr "Хранилище переполнено"
 
-#: storage.py:312
+#: storage.py:311
 msgid ""
 "The operation cannot be completed because the storage is over limit by "
 "{excess_size}. You currently have {storage_used} of {storage_limit} used. "
@@ -72,11 +76,11 @@ msgstr ""
 "{excess_size}. У вас уже используется {storage_used} из {storage_limit}. "
 "Освободите место в хранилище перед тем как продолжить."
 
-#: storage.py:332
+#: storage.py:331
 msgid "Not enough storage"
 msgstr "Недостаточно места в хранилище"
 
-#: storage.py:334
+#: storage.py:333
 msgid ""
 "This operation requires %s of storage and can't be performed because only %s "
 "available."
@@ -84,10 +88,10 @@ msgstr ""
 "Операция не может быть выполнена, так как для ее выполнения требуется %s в "
 "хранилище, однако доступно только %s."
 
-#: storage.py:355
+#: storage.py:354
 msgid "Estimation is already running"
 msgstr "Процесс оценки хранилища уже запущен"
 
-#: test/test_exception.py:76
+#: test/test_exception.py:28
 msgid "The answer is %d"
 msgstr "Ответ %d"

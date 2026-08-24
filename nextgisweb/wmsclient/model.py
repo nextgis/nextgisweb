@@ -16,12 +16,13 @@ from requests.exceptions import RequestException
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import Base, gettext
+from nextgisweb.env import Base, gettext, gettextf
 from nextgisweb.lib import saext
 from nextgisweb.lib.apitype import make_literal
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.pilhelper import reproject_render
+from nextgisweb.lib.reqext import response_diagnostics
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
@@ -58,16 +59,37 @@ _WMS_EXCEPTION_TAGS = (
 )
 
 
-def _extract_wms_error(content: bytes) -> str | None:
+def _extract_wms_error(content: bytes) -> tuple[str | None, str | None]:
+    """Extract exception code and message from a WMS service exception document
+
+    Both WMS 1.1.1 and 1.3.0 use the same ServiceExceptionReport format,
+    so a single parser covers both versions."""
+
+    def _clean(value: str | None) -> str | None:
+        return value.strip() or None if value else None
+
     try:
         root = etree.fromstring(content)
     except etree.XMLSyntaxError:
-        return None
+        return None, None
+
     for tag in _WMS_EXCEPTION_TAGS:
+        # A ServiceExceptionReport may contain multiple ServiceException
+        # elements, but we only use the first one.
         el = root.find(tag)
-        if el is not None and el.text:
-            return el.text.strip()
-    return None
+        if el is not None:
+            code = _clean(el.attrib.get("code"))
+            text = _clean(el.text)
+            if code is not None or text is not None:
+                return code, text
+
+    return None, None
+
+
+def _wms_error_message(code: str | None, msg: str | None) -> str | None:
+    if msg and code:
+        return f"{msg} ({code})"
+    return msg or code
 
 
 WMS_VERSIONS = ("1.1.1", "1.3.0")
@@ -144,8 +166,12 @@ class WMSConnection(Resource):
                 timeout=WMSClientComponent.current().options["timeout"].total_seconds(),
                 verify=not self.insecure,
             )
-        except RequestException:
-            raise ExternalServiceError
+        except RequestException as exc:
+            logger.error("External service request failed: %s: %s", type(exc).__name__, exc)
+            raise ExternalServiceError(
+                gettext("Unable to get a response from the remote server."),
+                detail=f"{type(exc).__name__}.",
+            ) from exc
 
     def capcache_query(self):
         self.capcache_tstamp = utcnow_naive()
@@ -153,7 +179,13 @@ class WMSConnection(Resource):
         response = self.request_wms("GetCapabilities")
         self.capcache_xml = response.content
 
-        root = etree.parse(BytesIO(self.capcache_xml)).getroot()
+        try:
+            root = etree.parse(BytesIO(self.capcache_xml)).getroot()
+        except etree.XMLSyntaxError as exc:
+            raise ExternalServiceError(
+                gettext("Failed to parse the XML response from the remote server."),
+                data=response_diagnostics(response),
+            ) from exc
 
         version = root.attrib["version"]
         if version not in WMS_VERSIONS:
@@ -329,19 +361,33 @@ class WMSLayer(Resource, SpatialLayerMixin):
             data = BytesIO(response.content)
             try:
                 img = Image.open(data)
-            except OSError:
-                if msg := _extract_wms_error(response.content):
-                    logger.error("WMS service error: %s", msg)
-                raise ExternalServiceError("Image processing error.")
+            except OSError as exc:
+                code, msg = _extract_wms_error(response.content)
+                if (message := _wms_error_message(code, msg)) is not None:
+                    raise ExternalServiceError(
+                        message, data=response_diagnostics(response)
+                    ) from exc
+                raise ExternalServiceError(
+                    gettext("Image processing error."),
+                    detail=gettextf("Response Content-Type is {}.")(
+                        response.headers.get("Content-Type")
+                    ),
+                ) from exc
             if img.mode != "RGBA":
                 img = img.convert("RGBA")
             return img
         elif response.status_code in (204, 404):
             return None
         else:
-            if msg := _extract_wms_error(response.content):
-                logger.error("WMS service error (HTTP %d): %s", response.status_code, msg)
-            raise ExternalServiceError
+            code, msg = _extract_wms_error(response.content)
+            if (message := _wms_error_message(code, msg)) is not None:
+                raise ExternalServiceError(message, data=response_diagnostics(response))
+            raise ExternalServiceError(
+                gettextf("The remote server returned an unexpected HTTP status code ({}).")(
+                    response.status_code
+                ),
+                data=response_diagnostics(response),
+            )
 
     def render_image(self, extent, size):
         if self.remote_srs.id == self.srs.id:

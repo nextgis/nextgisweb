@@ -1,30 +1,42 @@
-#: api.py:170
+#: api.py:173
 msgid "System SRS cannot be deleted."
 msgstr "Системная СК не может быть удалена."
 
-#: api.py:191
+#: api.py:194
 msgid "Invalid SRS definition!"
 msgstr "Неверное определение SRS!"
 
-#: api.py:426
+#: api.py:352
+msgid "The remote server returned an unexpected HTTP status code ({})."
+msgstr "Удаленный сервер вернул неожиданный код статуса HTTP ({})."
+
+#: api.py:360
+msgid "Unable to get a response from the remote server."
+msgstr "Не удалось получить ответ от удаленного сервера."
+
+#: api.py:368
+msgid "Failed to parse the JSON response from the remote server."
+msgstr "Не удалось разобрать JSON-ответ от удаленного сервера."
+
+#: api.py:460
 msgid "SRS authority attributes must be defined while importing from the catalog."
 msgstr "Аттрибуты организации СК должны быть указаны при импорте из каталога."
 
-#: api.py:448
+#: api.py:482
 msgid "SRS #{} already exists."
 msgstr "СК #{} уже существует."
 
-#: model.py:69 model.py:70 nodepkg/control-panel-plugin.tsx:33 view.py:18
+#: model.py:71 model.py:72 nodepkg/control-panel-plugin.tsx:33 view.py:19
 msgid "Spatial reference systems"
 msgstr "Системы координат"
 
-#: model.py:88
+#: model.py:90
 msgid "Invalid OGC WKT definition!"
 msgstr "Неверное определение OGC WKT!"
 
 #: nodepkg/catalog-browse/CatalogBrowse.tsx:91
 #: nodepkg/catalog-import/CatalogImport.tsx:30 nodepkg/srs-browse/SrsBrowse.tsx:37
-#: nodepkg/srs-widget/SRSWidget.tsx:30
+#: nodepkg/srs-widget/SRSWidget.tsx:35
 msgid "Display name"
 msgstr "Наименование"
 
@@ -32,7 +44,7 @@ msgstr "Наименование"
 msgid "Show in catalog"
 msgstr "Показать в каталоге"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:113 nodepkg/srs-widget/SRSWidget.tsx:36
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:113 nodepkg/srs-widget/SRSWidget.tsx:41
 msgid "Authority and code"
 msgstr "Источник и код"
 
@@ -53,7 +65,7 @@ msgstr "Широта"
 msgid "Longitude"
 msgstr "Долгота"
 
-#: nodepkg/catalog-import/CatalogImport.tsx:35 nodepkg/srs-widget/SRSWidget.tsx:44
+#: nodepkg/catalog-import/CatalogImport.tsx:35 nodepkg/srs-widget/SRSWidget.tsx:48
 msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
 
@@ -85,7 +97,7 @@ msgstr "Формат"
 msgid "Definition"
 msgstr "Определение"
 
-#: nodepkg/srs-widget/SRSWidget.tsx:85 nodepkg/srs-widget/SRSWidget.tsx:113
+#: nodepkg/srs-widget/SRSWidget.tsx:22 nodepkg/srs-widget/SRSWidget.tsx:118
 msgid "Import definition"
 msgstr "Импортировать определение"
 
@@ -105,14 +117,14 @@ msgstr "Неверная система координат MapInfo: %s"
 msgid "Unknown spatial reference system format: %s!"
 msgstr "Неверный формат системы координат: %s!"
 
-#: view.py:28
+#: view.py:29
 msgid "Create new Spatial reference system"
 msgstr "Создать новую Систему координат"
 
-#: view.py:49
+#: view.py:50
 msgid "Spatial reference system catalog"
 msgstr "Каталог систем координат"
 
-#: view.py:61
+#: view.py:62
 msgid "Spatial reference system"
 msgstr "Система координат"

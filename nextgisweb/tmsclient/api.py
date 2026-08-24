@@ -2,7 +2,11 @@ from typing import Annotated
 
 import requests
 from msgspec import Meta, Struct
-from requests.exceptions import RequestException
+from requests.exceptions import HTTPError, JSONDecodeError, RequestException
+
+from nextgisweb.env import gettext, gettextf
+from nextgisweb.lib.logging import logger
+from nextgisweb.lib.reqext import response_diagnostics
 
 from nextgisweb.core.exception import ExternalServiceError
 from nextgisweb.pyramid.tomb import Request
@@ -45,11 +49,33 @@ def inspect_connection(resource, request: Request) -> InspectResponse:
                 headers=comp.headers,
                 timeout=comp.options["timeout"].total_seconds(),
             )
+            # raise_for_status() is the only call above that can raise
+            # HTTPError; requests.get() itself only raises other
+            # RequestException subclasses (connection errors, timeouts...).
             result.raise_for_status()
-        except RequestException:
-            raise ExternalServiceError()
+        except HTTPError as exc:
+            raise ExternalServiceError(
+                gettextf("The remote server returned an unexpected HTTP status code ({}).")(
+                    result.status_code
+                ),
+                data=response_diagnostics(result),
+            ) from exc
+        except RequestException as exc:
+            logger.error("External service request failed: %s: %s", type(exc).__name__, exc)
+            raise ExternalServiceError(
+                gettext("Unable to get a response from the remote server."),
+                detail=f"{type(exc).__name__}.",
+            ) from exc
 
-        for layer in result.json():
+        try:
+            layers_data = result.json()
+        except JSONDecodeError as exc:
+            raise ExternalServiceError(
+                gettext("Failed to parse the JSON response from the remote server."),
+                data=response_diagnostics(result),
+            ) from exc
+
+        for layer in layers_data:
             layers.append(
                 LayerObject(
                     layer=layer["layer"],

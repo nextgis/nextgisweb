@@ -1,4 +1,7 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
+import requests
 import transaction
 
 from nextgisweb.env import DBSession
@@ -6,6 +9,7 @@ from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.pyramid.test import WebTestApp
 
+from ..component import SpatialRefSysComponent
 from ..model import SRS
 from .data import (
     srs_def,
@@ -209,3 +213,63 @@ def test_geom_area(wkt, srs_geom, srs_calc, area, srs_ids, ngw_webtest_app: WebT
         json={"geom": wkt, "srs": srs_ids[srs_geom]},
     )
     assert result.json["value"] == pytest.approx(area, rel=0.025)
+
+
+CATALOG_URL = "http://example.com"
+
+
+def _override_catalog(ngw_env):
+    comp = ngw_env.component(SpatialRefSysComponent)
+    return comp.options.override({"catalog.url": CATALOG_URL})
+
+
+def test_catalog_connection_error(ngw_webtest_app: WebTestApp, ngw_auth_administrator, ngw_env):
+    with _override_catalog(ngw_env):
+        with patch("nextgisweb.spatial_ref_sys.api.requests.get") as mock_get:
+            mock_get.side_effect = requests.exceptions.ConnectionError("simulated")
+            result = ngw_webtest_app.get("/api/component/spatial_ref_sys/catalog/", status=503)
+
+    assert "Unable to get a response" in result.json["message"]
+    assert "ConnectionError" in result.json["detail"]
+
+
+def test_catalog_http_error(ngw_webtest_app: WebTestApp, ngw_auth_administrator, ngw_env):
+    with _override_catalog(ngw_env):
+        with patch("nextgisweb.spatial_ref_sys.api.requests.get") as mock_get:
+            mock_response = MagicMock(
+                status_code=500,
+                headers={"Content-Type": "text/html"},
+            )
+            mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError()
+            mock_get.return_value = mock_response
+            result = ngw_webtest_app.get("/api/component/spatial_ref_sys/catalog/", status=503)
+
+    assert "500" in result.json["message"]
+    assert result.json["data"]["status_code"] == 500
+
+
+def test_catalog_invalid_json(ngw_webtest_app: WebTestApp, ngw_auth_administrator, ngw_env):
+    with _override_catalog(ngw_env):
+        with patch("nextgisweb.spatial_ref_sys.api.requests.get") as mock_get:
+            mock_response = MagicMock(
+                status_code=200,
+                headers={"Content-Type": "application/json"},
+            )
+            mock_response.json.side_effect = requests.exceptions.JSONDecodeError("", "", 0)
+            mock_get.return_value = mock_response
+            result = ngw_webtest_app.get("/api/component/spatial_ref_sys/catalog/", status=503)
+
+    assert "Failed to parse the JSON" in result.json["message"]
+    assert result.json["data"]["status_code"] == 200
+
+
+def test_catalog_item_connection_error(
+    ngw_webtest_app: WebTestApp, ngw_auth_administrator, ngw_env
+):
+    with _override_catalog(ngw_env):
+        with patch("nextgisweb.spatial_ref_sys.api.requests.get") as mock_get:
+            mock_get.side_effect = requests.exceptions.ConnectionError("simulated")
+            result = ngw_webtest_app.get("/api/component/spatial_ref_sys/catalog/4326", status=503)
+
+    assert "Unable to get a response" in result.json["message"]
+    assert "ConnectionError" in result.json["detail"]

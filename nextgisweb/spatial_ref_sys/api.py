@@ -5,12 +5,14 @@ import requests
 from msgspec import UNSET, Meta, Struct, UnsetType
 from pyproj import CRS
 from pyproj.database import query_crs_info
-from requests.exceptions import RequestException
+from requests.exceptions import HTTPError, JSONDecodeError, RequestException
 from sqlalchemy import sql
 
 from nextgisweb.env import DBSession, gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON, EmptyObject, StatusCode
 from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_length
+from nextgisweb.lib.logging import logger
+from nextgisweb.lib.reqext import response_diagnostics
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
@@ -335,6 +337,39 @@ QueryLat = Annotated[float | None, Meta(description="Latitude", examples=[27.988
 QueryLon = Annotated[float | None, Meta(description="Longitude", examples=[86.9250])]
 
 
+def _remote_catalog_get(url: str, params: dict | None = None, *, timeout: float) -> Any:
+    """GET a JSON document from the remote catalog
+
+    Translates request/response failures into ExternalServiceError."""
+    try:
+        res = requests.get(url, params, timeout=timeout)
+        # raise_for_status() is the only call above that can raise
+        # HTTPError; requests.get() itself only raises other
+        # RequestException subclasses (connection errors, timeouts...).
+        res.raise_for_status()
+    except HTTPError as exc:
+        raise ExternalServiceError(
+            gettextf("The remote server returned an unexpected HTTP status code ({}).")(
+                res.status_code
+            ),
+            data=response_diagnostics(res),
+        ) from exc
+    except RequestException as exc:
+        logger.error("External service request failed: %s: %s", type(exc).__name__, exc)
+        raise ExternalServiceError(
+            gettext("Unable to get a response from the remote server."),
+            detail=f"{type(exc).__name__}.",
+        ) from exc
+
+    try:
+        return res.json()
+    except JSONDecodeError as exc:
+        raise ExternalServiceError(
+            gettext("Failed to parse the JSON response from the remote server."),
+            data=response_diagnostics(res),
+        ) from exc
+
+
 def catalog_collection(
     request: Request,
     *,
@@ -374,11 +409,7 @@ def catalog_collection(
     catalog_url = comp.options["catalog.url"]
     url = catalog_url + "/api/v1/spatial_ref_sys/"
     timeout = comp.options["catalog.timeout"].total_seconds()
-    try:
-        res = requests.get(url, query, timeout=timeout)
-        res.raise_for_status()
-    except RequestException:
-        raise ExternalServiceError()
+    catalog_data = _remote_catalog_get(url, query, timeout=timeout)
 
     return [
         SRSCatalogRecord(
@@ -387,7 +418,7 @@ def catalog_collection(
             auth_name=srs["auth_name"],
             auth_srid=srs["auth_srid"],
         )
-        for srs in res.json()
+        for srs in catalog_data
     ]
 
 
@@ -460,13 +491,8 @@ def remote_catalog_item(catalog_id: int) -> CatalogEntry:
     catalog_url = SpatialRefSysComponent.current().options["catalog.url"]
     url = catalog_url + "/api/v1/spatial_ref_sys/" + str(catalog_id)
     timeout = SpatialRefSysComponent.current().options["catalog.timeout"].total_seconds()
-    try:
-        res = requests.get(url, timeout=timeout)
-        res.raise_for_status()
-    except RequestException:
-        raise ExternalServiceError()
+    srs = _remote_catalog_get(url, timeout=timeout)
 
-    srs = res.json()
     return CatalogEntry(
         display_name=srs["display_name"],
         wkt=srs["wkt"],

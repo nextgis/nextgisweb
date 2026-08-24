@@ -1,21 +1,33 @@
-#: model.py:47 nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:115
+#: api.py:58 tile_fetcher.py:101
+msgid "The remote server returned an unexpected HTTP status code ({})."
+msgstr "Удаленный сервер вернул неожиданный код статуса HTTP ({})."
+
+#: api.py:66 tile_fetcher.py:92
+msgid "Unable to get a response from the remote server."
+msgstr "Не удалось получить ответ от удаленного сервера."
+
+#: api.py:74
+msgid "Failed to parse the JSON response from the remote server."
+msgstr "Не удалось разобрать JSON-ответ от удаленного сервера."
+
+#: model.py:49 nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:115
 #: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:113
 msgid "TMS connection"
 msgstr "Соединение TMS"
 
-#: model.py:109
+#: model.py:113
 msgid "API key required."
 msgstr "API ключ является обязательным."
 
-#: model.py:151
+#: model.py:157
 msgid "Zoom is out of range."
 msgstr "Масштаб вне диапазона"
 
-#: model.py:159 nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:195
+#: model.py:165 nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:195
 msgid "TMS layer"
 msgstr "Слой TMS"
 
-#: model.py:304
+#: model.py:309
 msgid "Layer name required."
 msgstr "Имя слоя является обязательным."
 
@@ -84,14 +96,9 @@ msgstr "Размер тайла"
 msgid "Extent"
 msgstr "Охват"
 
-#: tile_fetcher.py:36
+#: tile_fetcher.py:37
 msgid "The remote server did not respond in time."
 msgstr "Удаленный сервер не ответил вовремя."
 
-#: tile_fetcher.py:86
-msgid "Unable to get a response from the remote server."
-msgstr "Не удалось получить ответ от удаленного сервера."
-
-#: tile_fetcher.py:96
-msgid "An unexpected HTTP status code was received from the remote server."
-msgstr "От удаленного сервера получен неожиданный код статуса HTTP."
+#~ msgid "An unexpected HTTP status code was received from the remote server."
+#~ msgstr "От удаленного сервера получен неожиданный код статуса HTTP."

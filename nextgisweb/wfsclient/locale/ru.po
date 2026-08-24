@@ -1,24 +1,36 @@
-#: model.py:127 nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:61
+#: model.py:172 nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:60
 msgid "WFS connection"
 msgstr "Соединение WFS"
 
-#: model.py:431 nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:239
+#: model.py:215
+msgid "Unable to get a response from the remote server."
+msgstr "Не удалось получить ответ от удаленного сервера."
+
+#: model.py:224
+msgid "Failed to parse the XML response from the remote server."
+msgstr "Не удалось разобрать XML-ответ от удаленного сервера."
+
+#: model.py:237
+msgid "The remote server returned an unexpected HTTP status code ({})."
+msgstr "Удаленный сервер вернул неожиданный код статуса HTTP ({})."
+
+#: model.py:554 nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:230
 msgid "WFS layer"
 msgstr "Слой WFS"
 
-#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:28
+#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:22
 msgid "URL"
 msgstr "URL"
 
-#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:35
+#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:28
 msgid "Username"
 msgstr "Пользователь"
 
-#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:42
+#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:37
 msgid "Password"
 msgstr "Пароль"
 
-#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:49
+#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:47
 msgid "Version"
 msgstr "Версия"
 
@@ -26,62 +38,62 @@ msgstr "Версия"
 msgid "Fields need to be updated due to autodetection"
 msgstr "Поля необходимо обновить из-за автоопределения"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:19
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:18
 msgid "Autodetect"
 msgstr "Автоматически"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:73
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:69
 msgid "Point"
 msgstr "Точка"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:74
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:70
 msgid "Line"
 msgstr "Линия"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:75
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:71
 msgid "Polygon"
 msgstr "Полигон"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:76
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:72
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:77
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:73
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:78
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:74
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:91
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:87
 msgid "Keep existing definitions untouched"
 msgstr "Оставить существующие определения без изменений"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:92
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:88
 msgid "Update definitions from the server"
 msgstr "Обновить определения с сервера"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:170
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:165
 msgid "Connection"
 msgstr "Соединение"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:179
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:177
 msgid "Layer"
 msgstr "Слой"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:195
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:187
 msgid "SRID"
 msgstr "SRID"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:199
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:195
 msgid "Geometry column"
 msgstr "Поле геометрии"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:214
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:204
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:226
+#: nodepkg/wfsclient-layer/WfsClientLayerWidget.tsx:216
 msgid "Attribute definitions"
 msgstr "Описания атрибутов"

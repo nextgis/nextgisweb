@@ -14,12 +14,13 @@ from shapely.geometry import box
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, gettext
+from nextgisweb.env import COMP_ID, gettext, gettextf
 from nextgisweb.lib import saext
 from nextgisweb.lib.apitype import make_literal
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.ows import FIELD_TYPE_WFS
+from nextgisweb.lib.reqext import response_diagnostics
 
 from nextgisweb.core.exception import ExternalServiceError, ForbiddenError, ValidationError
 from nextgisweb.feature_layer import (
@@ -100,6 +101,36 @@ def find_tags(element, tag):
     return element.xpath('.//*[local-name()="%s"]' % tag)
 
 
+def _extract_wfs_error(root) -> tuple[str | None, str | None]:
+    """Extract exception code and message from a WFS exception document"""
+
+    def _clean(value: str | None) -> str | None:
+        return value.strip() or None if value else None
+
+    # WFS 1.1.0, 2.0.0, 2.0.2: ExceptionReport/Exception[exceptionCode]/ExceptionText
+    el_exc = next(iter(find_tags(root, "Exception")), None)
+    if el_exc is not None:
+        code = _clean(el_exc.attrib.get("exceptionCode"))
+        text = next(
+            (cleaned for el in find_tags(el_exc, "ExceptionText") if (cleaned := _clean(el.text))),
+            None,
+        )
+        return code, text
+
+    # WFS 1.0.0 (legacy): ServiceExceptionReport/ServiceException[code]text
+    el_exc = next(iter(find_tags(root, "ServiceException")), None)
+    if el_exc is not None:
+        return _clean(el_exc.attrib.get("code")), _clean(el_exc.text)
+
+    return None, None
+
+
+def _wfs_error_message(code: str | None, text: str | None) -> str | None:
+    if text and code:
+        return f"{text} ({code})"
+    return text or code
+
+
 def ns_trim(value):
     pos = max(value.find("}"), value.rfind(":"))
     return value[pos + 1 :]
@@ -178,18 +209,36 @@ class WFSConnection(Resource):
                 timeout=WFSClientComponent.current().options["timeout"].total_seconds(),
                 **kwargs,
             )
-        except RequestException:
-            raise ExternalServiceError
+        except RequestException as exc:
+            logger.error("External service request failed: %s: %s", type(exc).__name__, exc)
+            raise ExternalServiceError(
+                gettext("Unable to get a response from the remote server."),
+                detail=f"{type(exc).__name__}.",
+            ) from exc
 
         if response.status_code < 500:
-            root = etree.parse(BytesIO(response.content)).getroot()
+            try:
+                root = etree.parse(BytesIO(response.content)).getroot()
+            except etree.XMLSyntaxError as exc:
+                raise ExternalServiceError(
+                    gettext("Failed to parse the XML response from the remote server."),
+                    data=response_diagnostics(response),
+                ) from exc
             if 200 <= response.status_code < 300:
                 return root
             if response.status_code >= 400:
-                el_exc = find_tags(root, "Exception")[0]
-                if el_exc.attrib.get("exceptionCode") == "VersionNegotiationFailed":
+                code, text = _extract_wfs_error(root)
+                if code == "VersionNegotiationFailed":
                     raise VersionNotSupported
-        raise ExternalServiceError
+                if (message := _wfs_error_message(code, text)) is not None:
+                    raise ExternalServiceError(message, data=response_diagnostics(response))
+
+        raise ExternalServiceError(
+            gettextf("The remote server returned an unexpected HTTP status code ({}).")(
+                response.status_code
+            ),
+            data=response_diagnostics(response),
+        )
 
     def get_capabilities(self):
         root = self.request_wfs(

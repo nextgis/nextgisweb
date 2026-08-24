@@ -88,6 +88,7 @@ class OperationalError(UserException):
 
 class ExternalServiceError(OperationalError):
     title = gettext("External service error")
+    message = gettext("An error occurred while accessing an external service.")
 
 
 class NotConfigured(UserException):

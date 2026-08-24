@@ -7,7 +7,7 @@ from threading import Thread
 
 from httpx2 import AsyncClient, Limits, Timeout, TimeoutException, TransportError
 
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import ExternalServiceError
@@ -87,9 +87,10 @@ class TileFetcher:
             except TimeoutException as exc:
                 raise TimeoutError from exc
             except (TransportError, SSLCertVerificationError) as exc:
-                logger.error("TMS service error: %s: %s", type(exc).__name__, exc)
+                logger.error("External service request failed: %s: %s", type(exc).__name__, exc)
                 raise ExternalServiceError(
                     gettext("Unable to get a response from the remote server."),
+                    detail=f"{type(exc).__name__}.",
                 ) from exc
             if response.status_code == 200:
                 data = response.content
@@ -97,7 +98,9 @@ class TileFetcher:
                 data = None
             else:
                 raise ExternalServiceError(
-                    gettext("An unexpected HTTP status code was received from the remote server."),
+                    gettextf("The remote server returned an unexpected HTTP status code ({}).")(
+                        response.status_code
+                    ),
                     data=dict(status_code=response.status_code),
                 )
 
