@@ -4,7 +4,7 @@ interface IsModal {
   navigateToId?: never;
   isModal: true;
   onCancel: () => void;
-  onOk: () => void;
+  onOk: (deletedIds: number[]) => void;
 }
 
 interface NotModal {
@@ -20,6 +20,6 @@ export type DeletePageProps = {
 
 export interface DeleteConfirmModalProps extends ShowModalOptions {
   resources: number[];
-  onOkDelete: () => void;
+  onOkDelete: (deletedIds: number[]) => void;
   onCancelDelete: () => void;
 }

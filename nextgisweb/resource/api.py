@@ -286,6 +286,7 @@ class ResourceDeleteGetResponse(Struct, kw_only=True):
 def _delete_multiple(request: Request, resource_ids, partial, *, dry_run):
     affected = dict()
     unaffected = dict()
+    deleted = list()
 
     def _acc(d, cls, v=1):
         if cls not in d:
@@ -298,6 +299,7 @@ def _delete_multiple(request: Request, resource_ids, partial, *, dry_run):
             raise ResourceRootDeleteError
 
         _affected = dict()
+        _deleted = list()
 
         def _delete(resource):
             request.resource_permission(ResourceScope.delete, resource)
@@ -309,9 +311,10 @@ def _delete_multiple(request: Request, resource_ids, partial, *, dry_run):
             if not dry_run:
                 DBSession.delete(resource)
             _acc(_affected, resource.cls)
+            _deleted.append(resource.id)
 
         _delete(resource)
-        return _affected
+        return _affected, _deleted
 
     for rid in resource_ids:
         cls = "resource"
@@ -323,30 +326,39 @@ def _delete_multiple(request: Request, resource_ids, partial, *, dry_run):
                 raise ResourceNotFound(rid)
         else:
             try:
-                resource_affected = delete(resource)
+                resource_affected, resource_deleted = delete(resource)
             except UserException:
                 if not partial:
                     raise
                 if resource.has_permission(ResourceScope.read, request.user):
                     cls = resource.cls
             else:
+                deleted.extend(resource_deleted)
                 for k, v in resource_affected.items():
                     _acc(affected, k, v)
                 continue
 
         _acc(unaffected, cls)
 
-    return ResourceDeleteGetResponse(
-        affected=ResourceDeleteSummary.from_resources(resources=affected),
-        unaffected=ResourceDeleteSummary.from_resources(resources=unaffected),
-    )
+    return affected, unaffected, deleted
 
 
 def delete_get(request: Request, *, resources: DeleteResources) -> ResourceDeleteGetResponse:
     """Simulate deletion of multiple resources
 
     :returns: Dry-run result showing which resources would be deleted"""
-    return _delete_multiple(request, resources, True, dry_run=True)
+    affected, unaffected, _ = _delete_multiple(request, resources, True, dry_run=True)
+    return ResourceDeleteGetResponse(
+        affected=ResourceDeleteSummary.from_resources(resources=affected),
+        unaffected=ResourceDeleteSummary.from_resources(resources=unaffected),
+    )
+
+
+class ResourceDeletePostResponse(Struct, kw_only=True):
+    deleted: Annotated[
+        list[ResourceID],
+        Meta(description="IDs of the deleted resources"),
+    ]
 
 
 def delete_post(
@@ -357,13 +369,14 @@ def delete_post(
         bool,
         Meta(description="Skip non-deletable resources"),
     ] = False,
-) -> EmptyObject:
+) -> ResourceDeletePostResponse:
     """Delete multiple resources
 
-    :returns: Deletion result for each requested resource"""
+    :returns: IDs of the deleted resources"""
 
     with DBSession.no_autoflush:
-        _delete_multiple(request, resources, partial, dry_run=False)
+        _, _, deleted = _delete_multiple(request, resources, partial, dry_run=False)
+    return ResourceDeletePostResponse(deleted=deleted)
 
 
 if TYPE_CHECKING:

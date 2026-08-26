@@ -53,23 +53,8 @@ export function showMoveAbsolutError(
 }
 
 export function useResourceNotify() {
-  const { confirmDelete, messageApi, contextHolder } = useConfirm();
+  const { messageApi, contextHolder } = useConfirm();
 
-  function confirmThenDelete(onOk: () => void) {
-    confirmDelete({
-      onOk,
-      content: gettext(
-        "Please confirm resource deletion. This action cannot be undone."
-      ),
-    });
-  }
-
-  const notifySuccessfulDeletion = useCallback(
-    (count: number) => {
-      showSuccessfulDeletion(messageApi, count);
-    },
-    [messageApi]
-  );
   const notifySuccessfulMove = useCallback(
     (count: number) => {
       showSuccessfulMove(messageApi, count);
@@ -91,10 +76,8 @@ export function useResourceNotify() {
 
   return {
     contextHolder,
-    confirmThenDelete,
     notifyMoveWithError,
     notifySuccessfulMove,
     notifyMoveAbsolutError,
-    notifySuccessfulDeletion,
   };
 }

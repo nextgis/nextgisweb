@@ -15,5 +15,5 @@ export function Translated({ msgf, args }: TranslatedProps) {
   const argsc = !Array.isArray(args)
     ? ([args] as [FormatObject<ReactNode>])
     : args;
-  return createElement(Fragment, {}, compiled(...argsc));
+  return createElement(Fragment, {}, ...compiled(...argsc));
 }

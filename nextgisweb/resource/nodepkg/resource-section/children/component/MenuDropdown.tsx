@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, useCallback, useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
-import { Badge, Dropdown, Tooltip } from "@nextgisweb/gui/antd";
+import { useShowModal } from "@nextgisweb/gui";
+import { Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
-import { isAbortError } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
 import type { ResourcePickerAttr } from "@nextgisweb/resource/component/resource-picker/type";
@@ -18,7 +17,10 @@ import { forEachSelected } from "../util/forEachSelected";
 import { loadVolumes } from "../util/loadVoluems";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert";
-import PriorityHighIcon from "@nextgisweb/icon/material/priority_high";
+
+const DeletePageModalLazy = lazy(
+  () => import("@nextgisweb/resource/delete-page/DeletePageModal")
+);
 
 interface MenuDropdownProps {
   items: ChildrenResource[];
@@ -28,7 +30,6 @@ interface MenuDropdownProps {
   volumeVisible: boolean;
   storageEnabled: boolean;
   creationDateVisible: boolean;
-  setBatchDeletingInProgress: Dispatch<SetStateAction<boolean>>;
   setCreationDateVisible: Dispatch<SetStateAction<boolean>>;
   setVolumeVisible: Dispatch<SetStateAction<boolean>>;
   setVolumeValues: Dispatch<SetStateAction<Record<number, number>>>;
@@ -48,7 +49,6 @@ export function MenuDropdown({
   volumeVisible,
   storageEnabled,
   creationDateVisible,
-  setBatchDeletingInProgress,
   setCreationDateVisible,
   setVolumeVisible,
   setVolumeValues,
@@ -57,13 +57,12 @@ export function MenuDropdown({
   setSelected,
 }: MenuDropdownProps) {
   const { showResourcePicker } = useResourcePicker();
+  const { showModal, modalHolder } = useShowModal();
   const {
     contextHolder,
-    confirmThenDelete,
     notifyMoveWithError,
     notifySuccessfulMove,
     notifyMoveAbsolutError,
-    notifySuccessfulDeletion,
   } = useResourceNotify();
 
   const selectedAllowedForFeatureExport = useMemo(() => {
@@ -132,68 +131,18 @@ export function MenuDropdown({
       selected,
     ]
   );
-  const { makeSignal } = useAbortController();
-  const [selectedAllowedForDelete, setSelectedAllowedForDelete] = useState<
-    number[]
-  >([]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      const allowedToDelete: number[] = [];
-      const signal = makeSignal();
-      for (const item of items) {
-        if (selected.includes(item.resourceId)) {
-          const includeDelAction = await item.it.fetch(
-            [["resource.is_deletable"]],
-            { signal }
-          );
-          if (includeDelAction[0]) {
-            allowedToDelete.push(item.resourceId);
-          }
-        }
-      }
-      if (!cancelled) {
-        setSelectedAllowedForDelete(allowedToDelete);
-      }
-    };
-
-    /**
-     * TODO: AbortSignal is not supported by {@link ResourceAttrItem.fetch} yet.
-     * Remove the manual cancellation guard once per-waiter abort is supported.
-     */
-    load().catch((err) => {
-      if (!isAbortError(err)) {
-        throw err;
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [selected, makeSignal, items]);
-
-  const deleteSelected = useCallback(() => {
-    forEachSelected({
-      title: gettext("Deleting resources"),
-      setAttrItems,
-      setSelected,
-      setInProgress: setBatchDeletingInProgress,
-      selected: selectedAllowedForDelete,
-      executer: ({ selectedId, signal }) =>
-        route("resource.item", selectedId).delete({ signal }),
-      onComplate: (successItems) => {
-        if (successItems.length) {
-          notifySuccessfulDeletion(successItems.length);
-        }
+  const onDeleteClick = useCallback(() => {
+    const { destroy } = showModal(DeletePageModalLazy, {
+      resources: selected,
+      onCancelDelete: () => {
+        destroy();
+      },
+      onOkDelete: (deletedIds) => {
+        destroy();
+        setAttrItems((old) => old.filter((x) => !deletedIds.includes(x.id)));
       },
     });
-  }, [
-    selectedAllowedForDelete,
-    setBatchDeletingInProgress,
-    notifySuccessfulDeletion,
-    setAttrItems,
-    setSelected,
-  ]);
+  }, [showModal, selected, setAttrItems]);
 
   const menuItems = useMemo(() => {
     const menuItems_: MenuItems = [];
@@ -231,29 +180,11 @@ export function MenuDropdown({
       },
     });
     if (allowBatch) {
-      // Batch delete
-      const checkNotAllForDelete =
-        selectedAllowedForDelete.length < selected.length &&
-        selectedAllowedForDelete.length > 0;
       const deleteOperationConfig: MenuItem = {
         key: "delete",
-        label: (
-          <>
-            {gettext("Delete")}{" "}
-            {selectedAllowedForDelete.length > 0 && (
-              <Badge size="small" count={selectedAllowedForDelete.length} />
-            )}{" "}
-            {checkNotAllForDelete && (
-              <Tooltip
-                title={gettext("Not all of the selected can be deleted.")}
-              >
-                <PriorityHighIcon />
-              </Tooltip>
-            )}
-          </>
-        ),
-        disabled: !selectedAllowedForDelete.length,
-        onClick: () => confirmThenDelete(deleteSelected),
+        label: gettext("Delete"),
+        disabled: !selected.length,
+        onClick: onDeleteClick,
       };
 
       // Batch change parent
@@ -309,7 +240,6 @@ export function MenuDropdown({
     return menuItems_;
   }, [
     selectedAllowedForFeatureExport,
-    selectedAllowedForDelete,
     creationDateVisible,
     storageEnabled,
     volumeVisible,
@@ -319,11 +249,10 @@ export function MenuDropdown({
     items,
     onNewGroup,
     setAllowBatch,
-    deleteSelected,
+    onDeleteClick,
     moveSelectedTo,
     setVolumeValues,
     setVolumeVisible,
-    confirmThenDelete,
     showResourcePicker,
     setCreationDateVisible,
   ]);
@@ -335,6 +264,7 @@ export function MenuDropdown({
   return (
     <>
       {contextHolder}
+      {modalHolder}
       <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
         <a>
           <MoreVertIcon />

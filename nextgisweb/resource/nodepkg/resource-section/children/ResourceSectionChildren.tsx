@@ -45,7 +45,6 @@ export function ResourceSectionChildren({
 }: ResourceSectionProps) {
   const [volumeVisible, setVolumeVisible] = useState(false);
   const [creationDateVisible, setCreationDateVisible] = useState(false);
-  const [batchDeletingInProgress, setBatchDeletingInProgress] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [hasVisible, setHasVisible] = useState(false);
   const [allowBatch, setAllowBatch] = useState(false);
@@ -123,16 +122,13 @@ export function ResourceSectionChildren({
     return allowBatch
       ? {
           type: "checkbox",
-          getCheckboxProps: () => ({
-            disabled: batchDeletingInProgress,
-          }),
           selectedRowKeys: selected,
           onChange: (selectedRowKeys) => {
             setSelected(selectedRowKeys.map(Number));
           },
         }
       : undefined;
-  }, [allowBatch, selected, batchDeletingInProgress]);
+  }, [allowBatch, selected]);
 
   const hasChildren = resourceData.resource.children;
 
@@ -248,7 +244,6 @@ export function ResourceSectionChildren({
             volumeVisible={volumeVisible}
             storageEnabled={storageEnabled}
             creationDateVisible={creationDateVisible}
-            setBatchDeletingInProgress={setBatchDeletingInProgress}
             setCreationDateVisible={setCreationDateVisible}
             setVolumeVisible={setVolumeVisible}
             setVolumeValues={setVolumeValues}

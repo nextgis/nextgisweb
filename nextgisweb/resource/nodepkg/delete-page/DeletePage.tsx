@@ -3,20 +3,24 @@ import { sortBy } from "lodash-es";
 import { useMemo, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
+import { CountdownButton } from "@nextgisweb/gui/buttons";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { DeleteIcon } from "@nextgisweb/gui/icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import { ResourceIcon } from "../icon";
 
+import { DeleteMessage, msgResourcesCount } from "./DeleteMessage";
 import type { DeletePageProps } from "./type";
-import { msgDeleteButton, msgMultiple, msgResourcesCount } from "./util";
 
 import "./DeletePage.less";
+
+const msgDeleteButton = (resources: number) =>
+  ngettextf("Delete {} resource", "Delete {} resources", resources)(resources);
 
 export function DeletePage({
   resources,
@@ -45,6 +49,17 @@ export function DeletePage({
     { cache: true }
   );
 
+  const isSingle = resources.length === 1;
+
+  const { data: singleResource, isLoading: isSingleResourceLoading } =
+    useRouteGet({
+      name: "resource.item",
+      params: { id: resources[0] },
+      enabled: isSingle,
+      loadOnInit: isSingle,
+      options: { cache: true },
+    });
+
   const sortedData = useMemo(() => {
     if (data && labelData)
       return sortBy(
@@ -56,17 +71,24 @@ export function DeletePage({
       );
   }, [data, labelData]);
 
+  const dataReady =
+    !isLoading &&
+    !isLabelDataLoading &&
+    !!data &&
+    !!labelData &&
+    (!isSingle || !isSingleResourceLoading);
+
   const onDeleteClick = async () => {
     setDeletingInProgress(true);
     try {
-      await route("resource.items.delete").post({
+      const { deleted } = await route("resource.items.delete").post({
         query: {
           resources,
           partial: true,
         },
         body: "",
       });
-      onOk?.();
+      onOk?.(deleted);
     } catch (err) {
       errorModal(err);
     } finally {
@@ -74,13 +96,24 @@ export function DeletePage({
     }
   };
 
-  if (!data || !labelData || isLoading || isLabelDataLoading) {
+  const nonModalonCancel = () => {
+    window.open(routeURL("resource.show", { id: resources[0] ?? 0 }), "_self");
+  };
+
+  if (!dataReady || !data || !labelData) {
     return <LoadingWrapper />;
   }
 
   return (
     <div className="ngw-resource-delete-page">
-      {msgMultiple(data.affected, data.unaffected)}
+      <DeleteMessage
+        affected={data.affected}
+        unaffected={data.unaffected}
+        selectedCount={resources.length}
+        resourceName={
+          isSingle ? singleResource?.resource.display_name : undefined
+        }
+      />
 
       {sortedData && sortedData.length > 0 && (
         <div className={classNames("table", isModal && "modal")}>
@@ -104,22 +137,24 @@ export function DeletePage({
       )}
 
       <div className="buttons">
-        <Button
-          disabled={data.affected.count === 0}
-          danger
-          type="primary"
-          icon={<DeleteIcon />}
-          loading={deletingInProgress}
-          onClick={onDeleteClick}
-        >
-          {msgDeleteButton(data.affected.count)}
-        </Button>
-
-        {isModal && (
-          <Button className="cancel" type="default" onClick={onCancel}>
-            {gettext("Cancel")}
-          </Button>
+        {data.affected.count > 0 && (
+          <CountdownButton
+            danger
+            type="primary"
+            icon={<DeleteIcon />}
+            loading={deletingInProgress}
+            onClick={onDeleteClick}
+          >
+            {msgDeleteButton(data.affected.count)}
+          </CountdownButton>
         )}
+        <Button
+          className="cancel"
+          type="default"
+          onClick={isModal ? onCancel : nonModalonCancel}
+        >
+          {gettext("Cancel")}
+        </Button>
       </div>
     </div>
   );

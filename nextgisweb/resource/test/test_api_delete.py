@@ -85,7 +85,7 @@ def test_delete(group1, group2, user, ngw_webtest_app: WebTestApp):
     }
 
     api.post(query=dict(query_base, partial=False), status=403)
-    assert api.post(query=dict(query_base, partial=True)).json == {}
+    assert api.post(query=dict(query_base, partial=True)).json == {"deleted": [group1]}
 
     ngw_webtest_app.authorization = ("Basic", ("administrator", "admin"))
 
@@ -95,4 +95,19 @@ def test_delete(group1, group2, user, ngw_webtest_app: WebTestApp):
     assert _get_json() == {
         "affected": {"count": 1, "resources": {"resource_group": 1}},
         "unaffected": {"count": 1, "resources": {"resource": 1}},
+    }
+
+
+@pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
+def test_delete_nested(ngw_webtest_app: WebTestApp):
+    with transaction.manager:
+        parent = ResourceGroup().persist()
+        child = ResourceGroup(parent=parent).persist()
+        DBSession.flush()
+        parent_id, child_id = parent.id, child.id
+
+    api = ngw_webtest_app.with_url("/api/resource/delete")
+
+    assert api.post(query=dict(resources=[parent_id])).json == {
+        "deleted": [child_id, parent_id],
     }

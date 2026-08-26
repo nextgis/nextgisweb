@@ -1,4 +1,4 @@
-#: api.py:451
+#: api.py:464
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -7,7 +7,7 @@ msgid "Resource ID"
 msgstr "ID ресурса"
 
 #: attr/resource.py:110 nodepkg/page/search/ResultsTable.tsx:17
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:194
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:190
 msgid "Type"
 msgstr "Тип"
 
@@ -16,40 +16,40 @@ msgid "Keyname"
 msgstr "Ключ"
 
 #: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
-msgid "Yes"
-msgstr "Да"
-
-#: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
 msgid "No"
 msgstr "Нет"
 
+#: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
+msgid "Yes"
+msgstr "Да"
+
 #: attr/resource.py:121 nodepkg/editor-widget/EditorWidget.tsx:46
 #: nodepkg/page/search/ResultsTable.tsx:18
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:201
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:197
 msgid "Owner"
 msgstr "Владелец"
 
-#: category.py:37
+#: category.py:41
 msgid "Layers and styles"
 msgstr "Слои и стили"
 
-#: category.py:42
+#: category.py:46
 msgid "Maps and services"
 msgstr "Карты и сервисы"
 
-#: category.py:47
+#: category.py:51
 msgid "Field data collection"
 msgstr "Сбор данных"
 
-#: category.py:52 scope.py:39
+#: category.py:56 scope.py:39
 msgid "External connections"
 msgstr "Внешние соединения"
 
-#: category.py:57
+#: category.py:61
 msgid "Miscellaneous"
 msgstr "Другие ресурсы"
 
-#: component.py:135
+#: component.py:149
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
@@ -195,7 +195,7 @@ msgstr "Группа ресурсов"
 #: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:32
 #: nodepkg/editor-widget/EditorWidget.tsx:19
 #: nodepkg/page/search/ResultsTable.tsx:16
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:180
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:176
 msgid "Display name"
 msgstr "Наименование"
 
@@ -270,11 +270,11 @@ msgid "Close without saving"
 msgstr "Закрыть без сохранения"
 
 #: nodepkg/composite/CompositeWidgetModal.tsx:114
-#: nodepkg/delete-page/DeletePage.tsx:120
+#: nodepkg/delete-page/DeletePage.tsx:159
 msgid "Cancel"
 msgstr "Отмена"
 
-#: nodepkg/control-panel-plugin.tsx:11 view.py:233
+#: nodepkg/control-panel-plugin.tsx:11 view.py:236
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
@@ -282,64 +282,84 @@ msgstr "Экспорт ресурсов"
 msgid "Confirmation required"
 msgstr "Необходимо подтверждение"
 
-#: nodepkg/delete-page/util.ts:5
+#: nodepkg/delete-page/DeletePage.tsx:25
 msgid "Delete {} resource"
 msgid_plural "Delete {} resources"
 msgstr[0] "Удалить {} ресурс"
 msgstr[1] "Удалить {} ресурса"
 msgstr[2] "Удалить {} ресурсов"
 
-#: nodepkg/delete-page/util.ts:13
+#: nodepkg/delete-page/DeleteMessage.tsx:8
 msgid "resource"
 msgid_plural "resources"
 msgstr[0] "ресурс"
 msgstr[1] "ресурса"
 msgstr[2] "ресурсов"
 
-#: nodepkg/delete-page/util.ts:20
-msgid ""
-"The selected resource cannot be deleted. You may not have sufficient "
-"permissions, or this resource is being referenced by other resources."
-msgstr ""
-"Выбранный ресурс невозможно удалить. Возможно, у вас недостаточно прав для "
-"удаления, или на этот ресурс ссылаются другие ресурсы."
+#: nodepkg/delete-page/DeleteMessage.tsx:11
+msgid "{} resource"
+msgid_plural "{} resources"
+msgstr[0] "{} ресурса"
+msgstr[1] "{} ресурсов"
+msgstr[2] "{} ресурсов"
 
-#: nodepkg/delete-page/util.ts:24
-msgid ""
-"Please confirm the deletion of the selected resource. This action is "
-"irreversible, and the resource will be permanently deleted."
-msgstr ""
-"Пожалуйста, подтвердите удаление выбранного ресурса. Это действие необратимо,"
-" и ресурс будет навсегда удален."
+#: nodepkg/delete-page/DeleteMessage.tsx:14
+msgid "{} selected resource"
+msgid_plural "{} selected resources"
+msgstr[0] "{} выбранного ресурса"
+msgstr[1] "{} выбранных ресурсов"
+msgstr[2] "{} выбранных ресурсов"
 
-#: nodepkg/delete-page/util.ts:29
-msgid ""
-"Please confirm the deletion of the selected resource and all its child "
-"resources."
-msgstr ""
-"Пожалуйста, подтвердите удаление выбранного ресурса и всех его дочерних "
-"ресурсов."
+#: nodepkg/delete-page/DeleteMessage.tsx:25
+msgid "You may not have sufficient permissions, or other resources may reference it."
+msgid_plural "You may not have sufficient permissions, or other resources may reference them."
+msgstr[0] "Возможно, у вас недостаточно прав, или на него ссылаются другие ресурсы."
+msgstr[1] "Возможно, у вас недостаточно прав, или на них ссылаются другие ресурсы."
+msgstr[2] "Возможно, у вас недостаточно прав, или на них ссылаются другие ресурсы."
 
-#: nodepkg/delete-page/util.ts:33
-msgid "{} resource will be permanently deleted."
-msgid_plural "{} resources will be permanently deleted."
-msgstr[0] "{} ресурс будет удален навсегда."
-msgstr[1] "{} ресурса будут удалены навсегда."
-msgstr[2] "{} ресурсов будут удалены навсегда."
+#: nodepkg/delete-page/DeleteMessage.tsx:32
+msgid "This action is irreversible, and the resource will be permanently deleted."
+msgid_plural "This action is irreversible, and the resources will be permanently deleted."
+msgstr[0] "Это действие необратимо, ресурс будет удалён навсегда."
+msgstr[1] "Это действие необратимо, ресурсы будут удалены навсегда."
+msgstr[2] "Это действие необратимо, ресурсы будут удалены навсегда."
 
-#: nodepkg/delete-page/util.ts:41
-msgid "{} resource cannot be deleted."
-msgid_plural "{} resources cannot be deleted."
-msgstr[0] "{} ресурс не может быть удален."
-msgstr[1] "{} ресурса не могут быть удалены."
-msgstr[2] "{} ресурсов не могут быть удалены."
+#: nodepkg/delete-page/DeleteMessage.tsx:39
+msgid "Including child resources, a total of {} will be deleted."
+msgstr "С учетом дочерних ресурсов, всего будет удалено {}."
 
-#: nodepkg/delete-page/util.ts:47
-msgid "Please confirm the permanent deletion of {} resource."
-msgid_plural "Please confirm the permanent deletion of {} resources."
-msgstr[0] "Пожалуйста, подтвердите необратимое удаление {} ресурса."
-msgstr[1] "Пожалуйста, подтвердите необратимое удаление {} ресурсов."
-msgstr[2] "Пожалуйста, подтвердите необратимое удаление {} ресурсов."
+#: nodepkg/delete-page/DeleteMessage.tsx:69
+msgid "The selected resource{} cannot be deleted."
+msgstr "Выбранный ресурс{} нельзя удалить."
+
+#: nodepkg/delete-page/DeleteMessage.tsx:80
+msgid "None of the {} selected resource can be deleted."
+msgid_plural "None of the {} selected resources can be deleted."
+msgstr[0] "Ни один из {} выбранного ресурса нельзя удалить."
+msgstr[1] "Ни один из {} выбранных ресурсов нельзя удалить."
+msgstr[2] "Ни один из {} выбранных ресурсов нельзя удалить."
+
+#: nodepkg/delete-page/DeleteMessage.tsx:102
+msgid "Please confirm the deletion of the selected resource{}."
+msgid_plural "Please confirm the deletion of the selected resources."
+msgstr[0] "Пожалуйста, подтвердите удаление выбранного ресурса{}."
+msgstr[1] "Пожалуйста, подтвердите удаление выбранных ресурсов."
+msgstr[2] "Пожалуйста, подтвердите удаление выбранных ресурсов."
+
+#: nodepkg/delete-page/DeleteMessage.tsx:118
+msgid "Please confirm the deletion of {}."
+msgstr "Пожалуйста, подтвердите удаление {}."
+
+#: nodepkg/delete-page/DeleteMessage.tsx:132
+msgid "Please confirm the deletion of {a} out of {s} selected."
+msgstr "Пожалуйста, подтвердите удаление {a} из {s} выбранных."
+
+#: nodepkg/delete-page/DeleteMessage.tsx:143
+msgid "The remaining resource cannot be deleted, you may not have sufficient permissions, or other resources may reference it."
+msgid_plural "The remaining resources cannot be deleted, you may not have sufficient permissions, or other resources may reference them."
+msgstr[0] "Оставшийся ресурс удалить нельзя, возможно, у вас недостаточно прав, или на него ссылаются другие ресурсы."
+msgstr[1] "Остальные ресурсы удалить нельзя, возможно, у вас недостаточно прав, или на них ссылаются другие ресурсы."
+msgstr[2] "Остальные ресурсы удалить нельзя, возможно, у вас недостаточно прав, или на них ссылаются другие ресурсы."
 
 #: nodepkg/description-editor/DescriptionEditorWidget.tsx:30
 msgid "Description"
@@ -419,10 +439,6 @@ msgstr[0] "Ресурс перемещен"
 msgstr[1] "Перемещено {} ресурса"
 msgstr[2] "Перемещено {} ресурсов"
 
-#: nodepkg/hook/useResourceNotify.ts:61
-msgid "Please confirm resource deletion. This action cannot be undone."
-msgstr "Пожалуйста, подтвердите удаление. Это действие не может быть отменено."
-
 #: nodepkg/page/search/FilterBar.tsx:17
 msgid "All resource types"
 msgstr "Все типы ресурсов"
@@ -485,7 +501,7 @@ msgid "Found"
 msgstr "Найдено"
 
 #: nodepkg/page/search/ResultsTable.tsx:19
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:209
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:205
 msgid "Created"
 msgstr "Дата создания"
 
@@ -546,7 +562,7 @@ msgid "Update"
 msgstr "Изменить"
 
 #: nodepkg/resource-action-plugin.tsx:39
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:242
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:185
 msgid "Delete"
 msgstr "Удалить"
 
@@ -587,51 +603,43 @@ msgstr ""
 msgid "Contact Web GIS administrator"
 msgstr "Связаться с администратором Web GIS"
 
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:227
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:223
 msgid "Volume"
 msgstr "Размер"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:100
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:99
 msgid "Moving resources"
 msgstr "Перемещение ресурсов"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:177
-msgid "Deleting resources"
-msgstr "Удаление ресурсов"
-
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:203
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:152
 msgid "Turn off multiple selection"
 msgstr "Отключить множественный выбор"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:204
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:153
 msgid "Select multiple resources"
 msgstr "Выбрать несколько ресурсов"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:214
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:163
 msgid "Hide resource volume"
 msgstr "Скрыть размер ресурса"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:215
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:164
 msgid "Show resource volume"
 msgstr "Показать размер ресурса"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:227
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:176
 msgid "Hide resource creation date"
 msgstr "Скрыть дату создания ресурса"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:228
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:177
 msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:248
-msgid "Not all of the selected can be deleted."
-msgstr "Не все выделенные ресурсы могут быть удалены."
-
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:262
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:193
 msgid "Move"
 msgstr "Переместить"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:281
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:212
 msgid "Export vector layers"
 msgstr "Экспорт векторных слоёв"
 
@@ -757,10 +765,10 @@ msgstr "Поиск ресурсов"
 msgid "Update resource"
 msgstr "Изменить ресурс"
 
-#: view.py:223
+#: view.py:226
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:285
+#: view.py:288
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
