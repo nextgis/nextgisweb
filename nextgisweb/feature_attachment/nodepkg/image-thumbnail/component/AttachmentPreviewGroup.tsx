@@ -121,6 +121,7 @@ export function AttachmentPreviewGroup({
   }, [previewImages, featureId, resourceId]);
 
   const tourViewerRef = useRef<Viewer | null>(null);
+  const autorotateShownRef = useRef(false);
 
   const currentImage: Attachment | undefined = previewImages[current];
   const currentNodeId =
@@ -146,6 +147,7 @@ export function AttachmentPreviewGroup({
       setCurrent(0);
       setLastPanoramaId(null);
       tourViewerRef.current = null;
+      autorotateShownRef.current = false;
     }
   }, [open]);
 
@@ -233,9 +235,11 @@ export function AttachmentPreviewGroup({
             <PhotospherePreview
               nodes={nodes}
               currentNodeId={isTour ? nodeId : "current"}
+              autorotate={!autorotateShownRef.current}
               onReady={(viewer) => {
                 tourViewerRef.current = viewer;
                 if (viewer) {
+                  autorotateShownRef.current = true;
                   panoramaStore.add(info.current, viewer);
                 } else {
                   panoramaStore.delete(info.current);

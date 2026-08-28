@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
+    "@photo-sphere-viewer/autorotate-plugin": "^5.7.0",
     "@photo-sphere-viewer/core": "^5.7.0",
     "@photo-sphere-viewer/markers-plugin": "^5.7.0"
   }

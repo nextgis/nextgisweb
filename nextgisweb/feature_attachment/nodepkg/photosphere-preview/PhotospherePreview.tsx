@@ -1,3 +1,4 @@
+import { AutorotatePlugin } from "@photo-sphere-viewer/autorotate-plugin";
 import { Viewer } from "@photo-sphere-viewer/core";
 import type { ViewerConfig } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
@@ -33,6 +34,7 @@ export interface PhotospherePreviewNode {
 export interface PhotospherePreviewProps extends Pick<ViewerConfig, "navbar"> {
   nodes: PhotospherePreviewNode[];
   currentNodeId: string;
+  autorotate?: boolean;
   onReady?: (viewer: Viewer | null) => void;
   onNavigate?: (nodeId: string) => void;
 }
@@ -86,6 +88,7 @@ function disposeViewerRenderer(viewer: Viewer) {
 export default function PhotospherePreview({
   nodes,
   currentNodeId,
+  autorotate = true,
   onReady,
   onNavigate,
   navbar,
@@ -103,6 +106,9 @@ export default function PhotospherePreview({
   nodesMapRef.current = nodesMap;
 
   const currentNodeIdRef = useRef(currentNodeId);
+
+  const autorotateRef = useRef(autorotate);
+  autorotateRef.current = autorotate;
 
   const viewerRef = useRef<Viewer | null>(null);
   const appliedNodeIdRef = useRef<string | null>(null);
@@ -151,6 +157,15 @@ export default function PhotospherePreview({
               nodesMapRef.current
             ),
           }),
+          ...(autorotateRef.current
+            ? [
+                AutorotatePlugin.withConfig({
+                  autostartDelay: 0,
+                  autostartOnIdle: false,
+                  autorotateSpeed: "1rpm",
+                }),
+              ]
+            : []),
         ],
       });
       viewerRef.current = viewer;
@@ -192,6 +207,11 @@ export default function PhotospherePreview({
     if (!node) return;
 
     appliedNodeIdRef.current = currentNodeId;
+
+    const autorotatePlugin = viewer.getPlugin(AutorotatePlugin) as
+      | AutorotatePlugin
+      | undefined;
+    autorotatePlugin?.stop();
 
     const markers = viewer.getPlugin(MarkersPlugin) as MarkersPlugin;
     markers.clearMarkers();
