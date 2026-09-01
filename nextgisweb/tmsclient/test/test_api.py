@@ -5,8 +5,9 @@ import transaction
 from requests.exceptions import ConnectionError, HTTPError, JSONDecodeError
 
 from nextgisweb.pyramid.test import WebTestApp
+from nextgisweb.resource.test import ResourceAPI
 
-from ..model import NEXTGIS_GEOSERVICES, TMSConnection
+from ..model import NEXTGIS_GEOSERVICES, TMSConnection, TMSLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -18,6 +19,13 @@ def connection_id():
             url_template="https://geoservices.nextgis.com/raster/{layer}/{z}/{x}/{y}.png",
             capmode=NEXTGIS_GEOSERVICES,
         ).persist()
+    return resource.id
+
+
+@pytest.fixture
+def layer_id(connection_id):
+    with transaction.manager:
+        resource = TMSLayer(connection_id=connection_id).persist()
     return resource.id
 
 
@@ -60,3 +68,26 @@ def test_inspect_invalid_json(connection_id, ngw_webtest_app: WebTestApp):
 
     assert "Failed to parse the JSON response" in res.json["message"]
     assert res.json["data"]["content_type"] == "text/html"
+
+
+def test_relation_delete(layer_id, connection_id, ngw_webtest_app: WebTestApp):
+    refdata_expected = ["tmsclient_connection", connection_id, "tmsclient_layer", layer_id]
+
+    rapi = ResourceAPI()
+    resp = rapi.delete_request(connection_id, status=422)
+    references_data = resp.json["data"]["references_data"]
+    assert references_data == refdata_expected
+
+    resp = ngw_webtest_app.post(
+        "/api/resource/delete",
+        query=dict(resources=[connection_id]),
+        status=422,
+    )
+    references_data = resp.json["data"]["references_data"]
+    assert references_data == refdata_expected
+
+    ngw_webtest_app.post(
+        "/api/resource/delete",
+        query=dict(resources=[connection_id, layer_id]),
+        status=200,
+    )

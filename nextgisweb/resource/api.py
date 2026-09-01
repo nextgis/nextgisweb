@@ -2,9 +2,9 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal
 
 import sqlalchemy as sa
+import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
 import zope.event
-import zope.event.classhandler
 from msgspec import UNSET, DecodeError, Meta, Struct, UnsetType, defstruct, field, to_builtins
 from msgspec import ValidationError as MsgspecValidationError
 from msgspec.json import Decoder
@@ -16,7 +16,7 @@ from sqlalchemy.sql import or_ as sa_or
 from sqlalchemy.sql.operators import eq as eq_op
 from sqlalchemy.sql.operators import ilike_op, in_op, like_op
 
-from nextgisweb.env import COMP_ID, DBSession, gettext
+from nextgisweb.env import COMP_ID, DBSession, gettext, gettextf, inject
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, Query, StatusCode, annotate
 from nextgisweb.lib.msext import DEPRECATED
 
@@ -196,6 +196,20 @@ def item_delete(context, request: Request) -> EmptyObject:
         delete(context)
 
     DBSession.flush()
+
+
+@sa_event.listens_for(DBSession, "before_flush")
+@inject()
+def _check_relations(session: orm.Session, flush_context, instances, *, comp: ResourceComponent):
+    for obj in session.deleted:
+        if isinstance(obj, Resource):
+            for rcls, key in comp._relinfo.get(cls := obj.__class__, []):
+                robj = rcls.filter(getattr(rcls, key) == obj).first()
+                if robj and robj not in session.deleted:
+                    raise ValidationError(
+                        gettextf("Resource #{} is referenced with other resources.")(obj.id),
+                        data=dict(references_data=(cls.identity, obj.id, rcls.identity, robj.id)),
+                    )
 
 
 def collection_get(

@@ -1,4 +1,8 @@
-#: api.py:464
+#: api.py:210
+msgid "Resource #{} is referenced with other resources."
+msgstr "Ресурс #{} связан с другими ресурсами."
+
+#: api.py:478
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -16,12 +20,12 @@ msgid "Keyname"
 msgstr "Ключ"
 
 #: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
-msgid "No"
-msgstr "Нет"
-
-#: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
 msgid "Yes"
 msgstr "Да"
+
+#: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
+msgid "No"
+msgstr "Нет"
 
 #: attr/resource.py:121 nodepkg/editor-widget/EditorWidget.tsx:46
 #: nodepkg/page/search/ResultsTable.tsx:18
@@ -49,7 +53,7 @@ msgstr "Внешние соединения"
 msgid "Miscellaneous"
 msgstr "Другие ресурсы"
 
-#: component.py:149
+#: component.py:166
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
@@ -150,35 +154,35 @@ msgstr "Пользовательские ресурсы"
 msgid "Resource"
 msgstr "Ресурс"
 
-#: model.py:327
+#: model.py:336
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:340
+#: model.py:349
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:372
+#: model.py:381
 msgid "Default style"
 msgstr "Стиль по умолчанию"
 
-#: model.py:495
+#: model.py:504
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:498
+#: model.py:507
 msgid "You are not allowed to create or move a resource of type '{}' here."
 msgstr "Вам не разрешено создавать или перемещать ресурс типа '{}' сюда."
 
-#: model.py:506
+#: model.py:515
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:518
+#: model.py:527
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:594
+#: model.py:603
 msgid ""
 "Unable to revoke '{permission}' permission for '{user}' as the user belongs "
 "to the administrators group. Administrators must always have ability to "
@@ -188,7 +192,7 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:693
+#: model.py:702
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -270,24 +274,13 @@ msgid "Close without saving"
 msgstr "Закрыть без сохранения"
 
 #: nodepkg/composite/CompositeWidgetModal.tsx:114
-#: nodepkg/delete-page/DeletePage.tsx:159
+#: nodepkg/delete-page/DeletePage.tsx:156
 msgid "Cancel"
 msgstr "Отмена"
 
 #: nodepkg/control-panel-plugin.tsx:11 view.py:236
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
-
-#: nodepkg/delete-page/DeletePageModal.tsx:18
-msgid "Confirmation required"
-msgstr "Необходимо подтверждение"
-
-#: nodepkg/delete-page/DeletePage.tsx:25
-msgid "Delete {} resource"
-msgid_plural "Delete {} resources"
-msgstr[0] "Удалить {} ресурс"
-msgstr[1] "Удалить {} ресурса"
-msgstr[2] "Удалить {} ресурсов"
 
 #: nodepkg/delete-page/DeleteMessage.tsx:8
 msgid "resource"
@@ -310,56 +303,79 @@ msgstr[0] "{} выбранного ресурса"
 msgstr[1] "{} выбранных ресурсов"
 msgstr[2] "{} выбранных ресурсов"
 
-#: nodepkg/delete-page/DeleteMessage.tsx:25
+#: nodepkg/delete-page/DeleteMessage.tsx:24
 msgid "You may not have sufficient permissions, or other resources may reference it."
-msgid_plural "You may not have sufficient permissions, or other resources may reference them."
+msgid_plural ""
+"You may not have sufficient permissions, or other resources may reference "
+"them."
 msgstr[0] "Возможно, у вас недостаточно прав, или на него ссылаются другие ресурсы."
 msgstr[1] "Возможно, у вас недостаточно прав, или на них ссылаются другие ресурсы."
 msgstr[2] "Возможно, у вас недостаточно прав, или на них ссылаются другие ресурсы."
 
-#: nodepkg/delete-page/DeleteMessage.tsx:32
+#: nodepkg/delete-page/DeleteMessage.tsx:31
 msgid "This action is irreversible, and the resource will be permanently deleted."
 msgid_plural "This action is irreversible, and the resources will be permanently deleted."
 msgstr[0] "Это действие необратимо, ресурс будет удалён навсегда."
 msgstr[1] "Это действие необратимо, ресурсы будут удалены навсегда."
 msgstr[2] "Это действие необратимо, ресурсы будут удалены навсегда."
 
-#: nodepkg/delete-page/DeleteMessage.tsx:39
+#: nodepkg/delete-page/DeleteMessage.tsx:49
 msgid "Including child resources, a total of {} will be deleted."
 msgstr "С учетом дочерних ресурсов, всего будет удалено {}."
 
-#: nodepkg/delete-page/DeleteMessage.tsx:69
+#: nodepkg/delete-page/DeleteMessage.tsx:84
 msgid "The selected resource{} cannot be deleted."
 msgstr "Выбранный ресурс{} нельзя удалить."
 
-#: nodepkg/delete-page/DeleteMessage.tsx:80
+#: nodepkg/delete-page/DeleteMessage.tsx:94
 msgid "None of the {} selected resource can be deleted."
 msgid_plural "None of the {} selected resources can be deleted."
 msgstr[0] "Ни один из {} выбранного ресурса нельзя удалить."
 msgstr[1] "Ни один из {} выбранных ресурсов нельзя удалить."
 msgstr[2] "Ни один из {} выбранных ресурсов нельзя удалить."
 
-#: nodepkg/delete-page/DeleteMessage.tsx:102
+#: nodepkg/delete-page/DeleteMessage.tsx:113
 msgid "Please confirm the deletion of the selected resource{}."
 msgid_plural "Please confirm the deletion of the selected resources."
 msgstr[0] "Пожалуйста, подтвердите удаление выбранного ресурса{}."
 msgstr[1] "Пожалуйста, подтвердите удаление выбранных ресурсов."
 msgstr[2] "Пожалуйста, подтвердите удаление выбранных ресурсов."
 
-#: nodepkg/delete-page/DeleteMessage.tsx:118
+#: nodepkg/delete-page/DeleteMessage.tsx:131
 msgid "Please confirm the deletion of {}."
 msgstr "Пожалуйста, подтвердите удаление {}."
 
-#: nodepkg/delete-page/DeleteMessage.tsx:132
+#: nodepkg/delete-page/DeleteMessage.tsx:146
 msgid "Please confirm the deletion of {a} out of {s} selected."
 msgstr "Пожалуйста, подтвердите удаление {a} из {s} выбранных."
 
-#: nodepkg/delete-page/DeleteMessage.tsx:143
-msgid "The remaining resource cannot be deleted, you may not have sufficient permissions, or other resources may reference it."
-msgid_plural "The remaining resources cannot be deleted, you may not have sufficient permissions, or other resources may reference them."
-msgstr[0] "Оставшийся ресурс удалить нельзя, возможно, у вас недостаточно прав, или на него ссылаются другие ресурсы."
-msgstr[1] "Остальные ресурсы удалить нельзя, возможно, у вас недостаточно прав, или на них ссылаются другие ресурсы."
-msgstr[2] "Остальные ресурсы удалить нельзя, возможно, у вас недостаточно прав, или на них ссылаются другие ресурсы."
+#: nodepkg/delete-page/DeleteMessage.tsx:154
+msgid ""
+"The remaining resource cannot be deleted, you may not have sufficient "
+"permissions, or other resources may reference it."
+msgid_plural ""
+"The remaining resources cannot be deleted, you may not have sufficient "
+"permissions, or other resources may reference them."
+msgstr[0] ""
+"Оставшийся ресурс удалить нельзя, возможно, у вас недостаточно прав, или на "
+"него ссылаются другие ресурсы."
+msgstr[1] ""
+"Остальные ресурсы удалить нельзя, возможно, у вас недостаточно прав, или на "
+"них ссылаются другие ресурсы."
+msgstr[2] ""
+"Остальные ресурсы удалить нельзя, возможно, у вас недостаточно прав, или на "
+"них ссылаются другие ресурсы."
+
+#: nodepkg/delete-page/DeletePage.tsx:23
+msgid "Delete {} resource"
+msgid_plural "Delete {} resources"
+msgstr[0] "Удалить {} ресурс"
+msgstr[1] "Удалить {} ресурса"
+msgstr[2] "Удалить {} ресурсов"
+
+#: nodepkg/delete-page/DeletePageModal.tsx:18
+msgid "Confirmation required"
+msgstr "Необходимо подтверждение"
 
 #: nodepkg/description-editor/DescriptionEditorWidget.tsx:30
 msgid "Description"

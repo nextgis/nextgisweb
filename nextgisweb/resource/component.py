@@ -2,6 +2,7 @@ import re
 
 import sqlalchemy as sa
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import RelationshipDirection
 
 from nextgisweb.env import Component, DBSession, gettext, require
 from nextgisweb.lib.apitype import fillgap, make_literal
@@ -24,6 +25,7 @@ from .model import (
     resource_registry,
 )
 from .model import ResourceACLRule as ACLRule
+from .sattribute import _mapper
 
 
 class ResourceComponent(Component):
@@ -56,6 +58,21 @@ class ResourceComponent(Component):
         self.quota_limit = self.options["quota.limit"]
         self.quota_resource_cls = self.options["quota.resource_cls"]
         self.quota_resource_by_cls = self._parse_quota_resource_by_cls()
+
+        self._relinfo = dict[type[Resource], list[tuple[type[Resource], str]]]()
+        for cls in resource_registry.values():
+            for rel in _mapper(cls).relationships:
+                if (
+                    rel.direction == RelationshipDirection.MANYTOONE
+                    and (rcls := rel.mapper.class_) is not Resource
+                    and issubclass(rcls, Resource)
+                    and not rel.cascade.delete
+                    and not rel.cascade.delete_orphan
+                    and not all(c.nullable for c in rel.local_columns)
+                ):
+                    if rcls not in self._relinfo:
+                        self._relinfo[rcls] = []
+                    self._relinfo[rcls].append((cls, rel.key))
 
     def _parse_disabled_resource_cls(self):
         disabled = []

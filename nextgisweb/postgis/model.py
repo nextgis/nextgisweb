@@ -294,7 +294,6 @@ class PostgisLayer(Resource, FeatureLayerMixin):
     __field_class__ = PostgisLayerField
 
     connection: Mapped[PostgisConnection] = orm.relationship(
-        Resource,
         foreign_keys=connection_id,
         cascade="save-update,merge",
     )
