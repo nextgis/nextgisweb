@@ -2,6 +2,7 @@ from typing import Annotated, Any
 
 from msgspec import Struct
 from osgeo import gdal
+from shapely.geometry import Polygon, mapping
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import Query
@@ -24,6 +25,8 @@ class RasterLayerIdentifyItem(Struct, kw_only=True):
     color_interpretation: list[str]
     pixel_class: list[str]
     values: list[Any]
+    pixel_geom: dict
+    srs_id: int
 
 
 class RasterLayerIdentifyResponse(Struct, kw_only=True):
@@ -46,8 +49,14 @@ def identify(
     for res in query:
         if res.has_permission(DataScope.read, request.user):
             ds = res.gdal_dataset()
-            if (values := val_at_coord(ds, point)) is None:
+            result = val_at_coord(ds, point)
+            if result is None:
                 continue
+
+            values, pi, pj = result
+
+            geotransform = ds.GetGeoTransform()
+            pgeom = pixel_geometry(geotransform, pi, pj)
 
             color_interpretation = []
             pixel_class = []
@@ -73,6 +82,8 @@ def identify(
                     color_interpretation=color_interpretation,
                     pixel_class=pixel_class,
                     values=values.flatten().tolist(),
+                    pixel_geom=pgeom,
+                    srs_id=res.srs_id,
                 )
             )
 
@@ -82,7 +93,8 @@ def identify(
 def val_at_coord(ds: gdal.Dataset, point: Point):
     """Simplified version of gdallocationinfo with less options. Borrowed from
     https://github.com/OSGeo/gdal/blob/master/swig/python/gdal-utils/osgeo_utils/samples/gdallocationinfo.py
-    """
+
+    Returns (values, pixel_column, pixel_row) or None if outside the raster."""
 
     # Read geotransform matrix and calculate corresponding pixel coordinates
     geotransform = ds.GetGeoTransform()
@@ -94,7 +106,29 @@ def val_at_coord(ds: gdal.Dataset, point: Point):
         return None
 
     result = ds.ReadAsArray(i, j, 1, 1)
-    return result
+    return result, i, j
+
+
+def pixel_geometry(geotransform: tuple, col: int, row: int) -> dict:
+    """Compute the GeoJSON polygon footprint of a single pixel.
+
+    Uses the forward affine geotransform to map the four pixel corners,
+    correctly handling rotated rasters."""
+
+    gt = geotransform
+
+    def corner(c: int, r: int) -> tuple[float, float]:
+        return (
+            gt[0] + gt[1] * c + gt[2] * r,
+            gt[3] + gt[4] * c + gt[5] * r,
+        )
+
+    tl = corner(col, row)
+    tr = corner(col + 1, row)
+    br = corner(col + 1, row + 1)
+    bl = corner(col, row + 1)
+
+    return mapping(Polygon([tl, tr, br, bl]))
 
 
 def setup_pyramid(comp: RasterLayerComponent, config):
