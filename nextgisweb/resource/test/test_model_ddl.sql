@@ -9,6 +9,7 @@ CREATE TABLE resource (
     creation_date timestamp without time zone NOT NULL,
     owner_user_id integer NOT NULL,
     description character varying,
+    deletion_date timestamp without time zone,
     PRIMARY KEY (id),
     CHECK (parent_id IS NOT NULL OR id = 0),
     CONSTRAINT resource_parent_id_display_name_key UNIQUE (parent_id, display_name) DEFERRABLE INITIALLY DEFERRED,

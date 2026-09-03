@@ -142,6 +142,8 @@ class Resource(Base, metaclass=ResourceMeta):
 
     description: Mapped[str | None] = mapped_column(sa.Unicode)
 
+    deletion_date: Mapped[datetime | None] = mapped_column(sa.TIMESTAMP)
+
     __mapper_args__ = dict(polymorphic_on=cls)
     __table_args__ = (
         sa.CheckConstraint("parent_id IS NOT NULL OR id = 0"),
@@ -225,6 +227,17 @@ class Resource(Base, metaclass=ResourceMeta):
             result.append(current)
 
         return reversed(result)
+
+    @property
+    def trashed(self) -> bool:
+        return self.deletion_date is not None
+
+    # Base
+
+    @classmethod
+    def query(cls, *args):
+        q = Base.query.__func__(cls, *args)
+        return q.where(cls.deletion_date.is_(None))
 
     # Permissions
 
@@ -612,7 +625,7 @@ class DescriptionAttr(SColumn["ResourceSerializer"]):
 
 class ChildrenAttr(SAttribute["ResourceSerializer"]):
     def get(self, srlzr: "ResourceSerializer") -> bool:
-        return len(srlzr.obj.children) > 0
+        return any(not c.trashed for c in srlzr.obj.children)
 
 
 class InterfacesAttr(SAttribute["ResourceSerializer"]):

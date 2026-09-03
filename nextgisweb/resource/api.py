@@ -16,8 +16,9 @@ from sqlalchemy.sql import or_ as sa_or
 from sqlalchemy.sql.operators import eq as eq_op
 from sqlalchemy.sql.operators import ilike_op, in_op, like_op
 
-from nextgisweb.env import COMP_ID, DBSession, gettext, gettextf, inject
+from nextgisweb.env import COMP_ID, DBSession, gettext, inject
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, Query, StatusCode, annotate
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.msext import DEPRECATED
 
 from nextgisweb.auth import User
@@ -37,6 +38,7 @@ from .exception import (
     HierarchyError,
     QuotaExceeded,
     ResourceNotFound,
+    ResourceReferenceError,
     ResourceRootDeleteError,
 )
 from .model import (
@@ -172,10 +174,13 @@ def item_put(context, request: Request, body: CompositeUpdate) -> EmptyObject:
     zope.event.notify(AfterResourcePut(context, request))
 
 
-def item_delete(context, request: Request) -> EmptyObject:
+def item_delete(context, request: Request, *, soft: bool = False) -> EmptyObject:
     """Delete resource
 
     :returns: Resource deleted successfully"""
+
+    if soft:
+        delete_ts = utcnow_naive()
 
     def delete(obj):
         request.resource_permission(ResourceScope.delete, obj)
@@ -184,7 +189,10 @@ def item_delete(context, request: Request) -> EmptyObject:
         for chld in obj.children:
             delete(chld)
 
-        DBSession.delete(obj)
+        if soft:
+            obj.deletion_date = delete_ts
+        else:
+            DBSession.delete(obj)
 
     if context.id == 0:
         raise ResourceRootDeleteError
@@ -203,13 +211,21 @@ def item_delete(context, request: Request) -> EmptyObject:
 def _check_relations(session: orm.Session, flush_context, instances, *, comp: ResourceComponent):
     for obj in session.deleted:
         if isinstance(obj, Resource):
-            for rcls, key in comp._relinfo.get(cls := obj.__class__, []):
+            for rcls, key in comp._relinfo.get(obj.__class__, []):
                 robj = rcls.filter(getattr(rcls, key) == obj).first()
                 if robj and robj not in session.deleted:
-                    raise ValidationError(
-                        gettextf("Resource #{} is referenced with other resources.")(obj.id),
-                        data=dict(references_data=(cls.identity, obj.id, rcls.identity, robj.id)),
-                    )
+                    raise ResourceReferenceError(local=obj, remote=robj)
+
+    for obj in session.dirty:
+        if (
+            isinstance(obj, Resource)
+            and obj.trashed
+            and orm.attributes.get_history(obj, "deletion_date").has_changes()
+        ):
+            for rcls, key in comp._relinfo.get(obj.__class__, []):
+                robj = rcls.filter(getattr(rcls, key) == obj).first()
+                if robj and not robj.trashed:
+                    raise ResourceReferenceError(local=obj, remote=robj)
 
 
 def collection_get(
@@ -297,10 +313,13 @@ class ResourceDeleteGetResponse(Struct, kw_only=True):
     ]
 
 
-def _delete_multiple(request: Request, resource_ids, partial, *, dry_run):
+def _delete_multiple(request: Request, resource_ids, partial, soft, *, dry_run):
     affected = dict()
     unaffected = dict()
     deleted = list()
+
+    if not dry_run and soft:
+        delete_ts = utcnow_naive()
 
     def _acc(d, cls, v=1):
         if cls not in d:
@@ -323,7 +342,10 @@ def _delete_multiple(request: Request, resource_ids, partial, *, dry_run):
                 _delete(child)
 
             if not dry_run:
-                DBSession.delete(resource)
+                if soft:
+                    resource.deletion_date = delete_ts
+                else:
+                    DBSession.delete(resource)
             _acc(_affected, resource.cls)
             _deleted.append(resource.id)
 
@@ -361,7 +383,7 @@ def delete_get(request: Request, *, resources: DeleteResources) -> ResourceDelet
     """Simulate deletion of multiple resources
 
     :returns: Dry-run result showing which resources would be deleted"""
-    affected, unaffected, _ = _delete_multiple(request, resources, True, dry_run=True)
+    affected, unaffected, _ = _delete_multiple(request, resources, True, False, dry_run=True)
     return ResourceDeleteGetResponse(
         affected=ResourceDeleteSummary.from_resources(resources=affected),
         unaffected=ResourceDeleteSummary.from_resources(resources=unaffected),
@@ -383,13 +405,14 @@ def delete_post(
         bool,
         Meta(description="Skip non-deletable resources"),
     ] = False,
+    soft: bool = False,
 ) -> ResourceDeletePostResponse:
     """Delete multiple resources
 
     :returns: IDs of the deleted resources"""
 
     with DBSession.no_autoflush:
-        _, _, deleted = _delete_multiple(request, resources, partial, dry_run=False)
+        _, _, deleted = _delete_multiple(request, resources, partial, soft, dry_run=False)
     return ResourceDeletePostResponse(deleted=deleted)
 
 
@@ -563,7 +586,7 @@ class SearchRootParams(Struct, kw_only=True):
         if (root := self.root) is UNSET:
             root = self.parent_id__recursive
 
-        result = sa.select(Resource)
+        result = Resource.query()
         if root is not UNSET:
             child = (
                 sa.select(Resource.id, sa.literal_column("0").label("depth"))
@@ -960,15 +983,12 @@ def search(
     serializer = CompositeSerializer(keys=cs_keys, user=request.user)
     check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
 
+    permitted = [res for res in query if check_perm(res)]
+
     legacy_mode = not breadcrumb and limit is None and offset == 0 and len(order) == 0
     if legacy_mode:
-        return [
-            serializer.serialize(res, CompositeRead)
-            for (res,) in DBSession.execute(query)
-            if check_perm(res)
-        ]
+        return [serializer.serialize(res, CompositeRead) for res in permitted]
 
-    permitted = [res for (res,) in DBSession.execute(query) if check_perm(res)]
     total_count = len(permitted)
 
     page = permitted[offset:]

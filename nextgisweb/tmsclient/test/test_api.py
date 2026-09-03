@@ -91,3 +91,26 @@ def test_relation_delete(layer_id, connection_id, ngw_webtest_app: WebTestApp):
         query=dict(resources=[connection_id, layer_id]),
         status=200,
     )
+
+
+def test_relation_delete_soft(layer_id, connection_id, ngw_webtest_app: WebTestApp):
+    refdata_expected = ["tmsclient_connection", connection_id, "tmsclient_layer", layer_id]
+
+    rapi = ResourceAPI()
+    resp = rapi.delete_request(connection_id, json=dict(soft=True), status=422)
+    references_data = resp.json["data"]["references_data"]
+    assert references_data == refdata_expected
+
+    resp = ngw_webtest_app.post(
+        "/api/resource/delete",
+        query=dict(resources=[connection_id], soft=True),
+        status=422,
+    )
+    references_data = resp.json["data"]["references_data"]
+    assert references_data == refdata_expected
+
+    ngw_webtest_app.post(
+        "/api/resource/delete",
+        query=dict(resources=[connection_id, layer_id], soft=True),
+        status=200,
+    )

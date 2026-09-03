@@ -103,11 +103,11 @@ class Base(metaclass=DeclarativeMeta):
 
     @classmethod
     def filter(cls, *args):
-        return DBSession.query(cls).filter(*args)
+        return cls.query().filter(*args)
 
     @classmethod
     def filter_by(cls, **kwargs):
-        return DBSession.query(cls).filter_by(**kwargs)
+        return cls.query().filter_by(**kwargs)
 
     def persist[T](self: T) -> T:
         DBSession.add(self)

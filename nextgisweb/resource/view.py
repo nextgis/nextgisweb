@@ -39,13 +39,17 @@ class ResourceFactory:
         # First, load base class resource
         res_id = request.path_param[self.key]
         try:
-            (res_cls,) = DBSession.query(Resource.cls).where(Resource.id == res_id).one()
+            (res_cls,) = (
+                DBSession.query(Resource.cls)
+                .where(Resource.id == res_id, Resource.deletion_date.is_(None))
+                .one()
+            )
         except NoResultFound:
             raise ResourceNotFound(res_id)
 
         polymorphic = with_polymorphic(Resource, [resource_registry[res_cls]])
         obj = (
-            DBSession.query(polymorphic)
+            polymorphic.query()
             .options(
                 joinedload(polymorphic.owner_user),
                 joinedload(polymorphic.parent),

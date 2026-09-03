@@ -63,6 +63,23 @@ class ResourceRootDeleteError(HierarchyError):
     message = gettext("Root resource could not be deleted.")
 
 
+class ResourceReferenceError(ValidationError):
+    message = gettextf("Resource #{} is referenced with other resources.")
+
+    def __init__(self, local, remote):
+        super().__init__(
+            message=self.__class__.message(local.id),
+            data=dict(
+                references_data=(
+                    local.__class__.identity,
+                    local.id,
+                    remote.__class__.identity,
+                    remote.id,
+                )
+            ),
+        )
+
+
 class ResourceDisabled(ValidationError):
     message = gettext("Resource class '%s' disabled.")
 

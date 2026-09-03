@@ -1,11 +1,9 @@
 from collections import defaultdict
 from typing import TYPE_CHECKING, Annotated, Any, cast
 
-import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, defstruct
 from typing_extensions import get_annotations
 
-from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import Gap, fillgap, make_literal
 
 from nextgisweb.auth import User
@@ -118,13 +116,13 @@ def attr(request: Request, *, body: ResourceAttrRequest) -> ResourceAttrResponse
             others.append((idx, attr))
 
     if isinstance(body.resources, list):
-        query = sa.select(Resource).where(Resource.id.in_(body.resources))
+        query = Resource.query().where(Resource.id.in_(body.resources))
     else:
         query = body.resources.query()
 
     ctx = ResourceAttrRequestContext(request=request)
     result: list[ResourceAttrResponseItem] = []
-    for (res,) in DBSession.execute(query):
+    for res in query:
         if not res.has_permission(ResourceScope.read, user=user):
             continue
         values: list[Any] = [None] * len(body.attributes)
