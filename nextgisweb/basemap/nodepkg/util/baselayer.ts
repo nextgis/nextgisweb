@@ -4,7 +4,7 @@ import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 
 import type {
   BasemapConfig,
-  QMSService,
+  QMSDetailEntry,
   WebmapPluginBaselayer,
 } from "@nextgisweb/basemap/layer-widget/type";
 import { registerEPSG3395Projection } from "@nextgisweb/basemap/util/epsg3395";
@@ -86,7 +86,7 @@ export function prepareBaselayerConfig(
   const layer = {} as LayerOptions;
   let source = {} as XYZSourceOptions;
 
-  let qms: QMSService | undefined;
+  let qms: QMSDetailEntry | undefined;
   let copyright_text: string | null | undefined;
   let copyright_url: string | null | undefined;
 
@@ -99,7 +99,6 @@ export function prepareBaselayerConfig(
 
       if (qms) {
         if (qms.epsg !== 3857 && qms.epsg !== 3395) {
-          console.warn();
           throw new Error(
             `CRS ${qms.epsg} is not supported, ${config.display_name} layer.`
           );
@@ -130,10 +129,6 @@ export function prepareBaselayerConfig(
 
   if (source.url) {
     source.url = source.url.replace(/\{[XYZQ]\}/g, (c) => c.toLowerCase());
-
-    if (qms && !qms.y_origin_top) {
-      source.url = source.url.replace("{y}", "{-y}");
-    }
   }
   if (source.projection === "EPSG:3395") {
     registerEPSG3395Projection();

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
-import type { QMSService } from "@nextgisweb/basemap/layer-widget/type";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import type { Extent } from "@nextgisweb/layer/type/api";
 import { useRoute } from "@nextgisweb/pyramid/hook";
@@ -42,18 +41,6 @@ export function PreviewLayer({
 
     if (resData.basemap_layer) {
       url = resData.basemap_layer.url;
-
-      if (url && "qms" in resData.basemap_layer && resData.basemap_layer.qms) {
-        try {
-          const qms = JSON.parse(resData.basemap_layer.qms) as QMSService;
-          if (!qms.y_origin_top) {
-            url = url.replace("{y}", "{-y}");
-          }
-        } catch {
-          //
-        }
-      }
-
       const base = resData.basemap_layer;
       copyrightText = base.copyright_text;
       copyrightUrl = base.copyright_url;

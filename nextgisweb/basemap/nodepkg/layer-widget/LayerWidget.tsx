@@ -12,7 +12,7 @@ import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import type { LayerStore } from "./LayerStore";
 import { QMSSelect } from "./component/QMSSelect";
-import type { QMSService } from "./type";
+import type { QMSDetailEntry } from "./type";
 
 /* prettier-ignore */ const
 msgPickQms = gettext("Pick from QMS"),
@@ -31,8 +31,10 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
 
   const [initialized, setInitialized] = useState(false);
 
-  const qms = useMemo<QMSService | null>(() => {
-    return store.qms.value ? (JSON.parse(store.qms.value) as QMSService) : null;
+  const qms = useMemo<QMSDetailEntry | null>(() => {
+    return store.qms.value
+      ? (JSON.parse(store.qms.value) as QMSDetailEntry)
+      : null;
   }, [store.qms.value]);
 
   useEffect(() => {
@@ -51,14 +53,6 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
       store.qms.value = null;
     }
   }, [initialized, qmsId, store.qms]);
-
-  const url = useMemo(() => {
-    let urlVal = store.url.value;
-    if (urlVal && qms && !qms.y_origin_top) {
-      urlVal = urlVal.replace("{y}", "{-y}");
-    }
-    return urlVal;
-  }, [qms, store.url.value]);
 
   return (
     <div
@@ -149,7 +143,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
           />
         </Area>
       </div>
-      {url ? (
+      {store.url.value ? (
         <div
           style={{
             flex: 1,
@@ -180,7 +174,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
               </div>
             </MapControl>
             <URLLayer
-              url={url}
+              url={store.url.value}
               key={qmsId}
               opacity={opacity}
               copyrightText={store.copyrightText.value}

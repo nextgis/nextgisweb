@@ -8,24 +8,24 @@ import { useAbortController, useDebounce } from "@nextgisweb/pyramid/hook";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { get, search } from "../service/qms";
-import type { QMSSearch, QMSService } from "../type";
+import type { QMSDetailEntry, QMSSearchEntry } from "../type";
 
-const searchCache = new LoaderCache<QMSSearch[]>();
-const getCache = new LoaderCache<QMSService>();
+const searchCache = new LoaderCache<QMSSearchEntry[]>();
+const getCache = new LoaderCache<QMSDetailEntry>();
 
 interface QMSSelectProps extends Omit<
   SelectProps<number>,
   "options" | "children"
 > {
   onChange: (value: number | undefined) => void;
-  onService?: (value: QMSService) => void;
+  onService?: (value: QMSDetailEntry) => void;
   value: number | undefined;
 }
 
 interface SearchOption {
   value: number;
   label: string;
-  result: QMSSearch;
+  result: QMSSearchEntry;
 }
 
 async function fetchOptions(
@@ -33,26 +33,20 @@ async function fetchOptions(
   signal: AbortSignal
 ): Promise<SearchOption[]> {
   try {
-    let results: QMSSearch[] = [];
+    let results: QMSSearchEntry[] = [];
     if (!isNaN(Number(query))) {
       try {
         const result = await getCache.promiseFor(String(query), () =>
-          get(Number(query), {
-            signal,
-          })
+          get(Number(query), { signal })
         );
-        if (result.type === "tms") {
-          results = [result];
-        }
+        results = [result];
       } catch {
         // pass
       }
     } else if (typeof query === "string") {
       if (results.length === 0) {
         results = await searchCache.promiseFor(query, () =>
-          search(query, {
-            signal,
-          })
+          search(query, { signal })
         );
       }
     }
