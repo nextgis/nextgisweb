@@ -27,6 +27,8 @@ import GoToIcon from "@nextgisweb/icon/material/center_focus_weak";
 
 const msgGoto = gettext("Go to");
 
+const wkt = new WKT();
+
 interface WebMapFeatureGridTabProps {
   plugin: PluginBase;
   item: TreeLayerStore;
@@ -115,7 +117,7 @@ export const WebMapFeatureGridTab = observer(
               })
               .then((feature) => {
                 display.highlighter.highlight({
-                  geom: feature.geom,
+                  geom: wkt.readGeometry(feature.geom),
                   featureId: feature.id,
                   layerId,
                 });
@@ -130,7 +132,6 @@ export const WebMapFeatureGridTab = observer(
             icon: <GoToIcon />,
             disabled: (params) => !params?.selectedIds?.length,
             action: () => {
-              const wkt = new WKT();
               const fid = store.selectedIds[0];
               if (fid !== undefined) {
                 route("feature_layer.feature.item", {

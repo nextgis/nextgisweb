@@ -1,10 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { Feature } from "ol";
-import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
-import Point from "ol/geom/Point";
 import type VectorSource from "ol/source/Vector";
-import { Circle, RegularShape, Stroke, Style } from "ol/style";
+import { Circle, Stroke, Style } from "ol/style";
+import type { StyleLike } from "ol/style/Style";
 import { useEffect, useRef } from "react";
 
 import { useCssVariable } from "@nextgisweb/gui/hook";
@@ -13,47 +12,21 @@ import type { HighlightEvent } from "@nextgisweb/webmap/highlight-store/Highligh
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
 
+import { createTargetSymbolStyle } from "./targetSymbolStyle";
+
 type Props = {
   mapStore: MapStore;
   highlightStore: HighlightStore;
 };
 
-const wkt = new WKT();
-
-function toOlFeature(
-  e: HighlightEvent,
-  { highlightStyle, crossStyle }: { highlightStyle: Style; crossStyle: Style }
-): Feature<Geometry> | null {
-  if (e.coordinates) {
-    const f = new Feature<Geometry>({
-      geometry: new Point(e.coordinates),
-      layerId: e.layerId,
-      featureId: e.featureId,
-    });
-    f.setStyle(crossStyle);
-    return f;
-  }
-  try {
-    const geometry = e.olGeometry
-      ? e.olGeometry
-      : e.geom
-        ? wkt.readGeometry(e.geom)
-        : e.coordinates;
-
-    if (geometry) {
-      const f = new Feature<Geometry>({
-        geometry,
-        layerId: e.layerId,
-        featureId: e.featureId,
-      });
-      f.setStyle(highlightStyle);
-      return f;
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
+function toOlFeature(e: HighlightEvent, style: StyleLike): Feature<Geometry> {
+  const feature = new Feature<Geometry>({
+    geometry: e.geom,
+    layerId: e.layerId,
+    featureId: e.featureId,
+  });
+  feature.setStyle(style);
+  return feature;
 }
 
 export const MapHighlight = observer(function MapHighlight({
@@ -96,27 +69,15 @@ export const MapHighlight = observer(function MapHighlight({
       image: new Circle({ stroke: hlStroke, radius: 5 }),
     });
 
-    const stroke = new Stroke({ width: 2, color: strokeColor });
-    const crossStyle = new Style({
-      image: new RegularShape({
-        points: 4,
-        radius: 10,
-        angle: Math.PI / 4,
-        stroke,
-      }),
-    });
+    const style = createTargetSymbolStyle(hlStyle, strokeColor);
 
     const source = sourceRef.current;
     if (!source) return;
     source.clear();
+
     for (const e of highlightStore.highlighted) {
-      const f = toOlFeature(e, {
-        highlightStyle: hlStyle,
-        crossStyle,
-      });
-      if (f) {
-        source.addFeature(f);
-      }
+      const feature = toOlFeature(e, style);
+      source.addFeature(feature);
     }
   }, [highlightStore.highlighted, strokeColor]);
 

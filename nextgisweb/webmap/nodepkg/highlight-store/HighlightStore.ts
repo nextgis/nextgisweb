@@ -1,15 +1,16 @@
 import { action, observable } from "mobx";
+import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
 
 import { route } from "@nextgisweb/pyramid/api";
 
 export interface HighlightEvent {
-  geom?: string;
+  geom: Geometry;
   layerId?: number;
   featureId?: number | string;
-  olGeometry?: Geometry;
-  coordinates?: [number, number];
 }
+
+const wkt = new WKT();
 
 export class HighlightStore {
   @observable.ref accessor highlighted: HighlightEvent[] = [];
@@ -40,7 +41,7 @@ export class HighlightStore {
     });
 
     const event = {
-      geom: feature.geom,
+      geom: wkt.readGeometry(feature.geom),
       featureId,
       layerId,
     };

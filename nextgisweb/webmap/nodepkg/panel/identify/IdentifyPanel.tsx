@@ -9,7 +9,6 @@ import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -20,11 +19,7 @@ import type IdentifyStore from "./IdentifyStore";
 import { FeatureInfoSection } from "./component/FeatureInfoSection";
 import { FeatureSelector } from "./component/FeatureSelector";
 import { RasterInfoSection } from "./component/RasterInfoSection";
-import type {
-  FeatureInfo,
-  IdentifyInfo,
-  IdentifyInfoItem,
-} from "./identification";
+import type { IdentifyInfoItem } from "./identification";
 import { identifyInfoToFeaturesInfo } from "./util/identifyInfoToFeaturesInfo";
 
 import "./IdentifyPanel.less";
@@ -35,24 +30,6 @@ msgLoad = gettext("Retrieving object information..."),
 msgNotFound = gettext("No objects were found at the click location.");
 
 const measurementSridSetting = webmapSettings.measurement_srid;
-
-const loadFeatureItem = async (
-  display: Display,
-  identifyInfo: IdentifyInfo,
-  featureInfo: FeatureInfo,
-  opt: { signal: AbortSignal }
-) => {
-  if (display.identify) {
-    const featureItem = await executeWithMinDelay(
-      display.identify.highlightFeature(identifyInfo, featureInfo, opt),
-      {
-        minDelay: 700,
-        signal: opt?.signal,
-      }
-    );
-    return featureItem;
-  }
-};
 
 const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
   ({ display, store }) => {
@@ -83,26 +60,20 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
 
         setFeatureItem(undefined);
 
-        if (!featureInfo || featureInfo.type !== "feature_layer") {
-          if (identifyInfo?.point) {
-            const [x, y] = identifyInfo.point;
-
-            display.highlighter.highlight({
-              coordinates: [x, y],
-            });
-          } else {
-            display.highlighter.unhighlight();
-          }
-
+        if (!featureInfo || !identifyInfo || !display.identify) {
+          display.highlighter.unhighlight();
           return;
         }
         const signal = makeSignal();
 
         try {
           const featureItemLoaded = await trackPromise(
-            loadFeatureItem(display, identifyInfo!, featureInfo, {
-              signal,
-            })
+            executeWithMinDelay(
+              display.identify.highlightItem(identifyInfo, featureInfo, {
+                signal,
+              }),
+              { minDelay: 700, signal }
+            )
           );
 
           setFeatureItem(featureItemLoaded);
@@ -197,7 +168,6 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             <FeatureSelector
               display={display}
               featureInfo={featureInfo}
-              featureItem={featureItem}
               featuresInfoList={featuresInfoList}
               onFeatureChange={onFeatureChange}
             />

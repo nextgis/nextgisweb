@@ -6,26 +6,31 @@ import {
   getCenter,
   wrapX,
 } from "ol/extent";
-import { WKT } from "ol/format";
-import { MultiPolygon } from "ol/geom";
+import { GeoJSON, WKT } from "ol/format";
+import { MultiPolygon, Polygon } from "ol/geom";
 import { fromExtent } from "ol/geom/Polygon";
 import type Interaction from "ol/interaction/Interaction";
 
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { route } from "@nextgisweb/pyramid/api/route";
 import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { RasterLayerIdentifyResponse } from "@nextgisweb/raster-layer/type/api";
+import type {
+  RasterLayerIdentifyItem,
+  RasterLayerIdentifyResponse,
+} from "@nextgisweb/raster-layer/type/api";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type IdentifyStore from "@nextgisweb/webmap/panel/identify/IdentifyStore";
 import type {
-  FeatureInfo,
   FeatureResponse,
   IdentifyInfo,
+  IdentifyInfoItem,
   IdentifyResponse,
 } from "@nextgisweb/webmap/panel/identify/identification";
 
+const geojson = new GeoJSON();
 const wkt = new WKT();
 
 interface IdentifyOptions {
@@ -106,15 +111,16 @@ export class Identify {
     }
   }
 
-  async highlightFeature(
+  async highlightItem(
     identifyInfo: IdentifyInfo,
-    featureInfo: FeatureInfo,
+    item: IdentifyInfoItem,
     opt: { signal: AbortSignal }
-  ) {
-    const layerResponse = identifyInfo.response[featureInfo.layerId];
+  ): Promise<FeatureItem | undefined> {
+    const layerResponse = identifyInfo.response[item.layerId];
+    if (!layerResponse) return;
 
-    if ("features" in layerResponse) {
-      const featureResponse = layerResponse.features[featureInfo.idx];
+    if (item.type === "feature_layer" && "features" in layerResponse) {
+      const featureResponse = layerResponse.features[item.idx];
 
       const featureItem = await route("feature_layer.feature.item", {
         id: featureResponse.layerId,
@@ -122,13 +128,48 @@ export class Identify {
       }).get({ query: { dt_format: "iso" }, ...opt });
 
       this.display.highlighter.highlight({
-        geom: featureItem.geom,
+        geom: wkt.readGeometry(featureItem.geom),
         featureId: featureItem.id,
-        layerId: featureInfo.layerId,
+        layerId: item.layerId,
       });
 
       return featureItem;
     }
+
+    if (item.type === "raster_layer" && "pixel_geom" in layerResponse) {
+      const geom = await this._readRasterPixelGeometry(layerResponse, opt);
+
+      this.display.highlighter.highlight({
+        geom,
+        layerId: item.layerId,
+      });
+    }
+  }
+
+  private async _readRasterPixelGeometry(
+    item: RasterLayerIdentifyItem,
+    opt: { signal: AbortSignal }
+  ): Promise<Polygon> {
+    let geometry = geojson.readGeometry(item.pixel_geom);
+
+    if (item.srs_id !== this.map.displaySrsId) {
+      const transformed = await route("spatial_ref_sys.geom_transform", {
+        id: this.map.displaySrsId,
+      }).post({
+        json: {
+          srs: item.srs_id,
+          geom: wkt.writeGeometry(geometry),
+        },
+        ...opt,
+      });
+      geometry = wkt.readGeometry(transformed.geom);
+    }
+
+    if (!(geometry instanceof Polygon)) {
+      throw new Error("Raster pixel geometry must be a polygon");
+    }
+
+    return geometry;
   }
 
   async identifyFeatureByAttrValue(

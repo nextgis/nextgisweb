@@ -55,7 +55,6 @@ export type IdentifyInfoItem = FeatureInfo | RasterInfo;
 export interface FeatureSelectorProps {
   display: Display;
   featureInfo?: IdentifyInfoItem;
-  featureItem?: FeatureItem;
   featuresInfoList: IdentifyInfoItem[];
   onFeatureChange: (featureInfoSelected: IdentifyInfoItem | undefined) => void;
 }

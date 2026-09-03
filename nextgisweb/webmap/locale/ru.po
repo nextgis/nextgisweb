@@ -6,15 +6,15 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: component.py:25
+#: component.py:28
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:6 nodepkg/resource-action-plugin.tsx:17
+#: favorite.py:7 nodepkg/resource-action-plugin.tsx:17
 msgid "Display"
 msgstr "Открыть"
 
-#: favorite.py:11
+#: favorite.py:12
 msgid "Fragment"
 msgstr "Фрагмент"
 
@@ -490,7 +490,7 @@ msgstr "Скопировать координаты точки идентифи�
 msgid "Edit feature"
 msgstr "Редактировать объект"
 
-#: nodepkg/panel/identify/IdentifyPanel.tsx:33
+#: nodepkg/panel/identify/IdentifyPanel.tsx:28
 msgid ""
 "To get feature information, click on the map with the left mouse button. Make"
 " sure that other tools are turned off."
@@ -498,11 +498,11 @@ msgstr ""
 "Чтобы получить информацию об объекте, щелкните на карте левой кнопкой мыши. "
 "Убедитесь, что другие инструменты отключены."
 
-#: nodepkg/panel/identify/IdentifyPanel.tsx:34
+#: nodepkg/panel/identify/IdentifyPanel.tsx:29
 msgid "Retrieving object information..."
 msgstr "Получение информации об объекте..."
 
-#: nodepkg/panel/identify/IdentifyPanel.tsx:35
+#: nodepkg/panel/identify/IdentifyPanel.tsx:30
 msgid "No objects were found at the click location."
 msgstr "Объекты в месте клика не найдены."
 
@@ -522,9 +522,9 @@ msgstr "Атрибуты"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: nodepkg/panel/identify/component/FeatureSelector.tsx:54
-msgid "Zoom to feature"
-msgstr "Приблизить к объекту"
+#: nodepkg/panel/identify/component/FeatureSelector.tsx:51
+msgid "Zoom to identification result"
+msgstr "Приблизить к результатам идентификации"
 
 #: nodepkg/panel/identify/component/RasterInfoSection.tsx:27
 msgid "Raster"
@@ -534,7 +534,7 @@ msgstr "Растр"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: nodepkg/panel/identify/plugin.tsx:17 nodepkg/store/Identify.ts:42
+#: nodepkg/panel/identify/plugin.tsx:17 nodepkg/store/Identify.ts:47
 msgid "Identify"
 msgstr "Идентификация"
 
@@ -907,7 +907,7 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: nodepkg/resource-action-plugin.tsx:44 view.py:101
+#: nodepkg/resource-action-plugin.tsx:44 view.py:102
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
@@ -1202,7 +1202,7 @@ msgstr "акр"
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:154
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:155
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 
@@ -1242,10 +1242,10 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: view.py:113
+#: view.py:114
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:124
+#: view.py:125
 msgid "Web map settings"
 msgstr "Настройки веб-карты"

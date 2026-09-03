@@ -74,7 +74,8 @@ export class MapStore {
 
   readonly maxZoom = DEFAULT_MAP_MAX_ZOOM;
 
-  readonly displayProjection = "EPSG:3857";
+  readonly displaySrsId = 3857;
+  readonly displayProjection = `EPSG:${this.displaySrsId}`;
   readonly lonlatProjection = "EPSG:4326";
 
   @observable.ref accessor hmux: boolean | null;

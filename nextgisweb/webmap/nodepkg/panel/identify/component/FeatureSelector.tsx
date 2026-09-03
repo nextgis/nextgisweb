@@ -8,7 +8,6 @@ import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 export function FeatureSelector({
   display,
   featureInfo,
-  featureItem,
   featuresInfoList,
   onFeatureChange,
 }: FeatureSelectorProps) {
@@ -17,12 +16,11 @@ export function FeatureSelector({
   }
 
   const zoomTo = () => {
-    if (!featureItem) return;
-    display.highlighter
-      .highlightById(featureItem.id, featureInfo.layerId)
-      .then(({ geom }) => {
-        display.map.zoomToGeom(geom);
-      });
+    const highlighted = display.highlighter.highlighted[0];
+    const geom = highlighted?.geom;
+    if (geom) {
+      display.map.zoomToGeom(geom);
+    }
   };
 
   const onSelectChange = (
@@ -50,17 +48,15 @@ export function FeatureSelector({
         value={featureInfo.value}
         options={featuresInfoList}
       />
-      {featureInfo.type === "feature_layer" && (
-        <Tooltip title={gettext("Zoom to feature")}>
-          <Button
-            type="link"
-            size="small"
-            onClick={zoomTo}
-            icon={<ZoomInMapIcon />}
-            style={{ flex: "0 0 auto" }}
-          />
-        </Tooltip>
-      )}
+      <Tooltip title={gettext("Zoom to identification result")}>
+        <Button
+          type="link"
+          size="small"
+          onClick={zoomTo}
+          icon={<ZoomInMapIcon />}
+          style={{ flex: "0 0 auto" }}
+        />
+      </Tooltip>
     </div>
   );
 }
