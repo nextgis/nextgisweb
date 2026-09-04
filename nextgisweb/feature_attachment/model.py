@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from io import BytesIO
 from typing import Any
+from xml.etree import ElementTree
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -14,6 +15,7 @@ from sqlalchemy.dialects import postgresql as pg
 from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base
+from nextgisweb.lib.logging import logger
 
 from nextgisweb.feature_layer.versioning import (
     ActColValue,
@@ -130,25 +132,33 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
                         try:
                             tstamp = datetime.strptime(tstamp, r"%Y:%m:%d %H:%M:%S").isoformat()
                         except ValueError:
-                            pass
+                            logger.warning("Failed to parse timestamp from EXIF metadata.")
                         else:
                             _file_meta["timestamp"] = tstamp
-                if (
-                    (xmp_root := image.getxmp())
-                    and (xmp_meta := xmp_root.get("xmpmeta"))
-                    and (xmp_rdf := xmp_meta.get("RDF"))
-                    and (xmp_desc := xmp_rdf.get("Description"))
-                ):
-                    if isinstance(xmp_desc, list):
-                        xmp_desc = xmp_desc[0] if len(xmp_desc) > 0 else {}
-                    if projection := xmp_desc.get("ProjectionType"):
-                        _file_meta["panorama"] = to_builtins(
-                            PanoramaMeta(
-                                ProjectionType=projection,
-                                id=xmp_desc.get("id") or UNSET,
-                                markers=_parse_panorama_markers(xmp_desc),
+
+                try:
+                    xmp_root = image.getxmp()
+                except ElementTree.ParseError:
+                    logger.warning("Failed to parse XMP metadata from image.")
+                else:
+                    if (
+                        isinstance(xmp_root, dict)
+                        and (xmp_meta := xmp_root.get("xmpmeta", {}))
+                        and isinstance(xmp_meta, dict)
+                        and (xmp_rdf := xmp_meta.get("RDF"))
+                        and isinstance(xmp_rdf, dict)
+                        and (xmp_desc := xmp_rdf.get("Description"))
+                    ):
+                        if isinstance(xmp_desc, list):
+                            xmp_desc = xmp_desc[0] if len(xmp_desc) > 0 else {}
+                        if projection := xmp_desc.get("ProjectionType"):
+                            _file_meta["panorama"] = to_builtins(
+                                PanoramaMeta(
+                                    ProjectionType=projection,
+                                    id=xmp_desc.get("id") or UNSET,
+                                    markers=_parse_panorama_markers(xmp_desc),
+                                )
                             )
-                        )
         self.file_meta = _file_meta
 
     @property
