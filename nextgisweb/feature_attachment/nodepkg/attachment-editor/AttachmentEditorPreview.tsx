@@ -43,6 +43,8 @@ export function AttachmentEditorPreview({
     getItemsURLs();
   }, [attachment, attachments, featureId, resourceId]);
 
+  const index = attachments.indexOf(attachment);
+
   return (
     <AttachmentPreviewGroup
       attachments={attachments}
@@ -56,6 +58,7 @@ export function AttachmentEditorPreview({
         featureId={featureId}
         width={width}
         height={height}
+        index={index}
       />
     </AttachmentPreviewGroup>
   );
