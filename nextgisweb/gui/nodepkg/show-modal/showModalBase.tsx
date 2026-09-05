@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import type { ReactElement } from "react";
 
 import type { ModalProps } from "@nextgisweb/gui/antd";
@@ -14,14 +14,25 @@ export interface ShowModalOptions extends ModalProps {
   close?: () => void;
 }
 
-export function SuspenseFallback({ onReady }: { onReady: () => void }) {
+function ModalContent<T extends ShowModalOptions>({
+  modalProps,
+  renderContent,
+  onReady,
+}: {
+  modalProps: T;
+  renderContent: (props: T) => ReactElement;
+  onReady?: () => void;
+}) {
+  const ready = useRef(false);
+
   useEffect(() => {
-    return () => {
-      onReady();
-    };
+    if (!ready.current) {
+      ready.current = true;
+      onReady?.();
+    }
   }, [onReady]);
 
-  return null;
+  return renderContent(modalProps);
 }
 
 export function showModalBase<T extends ShowModalOptions>(
@@ -91,16 +102,12 @@ export function showModalBase<T extends ShowModalOptions>(
     } as T;
 
     return (
-      <Suspense
-        fallback={
-          <SuspenseFallback
-            onReady={() => {
-              onReady?.();
-            }}
-          />
-        }
-      >
-        {renderContent(propsForRender)}
+      <Suspense fallback={null}>
+        <ModalContent
+          renderContent={renderContent}
+          modalProps={propsForRender}
+          onReady={onReady}
+        />
       </Suspense>
     );
   };
