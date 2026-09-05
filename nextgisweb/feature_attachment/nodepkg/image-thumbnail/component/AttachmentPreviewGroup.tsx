@@ -13,16 +13,21 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 
-import type { DataSource } from "@nextgisweb/feature-attachment/attachment-editor/type";
+import type {
+  Attachment,
+  DataSource,
+} from "@nextgisweb/feature-attachment/attachment-editor/type";
+import { getAttachmentKey } from "@nextgisweb/feature-attachment/attachment-editor/util/getAttachmentKey";
 import type { FeatureAttachment } from "@nextgisweb/feature-attachment/type";
 import { Image } from "@nextgisweb/gui/antd";
 import { CentralLoading } from "@nextgisweb/gui/component";
 
 import type { PhotospherePreviewNode } from "../../photosphere-preview";
-import { AttachmentPreviewToolbar } from "../component/AttachmentPreviewToolbar";
 import { getFeatureImage } from "../util/getFeatureImage";
 import { getImageURL } from "../util/getImageURL";
+import { isPanoramaFeatureAttachment } from "../util/isPanoramaFeatureAttachment";
 
+import { AttachmentPreviewToolbar } from "./AttachmentPreviewToolbar";
 import { PanoramaStore } from "./PanoramaStore";
 
 import "./AttachmentPreviewGroup.less";
@@ -46,14 +51,6 @@ function isPanoramaAttachment(attachment: DataSource) {
   return projection === "equirectangular";
 }
 
-export type Attachment = DataSource & { isPanorama: boolean };
-
-function isPanoramaFeatureAttachment(
-  attachment: Attachment
-): attachment is Attachment & FeatureAttachment {
-  return attachment.isPanorama;
-}
-
 function panoramaNodeId(
   attachment: Attachment & FeatureAttachment
 ): string | undefined {
@@ -72,7 +69,7 @@ function isLinkedTransition(
 
 interface PreviewContextValue {
   open: boolean;
-  onThumbnailClick?: (index: number) => void;
+  onThumbnailClick?: (attachment: DataSource) => void;
 }
 export const AttachmentPreviewContext =
   createContext<PreviewContextValue | null>(null);
@@ -90,7 +87,7 @@ export function AttachmentPreviewGroup({
   const [panoramaStore] = useState(() => new PanoramaStore());
 
   const [panoramaMode, togglePanoramaMode] = useReducer(
-    (state) => !state,
+    (state: boolean) => !state,
     true
   );
 
@@ -100,6 +97,20 @@ export function AttachmentPreviewGroup({
       isPanorama: isPanoramaAttachment(attachment),
     }));
   }, [images]);
+
+  const indexByKey = useMemo(
+    () => new Map(previewImages.map((a, i) => [getAttachmentKey(a), i])),
+    [previewImages]
+  );
+
+  const onThumbnailClick = useCallback(
+    (attachment: DataSource) => {
+      setCurrent(
+        (current) => indexByKey.get(getAttachmentKey(attachment)) ?? current
+      );
+    },
+    [indexByKey]
+  );
 
   const tourNodes = useMemo<PhotospherePreviewNode[]>(() => {
     if (typeof featureId !== "number") return [];
@@ -123,10 +134,12 @@ export function AttachmentPreviewGroup({
   const tourViewerRef = useRef<Viewer | null>(null);
   const autorotateShownRef = useRef(false);
 
-  const currentImage: Attachment | undefined = previewImages[current];
+  const activeAttachment: Attachment | undefined = previewImages[current];
   const currentNodeId =
-    panoramaMode && currentImage && isPanoramaFeatureAttachment(currentImage)
-      ? (panoramaNodeId(currentImage) ?? null)
+    panoramaMode &&
+    activeAttachment &&
+    isPanoramaFeatureAttachment(activeAttachment)
+      ? (panoramaNodeId(activeAttachment) ?? null)
       : null;
 
   const [lastPanoramaId, setLastPanoramaId] = useState<string | null>(null);
@@ -152,49 +165,49 @@ export function AttachmentPreviewGroup({
   }, [open]);
 
   useEffect(() => {
-    if (tourViewerRef.current) {
-      panoramaStore.add(current, tourViewerRef.current);
+    if (
+      tourViewerRef.current &&
+      activeAttachment &&
+      isPanoramaFeatureAttachment(activeAttachment)
+    ) {
+      panoramaStore.add(activeAttachment.id, tourViewerRef.current);
     }
-  }, [current, panoramaStore]);
+  }, [activeAttachment, panoramaStore]);
 
-  const onDownload = useCallback(
-    async (current: number) => {
-      const attachment = previewImages[current];
-      const url = await getImageURL({
-        featureId,
-        resourceId,
-        source: attachment,
-      });
-      if (url) {
-        fetch(url)
-          .then((response) => response.blob())
-          .then((blob) => {
-            const blobUrl = URL.createObjectURL(new Blob([blob]));
-            const link = document.createElement("a");
-            link.href = blobUrl;
-            link.download = attachment.name;
-            document.body.appendChild(link);
-            link.click();
-            URL.revokeObjectURL(blobUrl);
-            link.remove();
-          });
-      }
-    },
-    [featureId, previewImages, resourceId]
-  );
+  const onDownload = useCallback(async () => {
+    if (!activeAttachment) return;
+    const url = await getImageURL({
+      featureId,
+      resourceId,
+      source: activeAttachment,
+    });
+    if (url) {
+      fetch(url)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const blobUrl = URL.createObjectURL(new Blob([blob]));
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = activeAttachment.name;
+          document.body.appendChild(link);
+          link.click();
+          URL.revokeObjectURL(blobUrl);
+          link.remove();
+        });
+    }
+  }, [featureId, activeAttachment, resourceId]);
 
   const previewCallbacks = useMemo<PreviewCallbacks>(() => {
     return {
       countRender: () => undefined,
       actionsRender: (_, toolbarProps) => {
-        const currentImage = previewImages[toolbarProps.current];
+        if (!activeAttachment) return null;
 
         return (
           <AttachmentPreviewToolbar
             panoramaStore={panoramaStore}
-            attachmentId={toolbarProps.current}
-            attachment={currentImage}
-            onDownload={() => onDownload(toolbarProps.current)}
+            attachment={activeAttachment}
+            onDownload={onDownload}
             panoramaMode={panoramaMode}
             togglePanoramaMode={togglePanoramaMode}
             {...toolbarProps}
@@ -203,15 +216,19 @@ export function AttachmentPreviewGroup({
       },
 
       imageRender: (originalNode, info) => {
-        const renderedImage = previewImages[info.current];
-        const key = renderedImage.name ?? info.current;
+        const renderPlain = (key: string | number) => (
+          <div key={key} className="ngw-preview-img-wrapper">
+            {originalNode}
+          </div>
+        );
+
+        if (!activeAttachment) return renderPlain(info.current);
+
+        const renderedImage = activeAttachment;
+        const renderKey = getAttachmentKey(renderedImage);
 
         if (!panoramaMode || !isPanoramaFeatureAttachment(renderedImage)) {
-          return (
-            <div key={key} className="ngw-preview-img-wrapper">
-              {originalNode}
-            </div>
-          );
+          return renderPlain(renderKey);
         }
 
         const nodeId = panoramaNodeId(renderedImage);
@@ -229,7 +246,7 @@ export function AttachmentPreviewGroup({
 
         return (
           <Suspense
-            key={isTour ? `panorama-tour-${tourKey}` : key}
+            key={isTour ? `panorama-tour-${tourKey}` : renderKey}
             fallback={<CentralLoading indicatorStyle={{ color: "white" }} />}
           >
             <PhotospherePreview
@@ -240,9 +257,9 @@ export function AttachmentPreviewGroup({
                 tourViewerRef.current = viewer;
                 if (viewer) {
                   autorotateShownRef.current = true;
-                  panoramaStore.add(info.current, viewer);
+                  panoramaStore.add(renderedImage.id, viewer);
                 } else {
-                  panoramaStore.delete(info.current);
+                  panoramaStore.delete(renderedImage.id);
                 }
               }}
               onNavigate={
@@ -270,6 +287,7 @@ export function AttachmentPreviewGroup({
     onDownload,
     panoramaMode,
     previewImages,
+    activeAttachment,
     panoramaStore,
     tourNodes,
     tourKey,
@@ -285,7 +303,7 @@ export function AttachmentPreviewGroup({
   );
 
   return (
-    <AttachmentPreviewContext value={{ open, onThumbnailClick: setCurrent }}>
+    <AttachmentPreviewContext value={{ open, onThumbnailClick }}>
       <Image.PreviewGroup
         preview={previewProps}
         classNames={{

@@ -19,7 +19,6 @@ export type ImageThumbnailProps = {
   width?: number;
   height?: number;
   preview?: GetProp<typeof Image, "preview">;
-  index?: number;
 };
 
 export function ImageThumbnail({
@@ -29,7 +28,6 @@ export function ImageThumbnail({
   featureId,
   resourceId,
   attachment,
-  index,
 }: ImageThumbnailProps) {
   const [thumbUrl, setThumbUrl] = useState<string>();
   const [selfImageOpen, setSelfImageOpen] = useState(false);
@@ -84,10 +82,8 @@ export function ImageThumbnail({
       );
       return;
     }
-    if (typeof index === "number") {
-      ctx?.onThumbnailClick?.(index);
-    }
-  }, [ctx, imageUrl, index, isCtrlMode]);
+    ctx?.onThumbnailClick?.(attachment);
+  }, [attachment, ctx, imageUrl, isCtrlMode]);
 
   return (
     <Image

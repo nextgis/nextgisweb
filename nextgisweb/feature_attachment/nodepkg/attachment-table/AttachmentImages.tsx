@@ -26,7 +26,6 @@ export function AttachmentImages({
             featureId={featureId}
             width={size}
             height={size}
-            index={index}
           />
         );
       })}

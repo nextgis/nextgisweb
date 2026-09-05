@@ -1,12 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
+import type { Attachment } from "@nextgisweb/feature-attachment/attachment-editor/type";
 import { Button, Typography } from "@nextgisweb/gui/antd";
 import type { ButtonProps, GetProp, Image } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { Attachment } from "./AttachmentPreviewGroup";
+import { isPanoramaFeatureAttachment } from "../util/isPanoramaFeatureAttachment";
+
 import type { PanoramaStore } from "./PanoramaStore";
 
 import ChevronLeftIcon from "@nextgisweb/icon/material/chevron_left";
@@ -40,7 +42,6 @@ function ToolbarButton(props: ButtonProps) {
 interface AttachmentPreviewToolbarProps extends ToolbarRenderInfoType {
   panoramaStore: PanoramaStore;
   panoramaMode: boolean;
-  attachmentId: number;
   attachment: Attachment;
   onDownload: () => void;
   togglePanoramaMode: () => void;
@@ -52,7 +53,6 @@ export const AttachmentPreviewToolbar = observer(
     togglePanoramaMode,
     panoramaStore,
     panoramaMode,
-    attachmentId,
     attachment,
     transform: { scale },
     actions: { onRotateRight, onRotateLeft, onZoomOut, onZoomIn, onActive },
@@ -71,9 +71,13 @@ export const AttachmentPreviewToolbar = observer(
 
     const { viewers } = panoramaStore;
 
-    const panoramaViewer = useMemo(() => {
-      return viewers.get(attachmentId);
-    }, [attachmentId, viewers]);
+    const panoramaViewer = useMemo(
+      () =>
+        isPanoramaFeatureAttachment(attachment)
+          ? viewers.get(attachment.id)
+          : undefined,
+      [attachment, viewers]
+    );
 
     useEffect(() => {
       if (!panoramaViewer) return;
