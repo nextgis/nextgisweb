@@ -1,12 +1,13 @@
 from collections import namedtuple
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, ClassVar, Literal
+from typing import TYPE_CHECKING, Annotated, ClassVar, Literal, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy import event, func, text
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, DBSession, gettext, gettextf
@@ -225,6 +226,29 @@ class Resource(Base, metaclass=ResourceMeta):
             result.append(current)
 
         return reversed(result)
+
+    def ensure_id(self) -> int:
+        """Returns existing resource ID or generates one for new object
+
+        If the resource does not have a persistent ID, this method will generate
+        one using the database sequence and assign it to the resource. The
+        resource must be pending in a Session."""
+
+        existing_id = cast(int | None, self.id)
+        if existing_id is not None:
+            return existing_id
+
+        insp = sa.inspect(self, raiseerr=True)
+        if (session := insp.session) is None:
+            raise InvalidRequestError(f"{type(self).__name__} is not attached to a Session")
+
+        if not insp.pending:
+            raise InvalidRequestError("Resource must be pending to get a new persistent ID")
+
+        sql = sa.text("SELECT nextval(pg_get_serial_sequence('resource', 'id'))")
+        self.id = session.connection().scalar(sql)
+
+        return self.id
 
     # Permissions
 
