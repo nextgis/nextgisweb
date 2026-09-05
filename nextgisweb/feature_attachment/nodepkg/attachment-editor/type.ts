@@ -19,3 +19,5 @@ export interface FileMetaToUpload {
 }
 
 export type DataSource = FeatureAttachment | FileMetaToUpload;
+
+export type Attachment = DataSource & { isPanorama: boolean };
