@@ -7,7 +7,7 @@ import { EntrypointLoader } from "../component/EntrypointLoader";
 function EntrypointFallback() {
   return (
     <Flex style={{ padding: "4em 8em" }} vertical>
-      <Spin size="large" />
+      <Spin size="large" fullscreen />
     </Flex>
   );
 }
