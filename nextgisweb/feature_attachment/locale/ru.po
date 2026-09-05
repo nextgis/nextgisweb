@@ -132,7 +132,7 @@ msgstr "Безымянный"
 msgid "MIME type"
 msgstr "Тип MIME"
 
-#: nodepkg/image-thumbnail/component/AttachmentPreviewToolbar.tsx:34
+#: nodepkg/image-thumbnail/viewers/panorama/usePanoramaToolbarControls.tsx:12
 msgid "Toggle panorama viewer"
 msgstr "Переключить просмотр панорам"
 
