@@ -11,7 +11,9 @@ import { RemoveIcon } from "@nextgisweb/gui/icon";
 import { formatSize } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { AttachmentEditorPreview } from "./AttachmentEditorPreview";
+import ImageThumbnail from "../image-thumbnail";
+import { AttachmentPreviewGroup } from "../image-thumbnail/component/AttachmentPreviewGroup";
+
 import AttachmentEditorStore from "./AttachmentEditorStore";
 import type { DataSource } from "./type";
 import { isImageItem } from "./util/isImageItem";
@@ -106,67 +108,73 @@ const AttachmentEditor = observer(
       <div className="ngw-feature-attachment-editor">
         {contextHolder}
         <ActionToolbar pad borderBlockEnd actions={actions} />
-        <Upload {...props}>
-          <Table
-            rowKey={(record) => {
-              const r = record as DataSource;
-              return "file_upload" in r ? r.file_upload.id : r.id;
-            }}
-            dataSource={dataSource}
-            columns={[
-              {
-                key: "preview",
-                className: "preview",
-                render: (_, row) => {
-                  const r = row as DataSource;
-                  if (!isImageItem(r)) return "";
-                  return (
-                    <AttachmentEditorPreview
-                      attachment={r}
-                      attachments={imageAttachments}
-                      resourceId={store_.resourceId}
-                      featureId={store_.featureId}
-                      width={width}
-                      height={width}
-                    />
-                  );
+        <AttachmentPreviewGroup
+          attachments={imageAttachments}
+          resourceId={store_.resourceId}
+          featureId={store_.featureId}
+        >
+          <Upload {...props}>
+            <Table
+              rowKey={(record) => {
+                const r = record as DataSource;
+                return "file_upload" in r ? r.file_upload.id : r.id;
+              }}
+              dataSource={dataSource}
+              columns={[
+                {
+                  key: "preview",
+                  className: "preview",
+                  render: (_, row) => {
+                    const r = row as DataSource;
+                    if (!isImageItem(r)) return "";
+                    return (
+                      <ImageThumbnail
+                        attachment={r}
+                        resourceId={store_.resourceId}
+                        featureId={store_.featureId}
+                        width={width}
+                        height={width}
+                        index={imageAttachments.indexOf(r)}
+                      />
+                    );
+                  },
                 },
-              },
-              {
-                dataIndex: "name",
-                className: "name",
-                title: gettext("File name"),
-                render: editableField("name"),
-              },
-              {
-                dataIndex: "size",
-                className: "size",
-                title: gettext("Size"),
-                render: (text: number) => formatSize(text),
-              },
-              {
-                dataIndex: "description",
-                className: "description",
-                title: gettext("Description"),
-                render: editableField("description"),
-              },
-              {
-                key: "actions",
-                title: "",
-                render: (_, record) => (
-                  <Button
-                    onClick={() => handleDelete(record)}
-                    type="text"
-                    shape="circle"
-                    icon={<RemoveIcon />}
-                  />
-                ),
-              },
-            ]}
-            parentHeight
-            size="small"
-          />
-        </Upload>
+                {
+                  dataIndex: "name",
+                  className: "name",
+                  title: gettext("File name"),
+                  render: editableField("name"),
+                },
+                {
+                  dataIndex: "size",
+                  className: "size",
+                  title: gettext("Size"),
+                  render: (text: number) => formatSize(text),
+                },
+                {
+                  dataIndex: "description",
+                  className: "description",
+                  title: gettext("Description"),
+                  render: editableField("description"),
+                },
+                {
+                  key: "actions",
+                  title: "",
+                  render: (_, record) => (
+                    <Button
+                      onClick={() => handleDelete(record)}
+                      type="text"
+                      shape="circle"
+                      icon={<RemoveIcon />}
+                    />
+                  ),
+                },
+              ]}
+              parentHeight
+              size="small"
+            />
+          </Upload>
+        </AttachmentPreviewGroup>
         <div ref={previewRef}></div>
       </div>
     );
