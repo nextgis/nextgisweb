@@ -14,6 +14,12 @@ from .. import Layer, Service
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
+@pytest.fixture(scope="module", autouse=True)
+def disable_gdal_wms_cache():
+    with gdal.config_options({"GDAL_ENABLE_WMS_CACHE": "NO"}):
+        yield
+
+
 @pytest.fixture(scope="module")
 def service_id():
     from nextgisweb.raster_layer import test as raster_layer_test
