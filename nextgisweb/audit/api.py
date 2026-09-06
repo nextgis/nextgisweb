@@ -115,7 +115,7 @@ def dbase(
         Annotated[int, Meta(gt=0, le=MAX_ROWS)],
         Meta(description="Maximum number of records to return"),
     ] = MAX_ROWS,
-    comp: AuditComponent,
+    comp: AuditComponent = inject.arg(),
 ) -> AnyOf[
     AsJSON[list[AuditArrayLogEntry]],
     AsJSON[list[AuditObject]],

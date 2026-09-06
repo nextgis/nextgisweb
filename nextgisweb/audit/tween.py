@@ -28,7 +28,7 @@ class OnResponse:
 
 
 @inject()
-def factory(handler, registry, *, comp: AuditComponent):
+def factory(handler, registry, *, comp: AuditComponent = inject.arg()):
     fopts = comp.options.with_prefix("filter")
     filters = [
         lambda req: (

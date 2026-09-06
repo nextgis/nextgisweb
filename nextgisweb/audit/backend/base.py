@@ -30,7 +30,7 @@ registry = BackendBase.registry
 
 
 @inject()
-def is_backend_configured(identity, *, comp: AuditComponent):
+def is_backend_configured(identity, *, comp: AuditComponent = inject.arg()):
     assert identity in registry
     return identity in (comp.backends or ())
 

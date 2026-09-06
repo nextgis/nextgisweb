@@ -200,7 +200,13 @@ def item_delete(context, request: Request) -> EmptyObject:
 
 @sa_event.listens_for(DBSession, "before_flush")
 @inject()
-def _check_relations(session: orm.Session, flush_context, instances, *, comp: ResourceComponent):
+def _check_relations(
+    session: orm.Session,
+    flush_context,
+    instances,
+    *,
+    comp: ResourceComponent = inject.arg(),
+):
     for obj in session.deleted:
         if isinstance(obj, Resource):
             for rcls, key in comp._relinfo.get(cls := obj.__class__, []):

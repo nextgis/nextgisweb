@@ -17,7 +17,7 @@ def test_cog_rgb_overview_jpeg_compression(
     ngw_data_path,
     ngw_env,
     *,
-    comp: RasterLayerComponent,
+    comp: RasterLayerComponent = inject.arg(),
 ):
     with transaction.manager:
         res = RasterLayer(srs=SRS.filter_by(id=3857).one()).persist()
@@ -41,7 +41,7 @@ def test_external_rgb_overview_jpeg_compression(
     ngw_data_path,
     ngw_env,
     *,
-    comp: RasterLayerComponent,
+    comp: RasterLayerComponent = inject.arg(),
 ):
     with transaction.manager:
         res = RasterLayer(srs=SRS.filter_by(id=3857).one()).persist()

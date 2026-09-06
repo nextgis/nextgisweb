@@ -1,66 +1,110 @@
-from functools import partial
+from collections.abc import Callable
+from contextlib import suppress
 
 import pytest
 
-from ..container import Container
-from ..inject import UnresolvedDependency
-from ..inject import inject as _inject
+from ..container import Container, ContainerNotWiredError
+from ..inject import Injector, UnresolvedDependency, inject_wrapper
 
 A = type("A", (str,), {})
 B = type("B", (str,), {})
 
-CntA = type("CntA", (Container,), {})
-CntB = type("CntB", (Container,), {})
+Cnt = type("Cnt", (Container,), {})
 
 
-inject = partial(
-    _inject,
-    auto_provide={
-        CntA: lambda x: x is A,
-        CntB: lambda x: x is B,
-    },
-)
+@pytest.fixture
+def cnt():
+    c = Cnt().wire()
+    try:
+        yield c
+    finally:
+        with suppress(ContainerNotWiredError):
+            c.unwire()
+
+
+inject = Injector(Cnt)
 
 
 @inject()
-def fn(*, a: A, b: B):
+def direct(*, a: A = inject.arg(), b: B = inject.arg()):
     return a + b
 
 
-class Class:
+@inject()
+def forward(*, a: "A" = inject.arg(), b: "B" = inject.arg()) -> str:
+    return a + b
+
+
+@pytest.mark.parametrize("func", [direct, forward])
+def test_func(func: Callable, cnt: Cnt):
+    with pytest.raises(UnresolvedDependency):
+        func()
+
+    cnt.register(A, "A")
+    cnt.register(B, "B")
+
+    assert func() == "AB"
+    assert func(b=B("b")) == "Ab"
+
+    cnt.register(A, "X")
+    cnt.register(B, "Y")
+
+    assert func() == "XY"
+
+    assert isinstance(func, inject_wrapper)
+
+    assert len(func._inj_values) == 2
+    cnt.unregister(A)
+    assert len(func._inj_values) == 1
+    cnt.unwire()
+    assert len(func._inj_values) == 0
+
+
+class Direct:
     @inject()
-    def __call__(self, *, a: A, b: B):
-        assert isinstance(self, Class)
+    def __call__(self, *, a: A = inject.arg(), b: B = inject.arg()):
+        assert isinstance(self, Direct)
         return a + b
 
     @classmethod
     @inject()
-    def cmeth(cls, *, a: A, b: B):
-        assert cls is Class
+    def cmeth(cls, *, a: A = inject.arg(), b: B = inject.arg()):
+        assert cls is Direct
         return a + b
 
 
-def test_inject():
-    obj = Class()
+class Forward(Direct):
+    @inject()
+    def __call__(
+        self,
+        *,
+        a: "A" = inject.arg(),
+        b: "B" = inject.arg(),
+    ) -> "str":
+        assert isinstance(self, Forward)
+        return a + b
 
-    ca = CntA().wire()
-    cb = CntB().wire()
+    @classmethod
+    @inject()
+    def cmeth(cls, *, a: "A" = inject.arg(), b: "B" = inject.arg()) -> "str":
+        assert cls is Forward
+        return a + b
+
+
+@pytest.mark.parametrize("cls", [Direct, Forward])
+def test_cls(cls: type[Direct], cnt: Cnt):
+    obj = cls()
 
     with pytest.raises(UnresolvedDependency):
-        fn()
+        obj()
 
-    ca.register(A, "A")
-    cb.register(B, "B")
+    cnt.register(A, "A")
+    cnt.register(B, "B")
 
-    assert fn() == obj() == obj.cmeth() == "AB"
+    assert obj() == obj.cmeth() == "AB"
+    assert obj(b=B("b")) == "Ab"
 
-    ca.register(A, "X")
-    cb.register(B, "Y")
+    cnt.register(A, "X")
+    cnt.register(B, "Y")
 
-    assert fn() == obj() == obj.cmeth() == "XY"
-
-    assert len(fn._inj_values) == 2
-    ca.unregister(A)
-    assert len(fn._inj_values) == 1
-    cb.unwire()
-    assert len(fn._inj_values) == 0
+    assert obj() == obj.cmeth() == "XY"

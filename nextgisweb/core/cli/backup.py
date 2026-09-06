@@ -11,6 +11,7 @@ from zipfile import ZipFile, is_zipfile
 
 import transaction
 
+from nextgisweb.env import inject
 from nextgisweb.env.cli import EnvCommand, arg, cli, opt
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
@@ -26,7 +27,7 @@ def backup(
     one_shot: bool = opt(False),
     target: str | None = arg(metavar="path"),
     *,
-    core: CoreComponent,
+    core: CoreComponent = inject.arg(),
 ):
     """Backup data into an archive
 
@@ -108,7 +109,7 @@ def restore(
     self: EnvCommand,
     source: str = arg(metavar="path"),
     *,
-    core: CoreComponent,
+    core: CoreComponent = inject.arg(),
 ):
     """Restore data from a backup
 

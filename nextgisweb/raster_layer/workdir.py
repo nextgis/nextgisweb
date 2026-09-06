@@ -98,5 +98,5 @@ class WorkdirMixin:
 
 
 @inject()
-def _workdir_path(comp: Component, *, core: CoreComponent) -> Path:
+def _workdir_path(comp: Component, *, core: CoreComponent = inject.arg()) -> Path:
     return Path(core.gtsdir(comp))

@@ -23,7 +23,7 @@ def test_cog(
     ngw_env,
     ngw_httptest_app,
     *,
-    comp: RasterLayerComponent,
+    comp: RasterLayerComponent = inject.arg(),
 ):
     with transaction.manager:
         res = RasterLayer(srs=SRS.filter_by(id=srs_id).one()).persist()

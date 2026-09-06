@@ -1,8 +1,9 @@
+from nextgisweb.env import inject
 from nextgisweb.env.cli import EnvCommand, comp_cli
 
 from .component import FileUploadComponent
 
 
 @comp_cli.command()
-def cleanup(self: EnvCommand, *, file_upload: FileUploadComponent):
+def cleanup(self: EnvCommand, *, file_upload: FileUploadComponent = inject.arg()):
     file_upload.cleanup()

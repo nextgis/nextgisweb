@@ -1,3 +1,4 @@
+from nextgisweb.env import inject
 from nextgisweb.env.cli import InTransactionCommand, arg, cli
 from nextgisweb.lib.logging import logger
 
@@ -24,7 +25,7 @@ def authenticate(
     keyname: str = arg(metavar="user|group"),
     base_url: str = arg(),
     *,
-    auth: AuthComponent,
+    auth: AuthComponent = inject.arg(),
 ):
     """Impersonate an user via a link
 
@@ -44,7 +45,7 @@ class grauth:
 def sync(
     self: InTransactionCommand,
     *,
-    auth: AuthComponent,
+    auth: AuthComponent = inject.arg(),
 ):
     if not auth.oauth:
         logger.warning("OAuth server is not configured")

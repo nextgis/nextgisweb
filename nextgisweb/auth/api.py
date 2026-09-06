@@ -162,7 +162,7 @@ def deserialize_principal(
     *,
     create: bool,
     request: Request,
-    auth: AuthComponent,
+    auth: AuthComponent = inject.arg(),
 ):
     updated = set()
 
@@ -724,7 +724,7 @@ def validate_members(obj, members):
 
 
 @inject()
-def check_principal_delete(obj, *, auth: AuthComponent):
+def check_principal_delete(obj, *, auth: AuthComponent = inject.arg()):
     if obj.system:
         raise ValidationError(message=gettext("System principals can't be deleted."))
     if (

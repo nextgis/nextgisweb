@@ -2,7 +2,6 @@ import logging
 import logging.config
 import os
 from collections.abc import Mapping
-from functools import partial
 from inspect import isclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING
@@ -11,8 +10,7 @@ import sqlalchemy as sa
 import sqlalchemy.event as sa_event
 
 from nextgisweb.lib.config import ConfigOptions, Option, OptionAnnotations, load_config
-from nextgisweb.lib.dinject import Container
-from nextgisweb.lib.dinject import inject as _inject
+from nextgisweb.lib.dinject import Container, Injector
 from nextgisweb.lib.logging import logger
 
 from .component import Component, load_all
@@ -283,30 +281,6 @@ class Env(Container):
     # fmt: on
 
 
-provide = Env.provide
-
-
-class EnvDependency:
-    """Helper class for marking auto-provided dependecies"""
-
-
-inject = partial(
-    _inject,
-    auto_provide={
-        Env: lambda a: (
-            isclass(a)
-            and issubclass(
-                a,
-                (
-                    Env,
-                    EnvDependency,
-                    Component,
-                ),
-            )
-        ),
-    },
-)
-
 _env = None
 
 
@@ -340,6 +314,15 @@ else:
         multiple environments is currently not supported an will hardly
         ever be needed. To get original object for which messages are
         proxied one can use constructor ``env()``."""
+
+
+class EnvInjector(Injector[Env]):
+    def __init__(self):
+        auto_provide = lambda a: isclass(a) and issubclass(a, (Env, Component))
+        super().__init__(Env, auto_provide=auto_provide)
+
+
+inject = EnvInjector()
 
 
 def _filter_by_prefix(cfg, prefix):

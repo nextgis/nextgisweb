@@ -1,3 +1,4 @@
+from nextgisweb.env import inject
 from nextgisweb.env.cli import EnvCommand, cli, opt
 from nextgisweb.lib.json import dumps
 
@@ -9,7 +10,7 @@ def statistics(
     self: EnvCommand,
     estimate_storage: bool = opt(False),
     *,
-    core: CoreComponent,
+    core: CoreComponent = inject.arg(),
 ):
     """Gather statistics and print as JSON
 
@@ -32,6 +33,6 @@ class storage:
 
 
 @storage.command()
-def estimate(self: EnvCommand, *, core: CoreComponent):
+def estimate(self: EnvCommand, *, core: CoreComponent = inject.arg()):
     core.estimate_storage_all()
     print(dumps(core.query_storage()))

@@ -2,8 +2,29 @@ import typing
 from warnings import warn
 
 from .component import Component, load_all, require
-from .environment import Env, EnvDependency, env, inject, provide, setenv
+from .environment import Env, env, inject, setenv
 from .model import DBSession
+
+__all__ = [
+    "COMP_ID",
+    "Base",
+    "Component",
+    "DBSession",
+    "Env",
+    "env",
+    "gettext",
+    "gettextf",
+    "inject",
+    "load_all",
+    "ngettext",
+    "ngettextf",
+    "npgettext",
+    "npgettextf",
+    "pgettext",
+    "pgettextf",
+    "require",
+    "setenv",
+]
 
 if typing.TYPE_CHECKING:
     from nextgisweb.lib.i18n import TrStr as _TrStr

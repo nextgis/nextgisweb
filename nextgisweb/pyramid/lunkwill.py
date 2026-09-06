@@ -23,7 +23,7 @@ class LunkwillIntercepionExpected(NotConfigured):
 
 
 @inject()
-def ensure_interception(*, comp: PyramidComponent):
+def ensure_interception(*, comp: PyramidComponent = inject.arg()):
     if not comp.options["lunkwill.enabled"]:
         raise LunkwillNotConfigured
     if not comp.options["lunkwill.proxy"]:

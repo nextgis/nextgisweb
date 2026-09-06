@@ -5,7 +5,7 @@ from time import sleep
 
 import transaction
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, inject
 from nextgisweb.env.cli import EnvCommand, UninitializedEnvCommand, arg, cli, opt
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
@@ -113,7 +113,7 @@ def maintenance(
     estimate_storage: bool = opt(False),
     one_shot: bool = opt(False),
     *,
-    core: CoreComponent,
+    core: CoreComponent = inject.arg(),
 ):
     """Perform housekeeping tasks
 

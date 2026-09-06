@@ -24,7 +24,7 @@ BUF_SIZE = 1024 * 1024
 
 
 @inject()
-def check_storage_limit(file_size, *, core: CoreComponent):
+def check_storage_limit(file_size, *, core: CoreComponent = inject.arg()):
     try:
         core.check_storage_limit(requested=file_size)
     except StorageInsufficient as exc:
@@ -47,7 +47,7 @@ class FileUploadObject(Struct, kw_only=True):
 def collection_options(
     request: Request,
     *,
-    comp: FileUploadComponent,
+    comp: FileUploadComponent = inject.arg(),
 ) -> Annotated[Response, StatusCode(204)]:
     """Query TUS protocol capabilities
 
@@ -68,7 +68,7 @@ def collection_options(
 def collection_put(
     request: Request,
     *,
-    comp: FileUploadComponent,
+    comp: FileUploadComponent = inject.arg(),
 ) -> AsJSON[Annotated[FileUploadObject, StatusCode(201)],]:
     """Upload small file using single PUT request
 
@@ -124,7 +124,6 @@ class FileUploadFormPost(Struct, kw_only=True):
     upload_meta: list[FileUploadObject]
 
 
-@inject()
 def collection_post(
     request: Request,
 ) -> AnyOf[
@@ -152,7 +151,7 @@ def collection_post(
 
 
 @inject()
-def _collection_post_form(request: Request, *, comp: FileUploadComponent):
+def _collection_post_form(request: Request, *, comp: FileUploadComponent = inject.arg()):
     # File is uploaded as object of class cgi.FieldStorage which has properties
     # type(file type) and filename(file name), there is no file size property so
     # let's add our own implementation.
@@ -192,7 +191,7 @@ def _collection_post_form(request: Request, *, comp: FileUploadComponent):
 
 
 @inject()
-def _collection_post_tus(request: Request, *, comp: FileUploadComponent):
+def _collection_post_tus(request: Request, *, comp: FileUploadComponent = inject.arg()):
     try:
         upload_length = int(request.headers["Upload-Length"])
     except (KeyError, ValueError):

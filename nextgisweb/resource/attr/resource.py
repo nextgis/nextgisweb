@@ -81,7 +81,7 @@ class ResourceAttrChildrenCreatable(ResourceAttr, tag="resource.children_creatab
 
     @classmethod
     @inject()
-    def _disabled(cls, *, comp: ResourceComponent) -> set[ResourceCls]:
+    def _disabled(cls, *, comp: ResourceComponent = inject.arg()) -> set[ResourceCls]:
         return set(comp.disabled_resource_cls)
 
 

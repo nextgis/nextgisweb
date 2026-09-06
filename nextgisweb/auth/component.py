@@ -35,7 +35,7 @@ class AuthComponent(Component):
         self._auth_methods = list[AuthMethod]()
 
     @inject()
-    def initialize_db(self, *, core: CoreComponent):
+    def initialize_db(self, *, core: CoreComponent = inject.arg()):
         tr = core.localizer().translate
         for keyname, display_name in User.system_display_name.items():
             self.initialize_user(keyname, tr(display_name), system=True)

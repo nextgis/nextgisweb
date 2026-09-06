@@ -1,3 +1,4 @@
+from nextgisweb.env import inject
 from nextgisweb.env.cli import EnvCommand, comp_cli
 
 from .component import RasterLayerComponent
@@ -11,5 +12,5 @@ def rebuild_overview(self: EnvCommand):
 
 
 @comp_cli.command()
-def cleanup(self: EnvCommand, *, raster_layer: RasterLayerComponent):
+def cleanup(self: EnvCommand, *, raster_layer: RasterLayerComponent = inject.arg()):
     raster_layer.cleanup()

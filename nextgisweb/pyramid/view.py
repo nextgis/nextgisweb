@@ -91,7 +91,7 @@ def static_view(request: Request):
 
 
 @inject()
-def asset_favicon(request: Request, *, pyramid: PyramidComponent):
+def asset_favicon(request: Request, *, pyramid: PyramidComponent = inject.arg()):
     fn_favicon = pyramid.options["favicon"]
     if os.path.isfile(fn_favicon):
         return FileResponse(fn_favicon, request=request, content_type="image/x-icon")
@@ -100,7 +100,7 @@ def asset_favicon(request: Request, *, pyramid: PyramidComponent):
 
 
 @inject()
-def asset_css(request: Request, *, ckey: str | None = None, core: CoreComponent):
+def asset_css(request: Request, *, ckey: str | None = None, core: CoreComponent = inject.arg()):
     response = Response(
         core.settings_get("pyramid", "custom_css", ""),
         content_type="text/css",
@@ -115,7 +115,7 @@ def asset_css(request: Request, *, ckey: str | None = None, core: CoreComponent)
 
 
 @inject()
-def asset_hlogo(request: Request, *, ckey: str | None = None, core: CoreComponent):
+def asset_hlogo(request: Request, *, ckey: str | None = None, core: CoreComponent = inject.arg()):
     if (data := core.settings_get("pyramid", "logo", None)) is None:
         raise HTTPNotFound()
     mime_type, file = data
@@ -133,8 +133,8 @@ def asset_blogo(
     request: Request,
     *,
     ckey: str | None = None,
-    core: CoreComponent,
-    pyramid: PyramidComponent,
+    core: CoreComponent = inject.arg(),
+    pyramid: PyramidComponent = inject.arg(),
 ):
     if (view := pyramid.company_logo_view) is not None:
         try:
@@ -201,7 +201,7 @@ def swagger(request: Request):
 
 @react_renderer("@nextgisweb/pyramid/control-panel")
 @inject()
-def control_panel(request: Request, *, comp: PyramidComponent):
+def control_panel(request: Request, *, comp: PyramidComponent = inject.arg()):
     if not request.user.is_administrator and len(request.user.effective_permissions) == 0:
         raise ForbiddenError
     return dict(

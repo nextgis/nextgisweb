@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Hashable
-from dataclasses import dataclass
-from inspect import formatannotationrelativeto
-from typing import Any, TypeVar
+from typing import Any, Self
 
-KeyType = tuple[Hashable, ...]
-TContainer = TypeVar("TContainer", bound="Container")
+type KeyType = tuple[Hashable, ...]
 
 
 class Container:
@@ -19,7 +16,7 @@ class Container:
         self._container_registry = dict()
         self._container_invalidate = defaultdict(list)
 
-    def wire(self: TContainer) -> TContainer:
+    def wire(self) -> Self:
         cls = self.__class__
         if cls._instance is not None:
             raise ContainerWiredError(cls, self)
@@ -27,7 +24,7 @@ class Container:
 
         return self
 
-    def unwire(self: TContainer) -> TContainer:
+    def unwire(self) -> Self:
         if self.__class__._instance is None:
             raise ContainerNotWiredError
 
@@ -36,39 +33,22 @@ class Container:
                 cb()
             cbs[:] = []
 
+        self.__class__._instance = None
+
         return self
 
-    def register(
-        self,
-        tdef: Hashable,
-        value: Any,
-        *,
-        selector: tuple[Hashable, ...] = (),
-    ) -> None:
+    def register[T](self, tdef: type[T], value: T, /, selector: KeyType = ()) -> None:
         key = (tdef,) + selector
         self._invalidate_key(key)
         self._container_registry[key] = value
 
-    def unregister(
-        self,
-        tdef: Hashable,
-        *,
-        selector: tuple[Hashable, ...] = (),
-    ) -> None:
+    def unregister[T](self, tdef: type[T], /, *, selector: KeyType = ()) -> None:
         key = (tdef,) + selector
         self._invalidate_key(key)
         self._container_registry.pop(key)
 
     @classmethod
-    def provide(cls) -> Argument:
-        return Argument(cls)
-
-    @classmethod
-    def _from_container(
-        cls,
-        key: tuple[Hashable, ...],
-        invalidate: Callable[[], None],
-    ) -> Any:
+    def _from_container(cls, key: KeyType, invalidate: Callable[[], None]) -> Any:
         instance = cls._instance
         if instance is None:
             raise ContainerNotWiredError
@@ -78,31 +58,11 @@ class Container:
 
         return value
 
-    def _invalidate_key(self, key):
+    def _invalidate_key(self, key: KeyType) -> None:
         cbs = self._container_invalidate[key]
         for cb in cbs:
             cb()
         cbs[:] = []
-
-
-@dataclass(frozen=True)
-class Argument:
-    cnt: type[Container]
-    selector: KeyType = ()
-
-    def bind(self, name: str, tdef: Hashable) -> BoundArgument:
-        return BoundArgument(self.cnt, name, (tdef,) + self.selector)
-
-
-@dataclass(frozen=True)
-class BoundArgument:
-    cnt: type[Container]
-    name: str
-    key: KeyType
-
-    def __repr__(self) -> str:
-        trepr = formatannotationrelativeto(self.key[0])(self.key[0])
-        return f"{self.name}: {trepr}"
 
 
 class ContainerNotWiredError(Exception):
@@ -110,7 +70,7 @@ class ContainerNotWiredError(Exception):
 
 
 class ContainerWiredError(Exception):
-    def __init__(self, cls: TContainer, new: Container) -> None:
+    def __init__(self, cls: type[Container], new: object) -> None:
         super().__init__(
             f"{cls!r} is already wired to {cls._instance!r} but trying to wire to {new!r}"
         )

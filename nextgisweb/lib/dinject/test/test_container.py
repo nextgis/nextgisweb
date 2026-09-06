@@ -9,33 +9,46 @@ Cnt = type("Cnt", (Container,), {})
 def test_container():
     c = Cnt()
 
-    invs = 0
+    invalidate_calls = 0
 
-    def _inv():
-        nonlocal invs
-        invs += 1
+    def _invalidate():
+        nonlocal invalidate_calls
+        invalidate_calls += 1
 
     with pytest.raises(ContainerNotWiredError):
-        c._from_container((P,), _inv)
+        c._from_container((P,), _invalidate)
 
     c.wire()
     with pytest.raises(ContainerWiredError):
         c.wire()
 
     with pytest.raises(KeyError):
-        c._from_container((P,), _inv)
+        c._from_container((P,), _invalidate)
 
-    c.register(P, "a")
-    assert c._from_container((P,), _inv) == "a"
+    c.register(P, "foo")
+    assert c._from_container((P,), _invalidate) == "foo"
 
-    c.register(P, "sel", selector=("sel",))
-    assert c._from_container((P, "sel"), _inv) == "sel"
+    c.register(P, "bar", selector=("qux",))
+    assert c._from_container((P, "qux"), _invalidate) == "bar"
 
-    assert invs == 0
+    assert invalidate_calls == 0
 
-    c.register(P, "b")
-    assert invs == 1
-    assert c._from_container((P,), _inv) == "b"
+    c.register(P, "zoo")
+    assert invalidate_calls == 1
+    assert c._from_container((P,), _invalidate) == "zoo"
 
     c.unwire()
-    assert invs == 3
+    assert invalidate_calls == 3
+
+
+def test_wire_unwire():
+    c = Cnt()
+
+    c.wire()
+    assert Cnt._instance is c
+
+    c.unwire()
+    assert Cnt._instance is None
+
+    c.wire()
+    assert Cnt._instance is c

@@ -1,30 +1,41 @@
+from __future__ import annotations
+
 from collections.abc import Callable, Hashable, Sequence
+from dataclasses import dataclass
 from functools import partial, update_wrapper
-from inspect import Signature, signature
-from types import MethodType
+from inspect import Signature, formatannotationrelativeto, ismethod, signature, unwrap
+from types import FunctionType, MethodType
 from typing import Any
+from warnings import warn_explicit
 
-from .container import Argument, BoundArgument, Container
-
-TFunc = Callable[..., Any]
-TAutoProvide = Callable[[Hashable], bool]
+from .container import Container, KeyType
 
 
-def inject(
-    auto_provide: dict[type[Container], TAutoProvide] | None = None,
-) -> Callable[[TFunc], TFunc]:
-    def _auto_provide(annotation: Hashable) -> Argument | None:
-        if auto_provide is None:
-            return None
-        for k, v in auto_provide.items():
-            if v(annotation):
-                return Argument(k)
+class Injector[C: Container]:
+    def __init__(
+        self,
+        container: type[C],
+        *,
+        auto_provide: Callable[[Hashable], bool] | None = None,
+    ) -> None:
+        self._container = container
+        self._auto_provide = auto_provide
+
+    def __call__[F: Callable](self) -> Callable[[F], F]:
+        return self._wrap
+
+    def arg(self) -> Any:
+        return Argument(self._container)
+
+    def _auto_provide_for(self, tdef: Hashable, /) -> Argument | None:
+        if (v := self._auto_provide) is not None and v(tdef):
+            return Argument(self._container)
         return None
 
-    def _inject(func: TFunc) -> TFunc:
+    def _wrap[T: Callable](self, func: T) -> T:
         new_params = list()
         inj_params = list()
-        sig = signature(func)
+        sig = signature(func, eval_str=True)
         for name, p in sig.parameters.items():
             if p.kind != p.KEYWORD_ONLY:
                 # Bypass non keyword only
@@ -37,7 +48,14 @@ def inject(
             handle = False
             if isinstance(uarg, Argument):
                 handle = True
-            elif auto := _auto_provide(anno):
+            elif auto := self._auto_provide_for(anno):
+                self._warn_func(
+                    "Auto-providing argument in function `{func_name}` which is deprecated since "
+                    "nextgisweb 5.6.0.dev5 and will be removed in a future version. Dependencies "
+                    "should be marked explicitly using `Injector.arg()`.",
+                    func=func,
+                    category=DeprecationWarning,
+                )
                 uarg = auto
                 handle = True
             if not handle:
@@ -49,9 +67,42 @@ def inject(
         if len(inj_params) == 0:
             return func
 
-        return inject_wrapper(func, inj_params, sig.replace(parameters=new_params))
+        return inject_wrapper(func, inj_params, sig.replace(parameters=new_params))  # ty: ignore[invalid-return-type]
 
-    return _inject
+    def _warn_func(self, message: str, *, func: Callable, category: type[Warning]) -> None:
+        if ismethod(func):
+            func = func.__func__
+
+        func = unwrap(func)
+        assert isinstance(func, FunctionType)
+
+        warn_explicit(
+            message.format(func_name=func.__name__),
+            category=category,
+            filename=func.__code__.co_filename,
+            lineno=func.__code__.co_firstlineno,
+            module=func.__module__,
+        )
+
+
+@dataclass(slots=True, frozen=True)
+class Argument[C: Container]:
+    cnt: type[C]
+    selector: KeyType = ()
+
+    def bind(self, name: str, tdef: Hashable) -> BoundArgument[C]:
+        return BoundArgument(self.cnt, name, (tdef,) + self.selector)
+
+
+@dataclass(slots=True, frozen=True)
+class BoundArgument[C: Container]:
+    cnt: type[C]
+    name: str
+    key: KeyType
+
+    def __repr__(self) -> str:
+        trepr = formatannotationrelativeto(self.key[0])(self.key[0])
+        return f"{self.name}: {trepr}"
 
 
 class inject_wrapper:
@@ -60,7 +111,7 @@ class inject_wrapper:
 
     def __init__(
         self,
-        func: TFunc,
+        func: Callable,
         iargs: Sequence[BoundArgument],
         signature: Signature,
     ) -> None:
@@ -86,7 +137,7 @@ class inject_wrapper:
                         raise UnresolvedDependency(barg.cnt, barg)
 
         assert len(inj_values) == len(bound_args)
-        return self.func(*args, **inj_values, **kwargs)
+        return self.func(*args, **{**inj_values, **kwargs})
 
     def __get__(self, instance: Any, owner: Any) -> MethodType:
         return MethodType(self, instance)

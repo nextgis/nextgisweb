@@ -4,7 +4,7 @@ from pathlib import Path
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, inject
 from nextgisweb.env.cli import DryRunOptions, EnvCommand, UninitializedEnvCommand, arg, cli, opt
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.migration import (
@@ -27,7 +27,7 @@ def initialize_db(
     self: EnvCommand,
     drop: bool = opt(False),
     *,
-    core: CoreComponent,
+    core: CoreComponent = inject.arg(),
 ):
     """Initialize the database
 

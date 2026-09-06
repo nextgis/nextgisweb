@@ -33,7 +33,7 @@ def lib():
 
 
 @inject()
-def test_lookup(lib, ngw_data_path, *, comp: SVGMarkerLibraryComponent):
+def test_lookup(lib, ngw_data_path, *, comp: SVGMarkerLibraryComponent = inject.arg()):
     def asert_lookup(marker, expected):
         resolved = comp.lookup(marker, library=lib)
         assert resolved == str(expected)

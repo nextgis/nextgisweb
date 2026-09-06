@@ -1,3 +1,4 @@
+from nextgisweb.env import inject
 from nextgisweb.env.cli import UninitializedEnvCommand, cli, opt
 from nextgisweb.lib.logging import logger
 
@@ -13,8 +14,8 @@ def server(
     port: int = opt(8080),
     reload: bool | None = opt(flag=True),
     *,
-    core: CoreComponent,
-    pyramid: PyramidComponent,
+    core: CoreComponent = inject.arg(),
+    pyramid: PyramidComponent = inject.arg(),
 ):
     """Launch development-mode web server
 

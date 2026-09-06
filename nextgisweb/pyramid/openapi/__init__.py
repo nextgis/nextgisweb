@@ -72,7 +72,7 @@ def _context_param(value):
 
 
 @inject()
-def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
+def openapi(introspector, prefix="/api/", *, comp: PyramidComponent = inject.arg()):
     doc: dict[str, Any] = dict(openapi="3.1.0")
 
     info = doc["info"] = dict()

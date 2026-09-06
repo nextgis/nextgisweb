@@ -6,7 +6,7 @@ from pathlib import Path
 from subprocess import check_call
 from typing import Any
 
-from nextgisweb.env import Env
+from nextgisweb.env import Env, inject
 from nextgisweb.env.cli import UninitializedEnvCommand, comp_cli, opt
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.fileutil import update_text_file
@@ -67,10 +67,10 @@ def install(
     build: bool = opt(False),
     start: bool = opt(False),
     *,
-    env: Env,
-    core: CoreComponent,
-    pyramid: PyramidComponent,
-    jsrealm: JSRealmComponent,
+    env: Env = inject.arg(),
+    core: CoreComponent = inject.arg(),
+    pyramid: PyramidComponent = inject.arg(),
+    jsrealm: JSRealmComponent = inject.arg(),
 ):
     """Setup JavaScript environment
 
