@@ -19,7 +19,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import NoResultFound, OperationalError
 from sqlalchemy.orm import configure_mappers
 
-from nextgisweb.env import Component, DBSession, gettext
+from nextgisweb.env import Component, DBSession, gettext, inject
 from nextgisweb.env.package import enable_qualifications, pkginfo
 from nextgisweb.lib import json
 from nextgisweb.lib.config import Option, SizeInBytes
@@ -32,6 +32,16 @@ from nextgisweb.i18n import Localizer, Translations
 from .backup import BackupMetadata
 from .model import Setting
 from .storage import StorageComponentMixin
+
+
+class SystemFullNameDefault:
+    def __call__(self) -> str:
+        raise NotImplementedError
+
+
+class SupportUrl:
+    def __call__(self) -> str | None:
+        raise NotImplementedError
 
 
 class CoreComponent(StorageComponentMixin, Component):
@@ -88,11 +98,9 @@ class CoreComponent(StorageComponentMixin, Component):
         DBSession.configure(bind=self._sa_engine)
         self.DBSession = DBSession
 
-        # Methods for customization in components
-        self.system_full_name_default = self.localizer().translate(
-            gettext("NextGIS geoinformation system")
-        )
-        self.support_url_view = lambda request: self.options["support_url"]
+        # For further customization in components
+        self.env.register(SystemFullNameDefault, SystemFullNameDefaultImpl())
+        self.env.register(SupportUrl, SupportUrlImpl())
 
         self.fontconfig.initialize()
 
@@ -384,11 +392,12 @@ class CoreComponent(StorageComponentMixin, Component):
 
         return result
 
-    def system_full_name(self):
+    @inject()
+    def system_full_name(self, *, default_factory: SystemFullNameDefault = inject.arg()) -> str:
         try:
             return self.settings_get(self.identity, "system.full_name")
         except KeyError:
-            return self.system_full_name_default
+            return default_factory()
 
     @property
     def instance_id(self):
@@ -554,3 +563,15 @@ class CoreComponent(StorageComponentMixin, Component):
         Option("debug", bool, default=False, doc=("Enable additional debug tools.")),
     )
     # fmt: on
+
+
+class SystemFullNameDefaultImpl(SystemFullNameDefault):
+    @inject()
+    def __call__(self, *, comp: CoreComponent = inject.arg()) -> str:
+        return comp.localizer().translate(gettext("NextGIS geoinformation system"))
+
+
+class SupportUrlImpl(SupportUrl):
+    @inject()
+    def __call__(self, *, comp: CoreComponent = inject.arg()) -> str | None:
+        return comp.options["support_url"]

@@ -1,4 +1,7 @@
 <%page args="site_name, title"/>
+
+<%! from nextgisweb.pyramid.api import preview_link_data %>
+
 <%
     tags = {"og:site_name": site_name}
     if title:
@@ -6,10 +9,10 @@
 
     tags["og:url"] = request.url
 
-    preview_link = request.env.pyramid.preview_link_view(request)
-    if description := preview_link["description"]:
+    data = preview_link_data(request)
+    if description := data["description"]:
         tags["og:description"] = tr(description)
-    if image := preview_link["image"]:
+    if image := data["image"]:
         tags["og:image"] = image
         tags["twitter:card"] = "summary"
 %>

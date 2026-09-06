@@ -1,10 +1,12 @@
 import signal
+from collections.abc import Callable
 from datetime import timedelta
 from os import getenv
 from typing import Any
 
 import transaction
 from pyramid.interfaces import ITweens
+from pyramid.response import Response
 
 from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option, OptionAnnotations
@@ -17,7 +19,7 @@ from nextgisweb.core import CoreComponent
 
 from . import uacompat
 from .model import Session, SessionStore
-from .tomb import Configurator, iter_routes
+from .tomb import Configurator, Request, iter_routes
 from .util import StaticMap, gensecret
 
 
@@ -243,3 +245,23 @@ class PyramidComponent(Component):
         Option("compression.algorithms", list, default=['br', 'gzip']),
     )) + uacompat.option_annotations
     # fmt: on
+
+
+class HelpPageUrl:
+    def __call__(self) -> str | None:
+        raise NotImplementedError
+
+
+class CompanyUrl:
+    def __call__(self) -> str | None:
+        raise NotImplementedError
+
+
+class CompanyLogo:
+    def __call__(self) -> Callable[[Request], Response] | None:
+        raise NotImplementedError
+
+
+class LinkPreviewDefaults:
+    def __call__(self, request: Request) -> dict:
+        raise NotImplementedError

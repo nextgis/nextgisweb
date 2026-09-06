@@ -1,11 +1,12 @@
 import re
+from collections.abc import Callable
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
 from typing import TYPE_CHECKING, Annotated, Any, ClassVar, NewType
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
-from pyramid.response import Response
+from pyramid.response import FileResponse, Response
 
 from nextgisweb.env import COMP_ID, Component, DBSession, gettext, gettextf, inject
 from nextgisweb.env.package import pkginfo
@@ -34,7 +35,7 @@ from nextgisweb.resource import Resource, ResourceScope
 
 from . import client
 from .client import client_setting
-from .component import PyramidComponent
+from .component import CompanyLogo, CompanyUrl, HelpPageUrl, LinkPreviewDefaults, PyramidComponent
 from .permission import cors_manage, cors_view
 from .tomb import Request, UnsafeFileResponse
 from .util import gensecret, restart_delayed
@@ -658,6 +659,73 @@ def cs_logo_max_size(comp: PyramidComponent, request: Request) -> int:
     return LOGO_MAX_SIZE
 
 
+class HelpPageUrlImpl(HelpPageUrl):
+    @inject()
+    def __call__(self, *, comp: PyramidComponent = inject.arg()) -> str | None:
+        return comp.options["help_page.url"] if comp.options["help_page.enabled"] else None
+
+
+class CompanyUrlImpl(CompanyUrl):
+    @inject()
+    def __call__(self, *, comp: PyramidComponent = inject.arg()) -> str | None:
+        return comp.options["company_url"]
+
+
+class CompanyLogoImpl(CompanyLogo):
+    def __call__(self) -> Callable[[Request], Response] | None:
+        return self.view
+
+    @inject()
+    def view(self, request: Request, *, comp: PyramidComponent = inject.arg()) -> Response:
+        default = comp.resource_path("asset/logo_outline.png")
+        return FileResponse(default)
+
+
+class LinkPreviewDefaultsImpl(LinkPreviewDefaults):
+    def __call__(self, request: Request) -> dict:
+        return {
+            "image": request.static_url("asset/pyramid/webgis-for-social.png"),
+            "description": gettext("Your Web GIS at nextgis.com"),
+        }
+
+
+@inject()
+def preview_link_data(
+    request: Request,
+    *,
+    defaults_factory: LinkPreviewDefaults = inject.arg(),
+) -> dict:
+    defaults = defaults_factory(request)
+
+    if (
+        hasattr(request, "context")
+        and isinstance(request.context, Resource)
+        and request.context in DBSession
+    ):
+        if not request.context.has_permission(ResourceScope.read, request.user):
+            return dict(image=None, description=None)
+
+        social = request.context.social
+        if social is not None:
+            image = (
+                request.route_url(
+                    "resource.preview",
+                    id=request.context.id,
+                    _query=str(social.preview_fileobj_id),
+                )
+                if social.preview_fileobj is not None
+                else defaults["image"]
+            )
+            description = (
+                social.preview_description
+                if social.preview_description is not None
+                else defaults["description"]
+            )
+            return dict(image=image, description=description)
+
+    return defaults
+
+
 def setup_pyramid(comp: PyramidComponent, config):
     from . import api_cors
 
@@ -751,50 +819,9 @@ def setup_pyramid(comp: PyramidComponent, config):
         get=codegen_api_type,
     )
 
-    # Methods for customization in components
-    comp.company_logo_enabled = lambda request: True
-    comp.company_logo_view = None
-    comp.company_url_view = lambda request: comp.options["company_url"]
-
-    comp.help_page_url_view = lambda request: (
-        comp.options["help_page.url"] if comp.options["help_page.enabled"] else None
-    )
-
-    def preview_link_view(request: Request):
-        defaults = comp.preview_link_default_view(request)
-
-        if (
-            hasattr(request, "context")
-            and isinstance(request.context, Resource)
-            and request.context in DBSession
-        ):
-            if not request.context.has_permission(ResourceScope.read, request.user):
-                return dict(image=None, description=None)
-
-            social = request.context.social
-            if social is not None:
-                image = (
-                    request.route_url(
-                        "resource.preview",
-                        id=request.context.id,
-                        _query=str(social.preview_fileobj_id),
-                    )
-                    if social.preview_fileobj is not None
-                    else defaults["image"]
-                )
-                description = (
-                    social.preview_description
-                    if social.preview_description is not None
-                    else defaults["description"]
-                )
-                return dict(image=image, description=description)
-        return defaults
-
-    comp.preview_link_default_view = lambda request: dict(
-        image=request.static_url("asset/pyramid/webgis-for-social.png"),
-        description=gettext("Your Web GIS at nextgis.com"),
-    )
-
-    comp.preview_link_view = preview_link_view
+    comp.env.register(CompanyUrl, CompanyUrlImpl())
+    comp.env.register(HelpPageUrl, HelpPageUrlImpl())
+    comp.env.register(CompanyLogo, CompanyLogoImpl())
+    comp.env.register(LinkPreviewDefaults, LinkPreviewDefaultsImpl())
 
     # TODO: Add PUT method for changing custom_css setting and GUI

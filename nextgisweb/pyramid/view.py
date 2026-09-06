@@ -28,14 +28,14 @@ from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.safehtml import URL_PATTERN
 
-from nextgisweb.core import CoreComponent
+from nextgisweb.core import CoreComponent, SupportUrl
 from nextgisweb.core.exception import ForbiddenError, NotConfigured, UserException
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 
 from . import exception, permission, renderer
 from .client import client_setting
-from .component import PyramidComponent
+from .component import CompanyLogo, CompanyUrl, HelpPageUrl, PyramidComponent
 from .openapi import openapi
 from .session import WebSession
 from .tomb import Request, StaticFileResponse
@@ -134,19 +134,12 @@ def asset_blogo(
     *,
     ckey: str | None = None,
     core: CoreComponent = inject.arg(),
-    pyramid: PyramidComponent = inject.arg(),
+    company_logo: CompanyLogo = inject.arg(),
 ):
-    if (view := pyramid.company_logo_view) is not None:
-        try:
-            response = view(request)
-        except HTTPNotFound:
-            response = None
-    else:
-        response = None
+    if (view := company_logo()) is None:
+        raise HTTPNotFound()
 
-    if response is None:
-        default = pyramid.resource_path("asset/logo_outline.png")
-        response = FileResponse(default)
+    response = view(request)
 
     if ckey and ckey == core.settings_get("pyramid", "company_logo.ckey"):
         response.cache_control.public = True
@@ -433,13 +426,25 @@ def cs_url_safe_pattern(comp: PyramidComponent, request: Request) -> str:
 
 
 @client_setting("support_url")
-def cs_support_url(comp: PyramidComponent, request: Request) -> str | None:
-    return request.env.component(CoreComponent).support_url_view(request)
+@inject()
+def cs_support_url(
+    comp: PyramidComponent,
+    request: Request,
+    *,
+    support_url: SupportUrl = inject.arg(),
+) -> str | None:
+    return support_url()
 
 
 @client_setting("help_page_url")
-def cs_help_page_url(comp: PyramidComponent, request: Request) -> str | None:
-    return comp.help_page_url_view(request)
+@inject()
+def cs_help_page_url(
+    comp: PyramidComponent,
+    request: Request,
+    *,
+    help_page_url: HelpPageUrl = inject.arg(),
+) -> str | None:
+    return help_page_url()
 
 
 @client_setting("contactAdministratorUrl")
@@ -456,11 +461,18 @@ class PyramidCompanyLogoClientSetting(Struct, kw_only=True):
 
 
 @client_setting("company_logo")
-def cs_company_logo(comp: PyramidComponent, request: Request) -> PyramidCompanyLogoClientSetting:
+@inject()
+def cs_company_logo(
+    comp: PyramidComponent,
+    request: Request,
+    *,
+    company_url: CompanyUrl = inject.arg(),
+    company_logo: CompanyLogo = inject.arg(),
+) -> PyramidCompanyLogoClientSetting:
     return PyramidCompanyLogoClientSetting(
-        enabled=comp.company_logo_enabled(request),
+        enabled=company_logo() is not None,
         ckey=request.env.component(CoreComponent).settings_get("pyramid", "company_logo.ckey"),
-        link=comp.company_url_view(request),
+        link=company_url(),
     )
 
 
