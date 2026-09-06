@@ -110,9 +110,7 @@ def session_invite(request: Request):
 
 
 def alink(request: Request):
-    from nextgisweb.pyramid import PyramidComponent
-
-    if not request.env.component(PyramidComponent).options["alink"]:
+    if not request.env.component(AuthComponent).options["alink"]:
         raise HTTPNotFound()
 
     try:
