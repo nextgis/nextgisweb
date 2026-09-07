@@ -3,7 +3,7 @@ from collections.abc import Callable
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, NewType
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.response import FileResponse, Response
@@ -37,7 +37,7 @@ from . import client
 from .client import client_setting
 from .component import CompanyLogo, CompanyUrl, HelpPageUrl, LinkPreviewDefaults, PyramidComponent
 from .permission import cors_manage, cors_view
-from .tomb import Request, UnsafeFileResponse
+from .tomb import Configurator, Request, UnsafeFileResponse
 from .util import gensecret, restart_delayed
 
 LOGO_MAX_SIZE = 128 * (1 << 10)  # 128 KB
@@ -52,52 +52,50 @@ SettingsComponentGap = (
     ]
 )
 
-SettingsResponseTypedGap = Struct if TYPE_CHECKING else Gap("SettingsResponseTypedGap", Struct)
-SettingsResponseUntyped = NewType("SettingsResponseUntyped", dict[str, Any])
+SettingsResponseGap = Gap("SettingsResponseGap", Struct)
 
 
+class ClientSettingsStruct(dict[str, Any]):
+    pass
+
+
+@inject()
 def settings(
     request: Request,
     *,
     component: SettingsComponentGap,
-) -> AsJSON[AnyOf[SettingsResponseTypedGap, SettingsResponseUntyped]]:
+    cs_struct: ClientSettingsStruct = inject.arg(),
+) -> AsJSON[SettingsResponseGap]:
     """Read component settings
 
     :returns: Current component settings"""
 
-    comp = request.env.component(PyramidComponent)
-    if st := comp._client_settings_struct_types.get(component):
-        comp = request.env.components[component]
-        return client.evaluate(comp, request, struct_type=st)
-
-    return comp.client_settings(request)
+    comp = request.env.components[component]
+    struct_type = cs_struct[component]
+    return client.evaluate(comp, request, struct_type=struct_type)
 
 
-def setup_pyramid_client_settings(comp: PyramidComponent, config):
-    struct_types = dict[str, Any]()
-    comp_ids = tuple[str, ...]()
+def setup_pyramid_client_settings(comp: PyramidComponent, config: Configurator):
+    struct_types = ClientSettingsStruct()
     for comp_id, comp_obj in comp.env.components.items():
         if comp_struct_type := client.struct_type(comp_obj):
             struct_types[comp_id] = comp_struct_type
             assert not hasattr(comp_obj, "client_settings")
-        elif not hasattr(comp_obj, "client_settings"):
-            continue
-        comp_ids = (*comp_ids, comp_id)
 
     fillgap(
         SettingsComponentGap,
-        make_literal(comp_ids),
+        make_literal(tuple(struct_types)),
     )
 
     fillgap(
-        SettingsResponseTypedGap,
+        SettingsResponseGap,
         annotate(
             make_union(struct_types.values()),
-            [TSExport("PyramidSettingsResponseTyped")],
+            [TSExport("PyramidSettingsResponse")],
         ),
     )
 
-    comp._client_settings_struct_types = struct_types
+    comp.env.register(ClientSettingsStruct, struct_types)
 
     config.add_route(
         "pyramid.settings",
@@ -150,11 +148,11 @@ def healthcheck(
 
     :returns: Health check results"""
     result = HealthcheckResponse(success=True, component=dict())
-    components = [comp for comp in request.env.components.values() if hasattr(comp, "healthcheck")]
-    for comp in components:
-        cresult = comp.healthcheck()
-        result.success = result.success and cresult["success"]
-        result.component[comp.identity] = cresult
+    for comp in request.env.components.values():
+        if func := getattr(comp, "healthcheck", None):
+            cresult = func()
+            result.success = result.success and cresult["success"]
+            result.component[comp.identity] = cresult
 
     if not result.success:
         request.response.status_code = 503
@@ -170,8 +168,8 @@ def statistics(request: Request) -> AsJSON[dict[str, dict[str, Any]]]:
 
     result = dict()
     for comp in request.env.components.values():
-        if hasattr(comp, "query_stat"):
-            result[comp.identity] = comp.query_stat()
+        if func := getattr(comp, "query_stat", None):
+            result[comp.identity] = func()
     return result
 
 

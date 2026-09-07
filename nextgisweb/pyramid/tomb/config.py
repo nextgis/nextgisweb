@@ -2,7 +2,7 @@ import re
 from collections.abc import Mapping
 from inspect import signature
 from sys import _getframe
-from typing import Annotated, Any
+from typing import TYPE_CHECKING, Annotated, Any
 from warnings import warn
 
 from msgspec import NODEFAULT, Meta
@@ -155,6 +155,9 @@ PATH_PARAM_RE = re.compile(r"\{(?P<k>\w+)(?:\:(?P<r>.+?))?\}")
 
 
 class Configurator(PyramidConfigurator):
+    if TYPE_CHECKING:
+        registry: Any
+
     def setup_registry(self, *args, **kwargs):
         super().setup_registry(*args, **kwargs)
 

@@ -72,12 +72,14 @@ def asset(request: Request):
     component = request.matchdict["component"]
     subpath = request.matchdict["subpath"]
 
+    assert isinstance(component, str) and isinstance(subpath, tuple)
+
     try:
         comp_obj = env.components[component]
     except KeyError:
         raise HTTPNotFound()
 
-    pth = comp_obj.resource_path("/".join(("asset",) + subpath))
+    pth = comp_obj.resource_path("/".join(("asset", *subpath)))
     if pth.is_file():
         return FileResponse(pth, request=request, cache_max_age=3600)
     else:

@@ -32,6 +32,7 @@ def server(
         start_reloader("nextgisweb.script.main", reload_interval=0.25)
         logger.info("File monitor started")
 
+    assert self.env is not None
     self.env.initialize()
 
     config = pyramid.make_app({})

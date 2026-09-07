@@ -1,12 +1,12 @@
-import type { PyramidSettingsResponseTyped } from "@nextgisweb/pyramid/type/api";
+import type { PyramidSettingsResponse } from "@nextgisweb/pyramid/type/api";
 
 import { route } from "./api";
 
-type CSTypedComponent = PyramidSettingsResponseTyped["component"];
+type CSTypedComponent = PyramidSettingsResponse["component"];
 
 async function fetchSettings<C extends CSTypedComponent>(
   component: C
-): Promise<PyramidSettingsResponseTyped & { component: C }>;
+): Promise<PyramidSettingsResponse & { component: C }>;
 
 async function fetchSettings<T>(component: string): Promise<T>;
 
