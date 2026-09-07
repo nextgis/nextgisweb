@@ -319,7 +319,6 @@ class WMSLayer(Resource, SpatialLayerMixin):
     remote_srs_id: Mapped[int] = mapped_column(sa.ForeignKey(SRS.id))
 
     connection: Mapped[WMSConnection] = orm.relationship(
-        Resource,
         foreign_keys=connection_id,
         cascade="save-update,merge",
     )
