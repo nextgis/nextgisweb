@@ -1,4 +1,5 @@
 import signal
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from datetime import timedelta
 from os import getenv
@@ -247,21 +248,21 @@ class PyramidComponent(Component):
     # fmt: on
 
 
-class HelpPageUrl:
-    def __call__(self) -> str | None:
-        raise NotImplementedError
+class HelpPageUrl(ABC):
+    @abstractmethod
+    def __call__(self) -> str | None: ...
 
 
-class CompanyUrl:
-    def __call__(self) -> str | None:
-        raise NotImplementedError
+class CompanyUrl(ABC):
+    @abstractmethod
+    def __call__(self) -> str | None: ...
 
 
-class CompanyLogo:
-    def __call__(self) -> Callable[[Request], Response] | None:
-        raise NotImplementedError
+class CompanyLogo(ABC):
+    @abstractmethod
+    def __call__(self) -> Callable[[Request], Response] | None: ...
 
 
-class LinkPreviewDefaults:
-    def __call__(self, request: Request) -> dict:
-        raise NotImplementedError
+class LinkPreviewDefaults(ABC):
+    @abstractmethod
+    def __call__(self, request: Request) -> dict: ...

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from functools import partial, update_wrapper
 from inspect import Signature, formatannotationrelativeto, ismethod, signature, unwrap
 from types import FunctionType, MethodType
-from typing import Any
+from typing import Any, Self
 from warnings import warn_explicit
 
 from .container import Container, KeyType
@@ -139,7 +139,10 @@ class inject_wrapper:
         assert len(inj_values) == len(bound_args)
         return self.func(*args, **{**inj_values, **kwargs})
 
-    def __get__(self, instance: Any, owner: Any) -> MethodType:
+    def __get__(self, instance: object | None, owner: type[Any] | None = None) -> Self | Any:
+        if instance is None:
+            return self
+
         return MethodType(self, instance)
 
     def __repr__(self) -> str:

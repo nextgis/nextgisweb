@@ -6,6 +6,7 @@ import re
 import sys
 import tempfile
 import uuid
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from pathlib import Path
 from subprocess import check_output
@@ -34,14 +35,14 @@ from .model import Setting
 from .storage import StorageComponentMixin
 
 
-class SystemFullNameDefault:
-    def __call__(self) -> str:
-        raise NotImplementedError
+class SystemFullNameDefault(ABC):
+    @abstractmethod
+    def __call__(self) -> str: ...
 
 
-class SupportUrl:
-    def __call__(self) -> str | None:
-        raise NotImplementedError
+class SupportUrl(ABC):
+    @abstractmethod
+    def __call__(self) -> str | None: ...
 
 
 class CoreComponent(StorageComponentMixin, Component):

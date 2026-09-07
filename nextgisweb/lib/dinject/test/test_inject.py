@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from contextlib import suppress
 
@@ -108,3 +109,24 @@ def test_cls(cls: type[Direct], cnt: Cnt):
     cnt.register(B, "Y")
 
     assert obj() == obj.cmeth() == "XY"
+
+
+def test_abc(cnt: Cnt):
+    class Base(ABC):
+        @abstractmethod
+        def __call__(self) -> str: ...
+
+    class Impl(Base):
+        @inject()
+        def __call__(self, *, a: A = inject.arg(), b: B = inject.arg()) -> str:
+            return a + b
+
+    obj = Impl()
+
+    with pytest.raises(UnresolvedDependency):
+        obj()
+
+    cnt.register(A, "A")
+    cnt.register(B, "B")
+
+    assert obj() == "AB"
