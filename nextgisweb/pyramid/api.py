@@ -175,7 +175,7 @@ def statistics(request: Request) -> AsJSON[dict[str, dict[str, Any]]]:
     return result
 
 
-KindOfDataResponse = Gap("KindOfDataResponse", type[Struct])
+KindOfDataResponse = Struct if TYPE_CHECKING else Gap("KindOfDataResponse", Struct)
 
 
 def kind_of_data(request: Request) -> KindOfDataResponse:
@@ -226,7 +226,7 @@ def storage_estimate_post(request: Request) -> EmptyObject:
     request.env.component(CoreComponent).start_estimation()
 
 
-StorageResponse = Gap("StorageResponse", type[Struct])
+StorageResponse = Struct if TYPE_CHECKING else Gap("StorageResponse", Struct)
 
 
 class StorageValue(Struct, kw_only=True):
@@ -475,12 +475,8 @@ def setup_pyramid_csettings(comp: PyramidComponent, config):
             )
         )
 
-    if TYPE_CHECKING:
-        CSettingsRead = Struct
-        CSettingsUpdate = Struct
-    else:
-        CSettingsRead = defstruct("CSettingsRead", rfields)
-        CSettingsUpdate = defstruct("CSettingsUpdate", ufields)
+    CSettingsRead = Struct if TYPE_CHECKING else defstruct("CSettingsRead", rfields)
+    CSettingsUpdate = Struct if TYPE_CHECKING else defstruct("CSettingsUpdate", ufields)
 
     def get(request: Request, **kwargs) -> CSettingsRead:
         """Read component settings
@@ -519,10 +515,9 @@ def setup_pyramid_csettings(comp: PyramidComponent, config):
         return CSettingsRead(**sf)
 
     # Patch signature to get parameter extraction working
-    get_sig = signature(get)
-    get.__signature__ = get_sig.replace(
-        parameters=[get_sig.parameters["request"]] + get_parameters
-    )
+    get_sig = signature(get, locals=locals(), eval_str=True)
+    get_sig = get_sig.replace(parameters=(get_sig.parameters["request"], *get_parameters))
+    setattr(get, "__signature__", get_sig)
 
     def put(request: Request, *, body: CSettingsUpdate) -> EmptyObject:
         """Update component settings
@@ -542,6 +537,10 @@ def setup_pyramid_csettings(comp: PyramidComponent, config):
                             else:
                                 require_permission(ap)
                         loader(abody)
+
+    # Evaluate forward references locally
+    put_sig = signature(put, locals=locals(), eval_str=True)
+    setattr(put, "__signature__", put_sig)
 
     config.add_route(
         "pyramid.csettings",
@@ -776,18 +775,20 @@ def setup_pyramid(comp: PyramidComponent, config):
         get=kind_of_data,
     )
 
+    TotalStorageValue = Annotated[
+        StorageValue | UnsetType,
+        Meta(description="Total storage usage"),
+    ]
+
     fillgap(
         StorageResponse,
         defstruct(
             "StorageResponse",
-            [
-                (
-                    "total",
-                    Annotated[StorageValue | UnsetType, Meta(description="Total storage usage")],
-                    UNSET,
-                )
-            ]
-            + [(i, StorageValue | UnsetType, UNSET) for i in KindOfData.registry.keys()],
+            # ty: ignore[invalid-argument-type]
+            (
+                ("total", TotalStorageValue, UNSET),
+                *((i, StorageValue | UnsetType, UNSET) for i in KindOfData.registry.keys()),
+            ),
             kw_only=True,
             rename={"total": ""},
         ),

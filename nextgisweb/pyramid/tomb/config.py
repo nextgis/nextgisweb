@@ -316,9 +316,9 @@ class Configurator(PyramidConfigurator):
                         attrs.remove(attr)
                 fn = getattr(fn, "__wrapped__", None)
 
-            sig = signature(view)
+            sig = signature(view, eval_str=True)
 
-            body_type = return_type = None
+            body_type = None
             has_request = has_context = False
             path_params = dict[str, PathParam]()
             query_params = dict[str, QueryParam]()

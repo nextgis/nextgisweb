@@ -161,7 +161,7 @@ def _fn_signature(fn, pdoc):
     base_cls = None
     params = list()
 
-    for pn, p in signature(fn).parameters.items():
+    for pn, p in signature(fn, eval_str=True).parameters.items():
         if p.annotation is p.empty:
             raise TypeError(f"annotation required: {pn}")
 
