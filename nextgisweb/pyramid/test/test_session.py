@@ -204,13 +204,13 @@ def test_serialization(key, value, ngw_webtest_app: WebTestApp, ngw_request_hand
         return Response()
 
     with ngw_request_handler(_set):
-        ngw_webtest_app.get("/test/request/")
+        ngw_webtest_app.get("/test/request")
 
     with ngw_request_handler(_get):
-        ngw_webtest_app.get("/test/request/")
+        ngw_webtest_app.get("/test/request")
 
     with ngw_request_handler(_del):
-        ngw_webtest_app.get("/test/request/")
+        ngw_webtest_app.get("/test/request")
 
 
 def test_set_del(ngw_webtest_app: WebTestApp, ngw_request_handler):
@@ -235,7 +235,7 @@ def test_set_del(ngw_webtest_app: WebTestApp, ngw_request_handler):
 
     for req in (_set, _del, _check):
         with ngw_request_handler(req):
-            ngw_webtest_app.get("/test/request/")
+            ngw_webtest_app.get("/test/request")
 
 
 def test_exception(ngw_webtest_app: WebTestApp, ngw_request_handler):
@@ -249,7 +249,7 @@ def test_exception(ngw_webtest_app: WebTestApp, ngw_request_handler):
         return Response()
 
     with ngw_request_handler(_handler):
-        ngw_webtest_app.get("/test/request/")
+        ngw_webtest_app.get("/test/request")
 
 
 @pytest.mark.parametrize(
@@ -285,6 +285,6 @@ def test_session_start(handler, expect, ngw_webtest_app: WebTestApp, ngw_request
         return Response()
 
     with ngw_request_handler(_handler):
-        ngw_webtest_app.get("/test/request/")
+        ngw_webtest_app.get("/test/request")
         cookie_name = ngw_env.pyramid.options["session.cookie.name"]
         assert (cookie_name in ngw_webtest_app.cookies) == expect

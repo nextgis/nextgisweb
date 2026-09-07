@@ -36,10 +36,10 @@ from nextgisweb.jsrealm import jsentry
 from . import exception, permission, renderer
 from .client import client_setting
 from .component import CompanyLogo, CompanyUrl, HelpPageUrl, PyramidComponent
+from .exception import ErrorHandler
 from .openapi import openapi
 from .session import WebSession
-from .tomb import Request, StaticFileResponse
-from .tomb.predicate import ErrorRendererPredicate
+from .tomb import Configurator, Request, StaticFileResponse
 from .uacompat import FAMILIES
 from .uacompat import parse_header as ua_parse_header
 from .util import StaticMap, StaticSourcePredicate, set_output_buffering, viewargs
@@ -489,7 +489,8 @@ class PyramidI18nClientSetting(Struct, kw_only=True, rename="camel"):
             except UnknownLocaleError:
                 endonym = code
             else:
-                endonym = babel_locale.get_display_name().title()
+                endonym = babel_locale.get_display_name()
+                endonym = endonym.title() if endonym else code
             return cls(code=code, endonym=endonym)
 
     languages: list[Language]
@@ -547,10 +548,9 @@ def cs_lunkwill(comp: PyramidComponent, request: Request) -> PyramidLunkwillClie
     )
 
 
-def setup_pyramid(comp: PyramidComponent, config):
+def setup_pyramid(comp: PyramidComponent, config: Configurator):
     env = comp.env
     core = comp.env.component(CoreComponent)
-    is_debug = core.debug
 
     # Session factory
     config.set_session_factory(WebSession)
@@ -574,39 +574,21 @@ def setup_pyramid(comp: PyramidComponent, config):
 
     # ERROR HANGLING
 
-    comp.error_handlers = list()
+    from nextgisweb.auth import view as auth_view
 
-    @comp.error_handlers.append
-    def error_renderer_handler(request: Request, err_info, exc, exc_info):
-        error_renderer = None
+    error_handlers: tuple[ErrorHandler, ...] = (
+        exception.predicate_error_handler,
+        auth_view.forbidden_error_handler,
+        exception.default_error_handler,
+    )
 
-        mroute = request.matched_route
-        if mroute is not None:
-            for predicate in mroute.predicates:
-                if isinstance(predicate, ErrorRendererPredicate):
-                    error_renderer = predicate.val
-                    break
-
-        if error_renderer is not None:
-            return error_renderer(request, err_info, exc, exc_info, debug=is_debug)
-
-    @comp.error_handlers.append
-    def api_error_handler(request: Request, err_info, exc, exc_info):
-        if request.is_api or request.is_xhr:
-            return exception.json_error_response(request, err_info, exc, exc_info, debug=is_debug)
-
-    @comp.error_handlers.append
-    def html_error_handler(request: Request, err_info, exc, exc_info):
-        return exception.html_error_response(request, err_info, exc, exc_info, debug=is_debug)
-
-    def error_handler(request: Request, err_info, exc, exc_info, **kwargs):
-        for handler in comp.error_handlers:
-            result = handler(request, err_info, exc, exc_info)
+    def error_handler(*, exc: UserException, request: Request):
+        for handler in error_handlers:
+            result = handler(exc=exc, request=request)
             if result is not None:
                 return result
 
-    config.registry.settings["error.err_response"] = error_handler
-    config.registry.settings["error.exc_response"] = error_handler
+    env.register(ErrorHandler, error_handler)
 
     config.include(exception)
     comp.client_type(exception.ErrorResponse)
@@ -739,7 +721,16 @@ def setup_pyramid(comp: PyramidComponent, config):
 
     config.add_route("pyramid.locale", "/locale/{locale:str}").add_view(locale)
 
-    config.add_route("pyramid.test_request", "/test/request/").add_view(test_request_view)
+    config.add_route("pyramid.test_req", "/test/request").add_view(test_request_view)
+
+    config.add_route(
+        "pyramid.test_api",
+        "/api/test/request",
+        **{
+            m: test_request_view
+            for m in ("head", "get", "post", "put", "delete", "options", "patch")
+        },
+    )
 
     config.add_route(
         "pyramid.test_exception_handled",
@@ -768,7 +759,7 @@ def setup_pyramid(comp: PyramidComponent, config):
     config.add_route("pyramid.test_timeout", "/test/timeout").add_view(test_timeout)
 
 
-def _setup_static(comp: PyramidComponent, config):
+def _setup_static(comp: PyramidComponent, config: Configurator):
     config.registry.settings["pyramid.static_map"] = StaticMap()
     config.add_route_predicate("static_source", StaticSourcePredicate)
 
@@ -862,7 +853,7 @@ def _m_gettext(_template_filename):
     }
 
 
-def _setup_pyramid_mako(comp: PyramidComponent, config):
+def _setup_pyramid_mako(comp: PyramidComponent, config: Configurator):
     mako_imports = [
         "from markupsafe import Markup",
         "from nextgisweb.pyramid.view import json_js",

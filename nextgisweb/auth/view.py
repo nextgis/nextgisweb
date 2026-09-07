@@ -16,9 +16,10 @@ from sqlalchemy.orm import undefer
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.datetime import utcnow_naive
 
+from nextgisweb.core.exception import UserException
 from nextgisweb.gui import REACT_RENDERER, react_renderer
 from nextgisweb.jsrealm import jsentry
-from nextgisweb.pyramid import PyramidComponent, SessionStore, WebSession, client_setting
+from nextgisweb.pyramid import SessionStore, WebSession, client_setting
 from nextgisweb.pyramid.tomb import Request
 from nextgisweb.pyramid.view import ModelFactory
 
@@ -288,7 +289,7 @@ def _login_url(request: Request):
     return login_url
 
 
-def forbidden_error_handler(request: Request, err_info, exc, exc_info, **kwargs):
+def forbidden_error_handler(*, request: Request, exc: UserException, **kwargs):
     oaserver = request.env.component(AuthComponent).oauth
 
     # If user is not authentificated, we can offer him to sign in
@@ -296,7 +297,7 @@ def forbidden_error_handler(request: Request, err_info, exc, exc_info, **kwargs)
         request.method == "GET"
         and not request.is_api
         and not request.is_xhr
-        and err_info.http_status_code == 403
+        and exc.http_status_code == 403
         and request.authenticated_userid is None
     ):
         if oaserver and oaserver.options["default"]:
@@ -450,9 +451,6 @@ def cs_oauth(comp: AuthComponent, request: Request) -> AuthOAuthClientSetting:
 
 
 def setup_pyramid(comp: AuthComponent, config):
-    # Add it before default pyramid handlers
-    comp.env.component(PyramidComponent).error_handlers.insert(0, forbidden_error_handler)
-
     config.add_route("auth.login", "/login", get=login)
     config.add_route("auth.session_invite", "/session-invite").add_view(session_invite)
     config.add_route("auth.alink", "/alink/{token:str}").add_view(alink)

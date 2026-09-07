@@ -51,7 +51,6 @@ def _env():
     from nextgisweb.env.environment import Env, env
 
     result = env() or Env(set_global=True)
-    result.running_tests = True
     return result
 
 

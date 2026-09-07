@@ -1,13 +1,14 @@
 import sys
-from typing import Annotated, Any, Self
+from typing import Annotated, Any, Protocol, Self
 
 import pyramid.httpexceptions as httpexceptions
 from msgspec import UNSET, Struct, UnsetType
 from msgspec import DecodeError as MsgspecDecodeError
 from pyramid.renderers import render_to_response
 from pyramid.request import RequestLocalCache
+from pyramid.response import Response
 
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, inject
 from nextgisweb.lib import json
 from nextgisweb.lib.i18n.trstr import TrStr
 from nextgisweb.lib.logging import logger
@@ -18,6 +19,7 @@ from nextgisweb.jsrealm import TSExport, jsentry
 
 from .tomb import Request
 from .tomb.exception import MalformedJSONBody
+from .tomb.predicate import ErrorRendererPredicate
 
 JSENTRY = jsentry("@nextgisweb/pyramid/error-page")
 
@@ -43,8 +45,25 @@ def includeme(config):
     config.add_request_method(json_body, "json", property=True)
 
 
-def handled_exception_tween_factory(handler, registry):
-    err_response = registry.settings["error.err_response"]
+class ErrorHandler(Protocol):
+    def __call__(self, *, exc: UserException, request: Request) -> Response | None: ...
+
+
+tests_raise: bool | None = None  # For tests
+tests_urls: tuple[str, ...] = ("/test/request", "/api/test/request")
+
+
+def is_tests_raise(request: Request) -> bool:
+    return tests_raise is True or (tests_raise is None and request.path_info in tests_urls)
+
+
+@inject()
+def handled_exception_tween_factory(
+    handler,
+    registry,
+    *,
+    err_response: ErrorHandler = inject.arg(),
+):
 
     def handled_exception_tween(request: Request):
         try:
@@ -52,13 +71,13 @@ def handled_exception_tween_factory(handler, registry):
         except (httpexceptions.HTTPSuccessful, httpexceptions.HTTPRedirection) as exc:
             return exc
         except (UserException, httpexceptions.HTTPError) as exc:
-            if request.path_info.startswith("/test/request/"):
+            if is_tests_raise(request):
                 raise
 
             if isinstance(exc, httpexceptions.HTTPError):
                 exc = PyramidHTTPError(exc)
 
-            response = err_response(request, exc, exc, sys.exc_info())
+            response = err_response(exc=exc, request=request)
             if response is not None:
                 return response
 
@@ -67,17 +86,18 @@ def handled_exception_tween_factory(handler, registry):
     return handled_exception_tween
 
 
-def unhandled_exception_tween_factory(handler, registry):
-    exc_response = registry.settings["error.exc_response"]
-
+@inject()
+def unhandled_exception_tween_factory(
+    handler,
+    registry,
+    *,
+    exc_response: ErrorHandler = inject.arg(),
+):
     def unhandled_exception_tween(request: Request):
         try:
             return handler(request)
         except Exception as exc:
-            if request.path_info.startswith("/test/request/"):
-                raise
-
-            if (env := getattr(request, "env", None)) and env.running_tests:
+            if is_tests_raise(request):
                 raise
 
             try:
@@ -89,7 +109,7 @@ def unhandled_exception_tween_factory(handler, registry):
                     request.url,
                 )
                 iexc = InternalServerError(sys.exc_info())
-                return exc_response(request, iexc, iexc, iexc.exc_info)
+                return exc_response(exc=iexc, request=request)
             except Exception:
                 logger.exception(
                     "Exception %s while rendering error %s (%s %s)",
@@ -142,14 +162,14 @@ class ErrorResponse(Struct, kw_only=True):
         )
 
 
-def json_error_response(request: Request, err_info, exc, exc_info, debug=True):
+def json_error_response(*, exc: UserException, request: Request, **kwargs) -> Response:
     err_data = ErrorResponse.from_exception(exc, request=request)
     response = render_to_response("json", err_data, request=request)
     response.status_code = err_data.status_code
     return response
 
 
-def html_error_response(request: Request, err_info, exc, exc_info, debug=True):
+def html_error_response(*, exc: UserException, request: Request, **kwargs) -> Response:
     err_data = ErrorResponse.from_exception(exc, request=request)
     response = render_to_response(
         REACT_RENDERER,
@@ -165,6 +185,21 @@ def html_error_response(request: Request, err_info, exc, exc_info, debug=True):
 
     response.status = err_data.status_code
     return response
+
+
+def predicate_error_handler(*, exc: UserException, request: Request) -> Response | None:
+    if (mroute := request.matched_route) is not None:
+        for predicate in mroute.predicates:
+            if isinstance(predicate, ErrorRendererPredicate):
+                error_renderer = predicate.val
+                return error_renderer(exc=exc, request=request)
+
+
+def default_error_handler(*, exc: UserException, request: Request) -> Response:
+    if request.is_api or request.is_xhr:
+        return json_error_response(exc=exc, request=request)
+
+    return html_error_response(exc=exc, request=request)
 
 
 class InternalServerError(UserException):

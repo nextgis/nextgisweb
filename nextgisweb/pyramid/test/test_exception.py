@@ -1,11 +1,11 @@
-import pytest
-from pyramid.config import Configurator
+from unittest.mock import ANY, patch
+
 from pyramid.response import Response
 
 from nextgisweb.core.exception import UserException
 from nextgisweb.pyramid.test import WebTestApp
 
-from .. import exception, renderer
+from .. import exception
 
 
 class ErrorTest(UserException):
@@ -20,82 +20,62 @@ class ExceptionTest(Exception):
     pass
 
 
-@pytest.fixture(scope="module")
-def app():
-    settings = dict()
-    settings["error.err_response"] = exception.json_error_response
-    settings["error.exc_response"] = exception.json_error_response
+def test_error(ngw_webtest_app: WebTestApp, ngw_request_handler):
+    def error(request):
+        raise ErrorTest
 
-    config = Configurator(settings=settings)
-    config.add_renderer("json", renderer.JSON())
-    config.add_request_method(lambda req: "deadbeef", "request_id", property=True)
-    config.add_request_method(lambda req: req.localizer.translate, "translate", property=True)
-    config.include(exception)
+    with ngw_request_handler(error), patch.object(exception, "tests_raise", False):
+        resp = ngw_webtest_app.get("/api/test/request", status=418)
 
-    def view_error(request):
-        raise ErrorTest()
-
-    config.add_route("error", "/error")
-    config.add_view(view_error, route_name="error")
-
-    def view_exception(request):
-        raise ExceptionTest()
-
-    config.add_route("exception", "/exception")
-    config.add_view(view_exception, route_name="exception")
-
-    def view_json(request):
-        request.json
-        request.json_body
-        return Response("OK", status_code=200)
-
-    config.add_route("json", "/json")
-    config.add_view(view_json, route_name="json")
-
-    yield WebTestApp(config.make_wsgi_app())
+    assert resp.json == {
+        "title": "Test title",
+        "message": "Test message",
+        "detail": "Test detail",
+        "exception": "nextgisweb.pyramid.test.test_exception.ErrorTest",
+        "contact": "support",
+        "status_code": 418,
+        "request_id": ANY,
+        "data": {},
+    }
 
 
-def test_error(app: WebTestApp):
-    resp = app.get("/error", status=418)
-    rjson = resp.json
+def test_exception(ngw_webtest_app: WebTestApp, ngw_request_handler):
+    def handler(request):
+        raise ExceptionTest
 
-    assert rjson == dict(
-        title="Test title",
-        message="Test message",
-        detail="Test detail",
-        exception="nextgisweb.pyramid.test.test_exception.ErrorTest",
-        contact="support",
-        status_code=418,
-        request_id="deadbeef",
-        data={},
-    )
+    with ngw_request_handler(handler), patch.object(exception, "tests_raise", False):
+        resp = ngw_webtest_app.get("/api/test/request", status=500)
 
-
-def test_exception(app: WebTestApp):
-    resp = app.get("/exception", status=500)
-    rjson = resp.json
-
-    assert rjson.get("message", None) is not None
-    del rjson["message"]
-
-    assert rjson == dict(
-        title="Internal server error",
-        exception="nextgisweb.pyramid.exception.InternalServerError",
-        contact="support",
-        status_code=500,
-        request_id="deadbeef",
-        data={},
-    )
+    assert resp.json == {
+        "title": "Internal server error",
+        "message": ANY,
+        "exception": "nextgisweb.pyramid.exception.InternalServerError",
+        "contact": "support",
+        "status_code": 500,
+        "request_id": ANY,
+        "data": {},
+    }
 
 
-def test_json(app: WebTestApp):
-    headers = {"Content-Type": "application/json"}
+def test_json(ngw_webtest_app: WebTestApp, ngw_request_handler):
+    def handler(request):
+        data = str(type(request.json))
+        return Response(data, status_code=200)
 
-    data = r'{"almost": "json" . }'
-    app.post("/json", data=data, headers=headers, status=400)
+    with ngw_request_handler(handler), patch.object(exception, "tests_raise", False):
+        ngw_webtest_app.post(
+            "/api/test/request",
+            headers={"Content-Type": "application/json"},
+            data='{"almost": "json" . }',
+            status=400,
+        )
 
-    data = r'{"correct": "json"}'
-    app.post("/json", data=data, headers=headers, status=200)
+        ngw_webtest_app.post(
+            "/api/test/request",
+            headers={"Content-Type": "application/json"},
+            data='{"correct": "json"}',
+            status=200,
+        )
 
 
 def test_not_found_unauthorized(ngw_webtest_app: WebTestApp):

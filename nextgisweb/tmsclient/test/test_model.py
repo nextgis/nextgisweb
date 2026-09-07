@@ -41,7 +41,7 @@ def tms_server(request):
 def connection(ngw_httptest_app, ngw_request_handler):
     with transaction.manager:
         resource = TMSConnection(
-            url_template="%s/test/request/?layer={layer}&z={z}&x={x}&y={y}&custom=custom"
+            url_template="%s/test/request?layer={layer}&z={z}&x={x}&y={y}&custom=custom"
             % ngw_httptest_app.base_url,
             apikey="test-apikey",
         ).persist()

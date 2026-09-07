@@ -1,6 +1,6 @@
 from pyramid.response import Response
 
-from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.core.exception import InsufficientPermissions, UserException
 from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import ResourceFactory, ServiceScope
 
@@ -35,7 +35,7 @@ def wfs(resource, request: Request):
     return Response(xml, content_type="text/xml", charset="utf-8")
 
 
-def error_renderer(request: Request, err_info, exc, exc_info, debug=True):
+def error_renderer(*, exc: UserException, request: Request, **kwargs):
     tr = request.translate
     xml = WFSHandler.exception_response(
         request,

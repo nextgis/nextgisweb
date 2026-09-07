@@ -16,8 +16,8 @@ from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ows import SRSParseError, parse_request, parse_srs
 from nextgisweb.lib.pilhelper import reproject_render
 
-from nextgisweb.core.exception import InsufficientPermissions, ValidationError
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.core.exception import InsufficientPermissions, UserException, ValidationError
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.render import (
     COMPRESSION_DEFAULT,
     COMPRESSION_FAST,
@@ -446,7 +446,7 @@ def _get_legend_graphic(obj, params, request: Request):
     return Response(body_file=img, content_type=IMAGE_FORMAT.PNG)
 
 
-def error_renderer(request: Request, err_info, exc, exc_info, debug=True):
+def error_renderer(*, exc: UserException, request: Request, **kwargs):
     params, _ = parse_request(request)
 
     tr = request.translate
@@ -642,7 +642,7 @@ def _get_wmts_tile(obj, params, request: Request):
     return Response(body_file=buf, content_type=IMAGE_FORMAT.PNG)
 
 
-def setup_pyramid(comp: WMSServerComponent, config):
+def setup_pyramid(comp: WMSServerComponent, config: Configurator):
     service_factory = ResourceFactory(context=Service)
 
     config.add_route(
