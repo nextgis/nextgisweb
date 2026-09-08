@@ -42,11 +42,15 @@ def module_path(module_name: str) -> Path:
     root = rest.pop(0)
 
     if root_mod := sys.modules.get(root):
-        root_path = Path(root_mod.__file__)
+        root_file = root_mod.__file__
+        assert root_file is not None
+        root_path = Path(root_file)
     else:
         for mp in sys.meta_path:
             if root_spec := mp.find_spec(root, None):
-                root_path = Path(root_spec.origin)
+                root_origin = root_spec.origin
+                assert root_origin is not None
+                root_path = Path(root_origin)
                 break
         else:
             raise ValueError(f"{module_name} not found")

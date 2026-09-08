@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Any
 from urllib.parse import unquote, urljoin, urlparse
 
 from msgspec import Struct
@@ -208,8 +209,10 @@ def setup_pyramid(comp: WebMapComponent, config):
 
     for k, v in csetting.registry[COMP_ID].items():
 
-        def cs_k(comp: WebMapComponent, request: Request, *, cs) -> v.gtype:
+        def cs_k(comp: WebMapComponent, request: Request, *, cs) -> Any:
             return cs.getter()
 
         cs_k.__name__ = f"cs_{k}"
+        cs_k.__annotations__["return"] = v.gtype
+
         client_setting(k)(partial(cs_k, cs=v))

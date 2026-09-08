@@ -461,8 +461,3 @@ class Configurator(PyramidConfigurator):
                 return r"-?0*[1-9][0-9]*|0+"
         else:
             raise ValueError("Type or pattern required")
-
-
-def _request_path_param(request: Request):
-    matchdict = request.matchdict
-    return {k: v(matchdict[k]) for k, v in request.path_param_decoders}

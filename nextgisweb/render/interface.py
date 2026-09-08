@@ -17,12 +17,12 @@ class ILegendableStyle(IResourceBase):
         pass
 
 
-class IExtentRenderRequest(Interface):
+class IExtentRenderRequest(Interface):  # ty: ignore[unsupported-base]
     def render_extent(self, extent, size):
         pass
 
 
-class ITileRenderRequest(Interface):
+class ITileRenderRequest(Interface):  # ty: ignore[unsupported-base]
     def render_tile(self, tile, size):
         pass
 

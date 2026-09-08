@@ -403,22 +403,25 @@ def _get_feature_info(obj, params, request: Request):
             break
 
     if p_info_format == "application/json":
-        data = dict(
-            type="FeatureCollection",
-            totalFeatures="unknown",
-            features=[],
-            crs=dict(type="name", properties=dict(name=f"urn:ogc:def:crs:EPSG::{epsg}")),
-        )
+        features = []
         for result in results:
             for f in result["features"]:
-                data["features"].append(
-                    dict(
-                        type="Feature",
-                        id=result["keyname"] + "." + str(f.id),
-                        properties=f.fields,
-                        geometry=f.geom.to_geojson(),
-                    )
+                features.append(
+                    {
+                        "type": "Feature",
+                        "id": f"{result['keyname']}.{f.id}",
+                        "properties": f.fields,
+                        "geometry": f.geom.to_geojson(),
+                    }
                 )
+
+        data = {
+            "type": "FeatureCollection",
+            "totalFeatures": "unknown",
+            "features": features,
+            "crs": {"type": "name", "properties": {"name": f"urn:ogc:def:crs:EPSG::{epsg}"}},
+        }
+
         return Response(dumps(data), content_type="application/json", charset="utf-8")
 
     return Response(

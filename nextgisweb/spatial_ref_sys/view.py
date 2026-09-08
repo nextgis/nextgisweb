@@ -55,7 +55,10 @@ def catalog_browse(request: Request):
 def catalog_import(request: Request):
     request.user.require_permission(SRS.permissions.manage)
 
-    catalog_id = int(request.matchdict["id"])
+    catalog_id = request.matchdict["id"]
+    assert isinstance(catalog_id, str)
+    catalog_id = int(catalog_id)
+
     catalog_url = request.env.component(SpatialRefSysComponent).options["catalog.url"]
     item_url = (catalog_url + "/srs/" + str(catalog_id)) if catalog_url else None
     return dict(

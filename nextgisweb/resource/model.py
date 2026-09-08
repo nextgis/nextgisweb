@@ -1,7 +1,7 @@
 from collections import namedtuple
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, ClassVar, Literal, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -539,7 +539,7 @@ class ParentAttr(SResource["ResourceSerializer"]):
             and (OnChildClasses.apply(parent=new_parent, classes={srlzr.obj.__class__}))
         ):
             raise HierarchyError(
-                gettext("Resource can not be a child of resource id = %d.") % srlzr.obj.parent.id
+                gettext("Resource can not be a child of resource id = %d.") % new_parent.id
             )
 
 
@@ -575,7 +575,7 @@ class ACLRule(Struct, kw_only=True):
     @classmethod
     def from_model(cls, obj: ResourceACLRule):
         return cls(
-            action=obj.action,
+            action=cast(Any, obj.action),
             principal=PrincipalRef(id=obj.principal_id),
             identity=obj.identity,
             scope=obj.scope,

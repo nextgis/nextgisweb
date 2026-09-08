@@ -174,18 +174,18 @@ class WMSConnection(Resource):
             ) from exc
 
     def capcache_query(self):
-        self.capcache_tstamp = utcnow_naive()
-
         response = self.request_wms("GetCapabilities")
-        self.capcache_xml = response.content
 
         try:
-            root = etree.parse(BytesIO(self.capcache_xml)).getroot()
+            root = etree.parse(BytesIO(response.content)).getroot()
         except etree.XMLSyntaxError as exc:
             raise ExternalServiceError(
                 gettext("Failed to parse the XML response from the remote server."),
                 data=response_diagnostics(response),
             ) from exc
+
+        self.capcache_tstamp = utcnow_naive()
+        self.capcache_xml = response.content
 
         version = root.attrib["version"]
         if version not in WMS_VERSIONS:
@@ -202,8 +202,7 @@ class WMSConnection(Resource):
         self.capcache_json = data
 
     def get_info(self):
-        s = super()
-        result = s.get_info() if hasattr(s, "get_info") else ()
+        result = s() if (s := getattr(super(), "get_info", None)) else ()
         if self.capcache_tstamp is not None:
             result += (
                 (gettext("WMS capabilities"), self.capcache_tstamp),
@@ -323,6 +322,7 @@ class WMSLayer(Resource, SpatialLayerMixin):
         cascade="save-update,merge",
     )
 
+    @classmethod
     @orm.declared_attr
     def srs(cls):
         return orm.relationship(SRS, foreign_keys=[cls.srs_id], lazy="joined")

@@ -89,13 +89,11 @@ class RenderComponent(Component):
 
                 where = sa.or_(*cond)
 
-                def statement(dialect, table, schema=None):
-                    table = sa.sql.table(table)
-                    table.quote = True
-                    if schema is not None:
-                        table.schema = schema
-                        table.quote_schema = True
-                    stmt = table.delete().where(where)
+                def statement(dialect: sa.Dialect, table: str, schema: str | None = None):
+                    qname = sa.sql.quoted_name(table, quote=True)
+                    qschema = sa.sql.quoted_name(schema, quote=True) if schema else None
+                    tclause = sa.sql.table(qname, schema=qschema)
+                    stmt = tclause.delete().where(where)
                     return stmt.compile(dialect=dialect, compile_kwargs=dict(literal_binds=True))
 
                 stmt = statement(postgresql.dialect(), tc.uuid.hex, "tile_cache")

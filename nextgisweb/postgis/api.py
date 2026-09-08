@@ -177,6 +177,8 @@ def diagnostics(request: Request, *, body: CheckBody) -> CheckResponse:
             if connection is None:
                 connection = dict(id=res.connection_id)
 
+    assert connection is not None
+
     if cid := connection.get("id"):
         try:
             res = PostgisConnection.filter_by(id=cid).one()

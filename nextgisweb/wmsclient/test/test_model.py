@@ -55,7 +55,7 @@ def test_request_wms_request_exception(ngw_resource_defaults):
             conn.request_wms("GetCapabilities")
 
     assert "Unable to get a response" in str(exc_info.value.message)
-    assert "ConnectionError" in exc_info.value.detail
+    assert "ConnectionError" in str(exc_info.value.detail)
 
 
 def test_capcache_query_invalid_xml(ngw_resource_defaults, ngw_txn):

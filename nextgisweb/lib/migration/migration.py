@@ -1,11 +1,12 @@
 import re
-from collections import namedtuple
+from typing import NamedTuple
 
 from .revision import REVID_ZERO
 
-MigrationKey = namedtuple("MigrationKey", ("component", "revision"))
-MigrationKey.__repr__ = lambda self: "<{}:{}>".format(*self)
-MigrationKey.__str__ = lambda self: "{}:{}".format(*self)
+
+class MigrationKey(NamedTuple):
+    component: str
+    revision: str
 
 
 class Migration:

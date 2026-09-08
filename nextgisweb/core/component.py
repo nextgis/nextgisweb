@@ -311,7 +311,7 @@ class CoreComponent(StorageComponentMixin, Component):
             SELECT datcollate, datctype FROM pg_database
             WHERE datname = current_database()
         """
-        postgres_extra = list(DBSession.execute(text(sql_extra)).first())
+        postgres_extra = list(DBSession.execute(text(sql_extra)).one())
 
         sql_postgrespro = "SELECT EXISTS(SELECT * FROM pg_proc WHERE proname = 'pgpro_edition')"
         if DBSession.scalar(text(sql_postgrespro)):

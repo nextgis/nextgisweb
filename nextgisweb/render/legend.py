@@ -14,4 +14,5 @@ class LegendSymbol(Struct, kw_only=True):
 
 
 class ILegendSymbols(IResourceBase):
-    def legend_symbols(self, icon_size: int) -> list[LegendSymbol]: ...
+    def legend_symbols(self, icon_size: int) -> list[LegendSymbol]:
+        raise NotImplementedError

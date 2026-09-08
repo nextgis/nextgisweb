@@ -1,5 +1,7 @@
+from collections.abc import Sequence
 from enum import Enum
 from socket import gaierror, gethostbyname
+from typing import Any, cast
 
 from sqlalchemy import func, inspect, select, sql
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -112,6 +114,9 @@ class Check:
             logger.error("%r wasn't cleaned up" % self)
 
 
+DEP = cast(Any, None)
+
+
 class ConnectionCheck(Check):
     group = "connection"
 
@@ -131,13 +136,13 @@ class LayerCheck(Check):
     def __init__(
         self,
         *,
-        schema,
-        table,
-        column_id=None,
-        column_geom=None,
-        geometry_type=None,
-        geometry_srid=None,
-        fields=None,
+        schema: str,
+        table: str,
+        column_id: str | None = None,
+        column_geom: str | None = None,
+        geometry_type: str | None = None,
+        geometry_srid: int | None = None,
+        fields: Sequence | None = None,
     ):
         super().__init__()
         self.schema = schema
@@ -150,22 +155,21 @@ class LayerCheck(Check):
 
     @property
     def sa_table(self):
-        table = sql.table(self.table)
-        table.schema = self.schema
-        table.quote = True
-        table.quote_schema = True
-
-        return table
+        return sql.table(
+            sql.quoted_name(self.table, quote=True),
+            schema=sql.quoted_name(self.schema, quote=True),
+        )
 
 
 class PostgresCheck(ConnectionCheck):
     title = gettext("PostgreSQL connection")
 
-    def handler(self):
+    def handler(self, **kwargs):
         try:
             gethostbyname(self.hostname)
         except gaierror as exc:
-            self.error(gettextf("Host name resolution failed: {}.")(exc.strerror.lower()))
+            error = (exc.strerror or "None").lower()
+            self.error(gettextf("Host name resolution failed: {}.")(error))
             return
 
         engine_url = postgres_url(
@@ -232,13 +236,10 @@ class PostgresCheck(ConnectionCheck):
 class PostgisCheck(ConnectionCheck):
     title = gettext("PostGIS extension")
 
-    def handler(self, conn: Connection):
-        # fmt: off
-        ver = conn.execute(sql.text("""
-            SELECT extversion FROM pg_extension
-            WHERE extname = 'postgis'
-        """)).scalar()
-        # fmt: on
+    def handler(self, *, conn: Connection = DEP, **kwargs):
+        ver_sql = sql.text("SELECT extversion FROM pg_extension WHERE extname = 'postgis'")
+        ver = conn.execute(ver_sql).scalar()
+
         if ver is None:
             self.error(gettext("PostGIS extension not found."))
         else:
@@ -294,7 +295,9 @@ class TableInspector:
 class TableCheck(LayerCheck):
     title = gettext("Layer table")
 
-    def handler(self, conn: Connection):
+    def handler(self, *, conn: Connection = DEP, **kwargs):
+        assert conn is not None
+
         try:
             tins = TableInspector(conn, self.schema, self.table)
         except TableNotExists:
@@ -337,7 +340,9 @@ class TableCheck(LayerCheck):
 class IdColumnCheck(LayerCheck):
     title = gettext("ID column")
 
-    def handler(self, conn: Connection, tins: TableInspector):
+    def handler(self, *, conn: Connection = DEP, tins: TableInspector = DEP, **kwargs):
+        assert conn is not None and tins is not None
+
         cinfo = tins.columns.get(self.column_id)
         if cinfo is None:
             self.error(gettext("Column not found."))
@@ -360,6 +365,7 @@ class IdColumnCheck(LayerCheck):
             nullable = cinfo["nullable"]
             has_unique_index = is_table and tins.has_unique_index_on(self.column_id)
 
+            assert self.column_id
             column_id = sql.column(self.column_id)
 
             if nullable:
@@ -410,7 +416,16 @@ class IdColumnCheck(LayerCheck):
 class GeomColumnCheck(LayerCheck):
     title = gettext("Geometry column")
 
-    def handler(self, conn: Connection, postgis: PostgisCheck, tins: TableInspector):
+    def handler(
+        self,
+        *,
+        conn: Connection = DEP,
+        postgis: PostgisCheck = DEP,
+        tins: TableInspector = DEP,
+        **kwargs,
+    ):
+        assert conn is not None and postgis is not None and tins is not None
+
         cinfo = tins.columns.get(self.column_geom)
         if cinfo is None:
             self.error(gettext("Column not found."))
@@ -432,6 +447,7 @@ class GeomColumnCheck(LayerCheck):
             self.error(gettext("Geometry SRID mismatch."))
 
         for srid in (ctype.srid, *(s for s in (3857, 4326) if s != ctype.srid)):
+            assert self.column_geom
             expr = sql.column(self.column_geom)
             if ctype.srid != srid:
                 expr = func.st_transform(func.st_setsrid(expr, ctype.srid), srid)
@@ -457,7 +473,8 @@ class GeomColumnCheck(LayerCheck):
 class ColumnsCheck(LayerCheck):
     title = gettext("Field columns")
 
-    def handler(self, conn: Connection, tins: TableInspector):
+    def handler(self, *, conn: Connection = DEP, tins: TableInspector = DEP, **kwargs):
+        assert self.fields is not None
         for field in self.fields:
             cinfo = tins.columns.get(field.column_name)
             if cinfo is None:

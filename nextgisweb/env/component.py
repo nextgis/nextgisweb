@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Self
 from warnings import warn
 
-from nextgisweb.lib.config import ConfigOptions
+from nextgisweb.lib.config import ConfigOptions, Option
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
@@ -121,10 +121,13 @@ class Component(metaclass=ComponentMeta):
     basename: ClassVar[str]
     """Class name with 'Component' suffix removed (CoreComponent -> Core)"""
 
+    option_annotations: ClassVar[tuple[Option, ...]] = ()
+    """Option annotations of component"""
+
     def __init__(self, env: Env, settings: Mapping[str, Any]):
         self._env = env
         self._settings = settings
-        self._options = ConfigOptions(settings, getattr(self, "option_annotations", ()))
+        self._options = ConfigOptions(settings, self.option_annotations)
 
     @property
     def env(self) -> Env:

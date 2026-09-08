@@ -191,25 +191,29 @@ class Transformer:
         return Geometry.from_ogr(ogr_geom)
 
 
-def crs_unit_factor(crs):
+def crs_unit_factor(crs: CRS) -> float:
     return crs.axis_info[0].unit_conversion_factor if len(crs.axis_info) > 0 else 1.0
 
 
-def geom_length(geom, crs_wkt):
+def geom_length(geom: Geometry, crs_wkt: str) -> float:
     shape = geom.shape
     crs = CRS.from_wkt(crs_wkt)
 
     if crs.is_geographic:
-        return crs.get_geod().geometry_length(shape)
+        geod = crs.get_geod()
+        assert geod is not None
+        return geod.geometry_length(shape)
     else:
         return shape.length * crs_unit_factor(crs)
 
 
-def geom_area(geom, crs_wkt):
+def geom_area(geom: Geometry, crs_wkt: str) -> float:
     shape = geom.shape
     crs = CRS.from_wkt(crs_wkt)
 
     if crs.is_geographic:
-        return crs.get_geod().geometry_area_perimeter(shape)[0]
+        geod = crs.get_geod()
+        assert geod is not None
+        return geod.geometry_area_perimeter(shape)[0]
     else:
         return shape.area * crs_unit_factor(crs) ** 2

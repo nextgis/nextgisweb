@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from inspect import signature
+from typing import ClassVar
 
 from docstring_parser import parse as docstring_parse
 
@@ -186,6 +187,8 @@ def _fn_signature(fn, pdoc):
 
 
 class _FnWrapper:
+    _defn: ClassVar[tuple[Callable, Iterable]]
+
     def __call__(self):
         fn, args = self._defn
         fn(self, **{k: getattr(self, k) for k in args})

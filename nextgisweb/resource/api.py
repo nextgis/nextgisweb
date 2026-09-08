@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, cast
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -138,15 +138,10 @@ def blueprint(request: Request) -> Blueprint:
     )
 
 
-if TYPE_CHECKING:
-    CompositeCreate = Struct
-    CompositeRead = Struct
-    CompositeUpdate = Struct
-else:
-    composite = CompositeSerializer.types()
-    CompositeCreate = composite.create
-    CompositeRead = composite.read
-    CompositeUpdate = composite.update
+composite = CompositeSerializer.types()
+CompositeCreate = Struct if TYPE_CHECKING else composite.create
+CompositeRead = Struct if TYPE_CHECKING else composite.read
+CompositeUpdate = Struct if TYPE_CHECKING else composite.update
 
 
 def item_get(context, request: Request) -> CompositeRead:
@@ -256,7 +251,7 @@ def collection_post(
 
     CoreComponent.current().check_storage_limit()
 
-    resource_cls = body.resource.cls
+    resource_cls = cast(Any, body).resource.cls
     resource = resource_registry[resource_cls](owner_user=request.user)
     serializer = CompositeSerializer(user=request.user)
 
@@ -272,8 +267,11 @@ def collection_post(
     request.audit_context("resource", resource.id)
     zope.event.notify(AfterResourceCollectionPost(resource, request))
 
+    parent = resource.parent
+    assert parent is not None
+    parent_ref = ResourceRefOptional(id=parent.id)
+
     request.response.status_code = 201
-    parent_ref = ResourceRefOptional(id=resource.parent.id)
     return ResourceRefWithParent(id=resource.id, parent=parent_ref)
 
 

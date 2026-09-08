@@ -12,6 +12,7 @@ from pyramid.response import Response
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype.util import EmptyObject
+from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.feature_layer import IFeatureLayer, IFilterableFeatureLayer
@@ -75,7 +76,7 @@ def to_annot_read(obj: WebMapAnnotation, request: Request, with_user_info=False)
     )
 
     if with_user_info and (obj.public is False):
-        annotation_read.user_id = obj.user_id
+        annotation_read.user_id = obj.user_id or UNSET
         annotation_read.user = obj.user.display_name if obj.user else UNSET
 
     return annotation_read
@@ -89,7 +90,7 @@ def prepare_annotation(
         obj.public = data.public
 
     if data.geom is not UNSET and data.geom:
-        obj.geom = f"SRID=3857;{data.geom}"
+        obj.geom = Geometry.from_wkt(data.geom, srid=3857)
 
     obj.style = data.style if data.style is not UNSET else None
     obj.description = sanitize(data.description) if data.description is not UNSET else None

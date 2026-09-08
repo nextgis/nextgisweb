@@ -172,10 +172,7 @@ def config(argv=sys.argv):
             continue
 
         with _section(_section_header(comp.identity)):
-            try:
-                comp_option_annotaions = comp.option_annotations
-            except AttributeError:
-                continue
+            comp_option_annotaions = comp.option_annotations
 
             for oa in comp_option_annotaions:
                 with _section(_section_option(oa)):

@@ -22,6 +22,11 @@ class Service(Resource):
 
     __scope__ = ServiceScope
 
+    layers: Mapped[list["Layer"]] = orm.relationship(
+        cascade="all,delete-orphan",
+        back_populates="service",
+    )
+
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
@@ -42,7 +47,7 @@ class Layer(Base):
 
     service: Mapped[Service] = orm.relationship(
         foreign_keys=service_id,
-        backref=orm.backref("layers", cascade="all,delete-orphan"),
+        back_populates="layers",
     )
 
     resource: Mapped[Resource] = orm.relationship(

@@ -215,8 +215,8 @@ class Tileset(Resource, SpatialLayerMixin):
         )
 
     def get_info(self):
-        s = super()
-        return (s.get_info() if hasattr(s, "get_info") else ()) + (
+        return (
+            *(s() if (s := getattr(super(), "get_info", None)) else ()),
             (gettext("Number of tiles"), sum(self.tileset_ntiles)),
             (
                 gettext("Zoom levels"),

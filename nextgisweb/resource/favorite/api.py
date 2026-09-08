@@ -175,17 +175,21 @@ def setup_pyramid(comp: ResourceComponent, config):
     )
 
     cpost_sig = signature(cpost)
-    cpost.__signature__ = cpost_sig.replace(
-        parameters=[
-            param
-            if param.name != "body"
-            else Parameter(
-                "body",
-                Parameter.POSITIONAL_OR_KEYWORD,
-                annotation=AsJSON[cpost_body],
-            )
-            for param in cpost_sig.parameters.values()
-        ]
+    setattr(
+        cpost,
+        "__signature__",
+        cpost_sig.replace(
+            parameters=[
+                param
+                if param.name != "body"
+                else Parameter(
+                    "body",
+                    Parameter.POSITIONAL_OR_KEYWORD,
+                    annotation=AsJSON[cpost_body],
+                )
+                for param in cpost_sig.parameters.values()
+            ]
+        ),
     )
 
     config.add_route(

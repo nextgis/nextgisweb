@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar
-
-from zope.interface import Interface
+from typing import Any, ClassVar
 
 from nextgisweb.lib.i18n import Translatable
 from nextgisweb.lib.registry import ListRegistry, list_registry
@@ -21,7 +19,7 @@ class ExternalAccessLink:
     docs_url: str | None = None
 
     resource: type[Resource] | None = None
-    interface: type[Interface] | None = None
+    interface: Any | None = None
     attr_name: str | None = None
 
     url: str

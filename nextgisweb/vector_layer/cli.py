@@ -35,7 +35,7 @@ class cleanup_orphaned_tables(DryRunOptions, EnvCommand):
         total, orphan = con.execute(
             sa.text(sql_stats),
             dict(schema=SCHEMA, regexp=regexp),
-        ).fetchone()
+        ).one()
 
         logger.info(
             "%d tables found, %d orphan (schema = '%s', regexp = '%s')",
@@ -61,11 +61,11 @@ class cleanup_orphaned_tables(DryRunOptions, EnvCommand):
                 if self.one_per_txn:
                     con.execute(sa.text("BEGIN"))
 
-                if row["id"] is not None:
+                if row.id is not None:
                     raise ValueError("Resource id should be empty!")
 
-                sql_drop = 'DROP TABLE "%s"."%s"' % (SCHEMA, row["table_name"])
-                logger.debug("Dropping table %s.%s", SCHEMA, row["table_name"])
+                sql_drop = 'DROP TABLE "%s"."%s"' % (SCHEMA, row.table_name)
+                logger.debug("Dropping table %s.%s", SCHEMA, row.table_name)
                 con.execute(sa.text(sql_drop))
 
                 if self.one_per_txn:

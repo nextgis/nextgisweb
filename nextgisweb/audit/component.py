@@ -13,24 +13,22 @@ if TYPE_CHECKING:
 
 
 class AuditComponent(Component):
-    backends: Mapping[str, BackendBase] | None = None
+    _backends: dict[str, BackendBase] | None = None
 
     def initialize(self):
         from .backend import registry
 
         super().initialize()
-        self.backends = MappingProxyType(
-            {
-                identity: cls(self)
-                for identity, cls in registry.items()
-                if self.options[cls.identity + ".enabled"]
-            }
-        )
+        self._backends = {
+            identity: cls(self)
+            for identity, cls in registry.items()
+            if self.options[cls.identity + ".enabled"]
+        }
 
     def setup_pyramid(self, config):
         from . import api, view
 
-        if self.backends and len(self.backends) > 0:
+        if self._backends:
             config.add_tween(
                 "nextgisweb.audit.tween.factory",
                 over=("nextgisweb.pyramid.exception.unhandled_exception_tween_factory",),
@@ -43,6 +41,12 @@ class AuditComponent(Component):
         super().maintenance()
         for backend in self.backends.values():
             backend.maintenance()
+
+    @property
+    def backends(self) -> Mapping[str, BackendBase]:
+        if self._backends is None:
+            raise RuntimeError("Component not initialized")
+        return MappingProxyType(self._backends)
 
     option_annotations = (
         # File

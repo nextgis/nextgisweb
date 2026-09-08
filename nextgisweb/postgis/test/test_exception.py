@@ -1,13 +1,14 @@
 from types import SimpleNamespace
+from typing import Any
 
-import sqlalchemy as sa
+from sqlalchemy.exc import OperationalError, StatementError
 
 from ..exception import ExternalDatabaseError
 
 
 def _statement_error(sqlstate):
-    orig = SimpleNamespace(diag=SimpleNamespace(sqlstate=sqlstate))
-    return sa.exc.StatementError("Simulated error", "SELECT 1", {}, orig)
+    orig: Any = SimpleNamespace(diag=SimpleNamespace(sqlstate=sqlstate))
+    return StatementError("Simulated error", "SELECT 1", {}, orig)
 
 
 def test_detail_contains_sqlstate_and_name():
@@ -21,6 +22,7 @@ def test_detail_unknown_sqlstate_has_no_name():
 
 
 def test_detail_without_psycopg_diagnostics():
-    sa_error = sa.exc.OperationalError("SELECT 1", {}, SimpleNamespace(diag=None))
+    orig: Any = SimpleNamespace(diag=None)
+    sa_error = OperationalError("SELECT 1", {}, orig)
     exc = ExternalDatabaseError(sa_error=sa_error)
     assert exc.detail == f"SQLAlchemy error code: {sa_error.code}."

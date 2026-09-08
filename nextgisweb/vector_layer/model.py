@@ -240,7 +240,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
             table=vls.ctab.name,
             sequence=vls.cseq.name,
             columns=columns,
-            connection=session,
+            connection=session.connection(),
         )
 
         if self.fversioning:

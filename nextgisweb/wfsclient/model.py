@@ -748,7 +748,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._box = True
 
     def filter(self, *args):
-        self._filter = args
+        self._filter = list(args)
 
     def filter_by(self, **kwargs):
         self._filter_by = kwargs

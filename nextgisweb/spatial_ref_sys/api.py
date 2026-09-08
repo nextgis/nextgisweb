@@ -111,7 +111,7 @@ def serialize(obj: SRS) -> SRSRead:
     )
 
 
-def deserialize(obj, data: SRSCreate, *, create: bool):
+def deserialize(obj: SRS, data: SRSCreate | SRSUpdate, *, create: bool) -> None:
     if (display_name := data.display_name) is not UNSET:
         with DBSession.no_autoflush:
             existing = SRS.filter_by(display_name=display_name).filter(SRS.id != obj.id).first()

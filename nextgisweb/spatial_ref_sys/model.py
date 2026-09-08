@@ -53,18 +53,21 @@ class SRS(Base):
         autoincrement=False,
         server_default=id_seq.next_value(),
     )
+
     display_name: Mapped[str] = mapped_column(sa.Unicode)
     auth_name: Mapped[str | None] = mapped_column(sa.Unicode)  # NULL auth_* used for
     auth_srid: Mapped[int | None] = mapped_column(sa.Integer)  # custom local projection
+
+    # https://lists.osgeo.org/pipermail/postgis-users/2025-May/046787.html
     wkt: Mapped[str] = mapped_column(sa.Unicode)
-    wkt_short: Mapped[str] = mapped_column(
-        sa.Unicode
-    )  # https://lists.osgeo.org/pipermail/postgis-users/2025-May/046787.html
+    wkt_short: Mapped[str] = mapped_column(sa.Unicode)
     proj4: Mapped[str] = mapped_column(sa.Unicode)
+
     minx: Mapped[float | None] = mapped_column(sa.Float)
     miny: Mapped[float | None] = mapped_column(sa.Float)
     maxx: Mapped[float | None] = mapped_column(sa.Float)
     maxy: Mapped[float | None] = mapped_column(sa.Float)
+
     catalog_id: Mapped[int | None] = mapped_column(sa.Integer, unique=True)
 
     class permissions:
@@ -115,33 +118,48 @@ class SRS(Base):
     def _zero_level_numtiles_y(self):
         return 1
 
-    def _tile_step_x(self, z):
-        return (self.maxx - self.minx) / (2**z) / self._zero_level_numtiles_x
+    def _tile_step(self, z: int) -> tuple[float, float]:
+        minx, maxx = self.minx, self.maxx
+        miny, maxy = self.miny, self.maxy
+        assert minx is not None and maxx is not None and miny is not None and maxy is not None
 
-    def _tile_step_y(self, z):
-        return (self.maxy - self.miny) / (2**z) / self._zero_level_numtiles_y
-
-    def tile_extent(self, tile):
-        z, x, y = tile
-
+        ntiles = 2**z
         return (
-            self.minx + x * self._tile_step_x(z),
-            self.maxy - (y + 1) * self._tile_step_y(z),
-            self.minx + (x + 1) * self._tile_step_x(z),
-            self.maxy - y * self._tile_step_y(z),
+            (maxx - minx) / ntiles / self._zero_level_numtiles_x,
+            (maxy - miny) / ntiles / self._zero_level_numtiles_y,
         )
 
-    def tile_center(self, tile):
+    def tile_extent(self, tile: tuple[int, int, int]) -> tuple[float, float, float, float]:
+        z, x, y = tile
+        sx, sy = self._tile_step(z)
+
+        minx, maxx = self.minx, self.maxx
+        miny, maxy = self.miny, self.maxy
+        assert minx is not None and maxx is not None and miny is not None and maxy is not None
+
+        return (
+            minx + x * sx,
+            maxy - (y + 1) * sy,
+            minx + (x + 1) * sx,
+            maxy - y * sy,
+        )
+
+    def tile_center(self, tile: tuple[int, int, int]) -> tuple[float, float]:
         extent = self.tile_extent(tile)
         return (
             (extent[0] + extent[2]) / 2,
             (extent[1] + extent[3]) / 2,
         )
 
-    def _point_tilexy(self, px, py, ztile):
+    def _point_tilexy(self, px: float, py: float, ztile: int):
+        sx, sy = self._tile_step(ztile)
+
+        minx, maxy = self.minx, self.maxy
+        assert minx is not None and maxy is not None
+
         return (
-            (px - self.minx) / self._tile_step_x(ztile),
-            (self.maxy - py) / self._tile_step_y(ztile),
+            (px - minx) / sx,
+            (maxy - py) / sy,
         )
 
     def extent_tile_range(self, extent, ztile):

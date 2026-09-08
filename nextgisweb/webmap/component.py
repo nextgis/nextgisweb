@@ -40,10 +40,15 @@ class WebMapComponent(Component):
         view.setup_pyramid(self, config)
 
     def query_stat(self):
-        query_item_type = DBSession.query(
-            WebMapItem.item_type, sa.func.count(WebMapItem.id)
-        ).group_by(WebMapItem.item_type)
-        return dict(item_type=dict(query_item_type.all()))
+        return dict(
+            item_type={
+                k: v
+                for (k, v) in DBSession.query(
+                    WebMapItem.item_type,
+                    sa.func.count(WebMapItem.id),
+                ).group_by(WebMapItem.item_type)
+            }
+        )
 
     def effective_legend_symbols(self):
         core = self.env.component(CoreComponent)

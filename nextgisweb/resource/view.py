@@ -191,7 +191,10 @@ class OnResourceCreateView:
 @react_renderer("@nextgisweb/resource/composite")
 def create(request: Request):
     request.resource_permission(ResourceScope.manage_children)
+
     cls = request.GET.get("cls")
+    assert cls is not None
+
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
     setup = dict(operation="create", cls=cls, parent=request.context.id)
     return dict(

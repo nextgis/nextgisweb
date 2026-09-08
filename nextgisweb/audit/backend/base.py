@@ -13,7 +13,7 @@ from ..component import AuditComponent
 @dict_registry
 class BackendBase:
     registry: ClassVar[DictRegistry[type["BackendBase"]]]
-    identity = None
+    identity: ClassVar[str]
 
     def __init__(self, comp: AuditComponent) -> None:
         self.options = comp.options.with_prefix(self.identity)

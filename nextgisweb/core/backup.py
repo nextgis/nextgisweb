@@ -125,9 +125,9 @@ def backup(env, dst):
     # TRANSACTION AND CONNECTION
 
     con = DBSession.connection()
-    con.execute(sa.text("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE    READ ONLY DEFERRABLE"))
+    con.execute(sa.text("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE"))
 
-    (snapshot,) = con.execute(sa.text("SELECT pg_export_snapshot()")).fetchone()
+    (snapshot,) = con.execute(sa.text("SELECT pg_export_snapshot()")).one()
     logger.debug("Using postgres snapshot: %s", snapshot)
 
     # CONFIGURATION
@@ -177,14 +177,16 @@ def backup(env, dst):
     @cache
     def get_cls_relname(oid):
         (relname,) = con.execute(
-            sa.text("SELECT relname FROM pg_catalog.pg_class WHERE oid = :oid"), dict(oid=oid)
-        ).fetchone()
+            sa.text("SELECT relname FROM pg_catalog.pg_class WHERE oid = :oid"),
+            dict(oid=oid),
+        ).one()
         return relname
 
     def get_namespace(oid):
         (nspname,) = con.execute(
-            sa.text("SELECT nspname FROM pg_catalog.pg_namespace WHERE oid = :oid"), dict(oid=oid)
-        ).fetchone()
+            sa.text("SELECT nspname FROM pg_catalog.pg_namespace WHERE oid = :oid"),
+            dict(oid=oid),
+        ).one()
         return nspname
 
     pg_toc_regexp = re.compile(r"(\d+)\;\s+(\d+)\s+(\d+)\s+(.*)")
@@ -215,7 +217,7 @@ def backup(env, dst):
 
             restore_list.append((";" if skip else "") + line)
         else:
-            logger.warn("Unexpected line in TOC: %s", line)
+            logger.warning("Unexpected line in TOC: %s", line)
 
         skip_prev = skip
 

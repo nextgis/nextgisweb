@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pyramid.predicates import RequestMethodPredicate as PyramidRequestMethodPredicate
 from pyramid.predicates import as_sorted_tuple
@@ -27,7 +27,7 @@ class MetaPredicateBase:
 
     @classmethod
     def as_predicate(cls):
-        class Predicate(cls):
+        class Predicate(cls if not TYPE_CHECKING else MetaPredicateBase):
             def __new__(bcls, value, config):
                 return value
 

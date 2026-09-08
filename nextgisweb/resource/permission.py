@@ -1,6 +1,7 @@
 from collections import UserList
+from collections.abc import Generator
 from functools import reduce
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
@@ -131,6 +132,12 @@ class ScopeMeta(type):
 
 class Scope(metaclass=ScopeMeta, abstract=True):
     registry: ClassVar[DictRegistry] = scope_registry
+
     identity: ClassVar[str]
     label: ClassVar[TrStr]
     requirements: ClassVar[RequirementList]
+
+    if TYPE_CHECKING:
+
+        @classmethod
+        def values(cls, **kwargs) -> Generator[Permission, None, None]: ...

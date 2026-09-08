@@ -158,7 +158,7 @@ def dbase(
     rows = DBSession.execute(q)
 
     if format == QueryFormat.ARRAY:
-        return [(row[0], row[1:]) for row in rows]
+        return [(row[0], row[1:]) for row in rows]  # ty: ignore[invalid-return-type]
     elif format == QueryFormat.OBJECT:
         return [data for _, data in rows]
     elif format == QueryFormat.CSV:
@@ -185,7 +185,7 @@ def dbase(
             buf.getvalue(),
             content_type="text/csv",
             content_disposition=f"attachment; filename={fn}",
-        )
+        )  # ty: ignore[invalid-return-type]
 
 
 def setup_pyramid(comp: AuditComponent, config):

@@ -186,7 +186,7 @@ class IVersionableFeatureLayer(IWritableFeatureLayer):
     pass
 
 
-class IFeatureQuery(Interface):
+class IFeatureQuery(Interface):  # ty: ignore[unsupported-base]
     layer = Attribute(""" IFeatureLayer """)
 
     def fields(self, *args):

@@ -13,7 +13,8 @@ from nextgisweb.lib.registry import DictRegistry, dict_registry
 from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource.sattribute import ResourceRef
 
-T, FM = TypeVar("T"), "ResourceFavoriteField"
+FM = "ResourceFavoriteField"
+T = TypeVar("T")
 Field = Annotated[T, FM]
 
 
@@ -26,7 +27,7 @@ class ResourceFavoriteMeta(type):
         if result := getattr(self, "_types", None):
             return result
 
-        fields = [("resource", ResourceRef)]
+        fields: list[tuple] = [("resource", ResourceRef)]
         if self.route is None:
             fields.append(("label", str | None, None))
 
@@ -36,7 +37,8 @@ class ResourceFavoriteMeta(type):
                 fields.append((k, v))
 
         result = defstruct(
-            *[self.__name__, fields],
+            self.__name__,
+            fields,
             kw_only=True,
             tag_field="identity",
             tag=self.identity,

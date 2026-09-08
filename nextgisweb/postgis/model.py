@@ -123,7 +123,7 @@ def calculate_extent(layer, where=None, geomcol=None):
     extent_fn = st_extent(st_transform(st_setsrid(st_force2d(geomcol), layer.geometry_srid), 4326))
 
     if where_geom_exist:
-        bbox = sql.select(extent_fn).where(sa.and_(True, *where)).label("bbox")
+        bbox = sql.select(extent_fn).where(sql_and(True, *where)).label("bbox")
     else:
         bbox = extent_fn.label("bbox")
 
@@ -517,12 +517,9 @@ class PostgisLayer(Resource, FeatureLayerMixin):
             cols.append(sa.sql.column(self.column_id))
             cols.append(sa.sql.column(self.column_geom))
 
-        tab = sa.sql.table(self.table, *cols)
-        tab.schema = self.schema
-        tab.quote = True
-        tab.quote_schema = True
-
-        return tab
+        qname = sa.sql.quoted_name(self.table, quote=True)
+        qschema = sa.sql.quoted_name(self.schema, quote=True)
+        return sa.sql.table(qname, *cols, schema=qschema)
 
     def _makevals(self, feature):
         values = dict()
@@ -739,7 +736,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         for field in self.layer.fields:
             col_map[field.keyname] = tab.columns[field.column_name]
 
-        where = [idcol.isnot(None)]
+        where: list[sa.ColumnElement[bool]] = [idcol.isnot(None)]
 
         if self._filter_by:
             for k, v in self._filter_by.items():
@@ -779,7 +776,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         o = "isnot"
                     else:
                         raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
-                    v = sa.sql.null()
+                    v = sa.null()
 
                 op = getattr(sa_operators, o)
                 column = (
@@ -794,7 +791,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
-                where.append(sa.and_(*_where_filter))
+                where.append(sql_and(*_where_filter))
 
         if self._filter_program is not None:
             virtual_operands_mapping = {"fid": idcol}
@@ -809,10 +806,10 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 if fld.text_search
             ]
             if len(operands) == 0:
-                where.append(False)
+                where.append(sa.false())
             else:
                 method, value = ("like", self._like) if self._like else ("ilike", self._ilike)
-                where.append(sa.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
+                where.append(sql_or(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
         if self._intersects:
             int_srid = self._intersects.srid
@@ -920,7 +917,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 )
 
                 if len(where) > 0:
-                    query = query.where(sa.and_(*where))
+                    query = query.where(sql_and(*where))
 
                 with self.layer.connect() as conn:
                     result = conn.execute(query, update=False)
@@ -958,7 +955,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 with self.layer.connect() as conn:
                     query = sql.select(func.count(idcol))
                     if len(where) > 0:
-                        query = query.where(sa.and_(*where))
+                        query = query.where(sql_and(*where))
                     result = conn.execute(query, update=False)
                     return result.scalar()
 

@@ -1,5 +1,6 @@
 import re
 from io import BytesIO
+from typing import NamedTuple
 
 from lxml import etree
 
@@ -52,20 +53,32 @@ class SRSParseError(ValueError):
     pass
 
 
+class SRSFormatDefinition(NamedTuple):
+    pattern: re.Pattern
+    axis_xy: bool
+
+
 srs_formats = dict(
-    short=dict(pattern=re.compile(r"EPSG:(\d+)"), axis_xy=True),
-    ogc_urn=dict(pattern=re.compile(r"urn:ogc:def:crs:EPSG::(\d+)"), axis_xy=False),
-    ogc_url=dict(
-        pattern=re.compile(r"http://www.opengis.net/def/crs/EPSG/0/(\d+)"), axis_xy=False
+    short=SRSFormatDefinition(
+        pattern=re.compile(r"EPSG:(\d+)"),
+        axis_xy=True,
+    ),
+    ogc_urn=SRSFormatDefinition(
+        pattern=re.compile(r"urn:ogc:def:crs:EPSG::(\d+)"),
+        axis_xy=False,
+    ),
+    ogc_url=SRSFormatDefinition(
+        pattern=re.compile(r"http://www.opengis.net/def/crs/EPSG/0/(\d+)"),
+        axis_xy=False,
     ),
 )
 
 
-def parse_srs(value):
+def parse_srs(value) -> tuple[int, bool]:
     for srs_format in srs_formats.values():
-        match = srs_format["pattern"].match(value)
+        match = srs_format.pattern.match(value)
         if match is not None:
-            return int(match[1]), srs_format["axis_xy"]
+            return int(match[1]), srs_format.axis_xy
     raise SRSParseError("Could not recognize SRS format '%s'." % value)
 
 

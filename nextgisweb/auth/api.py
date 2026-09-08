@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, cast
 
 import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
@@ -574,7 +574,7 @@ def current_user(
 
         result = CurrentUser(
             id=user.id,
-            keyname=user.keyname,
+            keyname=cast(str, user.keyname),
             display_name=user.display_name,
             language=request.locale_name,
             auth_medium=None,

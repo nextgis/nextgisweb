@@ -13,7 +13,7 @@ class Geometry(UserDefinedType):
         self.geometry_type = geometry_type
         self.srid = srid
 
-    def get_col_spec(self):
+    def get_col_spec(self, **kw):
         return f"GEOMETRY({self.geometry_type}, {self.srid})"
 
     def bind_expression(self, bindvalue):

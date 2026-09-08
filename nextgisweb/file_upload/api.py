@@ -225,8 +225,10 @@ class FileUploadFactory:
         self.incomplete_ok = incomplete_ok
 
     def __call__(self, request: Request) -> FileUpload:
+        id = request.matchdict[self.key]
+        assert isinstance(id, str)
         try:
-            return FileUpload(id=request.matchdict[self.key], incomplete_ok=True)
+            return FileUpload(id=id, incomplete_ok=True)
         except FileUploadNotFound as exc:
             exc.http_status_code = 404
             raise

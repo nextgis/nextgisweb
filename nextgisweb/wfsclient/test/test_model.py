@@ -33,7 +33,7 @@ def test_request_wfs_request_exception(ngw_resource_defaults):
             conn.request_wfs("GET")
 
     assert "Unable to get a response" in str(exc_info.value.message)
-    assert "ConnectionError" in exc_info.value.detail
+    assert "ConnectionError" in str(exc_info.value.detail)
 
 
 def test_request_wfs_exception_report(ngw_resource_defaults):
