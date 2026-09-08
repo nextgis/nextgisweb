@@ -140,7 +140,6 @@ def check_integrity(self: EnvCommand):
 
     opts: Mapping[str, Any] = {
         "isolation_level": "SERIALIZABLE",
-        "postgresql_readonly": True,
         "postgresql_deferrable": True,
     }
 
