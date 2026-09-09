@@ -10,13 +10,27 @@ from .interface import FIELD_TYPE
 
 
 class Feature:
-    def __init__(self, layer=None, id=None, version=None, fields=None, geom=UNSET, box=None):
+    def __init__(
+        self,
+        layer=None,
+        id=None,
+        version=None,
+        fields=None,
+        geom=UNSET,
+        box=None,
+        search_context=None,
+    ):
         self._layer = layer
         self._id = int(id) if id is not None else None
         self._version = version
         self._geom = geom
         self._box = box
         self._fields = dict(fields) if fields is not None else dict()
+        self._search_context = search_context
+
+    @property
+    def search_context(self) -> list[int] | None:
+        return self._search_context
 
     @property
     def layer(self):

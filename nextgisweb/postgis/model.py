@@ -46,7 +46,7 @@ from nextgisweb.feature_layer import (
     IWritableFeatureLayer,
     LayerField,
 )
-from nextgisweb.feature_layer.filter import FilterParser
+from nextgisweb.feature_layer.filter import FilterParser, text_search_match_clause
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import (
     ConnectionScope,
@@ -680,6 +680,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._like = None
         self._ilike = None
         self._filter_program = None
+        self._text_search_context = None
 
         self._order_by = None
 
@@ -710,6 +711,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def set_filter_program(self, program):
         self._filter_program = program
+
+    def set_text_search_context(self, spec):
+        self._text_search_context = spec
 
     def order_by(self, *args):
         self._order_by = args
@@ -847,6 +851,24 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             )
         )
 
+        self._search_flags = None
+        if self._text_search_context is not None:
+            spec = self._text_search_context
+            flags = [
+                (
+                    fld.id,
+                    text_search_match_clause(
+                        tab.columns[fld.column_name],
+                        spec.value,
+                        case_sensitive=spec.case_sensitive,
+                        keys_by_field=spec.keys_by_field.get(fld.keyname),
+                    ),
+                )
+                for fld in self.layer.fields
+                if fld.text_search
+            ]
+            self._search_flags = flags or None
+
         return tab, col_map, where
 
     def __call__(self):
@@ -879,6 +901,13 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 columns.append(tab.columns[fld.column_name].label(label))
                 selected_fields.append((fld.keyname, label))
 
+        search_flags: list[tuple[str, int]] = []
+        if self._search_flags:
+            for idx, (fld_id, pred) in enumerate(self._search_flags, start=1):
+                label = f"tsc_{idx}"
+                search_flags.append((label, fld_id))
+                columns.append(sa.case((pred, sa.true()), else_=sa.false()).label(label))
+
         if self._box:
             columns.extend(
                 (
@@ -897,9 +926,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     dict(asc=sa.asc, desc=sa.desc)[order](tab.columns[field.column_name])
                 )
         order_criterion.append(idcol)
+        search_flags_ref = search_flags
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
+            search_flags = search_flags_ref
 
             _geom = self._geom
             _geom_format = self._geom_format
@@ -942,12 +973,19 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         else:
                             _box = None
 
+                        search_context = (
+                            [fid for label, fid in self.search_flags if row[label]]
+                            if self.search_flags
+                            else None
+                        )
+
                         yield Feature(
                             layer=self.layer,
                             id=row.id,
                             fields=fdict,
                             geom=geom,
                             box=_box,
+                            search_context=search_context,
                         )
 
             @property

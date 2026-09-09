@@ -121,5 +121,97 @@ def test_get_supported_operators():
         "ilike",
         "in",
         "is_null",
+        "text_search",
     }
     assert operators == expected
+
+
+def _search_parser():
+    return FilterParser(
+        [
+            FieldInfo(key="name", datatype=FIELD_TYPE.STRING),
+            FieldInfo(key="city", datatype=FIELD_TYPE.STRING),
+        ]
+    )
+
+
+@pytest.mark.parametrize(
+    "expression, expected_value, expected_case_sensitive",
+    [
+        (["text_search", "NYC"], "NYC", False),
+        (["text_search", "NYC", {}], "NYC", False),
+        (["text_search", "NYC", {"case_sensitive": True}], "NYC", True),
+        (["text_search", "nyc", {"case_sensitive": False}], "nyc", False),
+        (["text_search", "NYC", {"case_sensitive": False, "other": 1}], "NYC", False),
+    ],
+)
+def test_text_search_spec(expression, expected_value, expected_case_sensitive):
+    spec = _search_parser().parse(expression).text_search_spec
+    assert spec is not None
+    assert spec.value == expected_value
+    assert spec.case_sensitive == expected_case_sensitive
+
+
+def test_text_search_spec_nested():
+    program = _search_parser().parse(["all", [">", ["get", "name"], "a"], ["text_search", "NYC"]])
+    spec = program.text_search_spec
+    assert spec is not None
+    assert spec.value == "NYC"
+
+
+def test_text_search_spec_absent():
+    spec = _search_parser().parse(["all", [">", ["get", "name"], "a"]]).text_search_spec
+    assert spec is None
+
+
+def test_text_search_spec_multiple_first_wins():
+    program = _search_parser().parse(
+        ["any", ["text_search", "SF"], ["text_search", "c", {"case_sensitive": True}]]
+    )
+    spec = program.text_search_spec
+    assert spec is not None
+    assert spec.value == "SF"
+    assert spec.case_sensitive is False
+
+
+def test_text_search_compile(columns, virtual_operands):
+    parser = _search_parser()
+    cols = {key: columns[key] for key in ("name", "city")}
+    clause = parser.parse(["text_search", "NYC"]).to_clause(cols, virtual_operands)
+    assert (
+        compile_clause(clause)
+        == "lower(CAST(name AS TEXT)) LIKE lower('%NYC%') OR lower(CAST(city AS TEXT)) LIKE lower('%NYC%')"
+    )
+
+
+def test_text_search_compile_case_sensitive(columns, virtual_operands):
+    parser = _search_parser()
+    cols = {key: columns[key] for key in ("name", "city")}
+    clause = parser.parse(["text_search", "NYC", {"case_sensitive": True}]).to_clause(
+        cols, virtual_operands
+    )
+    assert (
+        compile_clause(clause)
+        == "CAST(name AS TEXT) LIKE '%NYC%' OR CAST(city AS TEXT) LIKE '%NYC%'"
+    )
+
+
+def test_text_search_no_searchable_fields(columns, virtual_operands):
+    parser = FilterParser([FieldInfo(key="name", datatype=FIELD_TYPE.STRING, text_search=False)])
+    clause = parser.parse(["text_search", "NYC"]).to_clause(
+        {"name": columns["name"]}, virtual_operands
+    )
+    assert compile_clause(clause) == "false"
+
+
+def test_text_search_compile_multiple(columns, virtual_operands):
+    parser = _search_parser()
+    cols = {key: columns[key] for key in ("name", "city")}
+    clause = parser.parse(["any", ["text_search", "SF"], ["text_search", "c"]]).to_clause(
+        cols, virtual_operands
+    )
+    assert (
+        compile_clause(clause)
+        == "lower(CAST(name AS TEXT)) LIKE lower('%SF%') OR lower(CAST(city AS TEXT)) LIKE lower('%SF%') "
+        "OR lower(CAST(name AS TEXT)) LIKE lower('%c%') OR lower(CAST(city AS TEXT)) LIKE lower('%c%')"
+    )

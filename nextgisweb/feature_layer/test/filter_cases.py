@@ -504,6 +504,16 @@ INVALID_DATA_CASES = [
     ("datetime_int_rejected", ["==", ["get", "created_at"], 123], True, _E),
     ("wrong_get_expression", ["get", ["get", "name"]], True, _E),
     ("all_with_empty_array", ["all", []], False, _E),
+    ("text_search_missing_query", ["text_search"], True, _E),
+    ("text_search_empty_query", ["text_search", ""], True, _E),
+    ("text_search_non_string_query", ["text_search", 123], True, _E),
+    ("text_search_options_not_object", ["text_search", "x", "options"], True, _E),
+    (
+        "text_search_case_sensitive_not_bool",
+        ["text_search", "x", {"case_sensitive": "yes"}],
+        True,
+        _E,
+    ),
 ]
 
 INVALID_FILTER_CASES = [

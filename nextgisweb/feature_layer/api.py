@@ -26,7 +26,7 @@ from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
 from .feature import Feature
-from .filter import str_contains_filter
+from .filter import FilterParser, str_contains_filter
 from .interface import (
     FIELD_TYPE,
     IAggregatableFeatureQuery,
@@ -436,16 +436,39 @@ def apply_fields_filter(query, request: Request):
         query.ilike(request.GET["ilike"])
 
 
-def apply_filter_expression(query, resource, filter):
-    if not str_contains_filter(filter):
-        return
+def _filter_expression(filter: str | None, text_search: str | None) -> Any:
+    """Build a combined filter expression from the ``filter`` and
+    ``text_search`` query parameters.
 
+    The ``text_search`` parameter is applied in conjunction with the
+    regular filter expression via an ``all`` logical node."""
+
+    expr: Any = None
+    if filter is not None and str_contains_filter(filter):
+        expr = json_loads(filter)
+    if text_search is not None:
+        search = ["text_search", text_search]
+        expr = ["all", search, expr] if expr is not None else search
+    return expr
+
+
+def apply_filter_expression(query, resource, filter, *, user):
     if not IFilterableFeatureLayer.providedBy(resource):
-        return
+        return None
 
-    filter_parser = resource.filter_parser
+    if isinstance(filter, str):
+        if not str_contains_filter(filter):
+            return None
+    elif isinstance(filter, list):
+        if not filter:
+            return None
+    else:
+        return None
+
+    filter_parser = FilterParser.from_resource(resource, user=user)
     filter_program = filter_parser.parse(filter)
     query.set_filter_program(filter_program)
+    return filter_program
 
 
 def apply_intersect_filter(query, request: Request, resource):
@@ -477,6 +500,11 @@ def cget(
     limit: Annotated[int, Meta(ge=0)] | None = None,
     offset: Annotated[int, Meta(ge=0)] = 0,
     filter: Annotated[str | None, Meta(description="Filter expression (JSON string)")] = None,
+    text_search: Annotated[str | None, Meta(description="Text search query")] = None,
+    text_search_context: Annotated[
+        Literal["fields"] | None,
+        Meta(description="Per-feature search context (exact match fields)"),
+    ] = None,
 ) -> JSONType:
     """Read features
 
@@ -492,7 +520,20 @@ def cget(
 
     apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
-    apply_filter_expression(query, resource, filter)
+
+    program = apply_filter_expression(
+        query, resource, _filter_expression(filter, text_search), user=request.user
+    )
+    if text_search_context is not None:
+        if text_search is None:
+            raise ValidationError(
+                gettext(
+                    "The 'text_search_context' parameter requires the 'text_search' parameter."
+                )
+            )
+        spec = program.text_search_spec if program is not None else None
+        if spec is not None:
+            query.set_text_search_context(spec)
 
     # Ordering
     order_by_ = []
@@ -506,7 +547,13 @@ def cget(
     if order_by_:
         query.order_by(*order_by_)
 
-    return [dumper(feature) for feature in query()]
+    result = []
+    for feature in query():
+        dumped = dumper(feature)
+        if text_search_context is not None:
+            dumped["search_context"] = feature.search_context or []
+        result.append(dumped)
+    return result
 
 
 def cpost(
@@ -602,8 +649,8 @@ def cdelete(resource, request: Request) -> JSONType:
     return result
 
 
-def has_filters(request: Request, filter):
-    if str_contains_filter(filter):
+def has_filters(request: Request, filter, text_search=None):
+    if str_contains_filter(filter) or text_search is not None:
         return True
     if "intersects" in request.GET:
         return True
@@ -629,6 +676,7 @@ def count(
     request: Request,
     *,
     filter: Annotated[str | None, Meta(description="Filter expression (JSON string)")] = None,
+    text_search: Annotated[str | None, Meta(description="Text search query")] = None,
 ) -> CountResponse:
     """Count features
 
@@ -640,11 +688,13 @@ def count(
 
     result = CountResponse(total_count=total_count)
 
-    if has_filters(request, filter):
+    if has_filters(request, filter, text_search):
         filtered_query = resource.feature_query()
         apply_fields_filter(filtered_query, request)
         apply_intersect_filter(filtered_query, request, resource)
-        apply_filter_expression(filtered_query, resource, filter)
+        apply_filter_expression(
+            filtered_query, resource, _filter_expression(filter, text_search), user=request.user
+        )
         result.filtered_count = filtered_query().total_count
 
     return result
@@ -684,7 +734,7 @@ def cextent(resource, request: Request) -> NgwExtent:
 
     apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
-    apply_filter_expression(query, resource, request.GET.get("filter"))
+    apply_filter_expression(query, resource, request.GET.get("filter"), user=request.user)
 
     extent = query().extent
     return NgwExtent(**extent)
@@ -710,7 +760,9 @@ def aggregate(resource, request: Request, *, body: AggregateBody) -> AggregateRe
         raise ValidationError(message=gettext("Aggregation is not supported for this layer."))
 
     if body.filter is not UNSET and IFilterableFeatureLayer.providedBy(resource):
-        feature_query.set_filter_program(resource.filter_parser.parse(body.filter))
+        feature_query.set_filter_program(
+            FilterParser.from_resource(resource, user=request.user).parse(body.filter)
+        )
 
     indexed_specs = []
     for idx, spec in enumerate(body.items):
@@ -760,6 +812,8 @@ Condition expressions:
 - ["!is_null", ["get", "field"]] — field is not NULL
 - ["ilike", ["get", "field"], "%pattern%"] — case-insensitive text match (% = any chars)
 - ["!ilike", ["get", "field"], "%pattern%"] — does not match
+- ["text_search", "query"] — case-insensitive substring search across all searchable fields
+- ["text_search", "query", {"case_sensitive": true}] — case-sensitive variant
 
 Operator support by field type (use ONLY these combinations):
 - STRING: ==, !=, >, <, >=, <=, in, !in, is_null, !is_null, ilike, !ilike
@@ -769,6 +823,7 @@ Operator support by field type (use ONLY these combinations):
 - TIME: ==, !=, >, <, >=, <=, is_null, !is_null (values as "HH:mm:ss")
 - DATETIME: ==, !=, >, <, >=, <=, is_null, !is_null (values as "YYYY-MM-DDTHH:mm:ss")
 - BOOLEAN: ==, !=, is_null, !is_null
+- text_search: available for all layers with searchable fields
 
 Use only field names from the provided schema. When there are multiple top-level conditions, wrap them in ["all", ...] or ["any", ...] depending on the intent.
 """
