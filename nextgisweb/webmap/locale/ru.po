@@ -672,15 +672,19 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:358
+#: nodepkg/panel/search/SearchPanel.tsx:375
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:455
+#: nodepkg/panel/search/SearchPanel.tsx:474
+msgid "Identify object"
+msgstr "Идентифицировать объект"
+
+#: nodepkg/panel/search/SearchPanel.tsx:493
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:459
+#: nodepkg/panel/search/SearchPanel.tsx:497
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -907,7 +911,7 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: nodepkg/resource-action-plugin.tsx:44 view.py:102
+#: nodepkg/resource-action-plugin.tsx:44 view.py:103
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
@@ -1242,10 +1246,10 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: view.py:114
+#: view.py:115
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:125
+#: view.py:126
 msgid "Web map settings"
 msgstr "Настройки веб-карты"

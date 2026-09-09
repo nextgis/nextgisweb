@@ -20,6 +20,31 @@
         color: gray;
       }
 
+      .identify-icon {
+        display: inline-block;
+        position: relative;
+
+        .identify-icon-hover {
+          display: none;
+          position: absolute;
+          inset: 0;
+        }
+
+        &:hover {
+          .identify-icon-default {
+            visibility: hidden;
+          }
+
+          .identify-icon-hover {
+            display: inline-block;
+
+            svg {
+              color: var(--primary);
+            }
+          }
+        }
+      }
+
       &:first-child {
         padding-top: 7px;
       }

@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import GeoJSON from "ol/format/GeoJSON";
 import type { Geometry } from "ol/geom";
 import { createContext, use, useState } from "react";
-import type { ChangeEvent, ReactNode } from "react";
+import type { ChangeEvent, MouseEvent, ReactNode } from "react";
 
 import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
@@ -20,6 +20,7 @@ import { PanelContainer, PanelTitle } from "../component";
 import type { PanelTitleProps } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
+import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import LayersIcon from "@nextgisweb/icon/material/layers";
 import LocationOnIcon from "@nextgisweb/icon/material/location_on";
@@ -32,9 +33,13 @@ interface SearchResult {
   geometry: Geometry;
   type: "place" | "layers" | "public";
   key: number;
+  identifiable: boolean;
+  resourceId?: number;
+  featureId?: number;
 }
 
 interface FeatureResponse {
+  id: number;
   label: string;
   geom: any;
 }
@@ -89,6 +94,7 @@ const parseCoordinatesInput: SearchFunction = async (
       ),
       type: "place",
       key: limit,
+      identifiable: false,
     };
     searchResults.push(searchResult);
     limit = limit - 1;
@@ -103,7 +109,11 @@ const searchByLayers: SearchFunction = async (
   controller
 ) => {
   const visibleItems = await display.getVisibleItems();
-  const requests: Promise<FeatureResponse[]>[] = [];
+  const requests: {
+    layerId: number;
+    identifiable: boolean;
+    request: Promise<FeatureResponse[]>;
+  }[] = [];
   visibleItems.forEach((item) => {
     const layerId = item.layerId;
     if (!item.isLayer()) {
@@ -129,14 +139,15 @@ const searchByLayers: SearchFunction = async (
       },
       signal,
     });
-    requests.push(request);
+    requests.push({ layerId, identifiable: item.identifiable, request });
   });
 
-  const results = await Promise.allSettled(requests);
+  const results = await Promise.allSettled(requests.map((r) => r.request));
   const searchResults: SearchResult[] = [];
   let isExceeded = false;
-  results.forEach((r) => {
+  results.forEach((r, index) => {
     if (r.status !== "fulfilled" || !r.value || limit < 1) return;
+    const { layerId, identifiable } = requests[index];
     r.value.forEach((feature) => {
       if (isExceeded) return;
       const searchResult: SearchResult = {
@@ -144,6 +155,11 @@ const searchByLayers: SearchFunction = async (
         geometry: GEO_JSON_FORMAT.readGeometry(feature.geom),
         type: "layers",
         key: limit,
+        identifiable,
+        ...(identifiable && {
+          featureId: feature.id,
+          resourceId: layerId,
+        }),
       };
       searchResults.push(searchResult);
       limit = limit - 1;
@@ -216,6 +232,7 @@ const searchByNominatim: SearchFunction = async (
       }),
       type: "public",
       key: limit,
+      identifiable: false,
     };
     searchResults.push(searchResult);
     limit = limit - 1;
@@ -295,6 +312,7 @@ const searchByYandex: SearchFunction = async (
       ),
       type: "public",
       key: limit,
+      identifiable: false,
     };
     searchResults.push(searchResult);
     limit = limit - 1;
@@ -420,6 +438,17 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     display.highlighter.highlight({ geom: resultInfo.geometry });
   };
 
+  const onIdentifyIconClick = (
+    e: MouseEvent<HTMLElement>,
+    resultInfo: SearchResult
+  ) => {
+    e.stopPropagation();
+    const { resourceId, featureId } = resultInfo;
+    if (resourceId !== undefined && featureId !== undefined) {
+      display.identify.identifyFeatureByAttrValue(resourceId, "id", featureId);
+    }
+  };
+
   const makeResult = (resultInfo: SearchResult) => {
     const isSelected = resultSelected && resultSelected.key === resultInfo.key;
 
@@ -440,7 +469,20 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
       >
         <span>
           {resultInfo.label}
-          {resultSourceIcon}
+          {resultInfo.identifiable ? (
+            <span
+              className="identify-icon"
+              title={gettext("Identify object")}
+              onClick={(e) => onIdentifyIconClick(e, resultInfo)}
+            >
+              <span className="identify-icon-default">{resultSourceIcon}</span>
+              <span className="identify-icon-hover">
+                <IdentifyIcon />
+              </span>
+            </span>
+          ) : (
+            resultSourceIcon
+          )}
         </span>
       </div>
     );
