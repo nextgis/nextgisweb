@@ -1,4 +1,6 @@
 import { action, computed, observable } from "mobx";
+import { WKT } from "ol/format";
+import type { Geometry } from "ol/geom";
 
 import type {
   FeatureLayerFieldRead,
@@ -33,28 +35,43 @@ export class FeatureEditorStore {
   @observable.shallow accessor featureLayer: FeatureLayerRead | null = null;
 
   private _featureItem?: FeatureItem;
+  @observable.ref private accessor _geometry: Geometry | null = null;
+  private _wkt = new WKT();
 
   private _abortController = new AbortControllerHelper();
   private _initializing?: Promise<CompositeRead>;
 
   @observable.shallow private accessor _attributeStore: EditorStore | null =
     null;
-  @observable.shallow private accessor _geometryStore: EditorStore | null =
-    null;
+  @observable.shallow private accessor _geometryStore: EditorStore<
+    string | null
+  > | null = null;
   @observable.shallow private accessor _extensionStores: ExtensionStores = {};
 
   constructor({
     featureId,
     resourceId,
     featureItem,
+    geometry,
   }: FeatureEditorStoreOptions) {
     this.resourceId = resourceId;
     if (featureItem) {
       this.featureId = featureItem.id;
-      this._setFeatureItem(featureItem);
+      this._setFeatureItem(featureItem, geometry);
     } else {
       this.featureId = featureId;
+      this._geometry = geometry ?? null;
     }
+  }
+
+  /** Current geometry in the layer SRS, including unsaved geometry edits. */
+  @computed
+  get geometry(): Geometry | null {
+    if (this._geometryStore?.dirty) {
+      const value = this._geometryStore.value;
+      return value ? this._wkt.readGeometry(value) : null;
+    }
+    return this._geometry;
   }
 
   init() {
@@ -214,11 +231,9 @@ export class FeatureEditorStore {
     }
   }
   @action.bound
-  attachGeometryStore(geometryStore: EditorStore) {
+  attachGeometryStore(geometryStore: EditorStore<string | null>) {
     this._geometryStore = geometryStore;
-    if (this._featureItem) {
-      this._setGeometryValue(this._featureItem.geom);
-    }
+    this._setGeometryValue(this._geometry);
   }
 
   @action.bound
@@ -233,14 +248,14 @@ export class FeatureEditorStore {
 
   @action.bound
   reset() {
-    this._setFeatureItem(this._featureItem);
+    this._setStoreValues(this._featureItem);
   }
 
   @action
   private _setStoreValues(featureItem?: FeatureItem) {
     this._setExtensionsValue(featureItem ? featureItem.extensions : null);
     this._setAttributesValue(featureItem ? featureItem.fields : null);
-    this._setGeometryValue(featureItem ? featureItem.geom : null);
+    this._setGeometryValue(this._geometry);
   }
 
   private _setAttributesValue(attributes: NgwAttributeValue | null) {
@@ -248,9 +263,9 @@ export class FeatureEditorStore {
       this._attributeStore.load(attributes);
     }
   }
-  private _setGeometryValue(geom: string | null) {
+  private _setGeometryValue(geom: Geometry | null) {
     if (this._geometryStore) {
-      this._geometryStore.load(geom);
+      this._geometryStore.load(geom ? this._wkt.writeGeometry(geom) : null);
     }
   }
 
@@ -280,8 +295,17 @@ export class FeatureEditorStore {
   }
 
   @action
-  private _setFeatureItem(featureItem?: FeatureItem): void {
+  private _setFeatureItem(
+    featureItem?: FeatureItem,
+    geometry?: Geometry | null
+  ): void {
     this._featureItem = featureItem;
+    this._geometry =
+      geometry !== undefined
+        ? geometry
+        : featureItem?.geom
+          ? this._wkt.readGeometry(featureItem.geom)
+          : null;
     this._setStoreValues(featureItem);
   }
 
