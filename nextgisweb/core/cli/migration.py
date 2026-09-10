@@ -33,6 +33,7 @@ def initialize_db(
 
     :param drop: Attempt to drop existing objects"""
 
+    assert self.env is not None
     metadata = self.env.metadata()
 
     with transaction.manager:
@@ -63,7 +64,7 @@ class migration:
     """Database migration commands"""
 
 
-class RegistryMixin:
+class RegistryMixin(EnvCommand):
     registry: MigrationRegistry
 
     def __enter__(self):

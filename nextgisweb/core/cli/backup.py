@@ -90,7 +90,7 @@ def backup(
                     raise
 
     with tgt_context() as tgt:
-        mod.backup(self.env, tgt)
+        mod.backup(tgt)
 
     if not one_shot:
         with transaction.manager:
@@ -117,7 +117,6 @@ def restore(
 
     opts = core.options.with_prefix("backup")
 
-    source = self.source
     from_stdin = source == "-"
     if from_stdin:
 
@@ -144,7 +143,7 @@ def restore(
             yield source
 
     with src_context() as src:
-        mod.restore(self.env, src)
+        mod.restore(src)
 
 
 def _compress(src, dst):

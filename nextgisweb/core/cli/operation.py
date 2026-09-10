@@ -1,7 +1,9 @@
 import os
 import shutil
+from collections.abc import Mapping
 from datetime import datetime, timedelta
 from time import sleep
+from typing import Any
 
 import transaction
 
@@ -20,10 +22,11 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
     :param timeout: Seconds to wait or fail"""
 
+    assert self.env is not None
     components = [
-        (comp, comp.is_service_ready())
+        (comp, func())
         for comp in self.env.components.values()
-        if hasattr(comp, "is_service_ready")
+        if (func := getattr(comp, "is_service_ready", None))
     ]
 
     messages = dict()
@@ -84,7 +87,7 @@ def psql(
 
     :param arg: Options and arguments passed to psql, use "--" prefix to separate"""
 
-    opts, password = pg_connection_options(self.env)
+    opts, password = pg_connection_options()
     psql_path = shutil.which("psql")
     if psql_path is None:
         raise RuntimeError("Executable 'psql' not found!")
@@ -96,15 +99,7 @@ def psql(
     if len(psql_arg) > 0 and psql_arg[0] == "--":
         psql_arg.pop(0)
 
-    os.execve(
-        psql_path,
-        [
-            "psql",
-        ]
-        + opts
-        + psql_arg,
-        environ,
-    )
+    os.execve(psql_path, ["psql", *opts, *psql_arg], environ)
 
 
 @cli.command()
@@ -120,6 +115,7 @@ def maintenance(
     :param estimate_storage: Execute storage estimation after maintenance
     :param one_shot: Don't record metadata about this maintenance"""
 
+    assert self.env is not None
     for comp in self.env.chain("maintenance"):
         logger.debug("Maintenance for component: %s...", comp.identity)
         comp.maintenance()
@@ -141,13 +137,15 @@ def check_integrity(self: EnvCommand):
     """Check data integrity"""
 
     fail = False
-    with DBSession.connection(
-        execution_options=dict(
-            isolation_level="SERIALIZABLE",
-            postgresql_readonly=True,
-            postgresql_deferrable=True,
-        )
-    ) as con:
+
+    opts: Mapping[str, Any] = {
+        "isolation_level": "SERIALIZABLE",
+        "postgresql_readonly": True,
+        "postgresql_deferrable": True,
+    }
+
+    with DBSession.connection(execution_options=opts) as con:
+        assert self.env is not None
         for comp in self.env.chain("check_integrity"):
             with con.begin_nested():
                 try:

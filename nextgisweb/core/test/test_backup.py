@@ -33,5 +33,6 @@ def test_parse_pg_dump_version(output, expected):
     assert parse_pg_dump_version(output) == Version(expected)
 
 
-def test_dummy_backup(ngw_env, tmp_path):
-    backup(ngw_env, str(tmp_path))
+@pytest.mark.usefixtures("ngw_env")
+def test_dummy_backup(tmp_path):
+    backup(str(tmp_path))

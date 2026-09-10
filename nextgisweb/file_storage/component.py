@@ -6,11 +6,12 @@ from datetime import timedelta, timezone
 from operator import itemgetter
 from pathlib import Path
 from shutil import copyfileobj
+from typing import BinaryIO
 
 import sqlalchemy as sa
 import transaction
 
-from nextgisweb.env import Component, DBSession
+from nextgisweb.env import Component, DBSession, inject
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
@@ -21,28 +22,6 @@ from nextgisweb.core import BackupBase, CoreComponent
 from .model import FileObj
 
 BUF_SIZE = 1024 * 1024
-
-
-class FileObjBackup(BackupBase):
-    identity = "fileobj"
-    plget = itemgetter("component", "uuid")
-
-    def blob(self):
-        return True
-
-    def backup(self, dst):
-        with open(self.component.filename(self.plget(self.payload)), "rb") as fd:
-            copyfileobj(fd, dst, length=BUF_SIZE)
-
-    def restore(self, src):
-        fn = self.component.filename(self.plget(self.payload), makedirs=True)
-        if os.path.isfile(fn):
-            logger.debug(
-                "Skipping restoration of fileobj %s: file already exists!", self.payload["uuid"]
-            )
-        else:
-            with open(fn, "wb") as fd:
-                copyfileobj(src, fd, length=BUF_SIZE)
 
 
 class FileStorageComponent(Component):
@@ -181,3 +160,26 @@ class FileStorageComponent(Component):
         Option("cleanup_keep_interval", timedelta, default=timedelta(days=2)),
     )
     # fmt: on
+
+
+class FileObjBackup(BackupBase):
+    identity = "fileobj"
+    blob = True
+
+    plget = itemgetter("component", "uuid")
+
+    @inject()
+    def backup(self, dst: BinaryIO, *, component: FileStorageComponent = inject.arg()) -> None:
+        with open(component.filename(self.plget(self.payload)), "rb") as fd:
+            copyfileobj(fd, dst, length=BUF_SIZE)
+
+    @inject()
+    def restore(self, src: BinaryIO, *, component: FileStorageComponent = inject.arg()) -> None:
+        fn = component.filename(self.plget(self.payload), makedirs=True)
+        if os.path.isfile(fn):
+            logger.debug(
+                "Skipping restoration of fileobj %s: file already exists!", self.payload["uuid"]
+            )
+        else:
+            with open(fn, "wb") as fd:
+                copyfileobj(src, fd, length=BUF_SIZE)

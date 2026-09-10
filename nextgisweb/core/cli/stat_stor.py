@@ -20,9 +20,10 @@ def statistics(
         core.estimate_storage_all()
 
     result = dict()
+    assert self.env is not None
     for comp in self.env.components.values():
-        if hasattr(comp, "query_stat"):
-            result[comp.identity] = comp.query_stat()
+        if func := getattr(comp, "query_stat", None):
+            result[comp.identity] = func()
 
     print(dumps(result, pretty=True))
 

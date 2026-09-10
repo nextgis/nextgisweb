@@ -97,11 +97,7 @@ class StorageComponentMixin:
             dimen = storage_stat_dimension.alias("di")
             delta = storage_stat_delta.alias("de")
 
-        whereclause = (
-            sa.and_(v(sa.column(k)) for k, v in where.items())
-            if where and len(where) > 0
-            else True
-        )
+        whereclause = sa.and_(True, *(v(sa.column(k)) for k, v in (where or {}).items()))
 
         source = (
             sa.select(
@@ -171,9 +167,9 @@ class StorageComponentMixin:
                 totals = storage_stat_dimension_total
 
                 for comp in self.env.components.values():
-                    if hasattr(comp, "estimate_storage"):
+                    if func := getattr(comp, "estimate_storage", None):
                         logger.debug("Estimating storage of component '%s'...", comp.identity)
-                        for kind_of_data, resource_id, size in comp.estimate_storage():
+                        for kind_of_data, resource_id, size in func():
                             con.execute(
                                 details.insert().values(
                                     dict(

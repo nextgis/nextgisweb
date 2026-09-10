@@ -1,91 +1,98 @@
-import json
+from __future__ import annotations
+
 import os
 import re
-from collections import namedtuple
+from collections.abc import Callable, Generator, Iterable
 from contextlib import contextmanager
 from datetime import datetime
 from functools import cache
 from packaging.version import Version
 from subprocess import check_call, check_output
-from typing import ClassVar
+from typing import Any, BinaryIO, ClassVar, TextIO
 
 import sqlalchemy as sa
 import transaction
 from msgspec import Struct
+from msgspec.json import decode
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, env
+from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import DictRegistry, dict_registry
 
-IR_FIELDS = ("id", "identity", "payload")
-IndexRecord = namedtuple("IndexRecord", IR_FIELDS)
+
+class IndexRecord(Struct):
+    id: int
+    identity: str
+    payload: Any
 
 
 class IndexFile:
-    def __init__(self, filename):
+    def __init__(self, filename: str) -> None:
         self.filename = filename
 
     @contextmanager
-    def writer(self):
-        def write(record):
-            if write.fp is None:
-                write.fp = open(self.filename, "w", newline="\n", encoding="utf-8")
+    def writer(self) -> Generator[Callable[[IndexRecord], None], None, None]:
+        fd: TextIO | None = None
 
-            fp = write.fp
-            fp.write(json.dumps(dict(zip(IR_FIELDS, record)), ensure_ascii=False))
-            fp.write("\n")
+        def write(record: IndexRecord) -> None:
+            nonlocal fd
 
-        write.fp = None
+            if fd is None:
+                fd = open(self.filename, "w", newline="\n", encoding="utf-8")
 
-        yield write
+            data = dumps(record, pretty=False)
+            assert "\n" not in data
+            fd.write(data)
 
-        if write.fp is not None:
-            write.fp.close()
+            fd.write("\n")
+
+        try:
+            yield write
+        finally:
+            if fd is not None:
+                fd.close()
 
     @contextmanager
-    def reader(self):
+    def reader(self) -> Generator[Generator[IndexRecord, None, None], None, None]:
         with open(self.filename, newline="\n", encoding="utf-8") as fp:
 
-            def read():
+            def read() -> Generator[IndexRecord, None, None]:
                 for line in fp:
-                    data = json.loads(line)
-                    yield IndexRecord(**data)
+                    record = decode(line, type=IndexRecord)
+                    assert isinstance(record, IndexRecord)
+                    yield record
 
             yield read()
 
 
 @dict_registry
 class BackupBase:
-    registry: ClassVar[DictRegistry[type["BackupBase"]]]
+    registry: ClassVar[DictRegistry[type[BackupBase]]]
 
-    def __init__(self, payload):
+    identity: ClassVar[str]
+    blob: ClassVar[bool] = False
+
+    def __init__(self, payload: Any) -> None:
         self.payload = payload
-        self.component = None
 
-    def bind(self, component):
-        self.component = component
+    def backup(self, dst: BinaryIO) -> None:
+        raise NotImplementedError
 
-    @property
-    def blob(self):
-        return False
-
-    def backup(self, dst):
-        raise NotImplementedError()
-
-    def restore(self, src):
-        raise NotImplementedError()
+    def restore(self, src: BinaryIO) -> None:
+        raise NotImplementedError
 
 
 class BackupConfiguration:
-    def __init__(self):
+    def __init__(self) -> None:
         self._exclude_table = list()
         self._exclude_table_data = list()
 
-    def exclude_table(self, schema, table):
+    def exclude_table(self, schema: str, table: str) -> None:
         self._exclude_table.append("{}.{}".format(schema, table))
 
-    def exclude_table_data(self, schema, table):
+    def exclude_table_data(self, schema: str, table: str) -> None:
         self._exclude_table_data.append("{}.{}".format(schema, table))
 
 
@@ -95,7 +102,7 @@ class BackupMetadata(Struct):
     size: int
 
 
-def parse_pg_dump_version(output):
+def parse_pg_dump_version(output: str) -> Version:
     """Parse output of pg_dump --version to Version"""
     output = output.strip()
     output = re.sub(r"\(.*?\)", " ", output)
@@ -105,7 +112,7 @@ def parse_pg_dump_version(output):
     return Version(m.group(0))
 
 
-def pg_connection_options(env):
+def pg_connection_options() -> tuple[Iterable[str], str]:
     from nextgisweb.core import CoreComponent
 
     con_args = CoreComponent.current()._db_connection_args()
@@ -121,7 +128,7 @@ def pg_connection_options(env):
     ], con_args["password"]
 
 
-def backup(env, dst):
+def backup(dst: str) -> None:
     # TRANSACTION AND CONNECTION
 
     con = DBSession.connection()
@@ -158,7 +165,7 @@ def backup(env, dst):
         logger.debug("Excluding table data: %s", ", ".join(config._exclude_table_data))
         exc_opt += ["--exclude-table-data={}".format(i) for i in config._exclude_table_data]
 
-    pg_copt, pg_pass = pg_connection_options(env)
+    pg_copt, pg_pass = pg_connection_options()
     check_call(
         [
             "/usr/bin/pg_dump",
@@ -166,23 +173,23 @@ def backup(env, dst):
             "--compress=0",
             "--file={}".format(pg_dir),
             "--snapshot={}".format(snapshot),
-        ]
-        + exc_opt
-        + pg_copt,
+            *exc_opt,
+            *pg_copt,
+        ],
         env=dict(PGPASSWORD=pg_pass),
     )
 
     pg_listing = check_output(["/usr/bin/pg_restore", "--list", pg_dir]).decode("utf-8")
 
     @cache
-    def get_cls_relname(oid):
+    def get_cls_relname(oid: int) -> str:
         (relname,) = con.execute(
             sa.text("SELECT relname FROM pg_catalog.pg_class WHERE oid = :oid"),
             dict(oid=oid),
         ).one()
         return relname
 
-    def get_namespace(oid):
+    def get_namespace(oid: int) -> str:
         (nspname,) = con.execute(
             sa.text("SELECT nspname FROM pg_catalog.pg_namespace WHERE oid = :oid"),
             dict(oid=oid),
@@ -239,7 +246,7 @@ def backup(env, dst):
         idx_file = IndexFile(os.path.join(comp_dir, "$index"))
         with idx_file.writer() as idx_write:
             for seq, itm in enumerate(comp.backup_objects(), start=1):
-                itm.bind(comp)
+                assert isinstance(itm, BackupBase)
                 record = IndexRecord(id=seq, identity=itm.identity, payload=itm.payload)
                 if itm.blob:
                     binfn = os.path.join(comp_dir, "{:08d}".format(seq))
@@ -253,7 +260,7 @@ def backup(env, dst):
             os.rmdir(comp_dir)
 
 
-def restore(env, src):
+def restore(src: str) -> None:
     for comp in env.chain("restore_prepare"):
         comp.restore_prepare()
 
@@ -268,7 +275,7 @@ def restore(env, src):
     pg_dir = os.path.join(src, "postgres")
     pg_restore_list = os.path.join(pg_dir, "restore")
 
-    pg_copt, pg_pass = pg_connection_options(env)
+    pg_copt, pg_pass = pg_connection_options()
     check_call(
         [
             "/usr/bin/pg_restore",
@@ -279,9 +286,9 @@ def restore(env, src):
             "--exit-on-error",
             "--use-list",
             pg_restore_list,
-        ]
-        + pg_copt
-        + [pg_dir],
+            *pg_copt,
+            pg_dir,
+        ],
         env=dict(PGPASSWORD=pg_pass),
     )
 
@@ -299,9 +306,9 @@ def restore(env, src):
                 with idx_file.reader() as read:
                     for record in read:
                         itm = BackupBase.registry[record.identity](record.payload)
-                        itm.bind(comp)
                         if itm.blob:
                             binfn = os.path.join(comp_dir, "{:08d}".format(record.id))
                             with open(binfn, "rb") as fd:
                                 itm.restore(fd)
+
         mark_changed(DBSession())
