@@ -12,20 +12,26 @@ seq_pattern = re.compile(rf"^nextval\('{prefix}(\w+)'::regclass\)$")
 
 
 def check_table(tab: sa.Table) -> Iterable[str]:
+    conn = DBSession.connection()
+
     tab_name, tab_schema = tab.name, tab.schema
     tab_repr = (f"{tab_schema}." if tab_schema else "") + tab_name
     tab_msg = f"Table '{tab_repr}'"
 
+    meta = sa.MetaData()
+
     temp_tab = tab.to_metadata(
-        tab.metadata,
+        meta,
         name=prefix + tab_name,
+        schema=None,
     )
+    temp_tab._prefixes = ["TEMPORARY"]
 
-    for constraint in temp_tab.constraints:
-        if constraint.name is not None:
-            constraint.name = prefix + constraint.name
+    for c in temp_tab.constraints:
+        if not isinstance(c, sa.ForeignKeyConstraint) and c.name is not None:
+            c.name = prefix + c.name
 
-    DBSession.execute(CreateTable(temp_tab))
+    conn.execute(CreateTable(temp_tab, include_foreign_key_constraints=[]))
 
     # Columns
 
@@ -54,7 +60,7 @@ SELECT
 FROM attr_exp a
 FULL OUTER JOIN attr_act b ON b.attname = a.attname
 """)
-    result = DBSession.execute(qcolumns, dict(temp_name=temp_tab.name, name=tab_name))
+    result = conn.execute(qcolumns, dict(temp_name=temp_tab.name, name=tab_repr))
 
     col_extra = set()
 
@@ -71,7 +77,10 @@ FULL OUTER JOIN attr_act b ON b.attname = a.attname
             yield f"{col_msg}: {'should' if r.notnull_exp else 'should not'} be nullable."
         elif (
             defval_exp := seq_pattern.sub(
-                lambda m: f"nextval('{m.group(1)}'::regclass)", r.defval_exp
+                lambda m: (
+                    f"nextval('{f'{tab_schema}.' if tab_schema else ''}{m.group(1)}'::regclass)"
+                ),
+                r.defval_exp,
             )
             if r.defval_exp is not None
             else None
@@ -97,10 +106,37 @@ SELECT
 FROM pg_constraint
 WHERE conrelid = CAST(:name AS regclass)
 """)
-    result_exp = DBSession.execute(qconstraints, dict(name=temp_tab.name))
-    result_act = DBSession.execute(qconstraints, dict(name=tab_name))
+    result_exp = conn.execute(qconstraints, dict(name=temp_tab.name))
+    result_act = conn.execute(qconstraints, dict(name=tab_repr))
     data_exp = _group_constraints(result_exp)
     data_act = _group_constraints(result_act)
+
+    # Add foreign key expected data
+    fkeys = tuple(c for c in tab.constraints if isinstance(c, sa.ForeignKeyConstraint))
+    if len(fkeys) > 0:
+        fk_data = data_exp["f"] = dict()
+
+        tab_relid = _toid(tab_repr)
+        for c in fkeys:
+            ftab = c.referred_table
+            ftab_repr = (f"{ftab.schema}." if ftab.schema else "") + ftab.name
+            ftab_relid = _toid(ftab_repr)
+
+            colnames = tuple(c.name for c in c.columns)
+            fcolnames = tuple(e.column.name for e in c.elements)
+
+            key = (
+                colnames,
+                ftab_relid if ftab_relid != tab_relid else None,
+                fcolnames,
+            )
+
+            conname = c.name if c.name is not None else f"{tab_name}_{'_'.join(colnames)}_fkey"
+            fk_data[key] = dict(
+                conname=conname,
+                condeferrable=c.deferrable is True,
+                condeferred=c.initially == "DEFERRED",
+            )
 
     for contype in ("p", "u", "f", "c"):
 

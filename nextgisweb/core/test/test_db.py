@@ -2,44 +2,78 @@ import re
 from packaging.version import Version
 
 import pytest
-from sqlalchemy import text
+import sqlalchemy as sa
 
 from nextgisweb.env import DBSession
 
-from ..integrity import check_table
+from ..integrity import _toid, check_table
 
 
 def test_postgres_version(ngw_txn):
-    raw = DBSession.execute(text("SHOW server_version")).scalar()
+    raw = DBSession.execute(sa.text("SHOW server_version")).scalar()
     if m := re.search(r"\d+(?:\.\d){1,}", raw):
         version = Version(m.group(0))
     assert version >= Version("12.0")
 
 
 def test_postgis_version(ngw_txn):
-    version = Version(DBSession.execute(text("SELECT PostGIS_Lib_Version()")).scalar())
+    version = Version(DBSession.execute(sa.text("SELECT PostGIS_Lib_Version()")).scalar())
     assert version >= Version("3.0.0")
+
+
+# TODO: module scope
+@pytest.fixture
+def tables(ngw_txn):
+    conn = DBSession.connection()
+    meta = sa.MetaData()
+    t1 = sa.Table(
+        "test_table_1",
+        meta,
+        sa.Column("id", sa.Integer, primary_key=True),
+        sa.Column("value", sa.Float, nullable=False),
+        schema="test_1",
+    )
+    sa.Table(
+        "test_table_2",
+        meta,
+        sa.Column("t1_id", sa.Integer, sa.ForeignKey(t1.c.id)),
+        schema="test_2",
+    )
+    for schema in set(t.schema for t in meta.tables.values() if t.schema is not None):
+        conn.execute(sa.schema.CreateSchema(schema))
+    meta.create_all(conn)
+
+    try:
+        yield meta, conn
+    finally:
+        _toid.cache_clear()
 
 
 @pytest.mark.parametrize(
     "sql, expected",
     (
         (None, None),
-        ("ALTER TABLE setting ADD COLUMN hellothere integer;", "extra"),
-        ("ALTER TABLE setting DROP COLUMN value;", "not found"),
-        ("ALTER TABLE setting ALTER COLUMN value TYPE text;", "type mismatch"),
-        ("ALTER TABLE setting ALTER COLUMN value DROP NOT NULL;", "should be nullable"),
-        (r"ALTER TABLE setting ALTER COLUMN value SET DEFAULT '{}';", "default mismatch"),
+        ("ALTER TABLE test_1.test_table_1 ADD COLUMN hellothere integer;", "extra"),
+        ("ALTER TABLE test_1.test_table_1 DROP COLUMN value;", "not found"),
+        ("ALTER TABLE test_1.test_table_1 ALTER COLUMN value TYPE text;", "type mismatch"),
+        (
+            "ALTER TABLE test_1.test_table_1 ALTER COLUMN value DROP NOT NULL;",
+            "should be nullable",
+        ),
+        (r"ALTER TABLE test_1.test_table_1 ALTER COLUMN value SET DEFAULT 0;", "default mismatch"),
     ),
 )
-def test_integrity(sql, expected, ngw_env, ngw_txn):
-    metadata = ngw_env.metadata()
-    tab = metadata.tables["setting"]
+def test_integrity(tables: tuple[sa.MetaData, sa.Connection], sql, expected):
+    meta, conn = tables
 
     if sql is not None:
-        DBSession.execute(text(sql))
+        conn.execute(sa.text(sql))
 
-    messages = list(check_table(tab))
+    messages = []
+
+    for tab in meta.tables.values():
+        messages.extend(check_table(tab))
+
     if expected is None:
         assert len(messages) == 0
     else:
