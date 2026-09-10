@@ -53,9 +53,13 @@ def test_change_owner(ngw_resource_group_sub, user_id):
 @pytest.mark.parametrize(
     "resolve",
     (
-        pytest.param(lambda r, u: r.permissions(u), id="legacy"),
+        pytest.param(lambda res, user: res.permissions(user), id="legacy"),
         pytest.param(
-            lambda r, u: {p for p, v in PermissionResolver(r, u)._result.items() if v is True},
+            lambda res, user: {
+                perm
+                for perm, value in PermissionResolver(res, user=user)._result.items()
+                if value is True
+            },
             id="presolver",
         ),
     ),

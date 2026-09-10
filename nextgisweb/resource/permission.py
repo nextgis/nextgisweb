@@ -1,143 +1,141 @@
-from collections import UserList
-from collections.abc import Generator
-from functools import reduce
-from typing import TYPE_CHECKING, ClassVar
+from __future__ import annotations
+
+from collections.abc import Iterator, Sequence
+from dataclasses import dataclass
+from graphlib import TopologicalSorter
+from typing import ClassVar, Final, Self
 
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
 
+from . import model
 
-class RequirementList(UserList):
-    def toposort(self):
-        # Split on internal (attr is None) and external requirements
-        internal, external = list(), list()
-        for req in self:
+
+class Requirements:
+    def __init__(self) -> None:
+        self._list = list[Requirement]()
+        self._dirty = False
+
+    def add(self, requirement: Requirement) -> None:
+        self._list.append(requirement)
+        self._dirty = True
+
+    def __iter__(self) -> Iterator[Requirement]:
+        if self._dirty:
+            self._sort()
+            self._dirty = False
+        return iter(self._list)
+
+    def _sort(self) -> None:
+        # Split on internal and external requirements
+        internal: list[Requirement] = []
+        external: list[Requirement] = []
+        for req in self._list:
             (internal, external)[req.attr is not None].append(req)
 
-        # Build graph of internal requirements
-        g = dict()
-        for a in internal:
-            g[a] = set()
-            for b in internal:
-                if a.src == b.dst and a != b:
-                    g[a].add(b)
+        # Topological sort internal requirements
+        internal_graph = {a: {b for b in internal if a != b and a.src == b.dst} for a in internal}
+        internal[:] = TopologicalSorter(internal_graph).static_order()
 
-        # Put external requirements first
-        self[:] = list(external)
+        # Sort external requirements by attribute, with "parent" first
+        external.sort(key=lambda req: (0 if req.attr == "parent" else 1, req.attr))
 
-        # Sort internal
-        extra = reduce(set.union, g.values(), set()) - set(g.keys())
-        g.update({item: set() for item in extra})
-        while True:
-            ordered = set(item for item, dep in g.items() if not dep)
-            if not ordered:
-                break
-
-            # Add sorted internal requirements after externals
-            self.extend(ordered)
-            g = {item: (dep - ordered) for item, dep in g.items() if item not in ordered}
-
-        assert not g, "A cyclic dependency exists amongst %r" % g
+        self._list[:] = [*external, *internal]
 
 
+@dataclass(frozen=True)
 class Requirement:
-    def __init__(
-        self,
-        dst: "Permission",
-        src: "Permission",
-        attr: str | None = None,
-        cls: type | None = None,
-        attr_empty: bool = False,
-    ):
-        self.dst = dst
-        self.src = src
-        self.attr = attr
-        self.cls = cls
-        self.attr_empty = attr_empty
-
-    def __repr__(self):
-        crepr = f" FOR {self.cls.identity}" if self.cls else ""
-        arepr = f" ON {self.attr}{' IF SET' if self.attr_empty else ''}" if self.attr else ""
-        return f"<Requirement{crepr}: {self.dst} REQUIRES {self.src}{arepr}>"
+    dst: Permission
+    src: Permission
+    attr: str | None = None
+    cls: type[model.Resource] | None = None
+    attr_empty: bool = False
 
 
 class Permission:
-    def __init__(self, label: TrStr):
-        self.scope = None
-        self.name = None
+    def __init__(self, label: TrStr) -> None:
+        self.label: Final = label
 
-        self.label = label
-        self._requirements = list()
+        self._scope: type[Scope] | None = None
+        self._name: str | None = None
 
-    def __repr__(self):
-        if self.scope is None:
-            assert self.name is None
-            return "<Permission: unbound>"
-        else:
-            assert self.name is not None
-            return f"<Permission: {self.scope.identity}.{self.name}>"
+        self.requirements: Final = Requirements()
 
-    def __str__(self):
-        return "unbound" if self.scope is None else f"{self.scope.identity}:{self.name}"
+    def __set_name__(self, scope: type[Scope], name: str) -> None:
+        assert issubclass(scope, Scope)
+        assert self._scope is None and self._name is None
 
-    def is_bound(self):
-        return self.name is not None and self.scope is not None
+        self._scope = scope
+        self._name = name
 
-    def bind(self, name: str, scope: type["Scope"]):
-        assert isinstance(name, str) and issubclass(scope, Scope)
-        assert self.name is None and self.scope is None
-        self.name = name
-        self.scope = scope
+        scope._register_permission(self)
 
-        self.scope.requirements.extend(self._requirements)
-        self.scope.requirements.toposort()
-        del self._requirements
+    def __repr__(self) -> str:
+        return f"<Permission: {str(self)}>"
 
-    def require(self, other: "Permission", attr=None, cls=None, attr_empty=False):
+    def __str__(self) -> str:
+        return "unbound" if self._scope is None else f"{self._scope.identity}:{self._name}"
+
+    @property
+    def scope(self) -> type[Scope]:
+        if self._scope is None:
+            raise TypeError(f"Permission {self} is not bound")
+        return self._scope
+
+    @property
+    def name(self) -> str:
+        if self._name is None:
+            raise TypeError(f"Permission {self} is not bound")
+        return self._name
+
+    def require(
+        self,
+        other: Permission,
+        /,
+        *,
+        attr: str | None = None,
+        cls: type[model.Resource] | None = None,
+        attr_empty: bool = False,
+    ) -> Self:
         req = Requirement(self, other, attr=attr, attr_empty=attr_empty, cls=cls)
+        self.requirements.add(req)
 
-        if self.scope is None:
-            self._requirements.append(req)
-        else:
-            self.scope.requirements.append(req)
-            self.scope.requirements.toposort()
+        if self._scope is not None:
+            self._scope.requirements.add(req)
 
         return self
 
 
-scope_registry = DictRegistry()
-
-
-class ScopeMeta(type):
-    def __new__(cls, name, bases, nmspc, *, abstract=False, **kwargs):
-        return super().__new__(cls, name, bases, nmspc, **kwargs)
-
-    def __init__(cls, classname, bases, nmspc, *, abstract=False):
-        if not abstract:
-            identity = nmspc.get("identity")
-            assert isinstance(identity, str)
-            setattr(cls, "requirements", RequirementList())
-            scope_registry.register(cls)
-
-        for name, perm in cls.__dict__.items():
-            if isinstance(perm, Permission):
-                perm.bind(name, scope=cls)
-
-        super().__init__(classname, bases, nmspc)
-
-    def values(cls, **kwargs):
-        assert len(kwargs) == 0
-        yield from (p for p in cls.__dict__.values() if isinstance(p, Permission))
-
-
-class Scope(metaclass=ScopeMeta, abstract=True):
-    registry: ClassVar[DictRegistry] = scope_registry
+class Scope:
+    registry: ClassVar[DictRegistry[type[Scope]]] = DictRegistry()
 
     identity: ClassVar[str]
     label: ClassVar[TrStr]
-    requirements: ClassVar[RequirementList]
 
-    if TYPE_CHECKING:
+    permissions: ClassVar[Sequence[Permission]]
+    requirements: ClassVar[Requirements]
 
-        @classmethod
-        def values(cls, **kwargs) -> Generator[Permission, None, None]: ...
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+
+        assert isinstance(cls.identity, str)
+        if cls.__bases__ != (Scope,):
+            raise TypeError(f"Must inherit directly from Scope, not {cls.__bases__}")
+
+        assert getattr(cls, "permissions", []), "Scope without permissions"
+
+        cls.registry.register(cls)
+
+    @classmethod
+    def _register_permission(cls, perm: Permission) -> None:
+        if (permissions := cls.__dict__.get("permissions")) is None:
+            permissions = cls.permissions = list[Permission]()
+
+        assert perm not in permissions
+        permissions.append(perm)
+
+        if (requirements := cls.__dict__.get("requirements")) is None:
+            requirements = cls.requirements = Requirements()
+
+        for req in perm.requirements._list:
+            requirements.add(req)

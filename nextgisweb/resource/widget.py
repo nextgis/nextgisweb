@@ -1,53 +1,64 @@
+from __future__ import annotations
+
+from typing import Any, ClassVar, Final, Literal, cast
+
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid.tomb import Request
 
 from .model import Resource
 
-_registry = []
-
-
-class WidgetMeta(type):
-    def __init__(cls, name, bases, nmspc):
-        super().__init__(name, bases, nmspc)
-        if not nmspc.get("__abstract__", False):
-            _registry.append(cls)
+type WidgetOperation = Literal["create", "update"]
 
 
 class WidgetBase:
-    def __init__(self, operation, obj, request: Request):
+    # Hybrid attribute: tuple for class, single value for instance
+    operation: tuple[WidgetOperation, ...] | WidgetOperation
+
+    resource: ClassVar[type[Resource]] = Resource
+    interface: ClassVar[type | None] = None
+
+    obj: Final[Resource]
+    request: Final[Request]
+
+    def __init__(self, operation: WidgetOperation, obj: Resource, request: Request) -> None:
         self.operation = operation
         self.obj = obj
         self.request = request
 
 
-class Widget(WidgetBase, metaclass=WidgetMeta):
-    __abstract__ = True
+_registry = []
 
-    def is_applicable(self):
-        operation = self.operation in self.__class__.operation
-        resclass = not hasattr(self.__class__, "resource") or isinstance(
-            self.obj,
-            self.__class__.resource,
+
+class Widget(WidgetBase):
+    amdmod: ClassVar[str]
+
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+        _registry.append(cls)
+
+    def is_applicable(self) -> bool:
+        assert isinstance(self.operation, str)
+
+        return (
+            (self.operation in type(self).operation)
+            and (isinstance(self.obj, self.resource))
+            and ((iface := self.interface) is None or cast(Any, iface).providedBy(self.obj))
         )
-        interface = not hasattr(
-            self.__class__, "interface"
-        ) or self.__class__.interface.providedBy(self.obj)
-        return operation and resclass and interface
 
-    def config(self):
+    def config(self) -> dict:
         return dict()
 
 
 class CompositeWidget(WidgetBase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, operation: WidgetOperation, obj: Resource, request: Request) -> None:
+        super().__init__(operation, obj, request)
         self.members = []
         for mcls in _registry:
-            member = mcls(*args, **kwargs)
+            member = mcls(operation, obj, request)
             if member.is_applicable():
                 self.members.append(member)
 
-    def config(self):
+    def config(self) -> dict:
         result = dict()
         for m in self.members:
             result[m.amdmod] = m.config()
@@ -66,7 +77,7 @@ class ResourcePermissionWidget(Widget):
     amdmod = jsentry("@nextgisweb/resource/permissions-widget")
 
 
-class ResourceDescriptionWiget(Widget):
+class ResourceDescriptionWidget(Widget):
     resource = Resource
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/resource/description-editor")

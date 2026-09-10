@@ -1,7 +1,8 @@
-from collections import namedtuple
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, cast
+from functools import cache
+from logging import DEBUG
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NamedTuple, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -10,10 +11,11 @@ from sqlalchemy import event, func, text
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Mapped, mapped_column
 
-from nextgisweb.env import Base, DBSession, gettext, gettextf
+from nextgisweb.env import Base, DBSession, gettext, gettextf, inject
 from nextgisweb.lib.apitype import Gap
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import TrStr
+from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import DictRegistry
 from nextgisweb.lib.safehtml import sanitize
 
@@ -25,39 +27,44 @@ from nextgisweb.jsrealm import TSExport
 from . import category
 from .exception import DisplayNameNotUnique, HierarchyError
 from .interface import IResourceAdapter, interface_registry
-from .permission import RequirementList
+from .permission import Permission, Requirement, Requirements
 from .sattribute import ResourceRef, SColumn, SRelationship, SResource
 from .scope import DataScope, ResourceScope, Scope
 from .serialize import CRUTypes, SAttribute, Serializer
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
-if TYPE_CHECKING:
-    ResourceCls = str
-    ResourceInterfaceIdentity = str
-    ResourceScopeIdentity = str
-else:
-    ResourceCls = Annotated[
+ResourceCls = (
+    str
+    if TYPE_CHECKING
+    else Annotated[
         Gap("ResourceCls", str),
         TSExport("ResourceCls"),
     ]
+)
 
-    ResourceInterfaceIdentity = Annotated[
+ResourceInterfaceIdentity = (
+    str
+    if TYPE_CHECKING
+    else Annotated[
         Gap("ResourceInterfaceIdentity", str),
         TSExport("ResourceInterface"),
     ]
+)
 
-    ResourceScopeIdentity = Annotated[
+ResourceScopeIdentity = (
+    str
+    if TYPE_CHECKING
+    else Annotated[
         Gap("ResourceScopeIdentity", str),
         TSExport("ResourceScope"),
     ]
+)
 
 
 Base.depends_on("auth")
 
 resource_registry = DictRegistry[type["Resource"]]()
-
-PermissionSets = namedtuple("PermissionSets", ("allow", "deny", "mask"))
 
 
 class ResourceMeta(orm.DeclarativeMeta):
@@ -119,6 +126,12 @@ class ResourceMeta(orm.DeclarativeMeta):
 
 
 ResourceScopeType = tuple[type[Scope], ...] | type[Scope]
+
+
+class PermissionSets(NamedTuple):
+    allow: set[Permission]
+    deny: set[Permission]
+    mask: set[Permission]
 
 
 class Resource(Base, metaclass=ResourceMeta):
@@ -253,26 +266,49 @@ class Resource(Base, metaclass=ResourceMeta):
     # Permissions
 
     @classmethod
-    def class_permissions(cls):
+    @cache
+    def class_permissions(cls) -> frozenset[Permission]:
         """Permissions applicable to this resource class"""
 
-        result = set()
-        for scope in cls.scope.values():
-            result.update(scope.values())
+        assert issubclass(cls, Resource) and cls is not Resource
 
-        return frozenset(result)
+        result = frozenset(perm for scope in cls.scope.values() for perm in scope.permissions)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(
+                "%s class permissions: %s",
+                cls.__name__,
+                ",".join(str(p) for p in result),
+            )
+
+        return result
 
     @classmethod
-    def class_requirements(cls):
-        result = RequirementList()
+    @cache
+    def class_requirements(cls) -> tuple[Requirement, ...]:
+        assert issubclass(cls, Resource) and cls is not Resource
+
+        requirements = Requirements()
         for scope in cls.scope.values():
             for req in scope.requirements:
                 if req.cls is None or issubclass(cls, req.cls):
-                    result.append(req)
-        result.toposort()
-        return tuple(result)
+                    requirements.add(req)
 
-    def permission_sets(self, user):
+        result = tuple(requirements)
+
+        if logger.isEnabledFor(DEBUG):
+            for req in result:
+                logger.debug(
+                    "%s -> %s REQUIRES %s ON %s%s",
+                    cls.__name__,
+                    req.dst,
+                    req.src,
+                    req.attr or "self",
+                    "" if not req.attr or not req.attr_empty else " IF SET",
+                )
+
+        return result
+
+    def permission_sets(self, user: User) -> PermissionSets:
         class_permissions = self.class_permissions()
 
         if user.superuser:
@@ -316,16 +352,17 @@ class Resource(Base, metaclass=ResourceMeta):
 
         return PermissionSets(allow=allow, deny=deny, mask=mask)
 
-    def permissions(self, user):
+    def permissions(self, user: User) -> set[Permission]:
         sets = self.permission_sets(user)
         return sets.allow - sets.mask - sets.deny
 
-    def has_permission(self, permission, user):
+    def has_permission(self, permission: Permission, user: User) -> bool:
         return permission in self.permissions(user)
 
-    def has_export_permission(self, user):
+    @inject()
+    def has_export_permission(self, user: User, *, core: CoreComponent = inject.arg()) -> bool:
         try:
-            value = CoreComponent.current().settings_get("resource", "resource_export")
+            value = core.settings_get("resource", "resource_export")
         except KeyError:
             value = "data_read"
 
@@ -458,16 +495,16 @@ class ResourceACLRule(Base):
         ),
     )
 
-    def cmp_user(self, user):
+    def cmp_user(self, user: User) -> bool:
         principal = self.principal
         return (isinstance(principal, User) and principal.compare(user)) or (
             isinstance(principal, Group) and principal.is_member(user)
         )
 
-    def cmp_identity(self, identity):
+    def cmp_identity(self, identity: ResourceCls) -> bool:
         return (self.identity == "") or (self.identity == identity)
 
-    def cmp_permission(self, permission):
+    def cmp_permission(self, permission: Permission) -> bool:
         pname = permission.name
         pscope = permission.scope.identity
 

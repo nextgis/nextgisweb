@@ -1,33 +1,48 @@
-from collections import defaultdict, namedtuple
+from __future__ import annotations
 
-ExplainDefault = namedtuple("ExplainDefault", ["result", "resource"])
-ExplainACLRule = namedtuple("ExplainACLRule", ["result", "resource", "acl_rule"])
-ExplainRequirement = namedtuple(
-    "ExplainRequirement",
-    [
-        "result",
-        "resource",
-        "requirement",
-        "satisfied",
-        "resolver",
-    ],
-)
+from collections import defaultdict
+from collections.abc import Generator, Iterable
+from typing import Final, NamedTuple, cast
+
+from nextgisweb.auth import User
+
+from .model import Resource, ResourceACLRule
+from .permission import Permission
+
+
+class ExplainDefault(NamedTuple):
+    result: bool
+    resource: Resource
+
+
+class ExplainACLRule(NamedTuple):
+    result: bool
+    resource: Resource
+    acl_rule: ResourceACLRule
+
+
+class ExplainRequirement(NamedTuple):
+    result: bool
+    resource: Resource | None
+    requirement: object
+    satisfied: bool
+    resolver: PermissionResolver | None
 
 
 class PermissionResolver:
-    def __init__(self, resource, user, permissions=None, explain=False):
-        self._resource = resource
-        self._user = user
-        self._permissions = permissions
-        self._explain = explain
+    def __init__(
+        self,
+        resource: Resource,
+        *,
+        user: User,
+        permissions: Iterable[Permission] | None = None,
+        explain: bool = False,
+    ) -> None:
+        self.resource: Final = resource
+        self.user: Final = user
+        self.permissions: Final = permissions
+        self.explain: Final = explain
 
-        self._solve(resource, user, permissions, explain)
-
-    @property
-    def resource(self):
-        return self._resource
-
-    def _solve(self, resource, user, permissions, explain):
         req_list = resource.class_requirements()
 
         # Directly requested permissions
@@ -49,10 +64,8 @@ class PermissionResolver:
 
         perm_rest = set(perm_req)
 
-        result = self._result = dict([(perm, None) for perm in perm_all])
-        explanation = self._explanation = (
-            dict([(perm, list()) for perm in perm_all]) if explain else None
-        )
+        result = self._result = {perm: cast(bool | None, None) for perm in perm_all}
+        explanation = self._explanation = {perm: [] for perm in perm_all} if explain else None
 
         for perm, rule in _acl_rules(resource, user, perm_all):
             if rule.action == "allow":
@@ -61,16 +74,19 @@ class PermissionResolver:
                 result[perm] = False
                 perm_rest.remove(perm)
             else:
-                raise ValueError("Invalid action '{}'".format(rule.action))
-            if explain:
-                explanation[perm].append(ExplainACLRule(result[perm], rule.resource, rule))
+                raise NotImplementedError
+
+            if explanation is not None:
+                rule_result = result[perm]
+                assert rule_result is not None
+                explanation[perm].append(ExplainACLRule(rule_result, rule.resource, rule))
 
         for perm, value in result.items():
             if value is None:
                 result[perm] = False
                 perm_rest.remove(perm)
-                if explain:
-                    explanation[perm].append(ExplainDefault(result[perm], resource))
+                if explanation:
+                    explanation[perm].append(ExplainDefault(False, resource))
 
         if len(perm_rest) == 0:
             return
@@ -87,16 +103,18 @@ class PermissionResolver:
         for req in req_list:
             req_dst, req_src = req.dst, req.src
             if req.attr is None:
-                assert len(dependencies[req_src]) == 0, "{} evaluated before {}".format(
-                    req, dependencies[req_src]
+                assert len(dependencies[req_src]) == 0, (
+                    f"{req} evaluated before {dependencies[req_src]}"
                 )
                 req_satisfied = result[req_src] is True
                 if not req_satisfied:
                     result[req_dst] = False
                     perm_rest.remove(req_dst)
-                if explain:
+                if explanation:
+                    req_result = result[req_dst]
+                    assert req_result is not None
                     explanation[req_dst].append(
-                        ExplainRequirement(result[req_dst], resource, req, req_satisfied, None)
+                        ExplainRequirement(req_result, resource, req, req_satisfied, None)
                     )
             else:
                 attrval = getattr(resource, req.attr)
@@ -104,22 +122,31 @@ class PermissionResolver:
                     if not req.attr_empty:
                         result[req_dst] = False
                         perm_rest.remove(req_dst)
-                    if explain:
+                    if explanation:
+                        req_result = result[req_dst]
+                        assert req_result is not None
                         explanation[req_dst].append(
-                            ExplainRequirement(
-                                result[req_dst], None, req, not req.attr_empty, None
-                            )
+                            ExplainRequirement(req_result, None, req, not req.attr_empty, None)
                         )
                 else:
-                    attr_resolver = PermissionResolver(attrval, user, (req_src,), explain)
+                    attr_resolver = PermissionResolver(
+                        attrval,
+                        user=user,
+                        permissions=(req_src,),
+                        explain=explain,
+                    )
+
                     req_satisfied = attr_resolver._result[req_src] is True
+
                     if not req_satisfied:
                         result[req_dst] = False
                         perm_rest.remove(req_dst)
-                    if explain:
+                    if explanation:
+                        req_result = result[req_dst]
+                        assert req_result is not None
                         explanation[req_dst].append(
                             ExplainRequirement(
-                                result[req_dst], attrval, req, req_satisfied, attr_resolver
+                                req_result, attrval, req, req_satisfied, attr_resolver
                             )
                         )
 
@@ -127,7 +154,11 @@ class PermissionResolver:
                 dependencies[req_dst].remove(req)
 
 
-def _acl_rules(resource, user, permissions):
+def _acl_rules(
+    resource: Resource,
+    user: User,
+    permissions: Iterable[Permission],
+) -> Generator[tuple[Permission, ResourceACLRule], None, None]:
     for res in tuple(resource.parents) + (resource,):
         rules = filter(
             lambda rule: (

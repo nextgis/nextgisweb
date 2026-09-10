@@ -1,11 +1,14 @@
 from collections import defaultdict
 
-from ..model import resource_registry
+from ..model import Resource, resource_registry
 
 
 def test_requirement_ordering():
-    for resource_cls in resource_registry.values():
-        requirements = resource_cls.class_requirements()
+    for cls in resource_registry.values():
+        if cls is Resource:
+            continue
+
+        requirements = cls.class_requirements()
 
         dependencies = defaultdict(set)
         for req in requirements:

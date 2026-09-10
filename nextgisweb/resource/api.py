@@ -122,7 +122,7 @@ def blueprint(request: Request) -> Blueprint:
                         identity=perm.name,
                         label=tr(perm.label),
                     )
-                    for perm in scope.values()
+                    for perm in scope.permissions
                 },
             )
             for sid, scope in Scope.registry.items()
@@ -413,7 +413,7 @@ else:
                     perm.name,
                     annotate(bool, [Meta(description=f"{scope.label}: {perm.label}")]),
                 )
-                for perm in scope.values()
+                for perm in scope.permissions
             ],
             module=scope.__module__,
         )
@@ -430,7 +430,7 @@ else:
 
 
 def permission(
-    resource,
+    resource: Resource,
     request: Request,
     *,
     user: UserID | None = None,
@@ -448,7 +448,7 @@ def permission(
     return EffectivePermissions(
         **{
             sid: scope_permissions_struct[sid](
-                **{p.name: (p in effective) for p in scope.values()},
+                **{perm.name: (perm in effective) for perm in scope.permissions},
             )
             for sid, scope in resource.scope.items()
         }
@@ -483,7 +483,12 @@ def permission_explain(request: Request) -> JSONType:
     else:
         permissions = None
 
-    resolver = PermissionResolver(request.context, user, permissions, explain=True)
+    resolver = PermissionResolver(
+        request.context,
+        user=user,
+        permissions=permissions,
+        explain=True,
+    )
 
     def _jsonify_principal(principal):
         result = dict(id=principal.id)
@@ -492,32 +497,31 @@ def permission_explain(request: Request) -> JSONType:
             result["keyname"] = principal.keyname
         return result
 
-    def _explain_jsonify(value):
+    def _explain_jsonify(value: PermissionResolver | None):
         if value is None:
+            return None
+
+        if (explanation := value._explanation) is None:
             return None
 
         result = dict()
         for scope_identity, scope in value.resource.scope.items():
             n_scope = result.get(scope_identity)
-            for perm in scope.values():
+            for perm in scope.permissions:
                 if perm in value._result:
                     if n_scope is None:
                         n_scope = result[scope_identity] = dict()
                     n_perm = n_scope[perm.name] = dict()
                     n_perm["result"] = value._result[perm]
                     n_explain = n_perm["explain"] = list()
-                    for item in value._explanation[perm]:
-                        i_res = item.resource
-
-                        n_item = dict(
-                            result=item.result,
-                            resource=dict(id=i_res.id) if i_res else None,
-                        )
-
+                    for item in explanation[perm]:
+                        n_item: dict = {"result": item.result}
                         n_explain.append(n_item)
+
                         if isinstance(item, ExplainACLRule):
                             n_item["type"] = "acl_rule"
-                            if i_res.has_permission(ResourceScope.read, request.user):
+                            n_item["resource"] = {"id": item.resource.id}
+                            if item.resource.has_permission(ResourceScope.read, request.user):
                                 n_item["acl_rule"] = {
                                     "action": item.acl_rule.action,
                                     "principal": _jsonify_principal(item.acl_rule.principal),
@@ -529,7 +533,10 @@ def permission_explain(request: Request) -> JSONType:
 
                         elif isinstance(item, ExplainRequirement):
                             n_item["type"] = "requirement"
-                            if i_res is None or i_res.has_permission(
+                            n_item["resource"] = (
+                                {"id": item.resource.id} if item.resource else None
+                            )
+                            if item.resource is None or item.resource.has_permission(
                                 ResourceScope.read, request.user
                             ):
                                 n_item["requirement"] = {
@@ -543,9 +550,11 @@ def permission_explain(request: Request) -> JSONType:
 
                         elif isinstance(item, ExplainDefault):
                             n_item["type"] = "default"
+                            n_item["resource"] = {"id": item.resource.id}
 
                         else:
-                            raise ValueError("Unknown explain item: {}".format(item))
+                            raise NotImplementedError
+
         return result
 
     return _explain_jsonify(resolver)

@@ -158,28 +158,25 @@ def effective_permisssions(request: Request):
 # TODO: Move to API
 def schema(request: Request) -> JSONType:
     tr = request.translate
-    resources = dict()
-    scopes = dict()
 
-    for identity, cls in resource_registry.items():
-        resources[identity] = dict(
-            identity=identity,
-            label=tr(cls.cls_display_name),
-            scopes=list(cls.scope.keys()),
-        )
-
-    for k, scp in Scope.registry.items():
-        spermissions = dict()
-        for p in scp.values():
-            spermissions[p.name] = dict(label=tr(p.label))
-
-        scopes[k] = dict(
-            identity=k,
-            permissions=spermissions,
-            label=tr(scp.label),
-        )
-
-    return dict(resources=resources, scopes=scopes)
+    return dict(
+        resources={
+            identity: {
+                "identity": identity,
+                "label": tr(cls.cls_display_name),
+                "scopes": list(cls.scope.keys()),
+            }
+            for identity, cls in resource_registry.items()
+        },
+        scopes={
+            identity: {
+                "identity": identity,
+                "permissions": {p.name: {"label": tr(p.label)} for p in scp.permissions},
+                "label": tr(scp.label),
+            }
+            for identity, scp in Scope.registry.items()
+        },
+    )
 
 
 @dataclass

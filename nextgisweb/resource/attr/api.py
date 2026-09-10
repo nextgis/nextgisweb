@@ -155,7 +155,7 @@ def setup_pyramid(comp: ResourceComponent, config: Configurator):
 
     permissions = list()
     for scope_cls in Scope.registry.values():
-        for perm in scope_cls.values():
+        for perm in scope_cls.permissions:
             permissions.append(f"{scope_cls.identity}.{perm.name}")
     fillgap(ResourcePermissionGap, make_literal(permissions))
 
