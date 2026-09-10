@@ -415,7 +415,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
   const selectResult = (resultInfo: SearchResult) => {
     setResultSelected(resultInfo);
 
-    display.map.zoomToGeom(resultInfo.geometry);
+    display.map.searchGeom(resultInfo.geometry);
 
     display.highlighter.highlight({ geom: resultInfo.geometry });
   };
