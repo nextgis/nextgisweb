@@ -210,7 +210,7 @@ class WFSConnection(Resource):
                 **kwargs,
             )
         except RequestException as exc:
-            logger.error("External service request failed: %s: %s", type(exc).__name__, exc)
+            logger.warning("External service request failed: %s: %s", type(exc).__name__, exc)
             raise ExternalServiceError(
                 gettext("Unable to get a response from the remote server."),
                 detail=f"{type(exc).__name__}.",
