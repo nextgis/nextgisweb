@@ -170,7 +170,7 @@ def setup_pyramid(comp: ResourceComponent, config):
     )
 
     cpost_body = annotate(
-        make_union(v.ctype for v in ResourceFavorite.registry.values()),
+        make_union(v.ctype() for v in ResourceFavorite.registry.values()),
         [TSExport(ResourceFavoriteCreate.__name__)],
     )
 
