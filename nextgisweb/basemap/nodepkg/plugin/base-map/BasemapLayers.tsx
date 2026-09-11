@@ -2,7 +2,10 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
-import type { WebmapPluginConfig } from "@nextgisweb/basemap/layer-widget/type";
+import type {
+  BasemapConfig,
+  WebmapPluginConfig,
+} from "@nextgisweb/basemap/layer-widget/type";
 import {
   addBaselayer,
   prepareBaselayerConfig,
@@ -12,6 +15,16 @@ import type { Display } from "@nextgisweb/webmap/display";
 import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
+
+const vectorTilesTestLayer: BasemapConfig = {
+  keyname: "vector_tiles",
+  display_name: "Vector style test layer",
+  adapter: "vector_tiles",
+  url: "https://tiles.versatiles.org/assets/styles/colorful-terrain/style.json",
+  enabled: true,
+  copyright_text: "© OpenStreetMap contributors",
+  copyright_url: "https://www.openstreetmap.org/copyright",
+};
 
 function removeBaselayer(map: MapStore, layer: CoreLayer) {
   if (map.layers[layer.name] === layer) {
@@ -38,9 +51,12 @@ const BasemapLayers = observer(
       () =>
         disabled
           ? []
-          : wmplugin.basemaps.length
-            ? wmplugin.basemaps
-            : settings.basemaps,
+          : [
+              vectorTilesTestLayer,
+              ...(wmplugin.basemaps.length
+                ? wmplugin.basemaps
+                : settings.basemaps),
+            ],
       [disabled, wmplugin.basemaps]
     );
 

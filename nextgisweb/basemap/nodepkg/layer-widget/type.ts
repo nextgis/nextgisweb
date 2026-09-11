@@ -18,6 +18,7 @@ export interface WebmapPluginConfig {
 }
 
 export interface BasemapConfig {
+  adapter?: "tms" | "vector_tiles";
   keyname: string;
   url: string;
   display_name: string;

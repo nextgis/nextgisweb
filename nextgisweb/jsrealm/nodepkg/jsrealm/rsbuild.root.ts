@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 
-import { defineConfig, loadConfig } from "@rsbuild/core";
+import { defineConfig, loadConfig, mergeRsbuildConfig } from "@rsbuild/core";
 import type { EnvironmentConfig, RsbuildConfig } from "@rsbuild/core";
 import { pluginEslint } from "@rsbuild/plugin-eslint";
 
@@ -18,7 +18,10 @@ export default defineConfig(async (): Promise<RsbuildConfig> => {
       const resolved = require.resolve(`${pkg.name}/${modFile}`);
       const { content } = await loadConfig({ path: resolved });
 
-      environments[name] = content;
+      environments[name] = mergeRsbuildConfig(
+        environments[name] ?? {},
+        content
+      );
     }
   }
 

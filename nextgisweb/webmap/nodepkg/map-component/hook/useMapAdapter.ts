@@ -10,8 +10,7 @@ import {
 import { useObjectState } from "@nextgisweb/gui/hook";
 import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
 import type { MapExtent, MapStore } from "@nextgisweb/webmap/ol/MapStore";
-import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
-import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
+import type { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type { ExtentWSEN } from "@nextgisweb/webmap/type/api";
 
 import { createMapAdapter } from "../util/createMapAdapter";
@@ -34,7 +33,7 @@ export function useMapAdapter({
   mapExtent: mapExtentProp,
   ...restViewOptions
 }: MapProps) {
-  const baseRef = useRef<QuadKey | XYZ | undefined>(undefined);
+  const baseRef = useRef<CoreLayer | undefined>(undefined);
 
   const [center] = useObjectState(centerProp);
   const [viewOptions] = useObjectState(restViewOptions);

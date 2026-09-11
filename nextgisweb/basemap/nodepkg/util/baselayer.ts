@@ -17,6 +17,9 @@ import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
 import { DEFAULT_SOURCE_MAX_ZOOM } from "../constant";
+import type MapLibreAdapter from "../maplibre-adapter/MapLibreAdapter";
+
+type Baselayer = QuadKey | XYZ | MapLibreAdapter;
 
 const SAFE_URL_RE = new RegExp(pyramidSettings.urlSafePattern);
 
@@ -82,6 +85,7 @@ export function prepareBaselayerConfig(
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
+  adapter?: BasemapConfig["adapter"];
 } {
   const layer = {} as LayerOptions;
   let source = {} as XYZSourceOptions;
@@ -92,6 +96,22 @@ export function prepareBaselayerConfig(
 
   const keyname = "keyname" in config ? config.keyname : undefined;
   layer.title = config.display_name;
+
+  if ("adapter" in config && config.adapter === "vector_tiles") {
+    return {
+      adapter: config.adapter,
+      source: { url: config.url },
+      layer: {
+        ...layer,
+        visible: config.enabled ?? undefined,
+        opacity: config.opacity ?? undefined,
+        minZoom: config.z_min ?? undefined,
+      },
+      keyname,
+      copyrightText: config.copyright_text,
+      copyrightUrl: config.copyright_url,
+    };
+  }
 
   if ("qms" in config && config.qms) {
     try {
@@ -180,13 +200,15 @@ export async function createTileLayer({
   keyname,
   copyrightText,
   copyrightUrl,
+  adapter = "tms",
 }: {
   source: Omit<XYZSourceOptions, "attributions">;
   layer?: LayerOptions;
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
-}): Promise<QuadKey | XYZ | undefined> {
+  adapter?: BasemapConfig["adapter"];
+}): Promise<Baselayer | undefined> {
   if (!keyname) {
     keyname = `basemap_${idx++}`;
   }
@@ -197,6 +219,15 @@ export async function createTileLayer({
   };
 
   try {
+    if (adapter === "vector_tiles") {
+      if (!source.url) throw new Error("MapLibre style URL is required");
+      const { default: MapLibreAdapter } =
+        await import("../maplibre-adapter/MapLibreAdapter");
+      return new MapLibreAdapter(keyname, layerOptions, {
+        url: source.url,
+        attributions: sourceWithAttributions.attributions,
+      });
+    }
     const MID = sourceWithAttributions.url?.includes("{q}")
       ? (await import("@nextgisweb/webmap/ol/layer/QuadKey")).default
       : (await import("@nextgisweb/webmap/ol/layer/XYZ")).default;
@@ -218,8 +249,9 @@ export async function addBaselayer({
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
+  adapter?: BasemapConfig["adapter"];
   map: MapStore;
-}): Promise<QuadKey | XYZ | undefined> {
+}): Promise<Baselayer | undefined> {
   const layer = await createTileLayer(layerOptions);
   if (layer) {
     if (layer.olLayer.getVisible()) {
@@ -227,16 +259,16 @@ export async function addBaselayer({
     }
     layer.isBaseLayer = true;
     map.addLayer(layer);
-    return layer as QuadKey | XYZ;
+    return layer;
   }
 }
 
 export async function addBasemaps(
   basemaps: WebmapPluginBaselayer[] | BasemapConfig[],
   map: MapStore
-): Promise<(QuadKey | XYZ)[]> {
+): Promise<Baselayer[]> {
   let isDefaultExisted = false;
-  const layers: (QuadKey | XYZ)[] = [];
+  const layers: Baselayer[] = [];
   for (const { ...bm } of basemaps) {
     try {
       if (bm.enabled && !isDefaultExisted) {
