@@ -85,7 +85,7 @@ export function prepareBaselayerConfig(
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
-  adapter?: BasemapConfig["type"];
+  type?: BasemapConfig["type"];
 } {
   const layer = {} as LayerOptions;
   let source = {} as XYZSourceOptions;
@@ -99,7 +99,7 @@ export function prepareBaselayerConfig(
 
   if ("type" in config && config.type === "vector_tiles") {
     return {
-      adapter: config.type,
+      type: config.type,
       source: { url: config.url },
       layer: {
         ...layer,
@@ -200,14 +200,14 @@ export async function createTileLayer({
   keyname,
   copyrightText,
   copyrightUrl,
-  adapter = "tms",
+  type = "tms",
 }: {
   source: Omit<XYZSourceOptions, "attributions">;
   layer?: LayerOptions;
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
-  adapter?: BasemapConfig["type"];
+  type?: BasemapConfig["type"];
 }): Promise<Baselayer | undefined> {
   if (!keyname) {
     keyname = `basemap_${idx++}`;
@@ -219,7 +219,7 @@ export async function createTileLayer({
   };
 
   try {
-    if (adapter === "vector_tiles") {
+    if (type === "vector_tiles") {
       if (!source.url) throw new Error("MapLibre style URL is required");
       const { default: MapLibreAdapter } =
         await import("../maplibre-adapter/MapLibreAdapter");
@@ -249,7 +249,7 @@ export async function addBaselayer({
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
-  adapter?: BasemapConfig["type"];
+  type?: BasemapConfig["type"];
   map: MapStore;
 }): Promise<Baselayer | undefined> {
   const layer = await createTileLayer(layerOptions);

@@ -92,6 +92,9 @@ class MapLibreStyleLayerRenderer extends LayerRenderer<MapLibreStyleLayer> {
       this.container.style.visibility = "visible";
     });
 
+    mapLibreMap.on("dataloading", () => this.setReady(false));
+    mapLibreMap.on("idle", () => this.setReady(true));
+
     mapLibreMap.setStyle(this.styleUrl, {
       transformStyle: (_previous, next) => {
         const { terrain: _, ...result } = next;
@@ -101,6 +104,13 @@ class MapLibreStyleLayerRenderer extends LayerRenderer<MapLibreStyleLayer> {
 
     this.mapLibreMap = mapLibreMap;
     return mapLibreMap;
+  }
+
+  private setReady(ready: boolean) {
+    if (this.ready === ready) return;
+
+    this.ready = ready;
+    this.getLayer().changed();
   }
 
   private updateSize(size: Size) {
