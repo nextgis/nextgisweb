@@ -18,10 +18,10 @@ export interface WebmapPluginConfig {
 }
 
 export interface BasemapConfig {
-  adapter?: "tms" | "vector_tiles";
   keyname: string;
   url: string;
   display_name: string;
+  type?: "tms" | "vector_tiles";
   epsg?: number | null;
   opacity?: number | null;
   enabled?: boolean | null;

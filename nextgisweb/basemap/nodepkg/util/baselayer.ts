@@ -85,7 +85,7 @@ export function prepareBaselayerConfig(
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
-  adapter?: BasemapConfig["adapter"];
+  adapter?: BasemapConfig["type"];
 } {
   const layer = {} as LayerOptions;
   let source = {} as XYZSourceOptions;
@@ -97,9 +97,9 @@ export function prepareBaselayerConfig(
   const keyname = "keyname" in config ? config.keyname : undefined;
   layer.title = config.display_name;
 
-  if ("adapter" in config && config.adapter === "vector_tiles") {
+  if ("type" in config && config.type === "vector_tiles") {
     return {
-      adapter: config.adapter,
+      adapter: config.type,
       source: { url: config.url },
       layer: {
         ...layer,
@@ -207,7 +207,7 @@ export async function createTileLayer({
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
-  adapter?: BasemapConfig["adapter"];
+  adapter?: BasemapConfig["type"];
 }): Promise<Baselayer | undefined> {
   if (!keyname) {
     keyname = `basemap_${idx++}`;
@@ -249,7 +249,7 @@ export async function addBaselayer({
   keyname?: string;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
-  adapter?: BasemapConfig["adapter"];
+  adapter?: BasemapConfig["type"];
   map: MapStore;
 }): Promise<Baselayer | undefined> {
   const layer = await createTileLayer(layerOptions);

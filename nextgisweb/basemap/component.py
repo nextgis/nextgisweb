@@ -1,3 +1,5 @@
+from typing import Literal
+
 from msgspec import Struct
 
 from nextgisweb.env import Component, require
@@ -7,6 +9,7 @@ from nextgisweb.lib.config import Option
 class BasemapConfig(Struct, kw_only=True):
     keyname: str
     display_name: str
+    type: Literal["tms", "vector_tiles"]
     url: str
     copyright_text: str | None
     copyright_url: str | None
@@ -41,7 +44,8 @@ class BasemapComponent(Component):
                 BasemapConfig(
                     keyname="osm-mapnik",
                     display_name="OpenStreetMap",
-                    url="https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    type="tms",
+                    url="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                     copyright_text="© OpenStreetMap contributors",
                     copyright_url="https://www.openstreetmap.org/copyright",
                     enabled=True,
@@ -66,6 +70,7 @@ class BasemapComponent(Component):
                 BasemapConfig(
                     keyname=prefixed.get(f"{k}.keyname"),
                     display_name=prefixed.get(f"{k}.display_name"),
+                    type=prefixed.get(f"{k}.type") or "tms",
                     url=prefixed.get(f"{k}.url"),
                     epsg=prefixed.get(f"{k}.epsg"),
                     copyright_text=prefixed.get(f"{k}.copyright_text"),
@@ -83,6 +88,7 @@ class BasemapComponent(Component):
         Option("no_preset", bool, default=False, doc="Disable preset basemaps"),
         Option("preset.*.keyname", str, doc="Preset basemap keyname"),
         Option("preset.*.display_name", str, doc="Preset basemap display name"),
+        Option("preset.*.type", str, default="tms", doc="Preset basemap type (tms or vector_tiles)"),
         Option("preset.*.url", str, doc="Preset basemap URL template"),
         Option("preset.*.epsg", int, default=None, doc="Preset basemap EPSG code"),
         Option("preset.*.copyright_text", str, default=None, doc="Preset basemap copyright text"),
