@@ -4,8 +4,7 @@ import sys
 from collections.abc import Mapping
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Self
-from warnings import warn
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Self
 
 from nextgisweb.lib.config import ConfigOptions, Option
 from nextgisweb.lib.i18n import trstr_factory
@@ -19,110 +18,82 @@ if TYPE_CHECKING:
     from .environment import Env
 
 
-class ComponentMeta(type):
-    def __new__(mcls, name, bases, nmspc):
-        module = nmspc["__module__"]
-        module_parts = module.split(".")
-
-        last_part = module_parts.pop(-1)
-        nmspc["module"] = module_init = ".".join(module_parts)
-        assert last_part == "component", f"{name} must be declared in {module_init}.component"
-        assert 1 <= len(module_parts) <= 2
-
-        nmspc["package"] = package = module_parts[0]
-        assert package == "nextgisweb" or package.startswith("nextgisweb_")
-
-        nmspc["root_path"] = module_path(module_init)
-
-        # Skip Component base class from processing
-        if bases != ():
-            # Determine the identity from module name
-            if len(module_parts) == 2:
-                auto_identity = module_parts[-1]
-            elif len(module_parts) == 1:
-                auto_identity = package[len("nextgisweb_") :]
-            else:
-                assert False
-
-            logger.debug("Identity '%s' determined from '%s' module.", auto_identity, module)
-
-            identity = nmspc.get("identity")
-            assert identity is None or identity == auto_identity
-
-            if identity is None:
-                nmspc["identity"] = identity = auto_identity
-            else:
-                assert identity == auto_identity
-                warn(
-                    f"{name}.identity definition can be removed starting from "
-                    f"nextgisweb >= 4.5.0.dev7.",
-                    DeprecationWarning,
-                    2,
-                )
-
-            assert name.lower() == identity.replace("_", "").lower() + "component", (
-                f"Class name '{name}' doesn't match the '{identity}' identity."
-            )
-            nmspc["basename"] = name[: -len("Component")]
-
-        return super().__new__(mcls, name, bases, nmspc)
-
-    def __init__(cls: type[Component], name, bases, nmspc):
-        super().__init__(name, bases, nmspc)
-
-        # Skip Component base class from processing
-        if bases == ():
-            return
-
-        from .model import _base
-
-        # TODO: Switch to upcoming component module slots
-        model_mod_name = f"{cls.module}.model"
-        model_mod_exists = model_mod_name in sys.modules or find_spec(model_mod_name)
-
-        metadata = getattr(cls, "metadata", None)
-        if metadata is not None:
-            memoized = _base.memo.get(cls.identity)
-            assert memoized is not None
-            assert memoized.metadata is metadata
-            if model_mod_exists:
-                warn(
-                    f"{name}.metadata definition can be removed starting from "
-                    f"nextgisweb >= 4.5.0.dev6.",
-                    DeprecationWarning,
-                    2,
-                )
-        else:
-            if model_mod_exists and model_mod_name not in sys.modules:
-                __import__(model_mod_name)
-
-            if memoized := _base.memo.get(cls.identity):
-                cls.metadata = memoized.metadata
-
-
 @dict_registry
-class Component(metaclass=ComponentMeta):
+class Component:
+    """Base class for all components in NextGIS Web
+
+    A component must be declared in a module named ``component``. For the main ``nextgisweb``
+    package, the component must be placed under ``nextgisweb.<identity>.component``, where
+    ``<identity>`` is the component identity.
+
+    NextGIS Web extension packages must be named ``nextgisweb_<extension>``, so the component can be
+    declared in one of the following layouts:
+
+    * ``nextgisweb_<identity>.component`` for single-component extension.
+    * ``nextgisweb_<extension>.<identity>.component`` for multi-component extension.
+
+    The component class name must end with ``Component``. The remaining class name must match the
+    component identity case-insensitively, with underscores in the identity ignored. For example,
+    ``foo_bar`` corresponds to ``FooBarComponent``.
+    """
+
     registry: ClassVar[Mapping[str, type[Component]]]
     """Component classes registry"""
 
     identity: ClassVar[str]
-    """Identifier redefined in successors"""
+    """Component identity"""
 
     package: ClassVar[str]
-    """Top-level package name, usually 'nextgisweb' or 'nextgisweb_*'"""
+    """Top-level package name, ``nextgisweb`` or ``nextgisweb_<identity>`` or
+    ``nextgisweb_<extension>``"""
 
     module: ClassVar[str]
-    """Root module name: {package}.{identity} for multi-component and {package}
-    for single-component packages"""
+    """Root module name: ``nextgisweb.<identity>``, or ``nextgisweb_<identity>``, or
+    ``nextgisweb_<extension>.<identity>``"""
 
     root_path: ClassVar[Path]
-    """Path to a directory containing {module}"""
+    """Path to a directory containing :attr:`module`"""
 
     basename: ClassVar[str]
-    """Class name with 'Component' suffix removed (CoreComponent -> Core)"""
+    """Class name with ``Component`` suffix removed (``CoreComponent`` -> ``Core``)"""
 
     option_annotations: ClassVar[tuple[Option, ...]] = ()
     """Option annotations of component"""
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        conv = NamingConventions(cls.__name__, module=cls.__module__)
+
+        for a in ("package", "module", "identity", "basename", "root_path"):
+            if hasattr(cls, a):
+                raise TypeError(f"{cls.__name__}.{a} class attribute is forbidden")
+
+        cls.package = conv.package
+        cls.module = conv.module
+        cls.identity = conv.identity
+        cls.basename = conv.basename
+        cls.root_path = module_path(conv.module)
+
+        from .model import _base
+
+        if hasattr(cls, "metadata"):
+            raise TypeError(f"{cls.__name__}.metadata class attribute is forbidden")
+
+        # Autoload model module if it exists
+        model_mod_name = f"{cls.module}.model"
+        model_mod_exists = model_mod_name in sys.modules or find_spec(model_mod_name)
+
+        if model_mod_exists and model_mod_name not in sys.modules:
+            __import__(model_mod_name)
+
+        if memoized := _base.memo.get(cls.identity):
+            cls.metadata = memoized.metadata
+
+    def __new__(cls, *args, **kwargs):
+        if cls is Component:
+            raise TypeError("Component class cannot be instantiated directly")
+        return super().__new__(cls)
 
     def __init__(self, env: Env, settings: Mapping[str, Any]):
         self._env = env
@@ -191,14 +162,52 @@ class Component(metaclass=ComponentMeta):
         return ()
 
 
-def require(*deps):
-    """Decorator for dependencies between components methods.
-    When applied dependencies are written to private attributes of decorated
-    method. These private methods are used in
-    :py:meth:`~nextgisweb.env.Env.chain`.
+class NamingConventions:
+    """Class to enforce naming conventions for components"""
 
-    :param deps: One or many component identifiers which decorated method
-        execution depends on."""
+    def __init__(self, name: str, *, module: str) -> None:
+        parts = module.split(".")
+        last = parts.pop(-1)
+        init = ".".join(parts)
+        self.module: Final = init
+
+        if last != "component":
+            raise TypeError(f"{name} must be declared in {init}.component module")
+
+        self.package: Final = parts[0]
+        if (
+            len(parts) < 1
+            or len(parts) > 2
+            or not (self.package == "nextgisweb" or self.package.startswith("nextgisweb_"))
+        ):
+            raise TypeError(
+                f"{name} expected to be declared under 'nextgisweb' or 'nextgisweb_*' package"
+            )
+
+        if len(parts) == 2:
+            self.identity: Final = parts[-1]
+        elif len(parts) == 1:
+            self.identity: Final = self.package[len("nextgisweb_") :]
+        else:
+            raise NotImplementedError
+
+        logger.debug("Identity '%s' determined from '%s' module.", self.identity, self.module)
+
+        if not name.endswith("Component"):
+            raise TypeError(f"{name} must end with 'Component' suffix")
+        self.basename: Final = name.removesuffix("Component")
+
+        if self.basename.lower() != self.identity.replace("_", "").lower():
+            raise TypeError(f"Class name '{name}' doesn't match '{self.identity}' identity.")
+
+
+def require(*deps):
+    """Decorator for dependencies between components methods
+
+    When applied dependencies are written to private attributes of decorated method. These private
+    methods are used in :py:meth:`~nextgisweb.env.Env.chain`.
+
+    :param deps: One or many component identifiers which decorated method execution depends on."""
 
     def subdecorator(defn):
         def wrapper(*args, **kwargs):

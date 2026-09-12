@@ -1,10 +1,11 @@
-from pathlib import Path
-
-from ..component import Component
+from nextgisweb.core import CoreComponent
 
 
 def test_attributes():
-    assert Component.package == "nextgisweb"
-    assert Component.module == "nextgisweb.env"
-    assert Component.root_path == Path(__file__).parent.parent
-    assert Component.resource_path("test/__init__.py").is_file()
+    assert CoreComponent.package == "nextgisweb"
+    assert CoreComponent.module == "nextgisweb.core"
+    assert CoreComponent.identity == "core"
+    assert CoreComponent.basename == "Core"
+
+    assert str(CoreComponent.root_path).endswith("nextgisweb/nextgisweb/core")
+    assert CoreComponent.resource_path("test/__init__.py").is_file()
