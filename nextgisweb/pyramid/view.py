@@ -4,9 +4,9 @@ from base64 import b64decode
 from datetime import timedelta
 from functools import cache
 from hashlib import md5
-from itertools import chain
 from secrets import token_hex
 from time import sleep
+from typing import Iterable, Protocol
 
 from babel import Locale
 from babel.core import UnknownLocaleError
@@ -19,7 +19,8 @@ from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 from sqlalchemy.exc import NoResultFound
 
-from nextgisweb.env import DBSession, env, gettext, inject
+from nextgisweb.env import Component, DBSession, env, gettext, inject
+from nextgisweb.env.hook import ComponentHook, ComponentHookProtocol
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import JSONType, QueryString
 from nextgisweb.lib.datetime import utcnow_naive
@@ -30,6 +31,7 @@ from nextgisweb.lib.safehtml import URL_PATTERN
 
 from nextgisweb.core import CoreComponent, SupportUrl
 from nextgisweb.core.exception import ForbiddenError, NotConfigured, UserException
+from nextgisweb.core.sys_info import sys_info_hook
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 
@@ -66,6 +68,18 @@ class ModelFactory:
     @property
     def annotations(self):
         return {self.key: self.tdef}
+
+
+class TemplateIncludeProtocol(ComponentHookProtocol, Protocol):
+    def __call__[C: Component](self, comp: C) -> Iterable[str]: ...
+
+
+template_include_hook = ComponentHook[TemplateIncludeProtocol]("template_include_hook")
+
+
+@template_include_hook()
+def template_include(comp: PyramidComponent) -> Iterable[str]:
+    return ("nextgisweb:pyramid/template/update.mako",)
 
 
 def asset(request: Request):
@@ -239,8 +253,8 @@ def sysinfo(request: Request):
     packages.sort(key=lambda o: "" if o["name"] == "nextgisweb" else o["name"])
 
     platform = []
-    for comp in request.env.chain("sys_info"):
-        platform.extend((tr(k), tr(v)) for k, v in comp.sys_info())
+    for comp, func in sys_info_hook:
+        platform.extend((tr(k), tr(v)) for k, v in func(comp))
 
     def _browser_support(fid, fam):
         min_ver = request.env.component(PyramidComponent).options[f"uacompat.{fid}"]
@@ -629,12 +643,6 @@ def setup_pyramid(comp: PyramidComponent, config: Configurator):
             lg_ordered,
             default=lg_ordered[0],
         )
-
-    # Base template includes
-
-    comp._template_include = list(
-        chain(*[c.template_include for c in comp.env.chain("template_include")])
-    )
 
     # RENDERERS
 

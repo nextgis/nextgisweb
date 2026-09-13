@@ -1,9 +1,8 @@
 import transaction
 from sqlalchemy.sql import or_
 
-from nextgisweb.env import Component, DBSession, gettext, require
+from nextgisweb.env import Component, DBSession, require
 from nextgisweb.lib.config import Option, SizeInBytes
-from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.component import CoreComponent
@@ -47,10 +46,6 @@ class RasterLayerComponent(Component, WorkdirMixin):
         for layer in RasterLayer.query():
             if (err := layer._check_integrity()) is not None:
                 yield f"{err} [{RasterLayer.cls_display_name} #{layer.id}]"
-
-    def sys_info(self):
-        if self.size_limit is not None:
-            yield (gettext("Uncompressed raster size limit"), format_size(self.size_limit))
 
     def build_missing_overviews(self):
         logger.info("Building missing raster overviews...")

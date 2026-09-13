@@ -2,6 +2,8 @@ from nextgisweb.env import inject
 from nextgisweb.env.cli import EnvCommand, cli, opt
 from nextgisweb.lib.json import dumps
 
+from nextgisweb.core.stats import stats_hook
+
 from ..component import CoreComponent
 
 
@@ -20,10 +22,8 @@ def statistics(
         core.estimate_storage_all()
 
     result = dict()
-    assert self.env is not None
-    for comp in self.env.components.values():
-        if func := getattr(comp, "query_stat", None):
-            result[comp.identity] = func()
+    for comp, func in stats_hook:
+        result[comp.identity] = func(comp)
 
     print(dumps(result, pretty=True))
 

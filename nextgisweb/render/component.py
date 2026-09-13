@@ -41,11 +41,6 @@ class RenderComponent(Component):
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
-    def sys_info(self):
-        from .imgcodec import has_fpng
-
-        yield ("Fast PNG", gettext("Enabled") if has_fpng else gettext("Disabled"))
-
     def maintenance(self):
         self.cleanup()
 

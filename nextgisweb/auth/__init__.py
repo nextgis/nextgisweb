@@ -1,3 +1,4 @@
+from . import healthcheck, stats
 from .component import AuthComponent
 from .exception import UserDisabledException
 from .model import Group, OnFindReferencesData, Principal, User

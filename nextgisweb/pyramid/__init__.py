@@ -1,5 +1,6 @@
 from nextgisweb.lib.apitype import AsJSON, JSONType, XMLType
 
+from . import stats, sys_info
 from .component import CompanyLogo, CompanyUrl, HelpPageUrl, LinkPreviewDefaults, PyramidComponent
 from .model import Session, SessionStore
 from .session import WebSession

@@ -9,7 +9,7 @@ import transaction
 from pyramid.interfaces import ITweens
 from pyramid.response import Response
 
-from nextgisweb.env import Component, gettext, require
+from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.fileutil import update_text_file
@@ -151,10 +151,6 @@ class PyramidComponent(Component):
     def client_type(self, tdef: Any):
         self.client_types.append(tdef)
 
-    @property
-    def template_include(self):
-        return ("nextgisweb:pyramid/template/update.mako",)
-
     def maintenance(self):
         super().maintenance()
         self.cleanup()
@@ -168,40 +164,10 @@ class PyramidComponent(Component):
 
         logger.info("Deleted: %d sessions", deleted_sessions)
 
-    def sys_info(self):
-        try:
-            import uwsgi  # ty: ignore[unresolved-import]
-
-            yield ("uWSGI", uwsgi.version.decode())
-        except ImportError:
-            pass
-
-        if t := self.options["request_timeout"]:
-            yield (gettext("Request timeout"), str(t))
-
-        lunkwill = self.options["lunkwill.enabled"]
-        yield ("Lunkwill", gettext("Enabled") if lunkwill else gettext("Disabled"))
-
     def backup_configure(self, config):
         super().backup_configure(config)
         config.exclude_table_data("public", Session.__tablename__)
         config.exclude_table_data("public", SessionStore.__tablename__)
-
-    def query_stat(self):
-        core = self.env.component(CoreComponent)
-        result = dict()
-
-        try:
-            result["cors"] = len(core.settings_get("pyramid", "cors_allow_origin")) > 0
-        except KeyError:
-            result["cors"] = False
-
-        try:
-            result["custom_css"] = core.settings_get("pyramid", "custom_css").strip() != ""
-        except KeyError:
-            result["custom_css"] = False
-
-        return result
 
     # fmt: off
     option_annotations = OptionAnnotations((

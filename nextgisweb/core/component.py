@@ -1,22 +1,17 @@
-import multiprocessing
 import os
 import os.path
-import platform
 import re
-import sys
-import tempfile
 import uuid
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from pathlib import Path
-from subprocess import check_output
 
 import requests
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import UNSET
 from requests.exceptions import JSONDecodeError, RequestException
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.exc import NoResultFound, OperationalError
 from sqlalchemy.orm import configure_mappers
 
@@ -24,8 +19,6 @@ from nextgisweb.env import Component, DBSession, gettext, inject
 from nextgisweb.env.package import enable_qualifications, pkginfo
 from nextgisweb.lib import json
 from nextgisweb.lib.config import Option, SizeInBytes
-from nextgisweb.lib.datetime import utcnow_naive
-from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import postgres_url
 
 from nextgisweb.i18n import Localizer, Translations
@@ -129,69 +122,6 @@ class CoreComponent(StorageComponentMixin, Component):
 
         sa_engine.dispose()
 
-    def healthcheck(self):
-        stat = os.statvfs(self.options["sdir"])
-
-        if (free_space := self.options["healthcheck.free_space"]) > 0:
-            if (free_space_current := stat.f_bavail / stat.f_blocks * 100) < free_space:
-                return dict(
-                    success=False,
-                    message="%.2f%% free space left on file storage." % free_space_current,
-                )
-
-        if (
-            (free_inodes := self.options["healthcheck.free_inodes"]) > 0
-            and stat.f_ffree >= 0
-            and stat.f_files > 0  # Not available in some FS
-        ):
-            if (free_inodes_current := stat.f_ffree / stat.f_files * 100) < free_inodes:
-                return dict(
-                    success=False,
-                    message="%.2f%% free inodes left on file storage." % free_inodes_current,
-                )
-        try:
-            with tempfile.TemporaryFile(dir=self.options["sdir"]):
-                pass
-        except OSError:
-            return dict(success=False, message="Could not create a file on file storage.")
-
-        try:
-            sa_url = self._engine_url(error_on_pwfile=True)
-        except OSError:
-            return dict(success=False, message="Database password file is missing!")
-
-        sa_engine = create_engine(
-            sa_url,
-            connect_args=dict(
-                connect_timeout=int(self.options["database.connect_timeout"].total_seconds())
-            ),
-        )
-
-        try:
-            with sa_engine.connect() as conn:
-                conn.execute(text("SELECT 1"))
-        except OperationalError as exc:
-            msg = str(exc.orig).rstrip()
-            return dict(success=False, message="Database connection failed: " + msg)
-
-        sa_engine.dispose()
-
-        if (
-            (delta := self.options["backup.interval"]) is not None
-            and (last := self.settings_get(self.identity, "last_backup", None)) is not None
-            and (utcnow_naive() - datetime.fromisoformat(last)) > delta
-        ):
-            return dict(success=False, message="Backup has not been performed on time.")
-
-        if (
-            (delta := self.options["maintenance.interval"]) is not None
-            and (last := self.settings_get(self.identity, "last_maintenance", None)) is not None
-            and (utcnow_naive() - datetime.fromisoformat(last)) > delta
-        ):
-            return dict(success=False, message="Maintenance has not been performed on time.")
-
-        return dict(success=True)
-
     def initialize_db(self):
         self.init_settings(
             self.identity,
@@ -270,76 +200,6 @@ class CoreComponent(StorageComponentMixin, Component):
         except KeyError:
             self.settings_set(component, name, value)
 
-    def sys_info(self):
-        result = []
-        sysinfo_host_config = self.options["sysinfo_host_config"]
-
-        def try_check_output(cmd):
-            try:
-                return check_output(cmd, universal_newlines=True).strip()
-            except Exception:
-                msg = "Failed to get sys info with command: '%s'" % " ".join(cmd)
-                logger.error(msg, exc_info=True)
-
-        def cpu_info():
-            count = multiprocessing.cpu_count()
-            model = None
-            if cpuinfo := try_check_output(["cat", "/proc/cpuinfo"]):
-                for line in cpuinfo.split("\n"):
-                    if match := re.match(r"model name\s*:?(.*)", line):
-                        model = match.group(1).strip()
-            if not model:
-                model = platform.processor()
-            model = re.sub(r"\(?(TM|R)\)", "", model)
-            return f"{count} × {model}"
-
-        if sysinfo_host_config:
-            result.append((gettext("CPU"), cpu_info()))
-            mem_bytes = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
-            result.append((gettext("RAM"), f"{mem_bytes >> 20} MiB"))
-
-            result.append((gettext("Linux kernel"), platform.release()))
-            if os_distribution := try_check_output(["lsb_release", "-ds"]):
-                result.append((gettext("OS distribution"), os_distribution))
-
-        result.append(("Python", ".".join(map(str, sys.version_info[0:3]))))
-
-        postgres_version = DBSession.scalar(text("SHOW server_version"))
-        postgres_version = re.sub(r"\s\(.*\)$", "", postgres_version)
-
-        sql_extra = """
-            SELECT datcollate, datctype FROM pg_database
-            WHERE datname = current_database()
-        """
-        postgres_extra = list(DBSession.execute(text(sql_extra)).one())
-
-        sql_postgrespro = "SELECT EXISTS(SELECT * FROM pg_proc WHERE proname = 'pgpro_edition')"
-        if DBSession.scalar(text(sql_postgrespro)):
-            postgrespro_edition = DBSession.scalar(text("SELECT pgpro_edition()"))
-            postgres_extra.append(f"Postgres Pro {postgrespro_edition.capitalize()}")
-
-        result.append(("PostgreSQL", f"{postgres_version} ({', '.join(postgres_extra)})"))
-
-        postgis_version = DBSession.scalar(text("SELECT PostGIS_Lib_Version()"))
-        result.append(("PostGIS", postgis_version))
-
-        gdal_version = try_check_output(["gdal-config", "--version"])
-        if gdal_version is not None:
-            result.append(("GDAL", gdal_version))
-
-        if (instance_id := self.instance_id) is not None:
-            result.append((gettext("Instance ID"), instance_id))
-
-        if (lb := self.settings_get(self.identity, "last_backup", None)) is not None:
-            lb_dt = datetime.fromisoformat(lb).replace(microsecond=0)
-            result.append((gettext("Last backup"), lb_dt.strftime("%Y-%m-%d %H:%M UTC")))
-
-        if (lm := self.settings_get(self.identity, "last_maintenance", None)) is not None:
-            lm_dt = datetime.fromisoformat(lm).replace(microsecond=0)
-            result.append((gettext("Last maintenance"), lm_dt.strftime("%Y-%m-%d %H:%M UTC")))
-
-        return result
-
     def check_update(self):
         ngupdate_url = self.env.ngupdate_url
         if ngupdate_url is None:
@@ -374,24 +234,6 @@ class CoreComponent(StorageComponentMixin, Component):
             return data["distribution"].get("status") == "has_update"
 
         return False
-
-    def query_stat(self):
-        result = dict()
-        result["full_name"] = self.system_full_name()
-        fs_size = 0
-        for root, dirs, files in os.walk(self.options["sdir"]):
-            for f in files:
-                fs_size += os.stat(os.path.join(root, f), follow_symlinks=False).st_size
-        result["filesystem_size"] = fs_size
-        result["database_size"] = DBSession.query(
-            sa.func.pg_database_size(
-                sa.func.current_database(),
-            )
-        ).scalar()
-        if self.options["storage.enabled"]:
-            result["storage"] = self.query_storage()
-
-        return result
 
     @inject()
     def system_full_name(self, *, default_factory: SystemFullNameDefault = inject.arg()) -> str:

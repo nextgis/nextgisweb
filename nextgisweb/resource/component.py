@@ -198,24 +198,6 @@ class ResourceComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
-    @property
-    def template_include(self):
-        return ("nextgisweb:resource/template/favorite.mako",)
-
-    def query_stat(self):
-        query = DBSession.query(Resource.cls, sa.func.count(Resource.id)).group_by(Resource.cls)
-
-        total = 0
-        by_cls = dict()
-        for cls, count in query.all():
-            by_cls[cls] = count
-            total += count
-
-        query = DBSession.query(sa.func.max(Resource.creation_date))
-        cdate = query.scalar()
-
-        return dict(resource_count=dict(total=total, cls=by_cls), last_creation_date=cdate)
-
     # fmt: off
     option_annotations = (
         Option("disabled_cls", list, default=[], doc="Resource classes disabled for creation."),

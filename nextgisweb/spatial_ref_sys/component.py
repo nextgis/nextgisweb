@@ -57,9 +57,6 @@ class SpatialRefSysComponent(Component):
     def catalog_source(self) -> CatalogSource:
         return CatalogSource.REMOTE if self.options["catalog.url"] else CatalogSource.PROJ
 
-    def query_stat(self):
-        return dict(count=SRS.query().count())
-
     # fmt: off
     option_annotations = (
         Option("catalog.url", default=None, doc="Remote catalog URL. If not set, local PROJ data is used."),

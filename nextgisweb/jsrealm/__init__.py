@@ -1,3 +1,4 @@
+from . import sys_info
 from .component import JSRealmComponent
 from .entry import JSEntry, jsentry
 from .icon import Icon, icon

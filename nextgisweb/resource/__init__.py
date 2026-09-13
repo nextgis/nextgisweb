@@ -1,3 +1,4 @@
+from . import stats
 from .component import ResourceComponent
 from .exception import DisplayNameNotUnique, HierarchyError, ResourceNotFound, ValidationError
 from .favorite import ResourceFavoriteModel

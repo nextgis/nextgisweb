@@ -1,3 +1,4 @@
+from . import sys_info
 from .component import RenderComponent
 from .imgcodec import (
     COMPRESSION_BEST,

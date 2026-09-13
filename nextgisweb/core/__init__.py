@@ -1,3 +1,4 @@
+from . import healthcheck, stats, sys_info
 from .backup import BackupBase, BackupMetadata
 from .component import CoreComponent, SupportUrl, SystemFullNameDefault
 from .model import Setting

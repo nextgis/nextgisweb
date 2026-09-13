@@ -141,9 +141,6 @@ class Component:
     def check_integrity(self):
         pass
 
-    def sys_info(self):
-        return []
-
     def setup_pyramid(self, config):
         pass
 
@@ -156,10 +153,6 @@ class Component:
     @property
     def options(self):
         return self._options
-
-    @property
-    def template_include(self):
-        return ()
 
 
 class NamingConventions:

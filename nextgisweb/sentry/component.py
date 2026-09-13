@@ -94,10 +94,6 @@ class SentryComponent(Component):
     def setup_pyramid(self, config):
         from . import view  # noqa: F401
 
-    @property
-    def template_include(self):
-        return ("nextgisweb:sentry/template/init.mako",) if self.dsn_js else ()
-
     # fmt: off
     option_annotations = (
         Option("dsn.python", default=None, doc="DSN for Python SDK."),

@@ -29,6 +29,8 @@ from nextgisweb.auth import Permission
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import NotConfigured, ValidationError
 from nextgisweb.core.fontconfig import FONT_MAX_SIZE, FONT_PATTERN, CustomFont, FontKey, SystemFont
+from nextgisweb.core.healthcheck import healthcheck_hook
+from nextgisweb.core.stats import stats_hook
 from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
@@ -148,11 +150,10 @@ def healthcheck(
 
     :returns: Health check results"""
     result = HealthcheckResponse(success=True, component=dict())
-    for comp in request.env.components.values():
-        if func := getattr(comp, "healthcheck", None):
-            cresult = func()
-            result.success = result.success and cresult["success"]
-            result.component[comp.identity] = cresult
+    for comp, func in healthcheck_hook:
+        cresult = func(comp)
+        result.success = result.success and cresult["success"]
+        result.component[comp.identity] = cresult
 
     if not result.success:
         request.response.status_code = 503
@@ -166,10 +167,7 @@ def statistics(request: Request) -> AsJSON[dict[str, dict[str, Any]]]:
     :returns: Per-component statistics"""
     request.require_administrator()
 
-    result = dict()
-    for comp in request.env.components.values():
-        if func := getattr(comp, "query_stat", None):
-            result[comp.identity] = func()
+    result = {comp.identity: func(comp) for comp, func in stats_hook}
     return result
 
 

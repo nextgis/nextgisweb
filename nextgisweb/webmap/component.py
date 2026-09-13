@@ -1,6 +1,4 @@
-import sqlalchemy as sa
-
-from nextgisweb.env import Component, DBSession, gettext, require
+from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option
 
 from nextgisweb.auth import User
@@ -38,17 +36,6 @@ class WebMapComponent(Component):
 
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
-
-    def query_stat(self):
-        return dict(
-            item_type={
-                k: v
-                for (k, v) in DBSession.query(
-                    WebMapItem.item_type,
-                    sa.func.count(WebMapItem.id),
-                ).group_by(WebMapItem.item_type)
-            }
-        )
 
     def effective_legend_symbols(self):
         core = self.env.component(CoreComponent)

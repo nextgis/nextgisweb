@@ -3,8 +3,8 @@
 <%!
     from types import SimpleNamespace
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
-    from nextgisweb.pyramid.view import ICON_JSENTRY, LAYOUT_JSENTRY
     from nextgisweb.pyramid.util import get_text_direction
+    from nextgisweb.pyramid.view import ICON_JSENTRY, LAYOUT_JSENTRY, template_include_hook
 %>
 
 <%
@@ -57,8 +57,10 @@
         ${self.head()}
     %endif
 
-    %for template in request.env.pyramid._template_include:
-        <%include file="${template}"/>
+    %for comp, func in template_include_hook:
+        %for template in func(comp):
+            <%include file="${template}"/>
+        %endfor
     %endfor
 
     <script type="text/javascript">

@@ -8,10 +8,9 @@ from pathlib import Path
 from shutil import copyfileobj
 from typing import BinaryIO
 
-import sqlalchemy as sa
 import transaction
 
-from nextgisweb.env import Component, DBSession, inject
+from nextgisweb.env import Component, inject
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
@@ -56,27 +55,6 @@ class FileStorageComponent(Component):
             os.makedirs(path)
 
         return os.path.join(path, uuid)
-
-    def query_stat(self):
-        total_count = 0
-        total_size = 0
-        total_max = 0
-        component = dict()
-        for cid, count, csize, cmax in DBSession.query(
-            FileObj.component,
-            sa.func.count(FileObj.id),
-            sa.func.sum(FileObj.size).cast(sa.BigInteger),
-            sa.func.max(FileObj.size).cast(sa.BigInteger),
-        ).group_by(FileObj.component):
-            total_count += count
-            total_size += csize
-            total_max = max(total_max, cmax)
-            component[cid] = dict(count=count, size=csize, max=cmax)
-
-        return dict(
-            dict(count=total_count, size=total_size, max=total_max),
-            component=component,
-        )
 
     def maintenance(self):
         super().maintenance()

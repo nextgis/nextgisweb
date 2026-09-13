@@ -157,18 +157,6 @@ class AuthComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
-    def query_stat(self):
-        return dict(
-            user_count=_ucnt(),
-            local_count=_ucnt(User.password_hash.is_not(None)),
-            oauth_count=_ucnt(User.oauth_subject.is_not(None)),
-            last_activity=dict(
-                everyone=_ula(),
-                authenticated=_ula(User.keyname != "guest"),
-                administrator=_ula(User.member_of.any(keyname="administrators")),
-            ),
-        )
-
     def initialize_user(self, keyname, display_name, *, system, **kwargs):
         """Checks is user with keyname exists in DB and
         if not, creates it with kwargs parameters"""
@@ -260,12 +248,6 @@ class AuthComponent(Component):
                         "Maximum number of local users is reached. Your current plan local user number limit is {}."
                     ).format(limit)
                 )
-
-    def healthcheck(self):
-        if self.oauth is not None:
-            if error_message := self.oauth.auth_form_check():
-                return dict(success=False, message=f"OAuth code request failed: {error_message}.")
-        return dict(success=True)
 
     def maintenance(self):
         if self.oauth and self.options["oauth.server.sync"]:

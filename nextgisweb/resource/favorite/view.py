@@ -1,14 +1,22 @@
+from typing import Iterable
+
 import sqlalchemy as sa
 
 from nextgisweb.env import DBSession, gettext
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.view import template_include_hook
 
 from ..component import ResourceComponent
 from ..model import Resource
 from .base import ResourceFavorite
 from .model import ResourceFavoriteModel
+
+
+@template_include_hook()
+def template_include(comp: ResourceComponent) -> Iterable[str]:
+    return ("nextgisweb:resource/template/favorite.mako",)
 
 
 @react_renderer("@nextgisweb/resource/favorite/FavoritePage")
