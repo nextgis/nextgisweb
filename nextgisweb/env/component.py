@@ -144,12 +144,6 @@ class Component:
     def setup_pyramid(self, config):
         pass
 
-    def client_codegen(self):
-        pass
-
-    def stylesheets(self):
-        return ()
-
     @property
     def options(self):
         return self._options

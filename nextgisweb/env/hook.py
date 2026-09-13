@@ -32,7 +32,7 @@ class ComponentHook[P: ComponentHookProtocol]:
     def __init__(self, name: str) -> None:
         self._name = name
         self._entries: list[ComponentHookEntry[P]] = []
-        self._dirty = False
+        self._dirty = True
 
     def __call__(
         self,
@@ -80,10 +80,13 @@ class ComponentHook[P: ComponentHookProtocol]:
                 for entry in _topological_order(by_stage[stage])
             ]
 
-            logger.debug("Entries of `%s` in order:", self._name)
-            for i, entry in enumerate(self._sorted_entries, start=1):
-                full_name = entry.func.__module__ + "." + entry.func.__qualname__
-                logger.debug("#%d: %s", i, full_name)
+            if len(self._sorted_entries) == 0:
+                logger.debug("No entries for `%s`", self._name)
+            else:
+                logger.debug("Entries of `%s` in order:", self._name)
+                for i, entry in enumerate(self._sorted_entries, start=1):
+                    full_name = entry.func.__module__ + "." + entry.func.__qualname__
+                    logger.debug("#%d: %s", i, full_name)
 
             self._dirty = False
 

@@ -13,11 +13,14 @@ from nextgisweb.lib.fileutil import update_text_file
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
-from nextgisweb.jsrealm import Icon, JSEntry
 from nextgisweb.pyramid import PyramidComponent
 from nextgisweb.pyramid.uacompat import FAMILIES
 
+from .client_codegen import client_codegen_hook
 from .component import JSRealmComponent
+from .entry import JSEntry
+from .icon import Icon
+from .stylesheet import stylesheet_hook
 from .util import scan_for_nodepkgs
 
 
@@ -84,10 +87,8 @@ def install(
     if sum(run_flags) > 1:
         raise RuntimeError("Flags --watch, --build and --start are mutually exclusive.")
 
-    # NOTE: It loads modules using Component.setup_pyramid, which may register
-    # entrypoints using jsentry.
-    for comp in env.chain("client_codegen"):
-        comp.client_codegen()
+    for comp, func in client_codegen_hook:
+        func(comp)
 
     debug = core.options["debug"]
     cwd = Path().resolve()
@@ -191,9 +192,7 @@ def install(
         )
     ]
 
-    stylesheets = s_jsrealm["stylesheets"] = list()
-    for comp in env.chain("stylesheets"):
-        stylesheets.extend(str(s) for s in comp.stylesheets())
+    s_jsrealm["stylesheets"] = list(chain(func(comp) for comp, func in stylesheet_hook))
 
     targets = s_jsrealm["targets"] = dict()
     for k in FAMILIES.keys():

@@ -8,11 +8,22 @@ from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
 from pyramid.response import Response
 
 from nextgisweb.lib.apitype import unannotate
+from nextgisweb.lib.fileutil import update_text_file
 
+from nextgisweb.jsrealm.client_codegen import client_codegen_hook
 from nextgisweb.jsrealm.tsgen import TSGenerator
 
 from .component import PyramidComponent
 from .tomb import Configurator, iter_routes
+
+
+@client_codegen_hook()
+def client_codegen(comp: PyramidComponent) -> None:
+    nodepkg = comp.root_path / "nodepkg"
+    config = comp.make_app(settings=dict())
+    update_text_file(nodepkg / "api/type.inc.d.ts", api_type(comp, config))
+    update_text_file(nodepkg / "api/route.inc.ts", route(comp, config))
+
 
 counter = lambda c=count(1): next(c)
 

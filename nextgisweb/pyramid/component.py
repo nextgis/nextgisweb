@@ -12,7 +12,6 @@ from pyramid.response import Response
 from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
-from nextgisweb.lib.fileutil import update_text_file
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
@@ -139,14 +138,6 @@ class PyramidComponent(Component):
 
         if rt_not_set and (ev := self.options["request_timeout"]):
             logger.debug("Request timeout %s detected from uWSGI", str(ev))
-
-    def client_codegen(self):
-        from . import codegen as m
-
-        nodepkg = self.root_path / "nodepkg"
-        config = self.make_app(settings=dict())
-        update_text_file(nodepkg / "api/type.inc.d.ts", m.api_type(self, config))
-        update_text_file(nodepkg / "api/route.inc.ts", m.route(self, config))
 
     def client_type(self, tdef: Any):
         self.client_types.append(tdef)
