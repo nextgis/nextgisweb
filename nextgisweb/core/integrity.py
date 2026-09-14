@@ -4,8 +4,7 @@ from typing import Iterable
 import sqlalchemy as sa
 from sqlalchemy.schema import CreateTable
 
-prefix = "temp_"
-seq_pattern = re.compile(rf"^nextval\('{prefix}(\w+)'::regclass\)$")
+seq_pattern = re.compile(r"^nextval\('(\w+)'::regclass\)$")
 
 
 def check_metadata(metadata: sa.MetaData, conn: sa.Connection) -> Iterable[str]:
@@ -16,21 +15,17 @@ def check_metadata(metadata: sa.MetaData, conn: sa.Connection) -> Iterable[str]:
 
 def check_table(tab: sa.Table, conn: sa.Connection) -> Iterable[str]:
     tab_name, tab_schema = tab.name, tab.schema
+    tab_schema_norm = tab_schema if tab_schema else "public"
+    tab_name_norm = f"{tab_schema_norm}.{tab_name}"
+
     tab_repr = (f"{tab_schema}." if tab_schema else "") + tab_name
     tab_msg = f"Table '{tab_repr}'"
 
     meta = sa.MetaData()
 
-    temp_tab = tab.to_metadata(
-        meta,
-        name=prefix + tab_name,
-        schema=None,
-    )
+    temp_tab = tab.to_metadata(meta, schema=None)
     temp_tab._prefixes = ["TEMPORARY"]
-
-    for c in temp_tab.constraints:
-        if not isinstance(c, sa.ForeignKeyConstraint) and c.name is not None:
-            c.name = prefix + c.name
+    temp_tab_name_norm = f"pg_temp.{temp_tab.name}"
 
     conn.execute(CreateTable(temp_tab, include_foreign_key_constraints=[]))
 
@@ -61,7 +56,7 @@ SELECT
 FROM attr_exp a
 FULL OUTER JOIN attr_act b ON b.attname = a.attname
 """)
-    result = conn.execute(qcolumns, dict(temp_name=temp_tab.name, name=tab_repr))
+    result = conn.execute(qcolumns, dict(temp_name=temp_tab_name_norm, name=tab_name_norm))
 
     col_extra = set()
 
@@ -78,9 +73,7 @@ FULL OUTER JOIN attr_act b ON b.attname = a.attname
             yield f"{col_msg}: {'should' if r.notnull_exp else 'should not'} be nullable."
         elif (
             defval_exp := seq_pattern.sub(
-                lambda m: (
-                    f"nextval('{f'{tab_schema}.' if tab_schema else ''}{m.group(1)}'::regclass)"
-                ),
+                lambda m: f"nextval('{tab_schema_norm}.{m.group(1)}'::regclass)",
                 r.defval_exp,
             )
             if r.defval_exp is not None
@@ -107,8 +100,8 @@ SELECT
 FROM pg_constraint
 WHERE conrelid = CAST(:name AS regclass)
 """)
-    result_exp = conn.execute(qconstraints, dict(name=temp_tab.name))
-    result_act = conn.execute(qconstraints, dict(name=tab_repr))
+    result_exp = conn.execute(qconstraints, dict(name=temp_tab_name_norm))
+    result_act = conn.execute(qconstraints, dict(name=tab_name_norm))
     data_exp = _group_constraints(result_exp, conn=conn)
     data_act = _group_constraints(result_act, conn=conn)
 
@@ -118,11 +111,11 @@ WHERE conrelid = CAST(:name AS regclass)
     if len(fkeys) > 0:
         fk_data = data_exp["f"] = dict()
 
-        tab_relid = _toid(tab_repr, conn=conn)
+        tab_relid = _toid(tab_name_norm, conn=conn)
         for c in fkeys:
             ftab = c.referred_table
-            ftab_repr = (f"{ftab.schema}." if ftab.schema else "") + ftab.name
-            ftab_relid = _toid(ftab_repr, conn=conn)
+            ftab_name_norm = (f"{ftab.schema}" if ftab.schema else "public") + "." + ftab.name
+            ftab_relid = _toid(ftab_name_norm, conn=conn)
 
             colnames = tuple(c.name for c in c.columns)
             fcolnames = tuple(e.column.name for e in c.elements)
@@ -164,12 +157,8 @@ WHERE conrelid = CAST(:name AS regclass)
                 yield f"{tab_msg}, {conlabel(key)} not found."
                 continue
             d_act = cdata_act.pop(key)
-            if (
-                name_exp := d_exp["conname"][len(prefix) :]
-                if d_exp["conname"].startswith(prefix)
-                else d_exp["conname"]
-            ) != d_act["conname"]:
-                yield f"{tab_msg}, {conlabel(key)} name mismatch ({name_exp} <> {d_act['conname']})."
+            if d_exp["conname"] != d_act["conname"]:
+                yield f"{tab_msg}, {conlabel(key)} name mismatch ({d_exp['conname']} <> {d_act['conname']})."
             elif d_exp["condeferrable"] != d_act["condeferrable"]:
                 yield f"{tab_msg}, {conlabel(key)} {'should' if d_exp['condeferrable'] else 'should not'} be deferrable."
             elif d_exp["condeferred"] != d_act["condeferred"]:
