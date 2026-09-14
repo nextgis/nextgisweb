@@ -60,6 +60,7 @@ export const FeatureEditorWidget = observer(
     allowEmpty,
     resourceId,
     featureId,
+    geometry,
     okBtnMsg = msgOk,
     toolbar,
     store: storeProp,
@@ -75,6 +76,7 @@ export const FeatureEditorWidget = observer(
       return new FeatureEditorStore({
         resourceId,
         featureId,
+        geometry,
       });
     });
 

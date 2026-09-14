@@ -27,7 +27,7 @@ export function FeatureEditorModal({
   ...modalProps
 }: FeatureEditorModalProps) {
   const [open, setOpen] = useState(openProp);
-  const { resourceId, featureId, featureItem, onSave, mode, onOk } =
+  const { resourceId, featureId, featureItem, geometry, onSave, mode, onOk } =
     editorOptions || {};
   const [modal, contextHolder] = Modal.useModal();
 
@@ -38,6 +38,7 @@ export function FeatureEditorModal({
         featureId: typeof featureId === "number" ? featureId : null,
         resourceId,
         featureItem,
+        geometry,
       })
   );
 

@@ -80,6 +80,7 @@ export const EditableResource = observer(
               allowEmpty: true,
               resourceId,
               showGeometryTab: false,
+              geometry: ev.feature.getGeometry()?.clone(),
               onOk: (_, item) => {
                 ev.feature.set("attribution", item);
                 resolve(undefined);
