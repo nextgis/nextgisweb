@@ -1,19 +1,20 @@
 import re
-from functools import cache
 from typing import Iterable
 
 import sqlalchemy as sa
 from sqlalchemy.schema import CreateTable
 
-from nextgisweb.env import DBSession
-
 prefix = "temp_"
 seq_pattern = re.compile(rf"^nextval\('{prefix}(\w+)'::regclass\)$")
 
 
-def check_table(tab: sa.Table) -> Iterable[str]:
-    conn = DBSession.connection()
+def check_metadata(metadata: sa.MetaData, conn: sa.Connection) -> Iterable[str]:
+    for tab in metadata.tables.values():
+        for message in check_table(tab, conn):
+            yield message
 
+
+def check_table(tab: sa.Table, conn: sa.Connection) -> Iterable[str]:
     tab_name, tab_schema = tab.name, tab.schema
     tab_repr = (f"{tab_schema}." if tab_schema else "") + tab_name
     tab_msg = f"Table '{tab_repr}'"
@@ -108,19 +109,20 @@ WHERE conrelid = CAST(:name AS regclass)
 """)
     result_exp = conn.execute(qconstraints, dict(name=temp_tab.name))
     result_act = conn.execute(qconstraints, dict(name=tab_repr))
-    data_exp = _group_constraints(result_exp)
-    data_act = _group_constraints(result_act)
+    data_exp = _group_constraints(result_exp, conn=conn)
+    data_act = _group_constraints(result_act, conn=conn)
 
     # Add foreign key expected data
+    assert "f" not in data_exp
     fkeys = tuple(c for c in tab.constraints if isinstance(c, sa.ForeignKeyConstraint))
     if len(fkeys) > 0:
         fk_data = data_exp["f"] = dict()
 
-        tab_relid = _toid(tab_repr)
+        tab_relid = _toid(tab_repr, conn=conn)
         for c in fkeys:
             ftab = c.referred_table
             ftab_repr = (f"{ftab.schema}." if ftab.schema else "") + ftab.name
-            ftab_relid = _toid(ftab_repr)
+            ftab_relid = _toid(ftab_repr, conn=conn)
 
             colnames = tuple(c.name for c in c.columns)
             fcolnames = tuple(e.column.name for e in c.elements)
@@ -147,7 +149,7 @@ WHERE conrelid = CAST(:name AS regclass)
                     return f"{'unique' if contype == 'u' else 'primary key'} constraint for column(s) ({fmtcols})"
                 case "f":
                     columns, ft_oid, fcolumns = key
-                    ft_name = _tname(ft_oid)
+                    ft_name = _tname(ft_oid, conn=conn)
                     fmtcols = ", ".join(columns)
                     fmtfcols = ", ".join(fcolumns)
                     return f"foreign key constraint from '{tab_name}' ({fmtcols}) to '{ft_name}' ({fmtfcols})"
@@ -177,13 +179,27 @@ WHERE conrelid = CAST(:name AS regclass)
             yield f"{tab_msg}: extra constraint found ({conlabel(key)})."
 
 
-def _colnames(toid, keys):
-    return tuple(_colname(toid, k) for k in keys)
+def _colnames(toid, keys, *, conn):
+    return tuple(_colname(toid, k, conn=conn) for k in keys)
 
 
-@cache
-def _colname(toid: int, key: int):
-    return DBSession.execute(
+def _cache(func):
+    cache = dict()
+
+    def wrapped(*args, **kw):
+        conn = kw.pop("conn")
+        key = (args, *kw.items())
+        if key not in cache:
+            cache[key] = func(*args, **kw, conn=conn)
+        return cache[key]
+
+    setattr(wrapped, "cache_clear", lambda: cache.clear())
+    return wrapped
+
+
+@_cache
+def _colname(toid: int, key: int, *, conn: sa.Connection):
+    return conn.execute(
         sa.text("""
 SELECT attname FROM pg_attribute
 WHERE attrelid = :toid AND attnum = :attnum AND NOT attisdropped
@@ -192,31 +208,29 @@ WHERE attrelid = :toid AND attnum = :attnum AND NOT attisdropped
     ).scalar()
 
 
-@cache
-def _tname(oid: int):
-    return DBSession.execute(sa.text("SELECT CAST(:oid AS regclass)"), dict(oid=oid)).scalar()
+@_cache
+def _tname(oid: int, *, conn: sa.Connection):
+    return conn.execute(sa.text("SELECT CAST(:oid AS regclass)"), dict(oid=oid)).scalar()
 
 
-@cache
-def _toid(name: str):
-    return DBSession.execute(
-        sa.text("SELECT CAST(:name AS regclass)::oid"), dict(name=name)
-    ).scalar()
+@_cache
+def _toid(name: str, *, conn: sa.Connection):
+    return conn.execute(sa.text("SELECT CAST(:name AS regclass)::oid"), dict(name=name)).scalar()
 
 
 _conmap = dict(
-    p=lambda r: _colnames(r.conrelid, r.conkey),
-    u=lambda r: _colnames(r.conrelid, r.conkey),
-    f=lambda r: (
-        _colnames(r.conrelid, r.conkey),
+    p=lambda r, conn: _colnames(r.conrelid, r.conkey, conn=conn),
+    u=lambda r, conn: _colnames(r.conrelid, r.conkey, conn=conn),
+    f=lambda r, conn: (
+        _colnames(r.conrelid, r.conkey, conn=conn),
         r.confrelid if r.confrelid != r.conrelid else None,  # check self-relation
-        _colnames(r.confrelid, r.confkey),
+        _colnames(r.confrelid, r.confkey, conn=conn),
     ),
-    c=lambda r: r.expr,
+    c=lambda r, conn: r.expr,
 )
 
 
-def _group_constraints(qresult: sa.Result):
+def _group_constraints(qresult: sa.Result, *, conn):
     data = dict()
     for row in qresult.mappings():
         cmpfun = _conmap.get(row.contype)
@@ -224,7 +238,7 @@ def _group_constraints(qresult: sa.Result):
             continue
         if row.contype not in data:
             data[row.contype] = dict()
-        key = cmpfun(row)
+        key = cmpfun(row, conn)
         data[row.contype][key] = {
             k: row[k]
             for k in (

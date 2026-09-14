@@ -7,7 +7,7 @@ import sqlalchemy as sa
 
 from nextgisweb.env import DBSession
 
-from ..integrity import _toid, check_table
+from ..integrity import _toid, check_metadata
 
 
 def test_postgres_version(ngw_txn):
@@ -102,10 +102,7 @@ def test_integrity(
     if sql is not None:
         conn.execute(sa.text(sql))
 
-    messages = []
-
-    for tab in meta.tables.values():
-        messages.extend(check_table(tab))
+    messages = list(check_metadata(meta, conn))
 
     if expected is None:
         assert len(messages) == 0

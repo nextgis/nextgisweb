@@ -20,10 +20,10 @@ from nextgisweb.lib import json
 from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.saext import postgres_url
 
-from nextgisweb.core.integrity import check_table
 from nextgisweb.i18n import Localizer, Translations
 
 from .backup import BackupMetadata
+from .integrity import check_metadata
 from .model import Setting
 from .storage import StorageComponentMixin
 
@@ -293,11 +293,10 @@ class CoreComponent(StorageComponentMixin, Component):
 
     def check_integrity(self):
         metadata = self.env.metadata()
-        metadata.bind = self.engine
+        connection = DBSession.connection()
 
-        for tab in list(metadata.tables.values()):
-            for message in check_table(tab):
-                yield message
+        for message in check_metadata(metadata, connection):
+            yield message
 
     def backup_objects(self):
         yield from self.fontconfig.backup_objects()
