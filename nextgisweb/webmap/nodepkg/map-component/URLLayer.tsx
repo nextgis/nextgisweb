@@ -6,9 +6,10 @@ import { isValidURL } from "@nextgisweb/gui/arm/validate";
 import { useObjectState } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { tileLoadFunction } from "@nextgisweb/pyramid/util";
-import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
-import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
-import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
+import type {
+  CoreLayer,
+  LayerOptions,
+} from "@nextgisweb/webmap/ol/layer/CoreLayer";
 
 import { useMapContext } from "./context/useMapContext";
 
@@ -60,8 +61,8 @@ export function URLLayer({
   const [layerOptions] = useObjectState(layerOptionsProp || {});
   const layerOptionsRef = useRef(layerOptionsProp);
 
-  const [layer, setLayer] = useState<QuadKey | XYZ | undefined>(undefined);
-  const layerRef = useRef<QuadKey | XYZ | undefined>(undefined);
+  const [layer, setLayer] = useState<CoreLayer | undefined>(undefined);
+  const layerRef = useRef<CoreLayer | undefined>(undefined);
 
   useEffect(() => {
     const abortController = new AbortController();

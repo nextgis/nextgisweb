@@ -1,5 +1,14 @@
 {
   "name": "@nextgisweb/basemap",
   "version": "0.0.0",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "maplibre-gl": "6.9.0"
+  },
+  "nextgisweb": {
+    "rsbuildConfigs": {
+      "basemap": "rsbuild.basemap.ts",
+      "main": "rsbuild.main.ts"
+    }
+  }
 }
