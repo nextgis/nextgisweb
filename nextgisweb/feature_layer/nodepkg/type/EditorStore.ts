@@ -7,6 +7,10 @@ export interface EditorStoreConstructorOptions {
   fields?: FeatureLayerFieldRead[];
 }
 
+export type EditorStoreConstructor<S extends EditorStore = EditorStore> = new (
+  options: EditorStoreConstructorOptions
+) => S;
+
 export interface EditorStore<V = any> {
   value: V;
 

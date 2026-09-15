@@ -78,7 +78,7 @@ export class FeatureEditorStore {
     this.setInitLoading(true);
     const initializing = this._initialize();
     this._initializing = initializing;
-    initializing
+    return initializing
       .catch((err) => {
         if (!isAbortError(err)) {
           throw err;
