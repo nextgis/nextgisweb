@@ -162,9 +162,6 @@ class Env(Container):
             if hasattr(c, "metadata"):
                 c.metadata.bind = self.core.engine
 
-        for c in list(self.chain("configure")):
-            c.configure()
-
         self.initialized = True
 
     def metadata(self):

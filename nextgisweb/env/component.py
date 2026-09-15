@@ -118,10 +118,7 @@ class Component:
         return cls.root_path / path
 
     def initialize(self):
-        """First initialization stage."""
-
-    def configure(self):
-        """Second initialization stage."""
+        pass
 
     def initialize_db(self):
         pass
