@@ -7,7 +7,7 @@ from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.core import CoreComponent
+from nextgisweb.core import CoreComponent, maintenance_hook
 
 from .util import stat_dir
 
@@ -43,10 +43,6 @@ class FileUploadComponent(Component):
 
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
-
-    def maintenance(self):
-        super().maintenance()
-        self.cleanup()
 
     def cleanup(self):
         if not os.path.exists(self.path):
@@ -88,3 +84,8 @@ class FileUploadComponent(Component):
         Option("chunk_size", SizeInBytes, default=16 * 2**20),
     )
     # fmt: on
+
+
+@maintenance_hook()
+def maintenance(comp: FileUploadComponent) -> None:
+    comp.cleanup()

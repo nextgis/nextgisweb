@@ -22,9 +22,6 @@ class BackendBase:
     def __call__(self, request: Request):
         yield None
 
-    def maintenance(self):
-        pass
-
 
 registry = BackendBase.registry
 

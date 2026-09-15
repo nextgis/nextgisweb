@@ -12,6 +12,8 @@ from nextgisweb.env.cli import EnvCommand, UninitializedEnvCommand, arg, cli, op
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import maintenance_hook
+
 from ..backup import pg_connection_options
 from ..component import CoreComponent
 
@@ -115,10 +117,8 @@ def maintenance(
     :param estimate_storage: Execute storage estimation after maintenance
     :param one_shot: Don't record metadata about this maintenance"""
 
-    assert self.env is not None
-    for comp in self.env.chain("maintenance"):
-        logger.debug("Maintenance for component: %s...", comp.identity)
-        comp.maintenance()
+    for comp, func in maintenance_hook:
+        func(comp)
 
     if not one_shot:
         with transaction.manager:

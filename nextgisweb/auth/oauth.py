@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import itertools
 import re
 from base64 import b64encode
@@ -6,10 +8,12 @@ from datetime import timedelta
 from functools import lru_cache
 from hashlib import sha512
 from secrets import token_hex
+from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 
 import requests
 import sqlalchemy as sa
+import transaction
 import zope.event
 from passlib.hash import sha256_crypt  # ty: ignore[unresolved-import]
 from pyramid.threadlocal import get_current_request
@@ -23,13 +27,17 @@ from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import lazy_str, logger
 
-from nextgisweb.core.component import CoreComponent
+from nextgisweb.core import CoreComponent, maintenance_hook
 from nextgisweb.core.exception import UserException
 
 from .exception import UserDisabledException
 from .model import Group, OAuthAToken, OAuthPToken, User
 from .util import clean_user_keyname, current_tstamp, enum_name
 from .util import log_lazy_data as lf
+
+if TYPE_CHECKING:
+    from .component import AuthComponent
+
 
 MAX_TOKEN_LENGTH = 250
 
@@ -755,6 +763,15 @@ class OAuthAccessTokenExpiredException(UserException):
 
 class OAuthSyncNotEnabled(RuntimeError):
     pass
+
+
+@maintenance_hook()
+def sync_users(comp: AuthComponent) -> None:
+    if not comp.oauth or not comp.options["oauth.server.sync"]:
+        return
+
+    with transaction.manager:
+        comp.oauth.sync_users()
 
 
 def _fallback_value(*args):

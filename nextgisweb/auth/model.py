@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from collections import namedtuple
 from collections.abc import Callable, Iterable, Mapping
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import cached_property, lru_cache
 from itertools import chain
 from secrets import token_hex, token_urlsafe
@@ -9,17 +11,25 @@ from typing import TYPE_CHECKING, ClassVar, Literal, overload
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
+import transaction
 from passlib.hash import sha256_crypt  # ty: ignore[unresolved-import]
 from sqlalchemy.orm import Mapped, declared_attr, mapped_column
 from zope.event import notify
 from zope.event.classhandler import handler
 
 from nextgisweb.env import Base, DBSession, gettext
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import TrStr
+from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import maintenance_hook
 from nextgisweb.core.exception import ForbiddenError
 
 from .permission import Permission
+
+if TYPE_CHECKING:
+    from .component import AuthComponent
+
 
 tab_group_user = sa.Table(
     "auth_group_user",
@@ -305,6 +315,21 @@ class OAuthPToken(Base):
     refresh_exp: Mapped[int] = mapped_column(sa.BigInteger)
 
     user: Mapped[User] = orm.relationship()
+
+
+@maintenance_hook()
+def cleanup(comp: AuthComponent) -> None:
+    with transaction.manager:
+        # Add additional minute for clock skew
+        exp = utcnow_naive() + timedelta(seconds=60)
+        tstamp = exp.timestamp()
+        logger.debug("Cleaning up access and password tokens (exp < %s)", exp)
+
+        rows = OAuthAToken.filter(OAuthAToken.exp < tstamp).delete()
+        logger.info("Expired access tokens deleted: %d", rows)
+
+        rows = OAuthPToken.filter(OAuthPToken.refresh_exp < tstamp).delete()
+        logger.info("Expired password tokens deleted: %d", rows)
 
 
 @lru_cache(maxsize=256)

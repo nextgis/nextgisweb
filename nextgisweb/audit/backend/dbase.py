@@ -10,7 +10,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib import json
 from nextgisweb.lib.datetime import utcnow_naive
 
-from nextgisweb.core import CoreComponent
+from nextgisweb.core import CoreComponent, maintenance_hook
 from nextgisweb.pyramid.tomb import Request
 
 from ..component import AuditComponent
@@ -45,10 +45,17 @@ class DatabaseBackend(BackendBase):
         finally:
             con.close()
 
-    def maintenance(self):
-        super().maintenance()
-        with transaction.manager:
-            ts = utcnow_naive() - self.options["retention"]
-            q_delete = tab_journal.delete().where(tab_journal.c.tstamp < ts)
-            DBSession.connection().execute(q_delete)
-            mark_changed(DBSession())
+
+@maintenance_hook()
+def maintenance(comp: AuditComponent) -> None:
+    for backend in comp.backends:
+        if isinstance(backend, DatabaseBackend):
+            break
+    else:
+        return
+
+    with transaction.manager:
+        ts = utcnow_naive() - comp.options["retention"]
+        q_delete = tab_journal.delete().where(tab_journal.c.tstamp < ts)
+        DBSession.connection().execute(q_delete)
+        mark_changed(DBSession())

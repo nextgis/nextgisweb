@@ -37,11 +37,6 @@ class AuditComponent(Component):
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
-    def maintenance(self):
-        super().maintenance()
-        for backend in self.backends.values():
-            backend.maintenance()
-
     @property
     def backends(self) -> Mapping[str, BackendBase]:
         if self._backends is None:

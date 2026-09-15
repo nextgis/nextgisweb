@@ -15,7 +15,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.core import CoreComponent
+from nextgisweb.core import CoreComponent, maintenance_hook
 
 from . import uacompat
 from .model import Session, SessionStore
@@ -142,10 +142,6 @@ class PyramidComponent(Component):
     def client_type(self, tdef: Any):
         self.client_types.append(tdef)
 
-    def maintenance(self):
-        super().maintenance()
-        self.cleanup()
-
     def cleanup(self):
         logger.info("Cleaning up sessions...")
 
@@ -203,6 +199,11 @@ class PyramidComponent(Component):
         Option("compression.algorithms", list, default=['br', 'gzip']),
     )) + uacompat.option_annotations
     # fmt: on
+
+
+@maintenance_hook()
+def maintenance(comp: PyramidComponent) -> None:
+    comp.cleanup()
 
 
 class HelpPageUrl(ABC):

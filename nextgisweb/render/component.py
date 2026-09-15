@@ -11,8 +11,7 @@ from nextgisweb.lib.config import Option
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.core import KindOfData
-from nextgisweb.core.component import CoreComponent
+from nextgisweb.core import CoreComponent, KindOfData, maintenance_hook
 
 from .model import TIMESTAMP_EPOCH
 from .model import ResourceTileCache as RTC
@@ -40,9 +39,6 @@ class RenderComponent(Component):
 
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
-
-    def maintenance(self):
-        self.cleanup()
 
     def cleanup(self):
         logger.info("Cleaning up tile cache tables...")
@@ -167,3 +163,8 @@ class RenderComponent(Component):
         Option("tile_cache.enabled", bool, default=True),
         Option("legend_symbols_section", bool, default=False),
     )
+
+
+@maintenance_hook()
+def maintenance(comp: RenderComponent) -> None:
+    comp.cleanup()

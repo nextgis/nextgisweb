@@ -5,7 +5,8 @@ from nextgisweb.env import Component, DBSession, require
 from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.core.component import CoreComponent
+from nextgisweb.core import CoreComponent, maintenance_hook
+from nextgisweb.file_storage.component import maintenance as file_storage_maintenance
 from nextgisweb.file_upload import FileUploadComponent
 
 from .kind_of_data import RasterLayerData
@@ -34,13 +35,6 @@ class RasterLayerComponent(Component, WorkdirMixin):
 
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
-
-    @require("file_storage")
-    def maintenance(self):
-        super().maintenance()
-        self.build_missing_overviews()
-        self.populate_missing_columns()
-        self.workdir_cleanup()
 
     def check_integrity(self):
         for layer in RasterLayer.query():
@@ -95,3 +89,10 @@ class RasterLayerComponent(Component, WorkdirMixin):
             doc="Uncompressed raster size limit (by default equals 2x file upload max size)",
         ),
     )
+
+
+@maintenance_hook(after=[file_storage_maintenance])
+def maintenance(comp: RasterLayerComponent) -> None:
+    comp.build_missing_overviews()
+    comp.populate_missing_columns()
+    comp.workdir_cleanup()

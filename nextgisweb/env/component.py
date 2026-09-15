@@ -135,9 +135,6 @@ class Component:
     def restore_prepare(self):
         pass
 
-    def maintenance(self):
-        pass
-
     def check_integrity(self):
         pass
 

@@ -16,7 +16,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import query_unreferenced
 
-from nextgisweb.core import BackupBase, CoreComponent
+from nextgisweb.core import BackupBase, CoreComponent, maintenance_hook
 
 from .model import FileObj
 
@@ -55,10 +55,6 @@ class FileStorageComponent(Component):
             os.makedirs(path)
 
         return os.path.join(path, uuid)
-
-    def maintenance(self):
-        super().maintenance()
-        self.cleanup(dry_run=False)
 
     def cleanup(self, *, dry_run, unreferenced=True, orphaned=True):
         logger.info("Cleaning up file storage...")
@@ -161,3 +157,8 @@ class FileObjBackup(BackupBase):
         else:
             with open(fn, "wb") as fd:
                 copyfileobj(src, fd, length=BUF_SIZE)
+
+
+@maintenance_hook()
+def maintenance(comp: FileStorageComponent) -> None:
+    comp.cleanup(dry_run=False)

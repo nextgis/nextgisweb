@@ -3,11 +3,12 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from xml.etree import ElementTree
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+import transaction
 from msgspec import UNSET, Struct, UnsetType, to_builtins
 from PIL import Image, UnidentifiedImageError
 from PIL.Image import DecompressionBombError
@@ -17,6 +18,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from nextgisweb.env import Base
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import maintenance_hook
 from nextgisweb.feature_layer.versioning import (
     ActColValue,
     FVersioningExtensionMixin,
@@ -28,6 +30,10 @@ from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import Resource
 
 from .util import change_suffix
+
+if TYPE_CHECKING:
+    from .component import FeatureAttachmentComponent
+
 
 Base.depends_on("resource", "feature_layer")
 
@@ -296,3 +302,10 @@ class AttachmentRestore(Struct, kw_only=True, tag="attachment.restore", tag_fiel
     name: str | UnsetType = UNSET
     mime_type: str
     description: str | UnsetType = UNSET
+
+
+@maintenance_hook()
+def maintenance(comp: FeatureAttachmentComponent) -> None:
+    with transaction.manager:
+        for obj in FeatureAttachment.filter_by(file_meta=None):
+            obj.extract_meta()

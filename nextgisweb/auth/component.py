@@ -11,7 +11,6 @@ from sqlalchemy.orm import defer, undefer
 from nextgisweb.env import Component, DBSession, gettext, gettextf, inject
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
-from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError
@@ -248,23 +247,6 @@ class AuthComponent(Component):
                         "Maximum number of local users is reached. Your current plan local user number limit is {}."
                     ).format(limit)
                 )
-
-    def maintenance(self):
-        if self.oauth and self.options["oauth.server.sync"]:
-            with transaction.manager:
-                self.oauth.sync_users()
-
-        with transaction.manager:
-            # Add additional minute for clock skew
-            exp = utcnow_naive() + timedelta(seconds=60)
-            tstamp = exp.timestamp()
-            logger.debug("Cleaning up access and password tokens (exp < %s)", exp)
-
-            rows = OAuthAToken.filter(OAuthAToken.exp < tstamp).delete()
-            logger.info("Expired access tokens deleted: %d", rows)
-
-            rows = OAuthPToken.filter(OAuthPToken.refresh_exp < tstamp).delete()
-            logger.info("Expired password tokens deleted: %d", rows)
 
     def backup_configure(self, config):
         super().backup_configure(config)
