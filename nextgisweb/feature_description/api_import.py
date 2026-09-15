@@ -39,20 +39,21 @@ def descriptions_import(resource, filename, *, replace):
             fid = int(fn_match[1])
             fid_arcname[fid] = info.filename
 
-        if replace:
-            rows_deleted = FeatureDescription.filter_by(resource_id=resource.id).delete()
-            if rows_deleted > 0:
-                DBSession.flush()
-
+        keep = set()
         with DBSession.no_autoflush:
             for fid, arcname in fid_arcname.items():
-                if not replace:
-                    fd = FeatureDescription.filter_by(
-                        resource_id=resource.id,
+                fd = FeatureDescription.filter_by(
+                    resource_id=resource.id,
+                    feature_id=fid,
+                ).one_or_none()
+                if fd is None:
+                    fd = FeatureDescription(
+                        resource=resource,
                         feature_id=fid,
-                    ).one_or_none()
-                    if fd is not None:
-                        continue
+                    ).persist()
+                elif not replace:
+                    continue
+                keep.add(fid)
 
                 content = z.read(arcname).decode()
                 root = document_fromstring(content)
@@ -69,8 +70,10 @@ def descriptions_import(resource, filename, *, replace):
                     tostring(child, encoding="unicode") for child in body
                 )
 
-                FeatureDescription(
-                    resource=resource,
-                    feature_id=fid,
-                    value=sanitize(body_inner_html),
-                ).persist()
+                fd.value = sanitize(body_inner_html)
+
+            if replace:
+                FeatureDescription.filter(
+                    FeatureDescription.resource_id == resource.id,
+                    ~FeatureDescription.feature_id.in_(keep),
+                ).delete()
