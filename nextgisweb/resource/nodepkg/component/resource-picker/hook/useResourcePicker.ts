@@ -31,7 +31,7 @@ export function useResourcePicker({
         const originalOnTraverse = pickerOptions.onTraverse;
         pickerOptions.parentId =
           pickerParentIdRef.current ?? pickerOptions.parentId;
-        pickerOptions.initParentId = initParentId;
+        pickerOptions.initParentId ??= initParentId;
         pickerOptions.onTraverse = (parentId: number) => {
           pickerParentIdRef.current = parentId;
           originalOnTraverse?.(parentId);
