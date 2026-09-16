@@ -1,3 +1,5 @@
+import type { Geometry } from "ol/geom";
+
 import type { ActionToolbarProps } from "@nextgisweb/gui/action-toolbar";
 import type { RouteBody } from "@nextgisweb/pyramid/api/type";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
@@ -21,6 +23,8 @@ export interface FeatureEditorWidgetProps {
   allowEmpty?: boolean;
   featureId?: number;
   okBtnMsg?: string;
+  /** Current geometry, overriding featureItem.geom. */
+  geometry?: Geometry | null;
   toolbar?: Partial<ActionToolbarProps>;
   onSave?: (value: CompositeRead | undefined) => void;
   onOk?: (
@@ -34,6 +38,7 @@ export interface FeatureEditorWidgetProps {
 
 export interface FeatureEditorStoreOptions {
   featureItem?: FeatureItem;
+  geometry?: Geometry | null;
   resourceId: number;
   featureId: number | null;
   mode?: FeatureEditorMode;

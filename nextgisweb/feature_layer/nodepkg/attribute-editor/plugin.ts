@@ -1,17 +1,22 @@
 /** @plugin */
 import { lazy } from "react";
 
-import { registry } from "@nextgisweb/feature-layer/feature-editor/registry";
+import { featureEditorRegistry } from "@nextgisweb/feature-layer/feature-editor/registry";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ATTRIBUTES_KEY } from "../feature-editor/constant";
 
 const AttributeEditorLazy = lazy(() => import("./AttributeEditor"));
 
-registry.register(COMP_ID, {
-  widget: AttributeEditorLazy,
+featureEditorRegistry(COMP_ID, {
   store: () => import("./AttributeEditorStore"),
-  label: gettext("Attributes"),
-  identity: ATTRIBUTES_KEY,
-  order: 10,
+  provider: ({ store }) => [
+    {
+      widget: AttributeEditorLazy,
+      store,
+      label: gettext("Attributes"),
+      identity: ATTRIBUTES_KEY,
+      order: 10,
+    },
+  ],
 });

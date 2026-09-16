@@ -70,6 +70,7 @@ export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
               showGeometryTab: false,
               resourceId,
               featureItem: prevItem,
+              geometry: feature.getGeometry()?.clone(),
               onOk: (item) => {
                 feature.set("attribution", {
                   ...prevItem,

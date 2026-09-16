@@ -17,12 +17,12 @@ import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { GEOMETRY_KEY } from "../geometry-editor/constant";
-import type { EditorStore } from "../type";
+import type { EditorStore, EditorStoreConstructor } from "../type";
 
 import { FeatureEditorStore } from "./FeatureEditorStore";
 import { ATTRIBUTES_KEY } from "./constant";
 import { registry } from "./registry";
-import type { FeatureEditorPlugin } from "./registry";
+import type { FeatureEditorTab } from "./registry";
 import type { FeatureEditorWidgetProps } from "./type";
 
 import ResetIcon from "@nextgisweb/icon/material/restart_alt";
@@ -60,6 +60,7 @@ export const FeatureEditorWidget = observer(
     allowEmpty,
     resourceId,
     featureId,
+    geometry,
     okBtnMsg = msgOk,
     toolbar,
     store: storeProp,
@@ -75,45 +76,24 @@ export const FeatureEditorWidget = observer(
       return new FeatureEditorStore({
         resourceId,
         featureId,
+        geometry,
       });
     });
 
-    const { dirty, saving, initLoading } = store;
+    const { dirty, saving } = store;
 
     const [items, setItems] = useState<TabItem[]>([]);
 
-    useEffect(() => {
-      store.init();
-      return store.destroy;
-    }, [store]);
-
     const createEditorTab = useCallback(
-      async (newEditorWidget: FeatureEditorPlugin) => {
+      (newEditorWidget: FeatureEditorTab, attributeStore?: EditorStore) => {
         const key = newEditorWidget.identity;
-        const Store = await newEditorWidget.store();
-        const widgetStore = new Store.default({
-          parentStore: store,
-        });
-
-        if (key === ATTRIBUTES_KEY) {
-          store.attachAttributeStore(widgetStore);
-        } else if (key === GEOMETRY_KEY) {
-          if (
-            !showGeometryTab ||
-            store.featureLayer?.geometry_type === "NONE"
-          ) {
-            return;
-          }
-          store.attachGeometryStore(widgetStore);
-        } else {
-          store.addExtensionStore(key, widgetStore);
-        }
-
+        const widgetStore = newEditorWidget.store;
         const Widget = newEditorWidget.widget;
 
         return {
           key,
           order: newEditorWidget.order,
+          destroyOnHidden: widgetStore === attributeStore,
           label: (
             <TabsLabelObserver
               widgetStore={widgetStore}
@@ -127,26 +107,86 @@ export const FeatureEditorWidget = observer(
           ),
         };
       },
-      [showGeometryTab, store]
+      []
     );
 
     useEffect(() => {
-      if (!initLoading) return;
-      const loadWidgets = async () => {
-        const newTabs: TabItem[] = [];
+      let cancelled = false;
+      setItems([]);
 
+      const loadWidgets = async () => {
+        await store.init();
+        if (cancelled) return;
+
+        const stores = new Map<EditorStoreConstructor, EditorStore>();
+        const editorWidgets: FeatureEditorTab[] = [];
         for (const reg of registry.queryAll()) {
-          const tab = await createEditorTab(reg);
-          if (tab) {
-            newTabs.push(tab);
+          try {
+            const Store = await reg.store();
+            if (cancelled) return;
+
+            let widgetStore = stores.get(Store.default);
+            if (!widgetStore) {
+              widgetStore = new Store.default({
+                parentStore: store,
+              });
+              stores.set(Store.default, widgetStore);
+            }
+            const provider = await reg.provider({
+              parentStore: store,
+              store: widgetStore,
+            });
+            editorWidgets.push(...provider);
+          } catch (error) {
+            if (!cancelled) {
+              errorModal(error);
+            }
           }
+          if (cancelled) return;
+        }
+
+        const geometryTabAvailable =
+          showGeometryTab && store.featureLayer?.geometry_type !== "NONE";
+
+        const tabs = editorWidgets.filter(
+          ({ identity }) => identity !== GEOMETRY_KEY || geometryTabAvailable
+        );
+        const attributes = tabs.find(
+          ({ identity }) => identity === ATTRIBUTES_KEY
+        );
+        const geometry = tabs.find(({ identity }) => identity === GEOMETRY_KEY);
+        if (attributes) {
+          store.attachAttributeStore(attributes.store);
+        }
+        if (geometry) {
+          store.attachGeometryStore(geometry.store);
+        }
+
+        const attachedStores = new Set([attributes?.store, geometry?.store]);
+        const newTabs: TabItem[] = [];
+        for (const tab of tabs) {
+          if (!attachedStores.has(tab.store)) {
+            store.addExtensionStore(tab.identity, tab.store);
+            attachedStores.add(tab.store);
+          }
+          newTabs.push(createEditorTab(tab, attributes?.store));
         }
         newTabs.sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
+        setActiveKey(newTabs[0]?.key ?? ATTRIBUTES_KEY);
         setItems(newTabs);
       };
 
-      loadWidgets();
-    }, [store, createEditorTab, initLoading]);
+      loadWidgets().catch((error) => {
+        if (!cancelled) {
+          errorModal(error);
+        }
+      });
+
+      return () => {
+        cancelled = true;
+        store.destroy();
+      };
+    }, [store, createEditorTab, showGeometryTab]);
 
     const onSaveClick = useCallback(async () => {
       if (!(await store.validate())) {
@@ -182,7 +222,7 @@ export const FeatureEditorWidget = observer(
     const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
       const actions: ActionToolbarAction[] = [
         <SaveButton
-          disabled={allowEmpty ? false : !dirty}
+          disabled={!items.length || (allowEmpty ? false : !dirty)}
           key="save"
           loading={saving}
           onClick={onSaveClick}
@@ -212,6 +252,7 @@ export const FeatureEditorWidget = observer(
       };
     }, [
       allowEmpty,
+      items,
       dirty,
       saving,
       onSaveClick,

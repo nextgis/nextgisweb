@@ -1,5 +1,9 @@
-import type { EditorStore, EditorStoreConstructorOptions } from "./EditorStore";
+import type {
+  EditorStore,
+  EditorStoreConstructor,
+  EditorStoreConstructorOptions,
+} from "./EditorStore";
 
 export * from "./FeatureItem";
 
-export { EditorStore, EditorStoreConstructorOptions };
+export { EditorStore, EditorStoreConstructor, EditorStoreConstructorOptions };

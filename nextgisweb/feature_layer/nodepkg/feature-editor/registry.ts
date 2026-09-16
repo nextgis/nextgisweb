@@ -1,27 +1,42 @@
 /** @registry  */
-import type { FC, LazyExoticComponent, ReactNode } from "react";
+import type { FC, ReactNode } from "react";
 
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
 
-import type { EditorStore, EditorStoreConstructorOptions } from "../type";
+import type { EditorStore, EditorStoreConstructor } from "../type";
 
-import type { ATTRIBUTES_KEY } from "./constant";
+import type { FeatureEditorStore } from "./FeatureEditorStore";
 import type { EditorWidgetProps } from "./type";
 
-export type FeatureEditorPluginWidget<S extends EditorStore = EditorStore> =
-  LazyExoticComponent<FC<EditorWidgetProps<S>>>;
-
-export type FeatureEditorPluginStore = ImportCallback<
-  new (options: EditorStoreConstructorOptions) => EditorStore
+export type FeatureEditorPluginWidget<S extends EditorStore = EditorStore> = FC<
+  EditorWidgetProps<S>
 >;
 
-export interface FeatureEditorPlugin {
+export type FeatureEditorPluginStore<S extends EditorStore = EditorStore> =
+  ImportCallback<EditorStoreConstructor<S>>;
+
+export interface FeatureEditorTab {
   widget: FeatureEditorPluginWidget;
-  store: FeatureEditorPluginStore;
+  store: EditorStore;
   label: ReactNode;
-  identity: typeof ATTRIBUTES_KEY | string;
+  identity: string;
   order?: number;
 }
 
+export interface FeatureEditorPlugin<S extends EditorStore = EditorStore> {
+  store: FeatureEditorPluginStore<S>;
+  provider(options: {
+    parentStore: FeatureEditorStore;
+    store: S;
+  }): FeatureEditorTab[] | Promise<FeatureEditorTab[]>;
+}
+
 export const registry = pluginRegistry<FeatureEditorPlugin>(MODULE_NAME);
+
+export function featureEditorRegistry<S extends EditorStore>(
+  compId: string,
+  plugin: FeatureEditorPlugin<S>
+) {
+  registry.register(compId, plugin);
+}
