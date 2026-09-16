@@ -6,11 +6,14 @@ from dataclasses import dataclass
 from datetime import date, datetime, time
 from typing import Any
 
+import msgspec
 import sqlalchemy as sa
+from msgspec import Struct, convert
 
 from nextgisweb.env import gettext
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.resource import ResourceScope
 
 from .interface import FIELD_TYPE
 
@@ -36,18 +39,58 @@ class FilterExpressionError(ValidationError):
 class FieldInfo:
     key: str
     datatype: str
+    id: int | None = None
+    text_search: bool = True
+    lookup_table_id: int | None = None
+
+
+class TextSearchOptions(Struct):
+    case_sensitive: bool = False
+
+
+class TextSearchSpec:
+    __slots__ = ("value", "case_sensitive", "keys_by_field")
+
+    def __init__(
+        self,
+        value: str,
+        case_sensitive: bool,
+        keys_by_field: Mapping[str, Sequence[str]] | None = None,
+    ):
+        self.value = value
+        self.case_sensitive = case_sensitive
+        self.keys_by_field = keys_by_field or {}
+
+    def __repr__(self):
+        return f"TextSearchSpec(value={self.value!r}, case_sensitive={self.case_sensitive}, keys_by_field={self.keys_by_field!r})"
 
 
 class FilterProgram:
-    def __init__(self, root: FilterNode | None):
+    def __init__(
+        self,
+        root: FilterNode | None,
+        *,
+        search_keys: Sequence[str] = (),
+        text_search: TextSearchSpec | None = None,
+    ):
         self._root = root
+        self._search_keys = search_keys
+        self._text_search = text_search
 
     def to_clause(
         self,
         columns: Mapping[str, sa.sql.ColumnElement[Any]],
         virtual_operands: Mapping[str, sa.sql.ColumnElement[Any]] | None = None,
     ) -> sa.sql.ColumnElement[Any] | None:
-        return SQLAlchemyCompiler(columns, virtual_operands or {}).compile(self._root)
+        return SQLAlchemyCompiler(
+            columns,
+            virtual_operands or {},
+            search_keys=self._search_keys,
+        ).compile(self._root)
+
+    @property
+    def text_search_spec(self) -> TextSearchSpec | None:
+        return self._text_search
 
 
 class FilterNode:
@@ -246,14 +289,59 @@ class NotIlikeNode(BinaryConditionNode, operators=("!ilike",)):
     pass
 
 
+class TextSearchNode(FilterNode, operators=("text_search",)):
+    def __init__(
+        self, value: str, case_sensitive: bool, keys_by_field: Mapping[str, Sequence[str]]
+    ):
+        self.value = value
+        self.case_sensitive = case_sensitive
+        self.keys_by_field = keys_by_field
+
+    @classmethod
+    def from_json(
+        cls, operator: str, operands: Sequence[Any], parser: FilterParser
+    ) -> TextSearchNode:
+        if not 1 <= len(operands) <= 2:
+            raise FilterExpressionError(
+                data={"reason": f"Invalid number of operands for condition {operator}"}
+            )
+
+        value = operands[0]
+        if not isinstance(value, str) or not value:
+            raise FilterExpressionError(
+                data={"reason": "The 'text_search' query must be a non-empty string"}
+            )
+
+        options = TextSearchOptions()
+        if len(operands) == 2:
+            operand = operands[1]
+            if not isinstance(operand, dict):
+                raise FilterExpressionError(
+                    data={"reason": "The 'text_search' options must be an object"}
+                )
+            try:
+                options = convert(operand, TextSearchOptions)
+            except msgspec.ValidationError:
+                raise FilterExpressionError(
+                    data={"reason": "Invalid 'text_search' options"}
+                ) from None
+
+        return cls(
+            value, options.case_sensitive, parser._text_search_keys(value, options.case_sensitive)
+        )
+
+
 class SQLAlchemyCompiler:
     def __init__(
         self,
         columns: Mapping[str, sa.sql.ColumnElement[Any]],
         virtual_operands: Mapping[str, sa.sql.ColumnElement[Any]],
+        *,
+        search_keys: Sequence[str] = (),
     ):
         self.columns = columns
         self.virtual_operands = virtual_operands
+        self._search_keys = search_keys
 
     def compile(self, node: FilterNode | None) -> sa.sql.ColumnElement[Any] | None:
         match node:
@@ -303,6 +391,23 @@ class SQLAlchemyCompiler:
 
             case NotIlikeNode(left=left, right=right):
                 return sa.not_(self._compile_operand(left).ilike(self._compile_operand(right)))
+
+            case TextSearchNode(
+                value=value, case_sensitive=case_sensitive, keys_by_field=keys_by_field
+            ):
+                if not self._search_keys:
+                    return sa.false()
+                predicates: list[sa.sql.ColumnElement[Any]] = [
+                    text_search_match_clause(
+                        self.columns[key],
+                        value=value,
+                        case_sensitive=case_sensitive,
+                        keys_by_field=keys_by_field.get(key),
+                    )
+                    for key in self._search_keys
+                    if key in self.columns
+                ]
+                return sa.or_(*predicates) if predicates else sa.false()
 
             case FieldNode(field=field):
                 return self._get_column(field)
@@ -360,6 +465,27 @@ class SQLAlchemyCompiler:
 
         expr = left_expr.in_(right.value)
         return sa.not_(expr) if negate else expr
+
+
+def text_search_match_clause(
+    column: sa.sql.ColumnElement[Any],
+    value: str,
+    *,
+    case_sensitive: bool,
+    keys_by_field: Sequence[str] | None = None,
+) -> sa.sql.ColumnElement[Any]:
+    """Build a text search predicate for a single column.
+
+    The column value is matched against ``value`` with a substring match
+    (case-insensitive by default) and, when lookup-table keys are given for
+    the field, by exact key equality via ``IN``.
+    """
+
+    text_col = sa.cast(column, sa.Text)
+    match = text_col.like(f"%{value}%") if case_sensitive else text_col.ilike(f"%{value}%")
+    if keys_by_field:
+        return sa.or_(column.in_(list(keys_by_field)), match)
+    return match
 
 
 def _ensure_list(value: Any) -> list[Any]:
@@ -457,13 +583,32 @@ def _convert_value(datatype: str, value: Any, *, is_list: bool = False) -> Any:
 
 
 class FilterParser:
-    def __init__(self, fields: Iterable[FieldInfo]):
+    def __init__(self, fields: Iterable[FieldInfo], *, user: Any = None):
         self._fields = {field.key: field for field in fields}
+        self._search_keys = [f.key for f in self._fields.values() if f.text_search]
+        self._lookup_fields = [
+            f.key for f in self._fields.values() if f.text_search and f.lookup_table_id is not None
+        ]
+        self._lookup_ids = {
+            f.key: f.lookup_table_id
+            for f in self._fields.values()
+            if f.lookup_table_id is not None
+        }
+        self._user = user
 
     @classmethod
-    def from_resource(cls, resource) -> FilterParser:
-        fields = [FieldInfo(key=f.keyname, datatype=f.datatype) for f in resource.fields]
-        return cls(fields)
+    def from_resource(cls, resource, *, user: Any = None) -> FilterParser:
+        fields = [
+            FieldInfo(
+                key=f.keyname,
+                datatype=f.datatype,
+                id=f.id,
+                text_search=f.text_search,
+                lookup_table_id=f.lookup_table_id,
+            )
+            for f in resource.fields
+        ]
+        return cls(fields, user=user)
 
     def parse(self, expression: Any) -> FilterProgram:
         if expression is None:
@@ -482,7 +627,8 @@ class FilterParser:
             raise FilterExpressionError(data={"reason": "Filter root expression must be a list"})
 
         node = self.parse_operand(expression)
-        return FilterProgram(node)
+        text_search = self._get_text_search(node)
+        return FilterProgram(node, search_keys=self._search_keys, text_search=text_search)
 
     def parse_operand(self, expression: Any) -> FilterNode:
         if isinstance(expression, list):
@@ -502,6 +648,43 @@ class FilterParser:
     @classmethod
     def get_supported_operators(cls) -> list[str]:
         return list(FilterNode.registry.keys())
+
+    def _get_text_search(self, node: FilterNode | None) -> TextSearchSpec | None:
+        if isinstance(node, TextSearchNode):
+            return TextSearchSpec(node.value, node.case_sensitive, node.keys_by_field)
+        if isinstance(node, LogicalNode):
+            for child in node.children:
+                if (spec := self._get_text_search(child)) is not None:
+                    return spec
+        return None
+
+    def _text_search_keys(self, value: str, case_sensitive: bool) -> dict[str, list[str]]:
+        """Resolve lookup-table keys whose labels match ``value``.
+
+        Only fields the ``user`` can read are considered; otherwise the
+        field is searched by the raw value only.
+        """
+
+        if self._user is None or not self._lookup_fields:
+            return {}
+
+        from nextgisweb.lookup_table import LookupTable
+
+        result: dict[str, list[str]] = {}
+        for key in self._lookup_fields:
+            lookup = LookupTable.filter_by(id=self._lookup_ids[key]).first()
+            if lookup is None or not lookup.has_permission(ResourceScope.read, self._user):
+                continue
+
+            if case_sensitive:
+                keys = [k for k, v in lookup.value if value in v]
+            else:
+                q = value.lower()
+                keys = [k for k, v in lookup.value if q in v.lower()]
+
+            if keys:
+                result[key] = keys
+        return result
 
 
 __all__ = [

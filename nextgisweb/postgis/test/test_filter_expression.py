@@ -205,3 +205,37 @@ def test_filter_not_ilike_operator(layer):
 def test_filter_unknown_field(layer):
     with pytest.raises(FilterExpressionError):
         fetch_filtered_ids(layer, ["all", ["==", ["get", "nonexistent"], "value"]])
+
+
+def test_text_search_operator(layer):
+    ids = fetch_filtered_ids(layer, ["text_search", "NYC"])
+    assert ids == [1, 3, 5]
+
+
+def test_text_search_case_insensitive_by_default(layer):
+    ids = fetch_filtered_ids(layer, ["text_search", "nyc"])
+    assert ids == [1, 3, 5]
+    ids = fetch_filtered_ids(layer, ["text_search", "e"])
+    assert ids == [1, 3, 5]
+
+
+def test_text_search_case_sensitive(layer):
+    assert fetch_filtered_ids(layer, ["text_search", "nyc", {"case_sensitive": True}]) == []
+    assert fetch_filtered_ids(layer, ["text_search", "NYC", {"case_sensitive": True}]) == [1, 3, 5]
+
+
+def test_text_search_no_match(layer):
+    assert fetch_filtered_ids(layer, ["text_search", "zzz"]) == []
+
+
+def test_text_search_combined_with_filter(layer):
+    ids = fetch_filtered_ids(
+        layer,
+        ["all", [">", ["get", "age"], 30], ["text_search", "NYC"]],
+    )
+    assert ids == [3, 5]
+
+
+def test_text_search_multiple_operators(layer):
+    ids = fetch_filtered_ids(layer, ["any", ["text_search", "SF"], ["text_search", "c"]])
+    assert ids == [1, 3, 4, 5]

@@ -22,6 +22,7 @@ from nextgisweb.spatial_ref_sys.api import SRSID
 
 from .component import FeatureLayerComponent
 from .feature import Feature
+from .filter import FilterParser
 from .interface import IFeatureLayer, IFeatureQueryIlike, IFilterableFeatureLayer
 from .model import LayerField
 from .ogrdriver import EXPORT_FORMAT_OGR, OGRDriver
@@ -245,7 +246,7 @@ class ExportParamsPost(ExportParams):
     ]
 
 
-def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
+def export(resource: IFeatureLayer, options: ExportOptions, filepath: str, *, user=None):
     field_map = get_field_map(options.fields, resource.fields, options.use_display_name)
 
     options = options.for_fields([alias for alias, _ in field_map])
@@ -293,7 +294,7 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
         if not IFilterableFeatureLayer.providedBy(resource):
             raise ValidationError(message=gettext("Filter expressions are not supported."))
 
-        filter_parser = resource.filter_parser
+        filter_parser = FilterParser.from_resource(resource, user=user)
         filter_program = filter_parser.parse(options.filter)
         query.set_filter_program(filter_program)
 
@@ -371,7 +372,7 @@ def export_single(
         filename = f"{resource.id}.{options.driver.extension}"
         filepath = os.path.join(tmp_dir, filename)
 
-        export(resource, options, filepath)
+        export(resource, options, filepath, user=request.user)
 
         if not options.driver.single_file or zipped:
             return _zip_response(request, tmp_dir, filename)
@@ -403,7 +404,7 @@ def view_geojson_get(
         filename = f"{resource.id}.{options.driver.extension}"
         filepath = os.path.join(tmp_dir, filename)
 
-        export(resource, options, filepath)
+        export(resource, options, filepath, user=request.user)
 
         response = FileResponse(
             filepath,
@@ -478,7 +479,7 @@ def export_multi(
                 layer_dir = tmp_dir
             filepath = os.path.join(layer_dir, f"{layer_name}.{options.driver.extension}")
 
-            export(resource, options, filepath)
+            export(resource, options, filepath, user=request.user)
 
         return _zip_response(request, tmp_dir, "layers")
 

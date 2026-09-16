@@ -6,43 +6,47 @@ msgstr "Невалидная геометрия"
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:467 api_export.py:217
+#: api.py:490 api_export.py:219
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:710
+#: api.py:531
+msgid "The 'text_search_context' parameter requires the 'text_search' parameter."
+msgstr "Параметр 'text_search_context' требует наличия параметра 'text_search'."
+
+#: api.py:760
 msgid "Aggregation is not supported for this layer."
 msgstr "Агрегация не поддерживается для этого слоя."
 
-#: api.py:719
+#: api.py:771
 msgid "Aggregation '{}' is not supported for this layer."
 msgstr "Агрегация '{}' не поддерживается для этого слоя."
 
-#: api.py:725 api.py:732
+#: api.py:777 api.py:784
 msgid "Field '{}' not found."
 msgstr "Поле '{}' не найдено."
 
-#: api_export.py:111
+#: api_export.py:112
 msgid "Couldn't add FID field '{}'. Such field already exists."
 msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
-#: api_export.py:256
+#: api_export.py:258
 msgid "The selected format does not support {} geometry type."
 msgstr "Выбранный формат не поддерживает тип геометрии {}."
 
-#: api_export.py:269
+#: api_export.py:271
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:282
+#: api_export.py:284
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:293
+#: api_export.py:295
 msgid "Filter expressions are not supported."
 msgstr "Выражения фильтра не поддерживаются."
 
-#: api_export.py:467
+#: api_export.py:469
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -92,19 +96,19 @@ msgstr "Невозможно восстановить объект #{} поск�
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: filter.py:32
+#: filter.py:35
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
-#: model.py:138
+#: model.py:137
 msgid "Spatial reference system"
 msgstr "Система координат"
 
-#: model.py:302
+#: model.py:301
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:372
+#: model.py:371
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
 
@@ -141,7 +145,7 @@ msgid "Attributes"
 msgstr "Атрибуты"
 
 #: nodepkg/control-panel-plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:111
+#: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:112
 #: view.py:155
 msgid "Feature versioning"
 msgstr "Версионирование объектов"

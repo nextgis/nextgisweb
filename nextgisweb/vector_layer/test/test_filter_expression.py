@@ -254,6 +254,64 @@ def test_filter_not_ilike_operator(test_layer_id):
     assert fetch_filtered_ids(layer, ["all", ["!ilike", ["get", "name"], "%e"]]) == [2, 4]
 
 
+def test_filter_text_search(test_layer_id):
+    layer = load_layer(test_layer_id)
+
+    # Case-insensitive by default
+    assert fetch_filtered_ids(layer, ["all", ["text_search", "nyc"]]) == [1, 3, 5]
+    assert fetch_filtered_ids(layer, ["all", ["text_search", "AL"]]) == [1]
+
+
+def test_filter_text_search_case_sensitive(test_layer_id):
+    layer = load_layer(test_layer_id)
+
+    assert fetch_filtered_ids(
+        layer, ["all", ["text_search", "NYC", {"case_sensitive": True}]]
+    ) == [
+        1,
+        3,
+        5,
+    ]
+    assert (
+        fetch_filtered_ids(layer, ["all", ["text_search", "nyc", {"case_sensitive": True}]]) == []
+    )
+
+
+def test_filter_text_search_combined(test_layer_id):
+    layer = load_layer(test_layer_id)
+
+    filter = ["all", ["text_search", "NYC"], [">", ["get", "age"], 30]]
+    assert fetch_filtered_ids(layer, filter) == [3, 5]
+
+
+def test_filter_text_search_no_matches(test_layer_id):
+    layer = load_layer(test_layer_id)
+
+    assert fetch_filtered_ids(layer, ["all", ["text_search", "notfound"]]) == []
+
+
+def test_filter_text_search_invalid(test_layer_id):
+    layer = load_layer(test_layer_id)
+
+    with pytest.raises(FilterExpressionError):
+        fetch_filtered_ids(layer, ["all", ["text_search", ""]])
+
+    with pytest.raises(FilterExpressionError):
+        fetch_filtered_ids(layer, ["all", ["text_search", 123]])
+
+    with pytest.raises(FilterExpressionError):
+        fetch_filtered_ids(layer, ["all", ["text_search", "NYC", "options"]])
+
+    with pytest.raises(FilterExpressionError):
+        fetch_filtered_ids(layer, ["all", ["text_search", "NYC", {"case_sensitive": "yes"}]])
+
+
+def test_filter_text_search_root(test_layer_id):
+    layer = load_layer(test_layer_id)
+
+    assert fetch_filtered_ids(layer, ["text_search", "SF"]) == [4]
+
+
 def test_filter_unknown_field(test_layer_id):
     layer = load_layer(test_layer_id)
 
