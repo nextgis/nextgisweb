@@ -4,7 +4,7 @@ import os
 from collections.abc import Mapping
 from inspect import isclass
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type, cast, no_type_check
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -119,8 +119,12 @@ class Env(Container):
 
     def component[T: Component](self, cls: type[T], /) -> T:
         """Get component instance by its class type"""
-        return self.components[cls.identity]
+        result = self.components[cls.identity]
+        assert_type(result, Component)
+        result = cast(T, result)
+        return result
 
+    @no_type_check  # Migrating to component hooks
     def chain(self, meth, first="core"):
         """Building a sequence of method calls with dependencies.
         ``core`` component dependency gets added automatically for all
@@ -159,7 +163,9 @@ class Env(Container):
         for c in list(self.chain("initialize")):
             c.initialize()
 
+            # Do we still need to bind metadata to the engine?
             if hasattr(c, "metadata"):
+                # ty: ignore[unresolved-attribute]
                 c.metadata.bind = self.core.engine
 
         self.initialized = True

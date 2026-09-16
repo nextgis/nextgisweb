@@ -7,11 +7,11 @@ from nextgisweb.env.hook import ComponentHook
 def test_example():
     test_hook = ComponentHook("test_hook")
 
-    @test_hook(cid="core")
+    @test_hook(cident="core")
     def foo(comp):
         pass
 
-    @test_hook(before=[foo], cid="core")
+    @test_hook(before=[foo], cident="core")
     def bar(comp):
         pass
 
@@ -22,15 +22,15 @@ def test_example():
 def test_stages():
     test_hook = ComponentHook("test_hook")
 
-    @test_hook(stage="final", cid="core")
+    @test_hook(stage="final", cident="core")
     def final(comp):
         pass
 
-    @test_hook(stage="initial", cid="core")
+    @test_hook(stage="initial", cident="core")
     def initial(comp):
         pass
 
-    @test_hook(cid="core")
+    @test_hook(cident="core")
     def default(comp):
         pass
 

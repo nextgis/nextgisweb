@@ -88,7 +88,7 @@ def ngw_data_path(request) -> Path:
 
 @pytest.fixture(scope="session", autouse=True)
 def ngw_sql_compare(request):
-    from nextgisweb.env.test import sql_compare
+    from nextgisweb.env.test import sql_compare_set_update
 
     update_refs = request.config.getoption("--ngw-update-refs")
-    setattr(sql_compare, "update", update_refs)
+    sql_compare_set_update(update_refs)

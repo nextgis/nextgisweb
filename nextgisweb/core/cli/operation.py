@@ -24,7 +24,6 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
     :param timeout: Seconds to wait or fail"""
 
-    assert self.env is not None
     components = [
         (comp, func())
         for comp in self.env.components.values()
@@ -145,7 +144,6 @@ def check_integrity(self: EnvCommand):
     }
 
     with DBSession.connection(execution_options=opts) as con:
-        assert self.env is not None
         for comp in self.env.chain("check_integrity"):
             with con.begin_nested():
                 try:

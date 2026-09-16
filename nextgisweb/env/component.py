@@ -1,10 +1,20 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Self
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Final,
+    Protocol,
+    Self,
+    assert_type,
+    cast,
+    no_type_check,
+)
 
 from nextgisweb.lib.config import ConfigOptions, Option
 from nextgisweb.lib.i18n import trstr_factory
@@ -110,7 +120,10 @@ class Component:
         """Get current component instance from environment"""
         from .environment import env
 
-        return env.components[cls.identity]
+        result = env.components[cls.identity]
+        assert_type(result, Component)
+        result = cast(Self, result)
+        return result
 
     @classmethod
     def resource_path(cls, path: str = ""):
@@ -182,6 +195,7 @@ class NamingConventions:
             raise TypeError(f"Class name '{name}' doesn't match '{self.identity}' identity.")
 
 
+@no_type_check  # Migrating to component hooks
 def require(*deps):
     """Decorator for dependencies between components methods
 
@@ -227,24 +241,31 @@ def load_all(packages=None, components=None, enable_disabled=False):
     return (loaded_packages, loaded_components)
 
 
-def component_utility(factory):
-    memo = {}
+class ComponentUtility[T](Protocol):
+    memo: dict[str, T]
 
-    def get(depth=1, *, cident=None):
+    def __call__(self, depth: int = 1, *, cident: str | None = None) -> T: ...
+
+
+def component_utility[T](factory: Callable[[str], T]) -> ComponentUtility[T]:
+    memo: dict[str, T] = {}
+
+    def get(depth: int = 1, *, cident: str | None = None) -> T:
         if cident is None:
             mod = module_from_stack(depth, ("nextgisweb.env.",))
-            cident = pkginfo.component_by_module(mod)
-            assert cident is not None
+            cident = pkginfo.component_by_module(mod, required=True)
 
         try:
             return memo[cident]
         except KeyError:
-            result = memo[cident] = factory(cident)
+            result = factory(cident)
             assert result is not None
+            memo[cident] = result
             return result
 
-    get.memo = memo
-    return get
+    utility = cast(ComponentUtility[T], get)
+    utility.memo = memo
+    return utility
 
 
 _COMP_ID = component_utility(lambda component_id: component_id)

@@ -59,10 +59,7 @@ class WebMapOption:
 
     def __init_subclass__(cls) -> None:
         mod = module_from_stack(depth=1, skip=(__name__,))
-        cid = pkginfo.component_by_module(mod)
-        assert cid is not None
-
-        cls.component = cid
+        cls.component = pkginfo.component_by_module(mod, required=True)
         cls.identity = f"{cls.component}.{cls.name}"
 
     @classmethod

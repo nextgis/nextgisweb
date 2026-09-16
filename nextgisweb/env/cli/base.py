@@ -45,15 +45,18 @@ class bootstrap(EnvOptions):
 
 
 class EnvCommand(EnvOptions):
-    env: Env | None = None
     env_initialize: bool = True
     use_transaction: bool = False
 
+    def __init__(self):
+        self._env: Env | None = None
+
     def __enter__(self):
-        self.env = environment._env
+        self._env = environment._env
+        assert self._env is not None
 
         if self.env_initialize:
-            self.env.initialize()
+            self._env.initialize()
 
         if self.use_transaction:
             assert self.env_initialize
@@ -65,6 +68,11 @@ class EnvCommand(EnvOptions):
     def __exit__(self, type, value, traceback):
         if self.use_transaction:
             transaction.manager.__exit__(type, value, traceback)
+
+    @property
+    def env(self) -> Env:
+        assert self._env is not None
+        return self._env
 
 
 class InTransactionCommand(EnvCommand):

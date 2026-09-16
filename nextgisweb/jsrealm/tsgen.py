@@ -68,9 +68,9 @@ class TSGenerator:
                 and (name := getattr(otype, "__name__", None))
                 and (module := getattr(otype, "__module__", None))
             ):
-                cid = pkginfo.component_by_module(module)
-                if not name.startswith("_") and cid:
-                    result.add_export((component_tsmodule(cid), name))
+                cident = pkginfo.component_by_module(module)
+                if not name.startswith("_") and cident:
+                    result.add_export((component_tsmodule(cident), name))
 
         for ann in annotations:
             if isinstance(ann, TSExport):
@@ -416,9 +416,7 @@ class TSExport:
         if not module.startswith("@"):
             if component is None:
                 mod = module_from_stack(depth, (__name__,))
-                component = pkginfo.component_by_module(mod)
-                if component is None:
-                    raise TypeError(f"no component found for module: {mod}")
+                component = pkginfo.component_by_module(mod, required=True)
             module = component_tsmodule(component, module)
         self.module = module
 

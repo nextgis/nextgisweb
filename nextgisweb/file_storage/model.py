@@ -50,8 +50,8 @@ class FileObj(Base):
                 "sqlalchemy.",
             ),
         )
-        comp_id = pkginfo.component_by_module(mod)
-        assert comp_id and comp_id not in ("file_storage", "file_upload")
+        comp_id = pkginfo.component_by_module(mod, required=True)
+        assert comp_id not in ("file_storage", "file_upload")
         return comp_id
 
     def filename(self, *, makedirs=False, not_exists=False) -> Path:

@@ -9,7 +9,7 @@ from ..cli import EnvCommand, bootstrap, cli
 @cli.command()
 def do_test(this: EnvCommand, *, env: Env = inject.arg(), core: CoreComponent = inject.arg()):
     assert env is this.env
-    assert core is this.env.core
+    assert this.env.components["core"] is core
 
 
 def test_command(ngw_env):

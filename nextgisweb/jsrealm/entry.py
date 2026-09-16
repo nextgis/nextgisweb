@@ -18,7 +18,7 @@ def jsentry(module: str, *, depth: int = 0) -> str:
 
     if not module.startswith("@"):
         py_module = module_from_stack(depth, (__name__))
-        component = pkginfo.component_by_module(py_module)
+        component = pkginfo.component_by_module(py_module, required=True)
         module = "/".join(("@nextgisweb", component.replace("_", "-"), module))
     else:
         assert module.startswith("@nextgisweb/")

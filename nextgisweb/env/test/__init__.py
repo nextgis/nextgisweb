@@ -1,5 +1,4 @@
 import re
-import warnings
 from collections.abc import Sequence
 from contextvars import ContextVar
 from functools import cache, partial
@@ -60,14 +59,28 @@ def get_sqlglot_transpile():
                     return f"({columns})"
                 return super().schema_columns_sql(expression)
 
-    sqlglot_kwargs = dict(read="postgres", write=Dialect, pretty=True)
-    sqlglot_kwargs.update(indent=4, pad=4, normalize_functions=False)
+    sqlglot_kwargs = {
+        "pretty": True,
+        "indent": 4,
+        "pad": 4,
+        "read": "postgres",
+        "write": Dialect,
+        "normalize_functions": False,
+    }
 
     return partial(transpile, **sqlglot_kwargs)
 
 
 class Raw(str):
     pass
+
+
+sql_compare_update: bool = False
+
+
+def sql_compare_set_update(value: bool) -> None:
+    global sql_compare_update
+    sql_compare_update = value
 
 
 def sql_compare(sql, file):
@@ -85,8 +98,7 @@ def sql_compare(sql, file):
 
     norm_sql = "\n".join(out)
 
-    update = sql_compare.update
-    if update or not file.exists():
+    if sql_compare_update or not file.exists():
         file.write_text(norm_sql)
     else:
         ref_sql = file.read_text()
@@ -109,17 +121,3 @@ def _compile_sql(expr):
         return str(expr.compile(dialect=pg_dialect))
     finally:
         setattr(_compile_bindparam, "enabled", False)
-
-
-def __getattr__(name: str):
-    match name:
-        case "_env":
-            from nextgisweb.pytest.env import _env as v
-        case _:
-            raise AttributeError
-    warnings.warn(
-        f"Importing '{name}' from {__name__} is deprecated",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return v

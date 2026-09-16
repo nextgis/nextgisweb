@@ -25,8 +25,7 @@ registry = defaultdict[str, dict[str, _CSCallable]](dict)
 
 def client_setting(name: str, *, stacklevel: int = 0):
     module = module_from_stack(stacklevel)
-    comp_id = pkginfo.component_by_module(module)
-    assert comp_id is not None
+    comp_id = pkginfo.component_by_module(module, required=True)
 
     def decorator(func: _CSCallable):
         registry[comp_id][name] = func

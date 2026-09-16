@@ -1,31 +1,62 @@
-import os
+from __future__ import annotations
+
 import re
-import subprocess
 import sys
 import threading
-import warnings
-from collections import defaultdict
-from importlib.metadata import entry_points, metadata
+from collections.abc import Callable, Iterable, Mapping
+from dataclasses import dataclass, field
+from functools import cached_property, wraps
+from importlib.metadata import EntryPoint, PackageMetadata, entry_points, metadata
+from pathlib import Path
+from typing import ClassVar, Concatenate, Literal, TypedDict, overload
+from warnings import warn, warn_explicit
+
+from typing_extensions import ReadOnly
 
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
+
+from .git_info import git_info
 
 _version_re = re.compile(r"(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$", re.IGNORECASE)
 _qualifications = False
 
 
-class Package:
-    loading = threading.local()
+class PackageComp(TypedDict):
+    module: ReadOnly[str]
+    enabled: ReadOnly[bool]
 
-    def __init__(self, entrypoint):
-        self._name = entrypoint.dist.name.replace("-", "_")
-        self._entrypoint = entrypoint
+
+class PackageInfo(TypedDict):
+    components: ReadOnly[Mapping[str, PackageComp]]
+
+
+def ensure_qualified[**P, R](
+    func: Callable[Concatenate[Package, P], R],
+) -> Callable[Concatenate[Package, P], R]:
+    @wraps(func)
+    def wrapper(self: Package, *args: P.args, **kwargs: P.kwargs) -> R:
+        if not self._qualified:
+            self._qualify()
+            self._qualified = True
+        return func(self, *args, **kwargs)
+
+    return wrapper
+
+
+class Package:
+    loading: ClassVar = threading.local()
+
+    def __init__(self, epoint: EntryPoint) -> None:
+        assert epoint.dist is not None, "EntryPoint without distribution"
+
+        self._name = epoint.dist.name.replace("-", "_")
+        self._epoint = epoint
         self._path = module_path(self.name)
 
         # Assume a version local part consists of commit id and dirtiness flag.
-        self._version_raw = entrypoint.dist.version
-        m = _version_re.match(self._version_raw)
-        if m is not None:
+        self._version_raw = epoint.dist.version
+        if (m := _version_re.match(self._version_raw)) is not None:
             self._version = m.group(1)
             self._commit = m.group(2)
             self._dirty = m.group(3) is not None
@@ -37,246 +68,244 @@ class Package:
         self._qualified = False
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def version(self):
-        self._qualify()
+    @ensure_qualified
+    def version(self) -> str:
         return self._version
 
     @property
-    def commit(self):
-        self._qualify()
+    @ensure_qualified
+    def commit(self) -> str | None:
         return self._commit
 
     @property
-    def dirty(self):
-        self._qualify()
+    @ensure_qualified
+    def dirty(self) -> bool | None:
         return self._dirty
 
-    @property
-    def pkginfo(self):
-        if hasattr(self, "_pkginfo"):
-            return self._pkginfo
-
+    @cached_property
+    def pkginfo(self) -> PackageInfo:
         logger.debug(
             "Loading entrypoint: %s = %s",
-            self._entrypoint.name,
-            self._entrypoint.value,
+            self._epoint.name,
+            self._epoint.value,
         )
 
         mprefix = f"{self.name}."
+
+        ep_callable = self._epoint.load()
+
         mod_before = {k for k in sys.modules.keys() if k.startswith(mprefix)}
-
-        entrypoint_callable = self._entrypoint.load()
-
         try:
             self.loading.value = self
-            self._pkginfo = entrypoint_callable()
+            ep_result = ep_callable()
         finally:
             delattr(self.loading, "value")
-
         mod_after = {k for k in sys.modules.keys() if k.startswith(mprefix)}
-        mod_loaded = mod_after - mod_before
-        if mod_loaded:
+
+        if mod_loaded := mod_after - mod_before:
             mod_fmt = ", ".join(m[len(self.name) + 1 :] for m in mod_loaded)
-            warnings.warn_explicit(
+            mod_filename = sys.modules[self.name].__file__ or "<unknown>"
+            warn_explicit(
                 f"Loading of {self.name} pkginfo entrypoint shouldn't import "
                 f"any additional modules, but the following {self.name}.* "
                 f"modules were imported: {mod_fmt}.",
-                UserWarning,
-                sys.modules[self.name].__file__,
-                0,
+                category=UserWarning,
+                filename=mod_filename,
+                lineno=0,
                 module=self.name,
             )
 
-        return self._pkginfo
+        if (
+            not isinstance(ep_result, dict)
+            or (set(ep_result.keys()) != {"components"})
+            or not isinstance(ep_components := ep_result["components"], dict)
+        ):
+            raise TypeError(f"Invalid package info structure: {ep_result!r}")
 
-    @property
-    def metadata(self):
-        if cached := getattr(self, "_metadata", None):
-            return cached
-        value = metadata(self.name)
-        self._metadata = value
-        return value
+        components: dict[str, PackageComp] = {}
+        for k, v in ep_components.items():
+            if not isinstance(k, str) or not isinstance(v, (dict, str)):
+                raise TypeError(f"Invalid package info structure: {ep_result!r}")
+            if isinstance(v, str):
+                module, enabled = (v, True)
+            elif not isinstance(module := v.get("module"), str) or not isinstance(
+                enabled := v.get("enabled", True), bool
+            ):
+                raise TypeError(f"Invalid package info structure: {ep_result!r}")
+            components[k] = {"module": module, "enabled": enabled}
 
-    def _qualify(self):
+        return PackageInfo(components=components)
+
+    @cached_property
+    def metadata(self) -> PackageMetadata:
+        return metadata(self.name)
+
+    def _qualify(self) -> None:
         if self._qualified or not _qualifications:
             return
 
-        # TODO: Add version qualification!
-
-        commit = git_commit(str(self._path))
-        if commit is not None:
-            dirty = git_dirty(str(self._path))
-            self._commit = commit
-            self._dirty = dirty
+        if gi := git_info(self._path):
+            self._commit = gi.commit[:8]
+            self._dirty = gi.dirty
 
         self._qualified = True
 
 
+@dataclass
+class ModuleNode:
+    cident: str | None = None
+    children: dict[str, ModuleNode] = field(default_factory=dict)
+
+
+class ModuleTree:
+    def __init__(self) -> None:
+        self._root = ModuleNode()
+
+    def insert(self, module: str, cident: str) -> None:
+        node = self._root
+        for part in module.split("."):
+            node = node.children.setdefault(part, ModuleNode())
+        node.cident = cident
+
+    def lookup(self, module: str) -> str | None:
+        node = self._root
+        result = node.cident
+
+        for part in module.split("."):
+            child = node.children.get(part)
+            if child is None:
+                break
+
+            node = child
+            if node.cident is not None:
+                result = node.cident
+
+        return result
+
+
+def ensure_scanned[**P, R](
+    func: Callable[Concatenate[PkgInfo, P], R],
+) -> Callable[Concatenate[PkgInfo, P], R]:
+    @wraps(func)
+    def wrapper(self: PkgInfo, *args: P.args, **kwargs: P.kwargs) -> R:
+        if not self._scanned:
+            self._scan()
+            self._scanned = True
+        return func(self, *args, **kwargs)
+
+    return wrapper
+
+
 class PkgInfo:
-    def __init__(self):
-        self.scanned = False
-        self._comp_mod = dict()
-        self._comp_enabled = dict()
-        self._comp_pkg = dict()
-        self._comp_path = dict()
-        self._packages = dict()
-        self._pkg_comp = dict()
+    def __init__(self) -> None:
+        self._module_tree = ModuleTree()
+        self._scanned = False
 
-        def _node():
-            return defaultdict(_node, {None: None})
-
-        self._module_tree = _node()
-
-    def scan(self):
-        if self.scanned:
-            return
-
-        epoints = sorted(
-            entry_points(group="nextgisweb.packages"),
-            # Deterministic order: nextgisweb then others alphabetically
-            key=lambda ep: (ep.dist.name != "nextgisweb", ep.dist.name),
-        )
-
-        for epoint in epoints:
-            package = Package(epoint)
-            package_name = package.name
-            self._packages[package_name] = package
-            components = package.pkginfo.get("components", dict())
-            for comp, cdefn in components.items():
-                if isinstance(cdefn, str):
-                    cdefn = dict(module=cdefn, enabled=True)
-                if "enabled" not in cdefn:
-                    cdefn["enabled"] = True
-                modname = cdefn["module"]
-
-                if existing := self._comp_mod.get(comp):
-                    warnings.warn(
-                        f"Component '{comp}' was already registered in '{existing}'. "
-                        f"Instance from {modname} will be ignored!"
-                    )
-                    continue
-
-                self._module_tree_insert(modname, comp)
-
-                self._comp_enabled[comp] = cdefn["enabled"]
-                self._comp_pkg[comp] = package_name
-                self._comp_path[comp] = module_path(modname)
-                if package_name not in self._pkg_comp:
-                    self._pkg_comp[package_name] = list()
-                self._pkg_comp[package_name].append(comp)
-
-        for k, v in self._pkg_comp.items():
-            self._pkg_comp[k] = tuple(v)
-        self.scanned = True
+        self._comp_mod: dict[str, str] = {}
+        self._comp_enabled: dict[str, bool] = {}
+        self._comp_pkg: dict[str, str] = {}
+        self._comp_path: dict[str, Path] = {}
+        self._packages: dict[str, Package] = {}
+        self._pkg_comp: dict[str, tuple[str, ...]] = {}
 
     @property
-    def components(self):
-        self.scan()
+    @ensure_scanned
+    def components(self) -> Iterable[str]:
+        """All registered component identities"""
         return self._comp_mod.keys()
 
     @property
-    def packages(self):
-        self.scan()
+    @ensure_scanned
+    def packages(self) -> Mapping[str, Package]:
+        """All packages metadata"""
         return self._packages
 
-    def comp_mod(self, comp):
-        self.scan()
-        return self._comp_mod[comp]
+    @ensure_scanned
+    def comp_mod(self, cident: str) -> str:
+        """Get the module name for the given component"""
+        return self._comp_mod[cident]
 
-    def comp_enabled(self, comp):
-        self.scan()
-        return self._comp_enabled[comp]
+    @ensure_scanned
+    def comp_enabled(self, cident: str) -> bool:
+        """Check if the given component is enabled"""
+        return self._comp_enabled[cident]
 
-    def comp_pkg(self, comp):
-        self.scan()
-        return self._comp_pkg[comp]
+    @ensure_scanned
+    def comp_pkg(self, cident: str) -> str:
+        """Get the package name for the given component"""
+        return self._comp_pkg[cident]
 
-    def comp_path(self, comp):
-        self.scan()
-        return self._comp_path[comp]
+    @ensure_scanned
+    def comp_path(self, cident: str) -> Path:
+        """Get the filesystem path for the given component"""
+        return self._comp_path[cident]
 
-    def pkg_comp(self, pkg):
-        self.scan()
+    @ensure_scanned
+    def pkg_comp(self, pkg: str) -> Iterable[str]:
+        """Get all component identities for the given package"""
         return self._pkg_comp[pkg]
 
-    def component_by_module(self, module_name):
-        self.scan()
+    @overload
+    def component_by_module(self, /, module: str, *, required: Literal[True]) -> str: ...
 
-        n = self._module_tree
-        r = module_name
-        while True:
-            k, __, r = r.partition(".")
-            if k in n:
-                n = n[k]
-            else:
-                return n[None]
+    @overload
+    def component_by_module(self, /, module: str) -> str | None: ...
 
-    def _module_tree_insert(self, module_name, comp):
-        self._comp_mod[comp] = module_name
+    @ensure_scanned
+    def component_by_module(self, module: str, *, required: bool = False) -> str | None:
+        """Get the component identity for the given module name"""
+        result = self._module_tree.lookup(module)
+        if result is None and required:
+            raise KeyError(f"Component for module `{module}` not found")
+        return result
 
-        n = self._module_tree
-        r = module_name
-        while r:
-            k, __, r = r.partition(".")
-            n = n[k]
-        n[None] = comp
+    def _scan(self) -> None:
+        """Load `nextgisweb.packages` entry points and collect package and component information"""
+
+        def _epoint_sort_key(ep: EntryPoint) -> tuple[int, str]:
+            assert ep.dist is not None, "Entry point without distribution"
+            return (0 if ep.dist.name == "nextgisweb" else 1, ep.dist.name)
+
+        # Deterministic order: nextgisweb then others alphabetically
+        epoints = sorted(entry_points(group="nextgisweb.packages"), key=_epoint_sort_key)
+
+        for epoint in epoints:
+            package = Package(epoint)
+            self._packages[package.name] = package
+            for cident, cdefn in package.pkginfo["components"].items():
+                module = cdefn["module"]
+
+                if existing := self._comp_mod.get(cident):
+                    warn(
+                        f"Component `{cident}` was already registered in `{existing}`. "
+                        f"Instance from `{module}` will be ignored!"
+                    )
+                    continue
+
+                self._comp_mod[cident] = module
+                self._module_tree.insert(module, cident)
+
+                self._comp_enabled[cident] = cdefn["enabled"]
+                self._comp_pkg[cident] = package.name
+                self._comp_path[cident] = module_path(module)
+
+                package_components = self._pkg_comp.get(package.name, ())
+                self._pkg_comp[package.name] = (*package_components, cident)
 
 
 pkginfo = PkgInfo()
 
 
-def enable_qualifications(enabled):
+def enable_qualifications(enabled: bool) -> None:
     global _qualifications
     _qualifications = enabled
 
 
-def git_commit(path):
-    try:
-        devnull = open(os.devnull, "w")
-        commit = subprocess.check_output(
-            ["git", "rev-parse", "--short=8", "HEAD"],
-            cwd=path,
-            universal_newlines=True,
-            stderr=devnull,
-        )
-    except Exception as exc:
-        if isinstance(exc, subprocess.CalledProcessError) and exc.returncode == 128:
-            pass  # Not a git repository
-        else:
-            logger.error("Failed to get git commit hash in '%s'", path)
-        return None
-    finally:
-        devnull.close()
-    return commit.rstrip()
-
-
-def git_dirty(path):
-    try:
-        devnull = open(os.devnull, "w")
-        return (
-            subprocess.call(
-                ["git", "diff", "--no-ext-diff", "--quiet"],
-                cwd=path,
-                universal_newlines=True,
-                stderr=devnull,
-            )
-            != 0
-        )
-    except Exception as exc:
-        if isinstance(exc, subprocess.CalledProcessError) and exc.returncode == 128:
-            pass  # Not a git repository
-        else:
-            logger.error("Failed to get git dirty flag in '%s'", path)
-        return None
-    finally:
-        devnull.close()
-
-
-def single_component():
+def single_component() -> dict:
     package = Package.loading.value.name
     prefix = "nextgisweb_"
     assert package.startswith(prefix), f"Package name must start with {prefix}"

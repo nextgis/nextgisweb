@@ -359,7 +359,7 @@ class csetting:
         stacklevel: int = 0,
     ):
         caller_module = module_from_stack(stacklevel)
-        self.component = pkginfo.component_by_module(caller_module)
+        self.component = pkginfo.component_by_module(caller_module, required=True)
 
         self.name = name
         self.gtype, self.stype = type if isinstance(type, tuple) else (type, type)

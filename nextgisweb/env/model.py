@@ -48,8 +48,7 @@ class Base(metaclass=DeclarativeMeta):
         if not cls.__dict__.get("__abstract__", False):
             # Assign component-specific metadata, especially for joined table
             # inheritance, which takes place for every resource class.
-            cident = pkginfo.component_by_module(cls.__module__)
-            assert cident is not None
+            cident = pkginfo.component_by_module(cls.__module__, required=True)
             metadata = _base(cident=cident).metadata
             setattr(cls, "metadata", metadata)
         return super().__init_subclass__()
@@ -60,6 +59,7 @@ class Base(metaclass=DeclarativeMeta):
             metadata = MetaData()
             cls.component_metadata[cident] = metadata
 
+        # ty: ignore[invalid-return-type]
         return type(
             f"Base_{cident.upper()}",
             (cls,),
@@ -93,9 +93,8 @@ class Base(metaclass=DeclarativeMeta):
         self.postinit(**kwargs)
 
     def postinit(self, **kwargs):
-        sup = super()
-        if hasattr(sup, "postinit"):
-            sup.postinit(**kwargs)
+        if func := getattr(super(), "postinit", None):
+            func(**kwargs)
 
     @classmethod
     def query(cls, *args):

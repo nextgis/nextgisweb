@@ -65,7 +65,9 @@ class DirectoryMapping:
 
             if entry.is_dir():
                 for dm in self.dmap:
-                    if dm.pattern.search(p):
+                    pattern = dm.pattern
+                    assert pattern is not None
+                    if pattern.search(p):
                         yield from dm.scan(base, p, tags)
                         break
                 else:

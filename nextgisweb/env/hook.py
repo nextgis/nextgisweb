@@ -16,6 +16,9 @@ HookOrder: dict[HookStage, int] = {
 
 
 class ComponentHookProtocol(Protocol):
+    __module__: str
+    __qualname__: str
+
     def __call__[C: Component](self, comp: C, /, *args, **kwargs) -> Any: ...
 
 
@@ -25,7 +28,7 @@ class ComponentHookEntry[P: ComponentHookProtocol]:
     stage: HookStage = "default"
     before: Iterable[P] = ()
     after: Iterable[P] = ()
-    cid: str
+    cident: str
 
 
 class ComponentHook[P: ComponentHookProtocol]:
@@ -40,11 +43,11 @@ class ComponentHook[P: ComponentHookProtocol]:
         stage: HookStage = "default",
         before: Iterable[P] = (),
         after: Iterable[P] = (),
-        cid: str | None = None,
+        cident: str | None = None,
     ) -> Callable[[P], P]:
-        def decorator(func: P, *, cid: str | None = cid) -> P:
-            if cid is None:
-                cid = pkginfo.component_by_module(func.__module__)
+        def decorator(func: P, *, cident: str | None = cident) -> P:
+            if cident is None:
+                cident = pkginfo.component_by_module(func.__module__, required=True)
 
             self._entries.append(
                 ComponentHookEntry(
@@ -52,7 +55,7 @@ class ComponentHook[P: ComponentHookProtocol]:
                     stage=stage,
                     before=before,
                     after=after,
-                    cid=cid,
+                    cident=cident,
                 )
             )
 
@@ -65,7 +68,7 @@ class ComponentHook[P: ComponentHookProtocol]:
         from .environment import env
 
         for entry in self._sorted():
-            comp = env.components[entry.cid]
+            comp = env.components[entry.cident]
             yield comp, entry.func
 
     def _sorted(self) -> list[ComponentHookEntry[P]]:
@@ -95,7 +98,7 @@ class ComponentHook[P: ComponentHookProtocol]:
 
 def _topological_order[P: ComponentHookProtocol](
     entries: list[ComponentHookEntry[P]],
-) -> list[ComponentHookEntry]:
+) -> list[ComponentHookEntry[P]]:
     n = len(entries)
     position = {id(entry.func): i for i, entry in enumerate(entries)}
     successors: list[set[int]] = [set() for _ in range(n)]

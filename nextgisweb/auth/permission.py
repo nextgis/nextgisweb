@@ -27,8 +27,8 @@ class Permission:
         suffix: WellKnownSuffix | None = None,
     ) -> None:
         mod = module_from_stack(skip=(__name__,))
-        cid = pkginfo.component_by_module(mod)
-        self.identity = f"{cid}.{name}"
+        cident = pkginfo.component_by_module(mod, required=True)
+        self.identity = f"{cident}.{name}"
         if suffix is not None:
             assert isinstance(label, TrStr)
             label = label + ": " + WellKnownLabel[suffix]

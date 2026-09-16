@@ -194,10 +194,10 @@ def test_model_ddl(mock_table_comment, *, request):
     from nextgisweb.env.test import Raw, sql_compare
 
     module = request.module
-    cid = pkginfo.component_by_module(module.__name__)
+    cident = pkginfo.component_by_module(module.__name__, required=True)
 
-    tables = Component.registry[cid].metadata.tables
-    mock_table_comment.return_value = cid
+    tables = Component.registry[cident].metadata.tables
+    mock_table_comment.return_value = cident
 
     sql = []
     for t in sorted(tables.values(), key=lambda x: x.name):
