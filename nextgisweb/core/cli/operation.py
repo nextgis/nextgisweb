@@ -1,8 +1,7 @@
 import os
 import shutil
 from collections.abc import Mapping
-from datetime import datetime, timedelta
-from time import sleep
+from time import monotonic, sleep
 from typing import Any
 
 import transaction
@@ -16,6 +15,7 @@ from nextgisweb.core import maintenance_hook
 
 from ..backup import pg_connection_options
 from ..component import CoreComponent
+from ..is_ready import is_ready_hook
 
 
 @cli.command()
@@ -24,11 +24,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
     :param timeout: Seconds to wait or fail"""
 
-    components = [
-        (comp, func())
-        for comp in self.env.components.values()
-        if (func := getattr(comp, "is_service_ready", None))
-    ]
+    components = [(comp, func(comp)) for comp, func in is_ready_hook]
 
     messages = dict()
 
@@ -37,29 +33,29 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
             if messages[comp] is not None:
                 logfunc("Message from [%s]: %s", comp.identity, messages[comp])
 
-    start = datetime.now()
-    deadline = start + timedelta(seconds=timeout)
+    start = monotonic()
+    deadline = start + timeout
     backoff = 1 / 8
     maxinterval = 10
     while len(components) > 0:
         nxt = []
-        for comp, is_service_ready in components:
+        for comp, gen in components:
             try:
-                messages[comp] = next(is_service_ready)
-                nxt.append((comp, is_service_ready))
+                messages[comp] = next(gen)
+                nxt.append((comp, gen))
             except StopIteration:
                 logger.debug(
                     "Service ready for component [%s] in %0.2f seconds",
                     comp.identity,
-                    (datetime.now() - start).total_seconds(),
+                    monotonic() - start,
                 )
 
         components = nxt
-        if datetime.now() > deadline:
+        if monotonic() > deadline:
             log_messages(logger.error)
             logger.critical(
                 "Wait for service failed in components: {}!".format(
-                    ", ".join([comp.identity for comp, it in components])
+                    ", ".join([comp.identity for comp, _ in components])
                 )
             )
             exit(1)
@@ -67,9 +63,9 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
         elif len(components) > 0:
             if backoff == maxinterval:
                 log_messages(logger.info)
-                logger.info(
+                logger.debug(
                     "Waiting {} seconds to retry in components: {}".format(
-                        backoff, ", ".join([comp.identity for comp, it in components])
+                        backoff, ", ".join([comp.identity for comp, _ in components])
                     )
                 )
             sleep(backoff)

@@ -12,7 +12,7 @@ import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import UNSET
 from requests.exceptions import JSONDecodeError, RequestException
 from sqlalchemy import create_engine
-from sqlalchemy.exc import NoResultFound, OperationalError
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import configure_mappers
 
 from nextgisweb.env import Component, DBSession, gettext, inject
@@ -97,30 +97,6 @@ class CoreComponent(StorageComponentMixin, Component):
         self.env.register(SupportUrl, SupportUrlImpl())
 
         self.fontconfig.initialize()
-
-    def is_service_ready(self):
-        while True:
-            try:
-                sa_url = self._engine_url(error_on_pwfile=True)
-                break
-            except OSError as exc:
-                yield "File [{}] is missing!".format(exc.filename)
-
-        sa_engine = create_engine(
-            sa_url,
-            connect_args=dict(
-                connect_timeout=int(self.options["database.connect_timeout"].total_seconds())
-            ),
-        )
-
-        while True:
-            try:
-                with sa_engine.connect():
-                    break
-            except OperationalError as exc:
-                yield str(exc.orig).rstrip()
-
-        sa_engine.dispose()
 
     def initialize_db(self):
         self.init_settings(
