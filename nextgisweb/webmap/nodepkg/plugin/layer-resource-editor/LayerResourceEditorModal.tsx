@@ -72,7 +72,10 @@ export function LayerResourceEditorModal({
       }
 
       runInAction(() => {
-        nodeData.load(newItemConfig);
+        nodeData.load({
+          ...nodeData.dump(),
+          plugin: newItemConfig.plugin,
+        });
 
         if (filter !== undefined) {
           nodeData.update({ filter });

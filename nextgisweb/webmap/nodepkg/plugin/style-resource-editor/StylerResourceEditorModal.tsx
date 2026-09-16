@@ -49,7 +49,13 @@ export function StyleResourceEditorModal({
     if (newItemConfig && newItemConfig.type === "layer") {
       runInAction(() => {
         nodeData.legendInfo.setSymbols(null);
-        nodeData.load(newItemConfig);
+        // Only refresh settings affected by editing the style resource.
+        nodeData.load({
+          ...nodeData.dump(),
+          minScaleDenom: newItemConfig.minScaleDenom,
+          maxScaleDenom: newItemConfig.maxScaleDenom,
+          plugin: newItemConfig.plugin,
+        });
         display.treeStore.updateResourceLegendSymbols([id]);
       });
     }
