@@ -1,7 +1,14 @@
 import { debounce } from "lodash-es";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { AutoComplete, Button, Input, Tooltip } from "@nextgisweb/gui/antd";
+import {
+  AutoComplete,
+  Button,
+  Input,
+  Spin,
+  Tooltip,
+  Typography,
+} from "@nextgisweb/gui/antd";
 import type { AutoCompleteProps } from "@nextgisweb/gui/antd";
 import { AutoCompleteHoneypot } from "@nextgisweb/gui/component";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -13,12 +20,11 @@ import { ResourceIcon } from "../icon";
 
 import SettingsIcon from "@nextgisweb/icon/material/tune";
 
-import "./ResourcesFilter.less";
-
 const MIN_SEARCH_LENGTH = 3;
 
 interface ResourcesFilterProps extends Omit<AutoCompleteProps, "onChange"> {
   onChange?: AutoCompleteProps["onSelect"];
+  showAdvancedSearch?: boolean;
   cls?: ResourceCls | ResourceCls[];
 }
 
@@ -35,16 +41,16 @@ const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {
       url: resourceUrl,
       label: (
         <div
-          className="item"
           style={{
             display: "inline-flex",
             alignItems: "center",
             gap: "0.5em",
+            width: "100%",
           }}
           title={resource.display_name}
         >
           <ResourceIcon identity={resource.cls} />
-          <span className="title">{resource.display_name}</span>
+          <Typography.Text ellipsis>{resource.display_name}</Typography.Text>
         </div>
       ),
     };
@@ -53,6 +59,7 @@ const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {
 
 export function ResourcesFilter({
   onChange,
+  showAdvancedSearch = true,
   cls,
   ...rest
 }: ResourcesFilterProps) {
@@ -124,9 +131,6 @@ export function ResourcesFilter({
     <>
       <AutoCompleteHoneypot />
       <AutoComplete
-        classNames={{
-          popup: { root: "ngw-resource-resource-filter-dropdown" },
-        }}
         style={{ width: "100%" }}
         popupMatchSelectWidth={290}
         value={search}
@@ -145,23 +149,27 @@ export function ResourcesFilter({
           size="middle"
           placeholder={gettext("Search resources")}
           suffix={
-            <Tooltip title={gettext("Advanced search")}>
-              <Button
-                type="text"
-                size="small"
-                icon={<SettingsIcon />}
-                loading={loading}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  openAdvanced();
-                }}
-              />
-            </Tooltip>
+            showAdvancedSearch ? (
+              <Tooltip title={gettext("Advanced search")}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<SettingsIcon />}
+                  loading={loading}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openAdvanced();
+                  }}
+                />
+              </Tooltip>
+            ) : (
+              <Spin size="small" spinning={loading} />
+            )
           }
         />
       </AutoComplete>

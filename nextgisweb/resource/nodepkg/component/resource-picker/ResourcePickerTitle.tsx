@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
-import { Button, Col, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Col, Flex, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { CloseIcon, SearchIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -25,9 +25,12 @@ interface SearchPanelProps {
 
 const SearchPanel = observer(({ store, onCancelSearch }: SearchPanelProps) => {
   return (
-    <Space.Compact>
+    <Space.Compact block>
       <Button icon={<ArrowBack />} onClick={onCancelSearch} />
       <ResourcesFilter
+        autoFocus
+        showAdvancedSearch={false}
+        popupMatchSelectWidth
         cls={store.requireClass || undefined}
         onChange={(v, opt) => {
           store.changeParentTo(Number(opt.key));
@@ -101,22 +104,24 @@ export const ResourcePickerTitle = observer(
     }, [searchMode, store]);
 
     return (
-      <Row align="middle" justify="space-between" wrap={false}>
-        <Col flex="auto" style={{ minWidth: 0 }}>
+      <Flex align="center" gap="small">
+        <Flex flex={1} style={{ minWidth: 0 }}>
           {searchMode ? (
             <SearchPanel store={store} onCancelSearch={stopSearch} />
           ) : (
             <PathPanel store={store} onEnterSearchMode={startSearch} />
           )}
-        </Col>
+        </Flex>
         {showClose && (
-          <Col>
-            <a color="primary" onClick={onClose}>
-              <CloseIcon />
-            </a>
-          </Col>
+          <Button
+            type="text"
+            size="small"
+            icon={<CloseIcon />}
+            aria-label={gettext("Close")}
+            onClick={onClose}
+          />
         )}
-      </Row>
+      </Flex>
     );
   }
 );
