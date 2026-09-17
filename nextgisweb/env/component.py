@@ -75,7 +75,7 @@ class Component:
 
         conv = NamingConventions(cls.__name__, module=cls.__module__)
 
-        for a in ("package", "module", "identity", "basename", "root_path"):
+        for a in ("package", "module", "identity", "basename", "root_path", "metadata"):
             if hasattr(cls, a):
                 raise TypeError(f"{cls.__name__}.{a} class attribute is forbidden")
 
@@ -84,21 +84,6 @@ class Component:
         cls.identity = conv.identity
         cls.basename = conv.basename
         cls.root_path = module_path(conv.module)
-
-        from .model import _base
-
-        if hasattr(cls, "metadata"):
-            raise TypeError(f"{cls.__name__}.metadata class attribute is forbidden")
-
-        # Autoload model module if it exists
-        model_mod_name = f"{cls.module}.model"
-        model_mod_exists = model_mod_name in sys.modules or find_spec(model_mod_name)
-
-        if model_mod_exists and model_mod_name not in sys.modules:
-            __import__(model_mod_name)
-
-        if memoized := _base.memo.get(cls.identity):
-            cls.metadata = memoized.metadata
 
     def __new__(cls, *args, **kwargs):
         if cls is Component:
@@ -154,6 +139,20 @@ class Component:
     @property
     def options(self):
         return self._options
+
+    @classmethod
+    def _autoload_model(cls) -> None:
+        from .model import _base
+
+        model_mod_name = f"{cls.module}.model"
+        if model_mod_name not in sys.modules and find_spec(model_mod_name):
+            __import__(model_mod_name)
+
+        if (memoized := _base.memo.get(cls.identity)) is not None:
+            cls.metadata = memoized.metadata
+
+        # Replace _autoload_model with a no-op to prevent evaluating it again
+        cls._autoload_model = staticmethod(lambda: None)  # ty: ignore[invalid-assignment]
 
 
 class NamingConventions:

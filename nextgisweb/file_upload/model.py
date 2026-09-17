@@ -10,6 +10,8 @@ from nextgisweb.env import gettext
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
 
+from .component import FileUploadComponent
+
 FileUploadID = Annotated[
     str,
     Meta(
@@ -120,8 +122,6 @@ class FileUpload:
 
 
 def _filenames(id: FileUploadID, makedirs=False) -> tuple[Path, Path]:
-    from .component import FileUploadComponent
-
     ulid = ULID.from_hex(id)
     levels = (ulid.datetime.strftime(r"%Y-%m-%d"), id[-2:], id[-4:-2])
     level_path = Path(FileUploadComponent.current().path, *levels)

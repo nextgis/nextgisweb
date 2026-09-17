@@ -34,6 +34,7 @@ class Env(Container):
         set_global=False,
     ):
         super().__init__()
+
         self.register(Env, self)
 
         if cfg is None:
@@ -92,22 +93,25 @@ class Env(Container):
         self._components = dict()
         self.components = MappingProxyType(self._components)
 
-        for identity, comp_class in Component.registry.items():
-            if identity not in loaded_components:
+        for cident, comp_cls in Component.registry.items():
+            if cident not in loaded_components:
                 logger.warning(
-                    "Component '%s' was imported unexpectedly and won't be initialized!",
-                    identity,
+                    "Component `%s` was registered implicitly, likely as a dependency. "
+                    "Consider enabling it explicitly in the configuration.",
+                    cident,
                 )
                 continue
 
-            cfgcomp = _filter_by_prefix(cfg, identity + ".")
-            instance = comp_class(env=self, settings=cfgcomp)
-            self._components[comp_class.identity] = instance
-            self.register(comp_class, instance)
+            comp_cls._autoload_model()
 
-            assert not hasattr(self, identity), "Attribute name %s already used" % identity
+            comp_settings = _filter_by_prefix(cfg, cident + ".")
+            instance = comp_cls(env=self, settings=comp_settings)
 
-            setattr(self, identity, instance)
+            assert cident not in self._components and not hasattr(self, cident)
+            self._components[cident] = instance
+            setattr(self, cident, instance)
+
+            self.register(comp_cls, instance)
 
         Base.loaded(self)
 

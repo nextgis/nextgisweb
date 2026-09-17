@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from xml.etree import ElementTree
 
 import sqlalchemy as sa
@@ -29,11 +29,8 @@ from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import Resource
 
+from .component import FeatureAttachmentComponent
 from .util import change_suffix
-
-if TYPE_CHECKING:
-    from .component import FeatureAttachmentComponent
-
 
 Base.depends_on("resource", "feature_layer")
 
