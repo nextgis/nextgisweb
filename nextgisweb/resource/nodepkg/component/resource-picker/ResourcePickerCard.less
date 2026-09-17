@@ -17,22 +17,45 @@
   }
 
   .resource-breadcrumb {
-    .ant-breadcrumb-link {
-      display: inline-flex;
+    .resource-breadcrumb-measure {
+      visibility: hidden;
+      height: 0;
+      overflow: hidden;
 
-      .resource-breadcrumb-item {
+      .ant-breadcrumb {
+        width: max-content;
+      }
+    }
+
+    .ant-breadcrumb ol {
+      flex-wrap: nowrap;
+
+      > li {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+      }
+
+      > li:not(:last-child) {
         max-width: 220px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
-      .active {
-        color: var(--text-base);
 
-        .icon {
-          color: var(--text-base);
-        }
+      > li:first-child:not(:last-child),
+      > li:has(.ant-breadcrumb-overlay-link),
+      > .ant-breadcrumb-separator {
+        flex-shrink: 0;
       }
+    }
+
+    .ant-breadcrumb-overlay-link {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .resource-breadcrumb-item {
+      margin: 0;
+      padding: 0;
+      color: inherit;
     }
   }
 }

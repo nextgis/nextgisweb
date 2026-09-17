@@ -49,17 +49,21 @@ export const PathPanel = observer(
   ({ store, onEnterSearchMode }: PathPanelProps) => {
     const { initParentId: initialParentId, parentId, allowMoveInside } = store;
     return (
-      <Row>
-        <Col style={{ width: "30px" }}>
+      <Row align="middle" wrap={false}>
+        <Col flex="30px">
           <a onClick={onEnterSearchMode}>
             <SearchIcon />
           </a>
         </Col>
-        <Col flex="auto" className="resource-breadcrumb">
+        <Col
+          flex="auto"
+          className="resource-breadcrumb"
+          style={{ minWidth: 0 }}
+        >
           <ResourcePickerBreadcrumb store={store} />
         </Col>
         {parentId !== initialParentId && allowMoveInside && (
-          <Col style={{ width: "30px" }}>
+          <Col flex="30px">
             <Tooltip title={msgGotoInitialGroup}>
               <a onClick={() => store.returnToInitial()}>
                 <StartIcon />
@@ -67,7 +71,7 @@ export const PathPanel = observer(
             </Tooltip>
           </Col>
         )}
-        <Col style={{ width: "30px" }}>
+        <Col flex="30px">
           <Tooltip title={msgRefresh}>
             <a onClick={() => store.refresh()}>
               <SyncIcon />
@@ -97,8 +101,8 @@ export const ResourcePickerTitle = observer(
     }, [searchMode, store]);
 
     return (
-      <Row justify="space-between">
-        <Col flex="auto">
+      <Row align="middle" justify="space-between" wrap={false}>
+        <Col flex="auto" style={{ minWidth: 0 }}>
           {searchMode ? (
             <SearchPanel store={store} onCancelSearch={stopSearch} />
           ) : (

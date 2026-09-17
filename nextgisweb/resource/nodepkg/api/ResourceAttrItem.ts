@@ -52,7 +52,9 @@ export class ResourceAttrItem<A extends Attributes = Attributes> {
     public readonly id: number,
     private attrs: A,
     private values: unknown[]
-  ) {}
+  ) {
+    this.attrs = [...attrs] as A;
+  }
 
   get<S extends A[number]>(...spec: S): Value<S> {
     const [key, ...args] = spec as [keyof ResourceAttrTypes, ...unknown[]];

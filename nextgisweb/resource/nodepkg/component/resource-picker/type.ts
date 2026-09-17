@@ -32,7 +32,6 @@ export type PickerResource = ResourcePickerAttr;
 
 export interface ResourcePickerBreadcrumbProps {
   store: ResourcePickerStore;
-  maxBreadcrumbItems?: number;
 }
 
 export interface ResourcePickerChildrenProps<
