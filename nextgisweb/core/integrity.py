@@ -1,0 +1,258 @@
+import re
+from contextlib import contextmanager
+from textwrap import dedent
+from typing import Iterable
+
+import sqlalchemy as sa
+from sqlalchemy.schema import CreateTable
+
+seq_pattern = re.compile(r"^nextval\('(\w+)'::regclass\)$")
+
+
+def check_metadata(metadata: sa.MetaData, conn: sa.Connection) -> Iterable[str]:
+    for tab in metadata.tables.values():
+        for message in check_table(tab, conn):
+            yield message
+
+
+def check_table(tab: sa.Table, conn: sa.Connection) -> Iterable[str]:
+    tab_name, tab_schema = tab.name, tab.schema
+    tab_schema_norm = tab_schema if tab_schema else "public"
+    tab_name_norm = f"{tab_schema_norm}.{tab_name}"
+
+    tab_repr = (f"{tab_schema}." if tab_schema else "") + tab_name
+    tab_msg = f"Table '{tab_repr}'"
+
+    meta = sa.MetaData()
+
+    temp_tab = tab.to_metadata(meta, schema=None)
+    temp_tab._prefixes = ["TEMPORARY"]
+    temp_tab_name_norm = f"pg_temp.{temp_tab.name}"
+
+    conn.execute(CreateTable(temp_tab, include_foreign_key_constraints=[]))
+
+    with _null_search_path(conn):
+        # Columns
+
+        # fmt: off
+        qcolumns = sa.text(dedent("""
+            WITH attr_exp AS (
+                SELECT a.attname, a.atttypid, a.atttypmod, a.attnotnull, d.adbin, d.adrelid
+                FROM pg_attribute a
+                LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
+                WHERE a.attrelid = CAST(:temp_name AS regclass) AND attnum > 0 AND NOT attisdropped
+            ),
+            attr_act AS (
+                SELECT a.attname, a.atttypid, a.atttypmod, a.attnotnull, d.adbin, d.adrelid
+                FROM pg_attribute a
+                LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
+                WHERE attrelid = CAST(:name AS regclass) AND attnum > 0 AND NOT attisdropped
+            )
+            SELECT
+                a.attname AS name_exp,
+                b.attname AS name_act,
+                format_type(a.atttypid, a.atttypmod) AS t_exp,
+                format_type(b.atttypid, b.atttypmod) AS t_act,
+                a.attnotnull AS notnull_exp,
+                b.attnotnull AS notnull_act,
+                pg_get_expr(a.adbin, a.adrelid) AS defval_exp,
+                pg_get_expr(b.adbin, b.adrelid) AS defval_act
+            FROM attr_exp a
+            FULL OUTER JOIN attr_act b ON b.attname = a.attname
+        """))
+        # fmt: on
+        result = conn.execute(qcolumns, dict(temp_name=temp_tab_name_norm, name=tab_name_norm))
+
+        col_extra = set()
+
+        for r in result.mappings():
+            if r.name_exp is None:
+                col_extra.add(r.name_act)
+                continue
+            col_msg = f"{tab_msg}, column '{r.name_exp}'"
+            if r.name_act is None:
+                yield f"{col_msg}: not found."
+            elif r.t_exp != r.t_act:
+                yield f"{col_msg}: type mismatch ({r.t_exp} <> {r.t_act})."
+            elif r.notnull_exp is not r.notnull_act:
+                yield f"{col_msg}: {'should' if r.notnull_exp else 'should not'} be nullable."
+            elif (
+                defval_exp := seq_pattern.sub(
+                    lambda m: f"nextval('{tab_schema_norm}.{m.group(1)}'::regclass)",
+                    r.defval_exp,
+                )
+                if r.defval_exp is not None
+                else None
+            ) != r.defval_act:
+                yield f"{col_msg}: default mismatch ({defval_exp} <> {r.defval_act})."
+
+        if len(col_extra) > 0:
+            yield f"{tab_msg}: extra columns found ({', '.join(col_extra)})."
+
+        # Constraints
+
+        # fmt: off
+        qconstraints = sa.text(dedent("""
+            SELECT
+                contype,
+                conkey,
+                conrelid,
+                confrelid,
+                confkey,
+                pg_get_expr(conbin, conrelid) AS expr,
+                conname,
+                condeferrable,
+                condeferred
+            FROM pg_constraint
+            WHERE conrelid = CAST(:name AS regclass)
+        """))
+        # fmt: on
+        result_exp = conn.execute(qconstraints, dict(name=temp_tab_name_norm))
+        result_act = conn.execute(qconstraints, dict(name=tab_name_norm))
+        data_exp = _group_constraints(result_exp, conn=conn)
+        data_act = _group_constraints(result_act, conn=conn)
+
+        # Add foreign key expected data
+        assert "f" not in data_exp
+        fkeys = tuple(c for c in tab.constraints if isinstance(c, sa.ForeignKeyConstraint))
+        if len(fkeys) > 0:
+            fk_data = data_exp["f"] = dict()
+
+            tab_relid = _toid(tab_name_norm, conn=conn)
+            for c in fkeys:
+                ftab = c.referred_table
+                ftab_name_norm = (f"{ftab.schema}" if ftab.schema else "public") + "." + ftab.name
+                ftab_relid = _toid(ftab_name_norm, conn=conn)
+
+                colnames = tuple(c.name for c in c.columns)
+                fcolnames = tuple(e.column.name for e in c.elements)
+
+                key = (
+                    colnames,
+                    ftab_relid if ftab_relid != tab_relid else None,
+                    fcolnames,
+                )
+
+                conname = c.name if c.name is not None else f"{tab_name}_{'_'.join(colnames)}_fkey"
+                fk_data[key] = dict(
+                    conname=conname,
+                    condeferrable=c.deferrable is True,
+                    condeferred=c.initially == "DEFERRED",
+                )
+
+        for contype in ("p", "u", "f", "c"):
+
+            def conlabel(key):
+                match contype:
+                    case "p" | "u":
+                        fmtcols = ", ".join(key)
+                        return f"{'unique' if contype == 'u' else 'primary key'} constraint for column(s) ({fmtcols})"
+                    case "f":
+                        columns, ft_oid, fcolumns = key
+                        ft_name = _tname(ft_oid, conn=conn)
+                        fmtcols = ", ".join(columns)
+                        fmtfcols = ", ".join(fcolumns)
+                        return f"foreign key constraint from '{tab_name}' ({fmtcols}) to '{ft_name}' ({fmtfcols})"
+                    case "c":
+                        return f"check constraint ({key})"
+                raise NotImplementedError
+
+            cdata_exp = data_exp.get(contype, dict())
+            cdata_act = data_act.get(contype, dict())
+            for key, d_exp in cdata_exp.items():
+                if key not in cdata_act:
+                    yield f"{tab_msg}, {conlabel(key)} not found."
+                    continue
+                d_act = cdata_act.pop(key)
+                if d_exp["conname"] != d_act["conname"]:
+                    yield f"{tab_msg}, {conlabel(key)} name mismatch ({d_exp['conname']} <> {d_act['conname']})."
+                elif d_exp["condeferrable"] != d_act["condeferrable"]:
+                    yield f"{tab_msg}, {conlabel(key)} {'should' if d_exp['condeferrable'] else 'should not'} be deferrable."
+                elif d_exp["condeferred"] != d_act["condeferred"]:
+                    yield f"{tab_msg}, {conlabel(key)} {'should' if d_exp['condeferred'] else 'should not'} be deferred."
+
+            for key in cdata_act.keys():
+                yield f"{tab_msg}: extra constraint found ({conlabel(key)})."
+
+
+def _colnames(toid, keys, *, conn):
+    return tuple(_colname(toid, k, conn=conn) for k in keys)
+
+
+def _cache(func):
+    cache = dict()
+
+    def wrapped(*args, **kw):
+        conn = kw.pop("conn")
+        key = (args, *kw.items())
+        if key not in cache:
+            cache[key] = func(*args, **kw, conn=conn)
+        return cache[key]
+
+    setattr(wrapped, "cache_clear", lambda: cache.clear())
+    return wrapped
+
+
+@_cache
+def _colname(toid: int, key: int, *, conn: sa.Connection):
+    return conn.execute(
+        sa.text("""
+            SELECT attname FROM pg_attribute
+            WHERE attrelid = :toid AND attnum = :attnum AND NOT attisdropped
+        """),
+        dict(toid=toid, attnum=key),
+    ).scalar()
+
+
+@_cache
+def _tname(oid: int, *, conn: sa.Connection):
+    return conn.execute(sa.text("SELECT CAST(:oid AS regclass)"), dict(oid=oid)).scalar()
+
+
+@_cache
+def _toid(name: str, *, conn: sa.Connection):
+    return conn.execute(sa.text("SELECT CAST(:name AS regclass)::oid"), dict(name=name)).scalar()
+
+
+_conmap = dict(
+    p=lambda r, conn: _colnames(r.conrelid, r.conkey, conn=conn),
+    u=lambda r, conn: _colnames(r.conrelid, r.conkey, conn=conn),
+    f=lambda r, conn: (
+        _colnames(r.conrelid, r.conkey, conn=conn),
+        r.confrelid if r.confrelid != r.conrelid else None,  # check self-relation
+        _colnames(r.confrelid, r.confkey, conn=conn),
+    ),
+    c=lambda r, conn: r.expr,
+)
+
+
+def _group_constraints(qresult: sa.Result, *, conn):
+    data = dict()
+    for row in qresult.mappings():
+        cmpfun = _conmap.get(row.contype)
+        if cmpfun is None:
+            continue
+        if row.contype not in data:
+            data[row.contype] = dict()
+        key = cmpfun(row, conn)
+        data[row.contype][key] = {
+            k: row[k]
+            for k in (
+                "conname",
+                "condeferrable",
+                "condeferred",
+            )
+        }
+    return data
+
+
+@contextmanager
+def _null_search_path(conn: sa.Connection):
+    with conn.begin_nested():
+        search_path = conn.execute(sa.text("SHOW search_path")).scalar()
+        sql = sa.text("SELECT set_config('search_path', :value, true)")
+        conn.execute(sql, dict(value=""))
+        try:
+            yield
+        finally:
+            conn.execute(sql, dict(value=search_path))
