@@ -163,11 +163,6 @@ class Env(Container):
         for c in list(self.chain("initialize")):
             c.initialize()
 
-            # Do we still need to bind metadata to the engine?
-            if hasattr(c, "metadata"):
-                # ty: ignore[unresolved-attribute]
-                c.metadata.bind = self.core.engine
-
         self.initialized = True
 
     def metadata(self):
