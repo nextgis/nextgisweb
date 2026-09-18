@@ -5,7 +5,7 @@ from urllib.parse import quote
 from lxml import etree, html
 from lxml.builder import ElementMaker
 from PIL import Image, ImageColor, ImageDraw, ImageFont
-from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPBadRequest, HTTPUnauthorized
 from pyramid.renderers import render as render_template
 from pyramid.response import Response
 from sqlalchemy.exc import NoResultFound
@@ -59,20 +59,21 @@ def layer_by_keyname(service, keyname):
     )
 
 
-def _wms_auth(request: Request):
+def _wms_auth(request: Request) -> None:
     try:
         request.resource_permission(ServiceScope.connect)
     except InsufficientPermissions:
-        if request.authenticated_userid is None:
-            # Force 401 Unauthorized for unauthenticated users. It's useful for
-            # MapInfo because there is no way to give user credentials directly
-            # there.
+        if request.authenticated_userid is not None:
+            raise
 
-            # TODO: Maybe it should be implemented in the error handler with an
-            # additional option to enable this behavior.
-            return Response(status_code=401, headers={"WWW-Authenticate": "Basic"})
+        # Force 401 Unauthorized for unauthenticated users. It's useful for
+        # MapInfo because there is no way to give user credentials directly
+        # there.
 
-        raise
+        # NOTE: If move this authentication logic to an error handler, it
+        # would need to distinguish between the service resource and other
+        # types of resources.
+        raise HTTPUnauthorized(headers={"WWW-Authenticate": "Basic"})
 
 
 def wms_handler(obj, request: Request):
