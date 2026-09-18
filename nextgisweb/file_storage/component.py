@@ -122,12 +122,6 @@ class FileStorageComponent(Component):
         logger.info("%d orphaned files found (%d bytes)", deleted_files, deleted_bytes)
         logger.info("%d files remain (%d bytes)", kept_files, kept_bytes)
 
-    def check_integrity(self):
-        for fileobj in FileObj.query():
-            filepath = self.filename(fileobj, makedirs=False)
-            if not os.path.isfile(filepath):
-                yield f"File '{filepath}' not found."
-
     # fmt: off
     option_annotations = (
         Option("path", default=None),

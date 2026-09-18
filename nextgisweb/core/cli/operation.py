@@ -12,6 +12,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import maintenance_hook
+from nextgisweb.core.check_integrity import check_integrity_hook
 
 from ..backup import pg_connection_options
 from ..component import CoreComponent
@@ -139,16 +140,20 @@ def check_integrity(self: EnvCommand):
     }
 
     with DBSession.connection(execution_options=opts) as con:
-        for comp in self.env.chain("check_integrity"):
+        for comp, func in check_integrity_hook:
             with con.begin_nested():
                 try:
-                    citer = comp.check_integrity()
+                    citer = func(comp)
                     if citer is not None and hasattr(citer, "__next__"):
                         for error in citer:
-                            logger.error(f"Fault for [{comp.identity}]: {error}")
+                            logger.error("Integrity error from `%s`: %s", comp.identity, error)
                             fail = True
                 except Exception as exc:
-                    logger.error(f"Error for [{comp.identity}]: {str(exc)}")
                     fail = True
+                    logger.exception(
+                        "Exception while checking integrity of `%s`: %s",
+                        comp.identity,
+                        str(exc),
+                    )
     if fail:
         exit(1)

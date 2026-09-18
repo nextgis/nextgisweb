@@ -88,6 +88,7 @@ class Component:
                 raise TypeError(f"{cls.__name__}.{a} class attribute is forbidden")
 
         for a in (
+            "check_integrity",
             "client_codegen",
             "healthcheck",
             "is_service_ready",
@@ -149,9 +150,6 @@ class Component:
         return ()
 
     def restore_prepare(self):
-        pass
-
-    def check_integrity(self):
         pass
 
     def setup_pyramid(self, config):

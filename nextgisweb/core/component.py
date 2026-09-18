@@ -23,7 +23,6 @@ from nextgisweb.lib.saext import postgres_url
 from nextgisweb.i18n import Localizer, Translations
 
 from .backup import BackupMetadata
-from .integrity import check_metadata
 from .model import Setting
 from .storage import StorageComponentMixin
 
@@ -266,13 +265,6 @@ class CoreComponent(StorageComponentMixin, Component):
 
     def backup_filename(self, filename):
         return os.path.join(self.options["backup.path"], filename)
-
-    def check_integrity(self):
-        metadata = self.env.metadata()
-        connection = DBSession.connection()
-
-        for message in check_metadata(metadata, connection):
-            yield message
 
     def backup_objects(self):
         yield from self.fontconfig.backup_objects()
