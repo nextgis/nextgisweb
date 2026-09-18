@@ -17,6 +17,7 @@ export interface SearchResult {
   geometry: Geometry;
   key: number;
   featureId?: number;
+  searchContext?: number[];
 }
 
 type SearchStepResult = [number, SearchResultGroup[], boolean];
