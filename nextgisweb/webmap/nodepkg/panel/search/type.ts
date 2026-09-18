@@ -4,17 +4,22 @@ import type { Geometry } from "ol/geom";
 import type { AbortControllerHelper } from "@nextgisweb/pyramid/util";
 import type { Display } from "@nextgisweb/webmap/display";
 
+export type SearchResultGroup = {
+  type: "layers" | "place" | "public";
+  label: string;
+  resourceId?: number;
+  identifiable?: boolean;
+  children: SearchResult[];
+};
+
 export interface SearchResult {
   label: string;
   geometry: Geometry;
-  type: "place" | "layers" | "public";
   key: number;
-  identifiable: boolean;
-  resourceId?: number;
   featureId?: number;
 }
 
-type SearchStepResult = [number, SearchResult[], boolean];
+type SearchStepResult = [number, SearchResultGroup[], boolean];
 export type SearchFunction = (
   criteria: string,
   limit: number,

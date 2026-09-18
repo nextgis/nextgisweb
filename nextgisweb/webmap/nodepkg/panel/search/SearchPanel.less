@@ -10,59 +10,22 @@
   }
 
   > .ngw-webmap-panel-content {
-    .result {
-      cursor: pointer;
-      padding-inline: 10px;
-      padding-block: 6px;
+    .results {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      min-height: 0;
+    }
 
-      svg {
-        padding-inline-start: 2px;
-        color: gray;
-      }
-
-      .identify-icon {
-        display: inline-block;
-        position: relative;
-
-        .identify-icon-hover {
-          display: none;
-          position: absolute;
-          inset: 0;
-        }
-
-        &:hover {
-          .identify-icon-default {
-            visibility: hidden;
-          }
-
-          .identify-icon-hover {
-            display: inline-block;
-
-            svg {
-              color: var(--primary);
-            }
-          }
-        }
-      }
-
-      &:first-child {
-        padding-top: 7px;
-      }
-
-      &:hover {
-        background-color: #eae9e9;
-      }
-
-      &.selected {
-        cursor: auto;
-        background-color: #eae9e9;
-      }
+    .loading-wrapper {
+      display: flex;
+      flex: 1 1 auto;
+      justify-content: center;
+      align-items: center;
     }
 
     .loading {
-      margin-top: 20px;
       color: #076dbf;
-      text-align: center;
     }
   }
 }

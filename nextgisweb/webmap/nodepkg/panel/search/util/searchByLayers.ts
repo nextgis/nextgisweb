@@ -1,7 +1,7 @@
 import { route } from "@nextgisweb/pyramid/api";
 import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
 
-import type { SearchFunction, SearchResult } from "../type";
+import type { SearchFunction, SearchResult, SearchResultGroup } from "../type";
 
 interface FeatureResponse {
   id: number;
@@ -16,8 +16,9 @@ export const searchByLayers: SearchFunction = async (
   controller,
   geoJSON
 ) => {
-  const visibleItems = await display.getVisibleItems();
+  const visibleItems = display.getVisibleItems();
   const requests: {
+    layerName: string;
     layerId: number;
     identifiable: boolean;
     request: Promise<FeatureResponse[]>;
@@ -47,33 +48,42 @@ export const searchByLayers: SearchFunction = async (
       },
       signal,
     });
-    requests.push({ layerId, identifiable: item.identifiable, request });
-  });
-
-  const results = await Promise.allSettled(requests.map((r) => r.request));
-  const searchResults: SearchResult[] = [];
-  let isExceeded = false;
-  results.forEach((r, index) => {
-    if (r.status !== "fulfilled" || !r.value || limit < 1) return;
-    const { layerId, identifiable } = requests[index];
-    r.value.forEach((feature) => {
-      if (isExceeded) return;
-      const searchResult: SearchResult = {
-        label: feature.label,
-        geometry: geoJSON.readGeometry(feature.geom),
-        type: "layers",
-        key: limit,
-        identifiable,
-        ...(identifiable && {
-          featureId: feature.id,
-          resourceId: layerId,
-        }),
-      };
-      searchResults.push(searchResult);
-      limit = limit - 1;
-      isExceeded = limit < 1;
+    requests.push({
+      layerName: item.label,
+      layerId,
+      identifiable: item.identifiable,
+      request,
     });
   });
 
-  return [limit, searchResults, isExceeded];
+  const results = await Promise.allSettled(requests.map((r) => r.request));
+  const groups: SearchResultGroup[] = [];
+  let isExceeded = false;
+  results.forEach((r, index) => {
+    if (r.status !== "fulfilled" || !r.value || limit < 1) return;
+    const { layerName, layerId, identifiable } = requests[index];
+    const children: SearchResult[] = [];
+    r.value.forEach((feature) => {
+      if (isExceeded) return;
+      children.push({
+        label: feature.label,
+        geometry: geoJSON.readGeometry(feature.geom),
+        key: limit,
+        featureId: feature.id,
+      });
+      limit = limit - 1;
+      isExceeded = limit < 1;
+    });
+    if (children.length > 0) {
+      groups.push({
+        type: "layers",
+        label: layerName,
+        resourceId: layerId,
+        identifiable,
+        children,
+      });
+    }
+  });
+
+  return [limit, groups, isExceeded];
 };

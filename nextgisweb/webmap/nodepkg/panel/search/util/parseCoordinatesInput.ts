@@ -1,7 +1,10 @@
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 
 import type { SearchFunction, SearchResult } from "../type";
+
+import { toResultGroup } from "./toResultGroup";
 
 export const parseCoordinatesInput: SearchFunction = async (
   criteria,
@@ -24,12 +27,12 @@ export const parseCoordinatesInput: SearchFunction = async (
         },
         { featureProjection }
       ),
-      type: "place",
       key: limit,
-      identifiable: false,
     };
     searchResults.push(searchResult);
     limit = limit - 1;
   });
-  return [limit, searchResults, false];
+  const groups = toResultGroup("place", gettext("Coordinates"), searchResults);
+
+  return [limit, groups, false];
 };

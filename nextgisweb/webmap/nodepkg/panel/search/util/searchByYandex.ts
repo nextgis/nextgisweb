@@ -1,7 +1,10 @@
 import { request } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/webmap/client-settings";
 
 import type { SearchFunction, SearchResult } from "../type";
+
+import { toResultGroup } from "./toResultGroup";
 
 interface YandexGeoObject {
   name: string;
@@ -41,7 +44,7 @@ export const searchByYandex: SearchFunction = async (
     !settings.address_search_enabled ||
     settings.address_geocoder !== "yandex"
   ) {
-    return [limit, searchResults, false];
+    return [limit, [], false];
   }
 
   const apikey = settings.yandex_api_geocoder_key;
@@ -91,14 +94,14 @@ export const searchByYandex: SearchFunction = async (
           featureProjection: display.displayProjection,
         }
       ),
-      type: "public",
       key: limit,
-      identifiable: false,
     };
     searchResults.push(searchResult);
     limit = limit - 1;
     isExceeded = limit < 1;
   });
 
-  return [limit, searchResults, isExceeded];
+  const groups = toResultGroup("public", gettext("Places"), searchResults);
+
+  return [limit, groups, isExceeded];
 };

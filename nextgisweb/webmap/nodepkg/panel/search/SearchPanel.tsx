@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { createContext, use, useState } from "react";
-import type { ChangeEvent, MouseEvent, ReactNode } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 
 import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
 import { useDebounce } from "@nextgisweb/pyramid/hook";
@@ -11,14 +11,11 @@ import { PanelContainer, PanelTitle } from "../component";
 import type { PanelTitleProps } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
-import type { SearchResult } from "./type";
+import { SearchResultsTree } from "./component/SearchResultsTree";
+import type { SearchResultGroup } from "./type";
 import { search } from "./util/search";
 
-import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
-import LayersIcon from "@nextgisweb/icon/material/layers";
-import LocationOnIcon from "@nextgisweb/icon/material/location_on";
-import PublicIcon from "@nextgisweb/icon/material/public";
 
 import "./SearchPanel.less";
 
@@ -51,15 +48,15 @@ function SearchPanelTitle({ className, close }: PanelTitleProps) {
 const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<
-    [SearchResult[], boolean] | undefined
-  >(undefined);
-  const [resultSelected, setResultSelected] = useState<
-    SearchResult | undefined
+    [SearchResultGroup[], boolean] | undefined
   >(undefined);
   const [searchText, setSearchText] = useState<string | undefined>(undefined);
   const [searchController, setSearchController] = useState<
     AbortControllerHelper | undefined
   >(undefined);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    () => new Set()
+  );
 
   const clearResults = () => {
     if (searchController) {
@@ -91,70 +88,19 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }
   };
 
-  const selectResult = (resultInfo: SearchResult) => {
-    setResultSelected(resultInfo);
-
-    display.map.zoomToGeom(resultInfo.geometry);
-
-    display.highlighter.highlight({ geom: resultInfo.geometry });
-  };
-
-  const onIdentifyIconClick = (
-    e: MouseEvent<HTMLElement>,
-    resultInfo: SearchResult
-  ) => {
-    e.stopPropagation();
-    const { resourceId, featureId } = resultInfo;
-    if (resourceId !== undefined && featureId !== undefined) {
-      display.identify.identifyFeatureByAttrValue(resourceId, "id", featureId);
-    }
-  };
-
-  const makeResult = (resultInfo: SearchResult) => {
-    const isSelected = resultSelected && resultSelected.key === resultInfo.key;
-
-    let resultSourceIcon = <PublicIcon />;
-    if (resultInfo.type === "public") {
-      resultSourceIcon = <PublicIcon />;
-    } else if (resultInfo.type === "place") {
-      resultSourceIcon = <LocationOnIcon />;
-    } else if (resultInfo.type === "layers") {
-      resultSourceIcon = <LayersIcon />;
-    }
-
-    return (
-      <div
-        className={`result ${isSelected ? "selected" : ""}`}
-        key={resultInfo.key}
-        onClick={() => selectResult(resultInfo)}
-      >
-        <span>
-          {resultInfo.label}
-          {resultInfo.identifiable ? (
-            <span
-              className="identify-icon"
-              title={gettext("Identify object")}
-              onClick={(e) => onIdentifyIconClick(e, resultInfo)}
-            >
-              <span className="identify-icon-default">{resultSourceIcon}</span>
-              <span className="identify-icon-hover">
-                <IdentifyIcon />
-              </span>
-            </span>
-          ) : (
-            resultSourceIcon
-          )}
-        </span>
-      </div>
-    );
-  };
-
   let results: ReactNode = null;
   let info: ReactNode = null;
   if (searchResults && !loading) {
-    const [resultsInfo, isExceeded] = searchResults;
-    results = resultsInfo.map((r) => makeResult(r));
-    if (resultsInfo.length === 0) {
+    const [groups, isExceeded] = searchResults;
+    results = (
+      <SearchResultsTree
+        groups={groups}
+        display={display}
+        collapsedGroups={collapsedGroups}
+        onCollapsedGroupsChange={setCollapsedGroups}
+      />
+    );
+    if (groups.length === 0) {
       info = <Alert title={gettext("Not found")} type="info" showIcon />;
     } else if (isExceeded) {
       info = (
@@ -168,7 +114,11 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
       );
     }
   } else if (loading) {
-    results = <Spin className="loading" style={{ fontSize: 30 }} />;
+    results = (
+      <div className="loading-wrapper">
+        <Spin className="loading" style={{ fontSize: 30 }} />
+      </div>
+    );
   }
 
   const clearSearchText = () => {
