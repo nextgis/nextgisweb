@@ -75,9 +75,30 @@ class Component:
 
         conv = NamingConventions(cls.__name__, module=cls.__module__)
 
-        for a in ("package", "module", "identity", "basename", "root_path", "metadata"):
+        for a in (
+            "basename",
+            "configure",
+            "identity",
+            "metadata",
+            "module",
+            "package",
+            "root_path",
+        ):
             if hasattr(cls, a):
                 raise TypeError(f"{cls.__name__}.{a} class attribute is forbidden")
+
+        for a in (
+            "client_codegen",
+            "healthcheck",
+            "is_service_ready",
+            "maintenance",
+            "query_stat",
+            "stylesheets",
+            "sys_info",
+            "template_include",
+        ):
+            if hasattr(cls, a):
+                raise TypeError(f"Migrate {cls.__name__}.{a} to component hooks")
 
         cls.package = conv.package
         cls.module = conv.module
