@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Literal, Self, TypedDict, Unpack, overload
+from typing import Any, Literal, Self, TypedDict, Unpack, overload
 from urllib.parse import quote
 from warnings import warn
 
-import pytest
 from requests import Session as RequestsSession
 from typing_extensions import deprecated
 from webtest import TestApp as BaseTestApp

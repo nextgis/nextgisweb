@@ -1,6 +1,6 @@
 from nextgisweb.lib.apitype import AsJSON, JSONType, XMLType
 
-from . import client_codegen, stats, sys_info
+from . import client_codegen, stats, sys_info  # noqa: F401
 from .component import CompanyLogo, CompanyUrl, HelpPageUrl, LinkPreviewDefaults, PyramidComponent
 from .model import Session, SessionStore
 from .session import WebSession

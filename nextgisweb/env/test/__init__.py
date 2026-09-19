@@ -1,15 +1,12 @@
 import re
-from collections.abc import Sequence
 from contextvars import ContextVar
 from functools import cache, partial
 from importlib.util import find_spec
-from pathlib import Path
 
 import pytest
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import BindParameter
-from sqlglot.dialects.postgres import Postgres as SqlglotPostgres
 
 current_request = ContextVar("current_request")
 

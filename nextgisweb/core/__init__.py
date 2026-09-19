@@ -1,4 +1,4 @@
-from . import healthcheck, stats, sys_info
+from . import healthcheck, stats, sys_info  # noqa: F401
 from .backup import BackupBase, BackupMetadata
 from .check_integrity import CheckIntegrityResult, check_integrity_hook
 from .component import CoreComponent, SupportUrl, SystemFullNameDefault

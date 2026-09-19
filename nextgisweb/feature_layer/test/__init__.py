@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from contextlib import contextmanager
 from typing import Literal
 
 import pytest
@@ -9,8 +8,6 @@ import pytest
 from nextgisweb.env.test import fixture_value
 
 from nextgisweb.pyramid.test import WebTestApp
-
-from ..component import FeatureLayerComponent
 
 
 class FeatureLayerAPI:

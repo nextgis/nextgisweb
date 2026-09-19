@@ -8,7 +8,7 @@ import transaction
 from osgeo import ogr
 
 import nextgisweb.lib.saext as saext
-from nextgisweb.env import DBSession, env
+from nextgisweb.env import DBSession
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
 from nextgisweb.lib.saext import postgres_url
 

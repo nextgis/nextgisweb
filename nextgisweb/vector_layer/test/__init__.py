@@ -3,8 +3,6 @@ from secrets import token_hex
 
 import transaction
 
-from nextgisweb.env import DBSession
-
 from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 

@@ -1,4 +1,4 @@
-from nextgisweb.env import COMP_ID, gettext
+from nextgisweb.env import gettext
 
 from .base import (
     IdentificationCategory,

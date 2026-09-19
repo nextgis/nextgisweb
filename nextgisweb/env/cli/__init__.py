@@ -13,6 +13,20 @@ from .base import (
     cli,
 )
 
+__all__ = [
+    "DryRunOptions",
+    "EnvCommand",
+    "EnvOptions",
+    "InTransactionCommand",
+    "UninitializedEnvCommand",
+    "arg",
+    "bootstrap",
+    "cli",
+    "comp_cli",
+    "dump_config",
+    "opt",
+]
+
 if TYPE_CHECKING:
     from nextgisweb.lib.clann import Group
 

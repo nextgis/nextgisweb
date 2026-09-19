@@ -4,7 +4,12 @@ import time
 from typing import TYPE_CHECKING
 from warnings import filterwarnings
 
-from nextgisweb.lib.imptool import deprecate
+from nextgisweb.lib.imptool import deprecate  # noqa: F401
+
+__all__ = [
+    "load_config",
+    "single_component",
+]
 
 if TYPE_CHECKING:
     from nextgisweb.env.package import single_component

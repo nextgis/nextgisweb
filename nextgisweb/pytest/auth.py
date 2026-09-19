@@ -1,10 +1,10 @@
+import pytest
+
 __all__ = [
     "ngw_administrator_password",
     "ngw_auth_administrator",
     "ngw_disable_oauth",
 ]
-
-import pytest
 
 
 @pytest.fixture()

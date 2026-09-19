@@ -1,18 +1,9 @@
-from datetime import datetime
 from secrets import token_urlsafe
 from typing import Unpack
-from uuid import uuid4
-
-import pytest
-import transaction
-from sqlalchemy import event
 
 from nextgisweb.env.test import fixture_value
 
-from nextgisweb.auth import User
 from nextgisweb.pyramid.test import TestResponse, WebTestApp
-
-from ..model import Resource, ResourceGroup
 
 _Cls = str | None
 _KW = WebTestApp.KW

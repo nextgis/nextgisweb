@@ -1,5 +1,4 @@
-import typing
-from warnings import warn
+from typing import TYPE_CHECKING
 
 from .component import Component, load_all, require
 from .environment import Env, env, inject, setenv
@@ -26,7 +25,7 @@ __all__ = [
     "setenv",
 ]
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from nextgisweb.lib.i18n import TrStr as _TrStr
     from nextgisweb.lib.i18n import TrTpl as _TrTpl
 
