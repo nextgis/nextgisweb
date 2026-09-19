@@ -9,12 +9,6 @@ from sqlalchemy.schema import CreateTable
 seq_pattern = re.compile(r"^nextval\('(\w+)'::regclass\)$")
 
 
-def check_metadata(metadata: sa.MetaData, conn: sa.Connection) -> Iterable[str]:
-    for tab in metadata.tables.values():
-        for message in check_table(tab, conn):
-            yield message
-
-
 def check_table(tab: sa.Table, conn: sa.Connection) -> Iterable[str]:
     tab_name, tab_schema = tab.name, tab.schema
     tab_schema_norm = tab_schema if tab_schema else "public"
@@ -22,6 +16,19 @@ def check_table(tab: sa.Table, conn: sa.Connection) -> Iterable[str]:
 
     tab_repr = (f"{tab_schema}." if tab_schema else "") + tab_name
     tab_msg = f"Table '{tab_repr}'"
+
+    # fmt: off
+    table_type = conn.execute(sa.text(dedent("""
+        SELECT table_type FROM information_schema.tables
+        WHERE table_schema = :schema AND table_name = :name
+    """)), dict(schema=tab_schema_norm, name=tab_name)).scalar()
+    # fmt: off
+    if table_type is None:
+        yield f"{tab_msg} not exists."
+        return
+    if table_type != (exp:= "BASE TABLE"):
+        yield f"{tab_msg}: type mismatch ({exp} <> {table_type})."
+        return
 
     meta = sa.MetaData()
 

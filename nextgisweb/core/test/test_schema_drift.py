@@ -1,14 +1,15 @@
+from contextlib import contextmanager
+
 import pytest
 import sqlalchemy as sa
 
 from nextgisweb.env import DBSession
 
-from ..schema_drift import _toid, check_metadata
+from ..schema_drift import _toid, check_table
 
 
-@pytest.fixture
-def tables(ngw_txn):
-    conn = DBSession.connection()
+@contextmanager
+def tables(conn):
     meta = sa.MetaData()
     t1 = sa.Table(
         "test_table_1",
@@ -33,82 +34,96 @@ def tables(ngw_txn):
     meta.create_all(conn)
 
     try:
-        yield meta, conn
+        yield meta
     finally:
         _toid.cache_clear()
 
 
-@pytest.mark.parametrize(
-    "sql, expected",
-    (
-        pytest.param(None, None, id="success"),
-        pytest.param(
+@contextmanager
+def table_not_created(conn):
+    meta = sa.MetaData()
+    sa.Table("test_table", meta, sa.Column("value", sa.Integer))
+    yield meta
+
+
+def _generate():
+    yield pytest.param(table_not_created, None, "not exists", id="missing_table")
+
+    for sql, expected, id_ in (
+        (None, None, "success"),
+        (
             "ALTER TABLE test_1.test_table_1 ADD COLUMN hellothere integer;",
             "extra",
-            id="extra_column",
+            "extra_column",
         ),
-        pytest.param(
+        (
             "ALTER TABLE test_1.test_table_1 DROP COLUMN value;",
             "not found",
-            id="missing_column",
+            "missing_column",
         ),
-        pytest.param(
+        (
             "ALTER TABLE test_1.test_table_1 ALTER COLUMN value TYPE text;",
             "type mismatch",
-            id="type_mismatch",
+            "type_mismatch",
         ),
-        pytest.param(
+        (
             "ALTER TABLE test_1.test_table_1 ALTER COLUMN value DROP NOT NULL;",
             "should be nullable",
-            id="nullable",
+            "nullable",
         ),
-        pytest.param(
+        (
             "ALTER TABLE test_1.test_table_1 ALTER COLUMN value SET DEFAULT 0;",
             "default mismatch",
-            id="default_mismatch",
+            "default_mismatch",
         ),
-        pytest.param(
+        (
             "ALTER TABLE test_1.test_table_1 RENAME CONSTRAINT test_table_1_pkey TO test_table_1_pkey1;",
             "name mismatch",
-            id="name_mismatch",
+            "name_mismatch",
         ),
-        pytest.param(
+        (
             "ALTER TABLE test_1.test_table_1 DROP CONSTRAINT test_table_1_id_check;\n"
             "ALTER TABLE test_1.test_table_1 ADD CONSTRAINT test_table_1_id_check CHECK (id != 42);",
             None,
-            id="recreate_check",
+            "recreate_check",
         ),
-        pytest.param(
+        (
             "ALTER TABLE test_1.test_table_1 DROP CONSTRAINT test_table_1_id_check;\n"
             "ALTER TABLE test_1.test_table_1 ADD CONSTRAINT test_table_1_id_check CHECK (id <> 16);",
             ["not found", "extra constraint found"],
-            id="check_mismatch",
+            "check_mismatch",
         ),
-        pytest.param(
+        (
             "ALTER TABLE test_2.test_table_2 ALTER CONSTRAINT test_table_2_t1_id_fkey DEFERRABLE INITIALLY IMMEDIATE;",
             "should be deferred",
-            id="deferrable",
+            "deferrable",
         ),
-    ),
-)
+    ):
+        yield pytest.param(tables, sql, expected, id=id_)
+
+
+@pytest.mark.parametrize("setup, sql, expected", _generate())
 def test_integrity(
-    tables: tuple[sa.MetaData, sa.Connection],
+    setup,
     sql: str | None,
     expected: str | list[str] | None,
+    ngw_txn,
 ):
-    meta, conn = tables
+    conn = DBSession.connection()
+    with setup(conn) as meta:
+        if sql is not None:
+            conn.execute(sa.text(sql))
 
-    if sql is not None:
-        conn.execute(sa.text(sql))
+        messages = []
+        for tab in meta.tables.values():
+            messages.extend(check_table(tab, conn))
 
-    messages = list(check_metadata(meta, conn))
-
-    if expected is None:
-        assert len(messages) == 0
-    elif isinstance(expected, str):
-        assert len(messages) == 1
-        assert expected in messages[0]
-    else:
-        assert len(messages) == len(expected)
-        for e, m in zip(expected, messages):
-            assert e in m
+        if expected is None:
+            assert len(messages) == 0
+        elif isinstance(expected, str):
+            assert len(messages) == 1
+            assert expected in messages[0]
+        else:
+            assert len(messages) == len(expected)
+            for e, m in zip(expected, messages):
+                assert e in m
