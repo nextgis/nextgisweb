@@ -38,20 +38,14 @@ class SRSRef(Struct, kw_only=True):
 class SRS(Base):
     __tablename__ = "srs"
 
-    id_seq = sa.Sequence(
-        "srs_id_seq",
-        metadata=Base.metadata,
-        start=SRID_LOCAL,
-        minvalue=SRID_LOCAL,
-        maxvalue=SRID_MAX,
-    )
-
     id: Mapped[int] = mapped_column(
         sa.Integer,
-        id_seq,
+        sa.Identity(
+            start=SRID_LOCAL,
+            minvalue=SRID_LOCAL,
+            maxvalue=SRID_MAX,
+        ),
         primary_key=True,
-        autoincrement=False,
-        server_default=id_seq.next_value(),
     )
 
     display_name: Mapped[str] = mapped_column(sa.Unicode)
