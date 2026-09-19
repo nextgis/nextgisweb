@@ -139,15 +139,13 @@ def check_integrity(self: EnvCommand):
         "postgresql_deferrable": True,
     }
 
-    with DBSession.connection(execution_options=opts) as con:
+    with DBSession.connection(execution_options=opts) as conn:
         for comp, func in check_integrity_hook:
-            with con.begin_nested():
+            with conn.begin_nested():
                 try:
-                    citer = func(comp)
-                    if citer is not None and hasattr(citer, "__next__"):
-                        for error in citer:
-                            logger.error("Integrity error from `%s`: %s", comp.identity, error)
-                            fail = True
+                    for error in func(comp):
+                        logger.error("Integrity error from `%s`: %s", comp.identity, error)
+                        fail = True
                 except Exception as exc:
                     fail = True
                     logger.exception(

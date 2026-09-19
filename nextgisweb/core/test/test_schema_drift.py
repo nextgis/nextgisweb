@@ -5,7 +5,7 @@ import sqlalchemy as sa
 
 from nextgisweb.env import DBSession
 
-from ..schema_drift import _toid, check_table
+from ..schema_drift import check_table
 
 
 @contextmanager
@@ -33,10 +33,7 @@ def tables(conn):
         conn.execute(sa.schema.CreateSchema(schema))
     meta.create_all(conn)
 
-    try:
-        yield meta
-    finally:
-        _toid.cache_clear()
+    yield meta
 
 
 @contextmanager

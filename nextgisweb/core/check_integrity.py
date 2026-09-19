@@ -31,13 +31,14 @@ schema_drift_tables_hook = ComponentHook[SchemaDriftTablesProtocol]("schema_drif
 
 @check_integrity_hook()
 def schema_drift(comp: CoreComponent, /) -> CheckIntegrityResult:
-    from .schema_drift import check_table
+    from .schema_drift import InspectionHelper, check_table
 
     tables = chain(*(tfunc(tcomp) for tcomp, tfunc in schema_drift_tables_hook))
     conn = DBSession.connection()
+    ihelper = InspectionHelper(conn)
 
     for table in tables:
-        for msg in check_table(table, conn):
+        for msg in check_table(table, conn, ihelper=ihelper):
             yield msg
 
 
