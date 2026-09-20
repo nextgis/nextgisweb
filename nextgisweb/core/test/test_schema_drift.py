@@ -65,7 +65,7 @@ def _generate():
         ),
         (
             "ALTER TABLE test_1.test_table_1 ALTER COLUMN value DROP NOT NULL;",
-            "should be nullable",
+            "should not be nullable",
             "nullable",
         ),
         (

@@ -102,7 +102,7 @@ def check_table(
                 yield f"{col_msg}: type mismatch ({r.t_exp} <> {r.t_act})."
 
             if r.notnull_exp is not r.notnull_act:
-                yield f"{col_msg}: {'should' if r.notnull_exp else 'should not'} be nullable."
+                yield f"{col_msg}: {'should not' if r.notnull_exp else 'should'} be nullable."
 
             if (
                 defval_exp := seq_pattern.sub(
