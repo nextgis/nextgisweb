@@ -18,7 +18,7 @@ CREATE TABLE raster_layer (
     FOREIGN KEY (id) REFERENCES resource (id),
     FOREIGN KEY (fileobj_id) REFERENCES fileobj (id),
     FOREIGN KEY (fileobj_pam_id) REFERENCES fileobj (id),
-    FOREIGN KEY (storage_id) REFERENCES raster_layer_storage (id),
+    CONSTRAINT raster_layer_storage_id_fkey1 FOREIGN KEY (storage_id) REFERENCES raster_layer_storage (id),
     FOREIGN KEY (srs_id) REFERENCES srs (id)
 );
 
