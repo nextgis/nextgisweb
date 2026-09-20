@@ -21,6 +21,7 @@ from nextgisweb.lib.registry import ListRegistry, list_registry
 
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.core.storage import StorageEstimateResult, storage_estimate_hook
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
@@ -41,6 +42,8 @@ from nextgisweb.resource import (
     SRelationship,
 )
 from nextgisweb.tmsclient.util import crop_box, render_zoom, toggle_tms_xyz_y
+
+from .component import TilesetComponent
 
 TILE_SIZE = 256
 JPEG_EXTS = ("jpg", "jpeg")
@@ -226,6 +229,13 @@ class Tileset(Resource, SpatialLayerMixin):
                 ),
             ),
         )
+
+
+@storage_estimate_hook()
+def storage_estimate(comp: TilesetComponent, /) -> StorageEstimateResult:
+    for resource in Tileset.query():
+        size = resource.fileobj.filename().stat().st_size
+        yield TilesetData, resource.id, size
 
 
 @list_registry

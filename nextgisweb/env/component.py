@@ -94,6 +94,7 @@ class Component:
             "backup_objects",
             "check_integrity",
             "client_codegen",
+            "estimate_storage",
             "healthcheck",
             "is_service_ready",
             "maintenance",

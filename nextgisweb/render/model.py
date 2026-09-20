@@ -20,13 +20,15 @@ from sqlalchemy import MetaData, Table
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import Base, DBSession
+from nextgisweb.env import Base, DBSession, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import mapper_table
 
+from nextgisweb.core import KindOfData
 from nextgisweb.core.backup import BackupConfiguration, backup_configure_hook
+from nextgisweb.core.storage import StorageEstimateResult, storage_estimate_hook
 from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SAttribute, Serializer
 
 from .component import RenderComponent
@@ -461,6 +463,27 @@ sa_event.listen(
     sa.DDL("DROP SCHEMA IF EXISTS tile_cache CASCADE"),
     propagate=True,
 )
+
+
+class TileCacheData(KindOfData):
+    identity = "tile_cache"
+    display_name = gettext("Tile cache")
+
+
+@storage_estimate_hook()
+def storage_estimate(comp: RenderComponent, /) -> StorageEstimateResult:
+    for tc in ResourceTileCache.filter_by(enabled=True).all():
+        tilestor, lock = tc.get_tilestor()
+
+        # 16 bytes stand for 4 int columns (z, x, y)
+        query_tile = "SELECT coalesce(sum(length(data) + 16), 0) FROM tile"
+        size_img = tilestor.execute(query_tile).fetchone()[0]
+
+        query = sa.text('SELECT count(1) FROM tile_cache."{}"'.format(tc.uuid.hex))
+        count = DBSession.execute(query).scalar()
+        size_color = count * 20  # 5x int columns
+
+        yield TileCacheData, tc.resource_id, size_img + size_color
 
 
 class TileCacheFlushAttr(SAttribute):

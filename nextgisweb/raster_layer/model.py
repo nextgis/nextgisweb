@@ -27,7 +27,11 @@ from nextgisweb.lib.saext import Msgspec
 
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.core.storage import StorageInsufficient
+from nextgisweb.core.storage import (
+    StorageEstimateResult,
+    StorageInsufficient,
+    storage_estimate_hook,
+)
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.file_upload.exception import UnsupportedFile
@@ -49,6 +53,7 @@ from nextgisweb.resource import (
 from nextgisweb.resource.category import ExternalConnectionsCategory
 from nextgisweb.spatial_ref_sys import SRS
 
+from .component import RasterLayerComponent
 from .kind_of_data import RasterLayerData
 from .util import (
     band_color_interp,
@@ -734,6 +739,13 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 return f"Can't read band #{bidx}"
             if band.DataType != dt:
                 return f"Band #{bidx} data type mismatch"
+
+
+@storage_estimate_hook()
+def storage_estimate(comp: RasterLayerComponent, /) -> StorageEstimateResult:
+    for resource in RasterLayer.filter(RasterLayer.storage_id.is_(None)):
+        size = estimate_raster_layer_data(resource)
+        yield RasterLayerData, resource.id, size
 
 
 class RasterLayerUncompressedStorageInsufficient(StorageInsufficient):

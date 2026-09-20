@@ -19,6 +19,7 @@ from nextgisweb.lib import saext
 
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError as VE
+from nextgisweb.core.storage import StorageEstimateResult, storage_estimate_hook
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
@@ -62,6 +63,7 @@ from nextgisweb.resource import (
 )
 
 from ..feature_layer.filter import FilterParser
+from .component import VectorLayerComponent
 from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
 from .ogrloader import (
@@ -704,6 +706,13 @@ sa_event.listen(
     sa.DDL(f"DROP SCHEMA IF EXISTS {SCHEMA} CASCADE"),
     propagate=True,
 )
+
+
+@storage_estimate_hook()
+def storage_estimate(comp: VectorLayerComponent, /) -> StorageEstimateResult:
+    for resource in VectorLayer.query():
+        size = estimate_vector_layer_data(resource)
+        yield VectorLayerData, resource.id, size
 
 
 class VectorLayerSession:

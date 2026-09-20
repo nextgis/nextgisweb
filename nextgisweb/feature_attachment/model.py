@@ -15,10 +15,11 @@ from PIL.Image import DecompressionBombError
 from sqlalchemy.dialects import postgresql as pg
 from sqlalchemy.orm import Mapped, mapped_column
 
-from nextgisweb.env import Base
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.core import maintenance_hook
+from nextgisweb.core import KindOfData, maintenance_hook
+from nextgisweb.core.storage import StorageEstimateResult, storage_estimate_hook
 from nextgisweb.feature_layer.versioning import (
     ActColValue,
     FVersioningExtensionMixin,
@@ -252,6 +253,17 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
             self.fileobj = session.execute(query_fileobj).scalar_one()
 
         self.extract_meta()
+
+
+class FeatureAttachmentData(KindOfData):
+    identity = "feature_attachment"
+    display_name = gettext("Feature attachments")
+
+
+@storage_estimate_hook()
+def storage_estimate(comp: FeatureAttachmentComponent, /) -> StorageEstimateResult:
+    for obj in FeatureAttachment.query():
+        yield FeatureAttachmentData, obj.resource_id, obj.fileobj.size
 
 
 @register_change

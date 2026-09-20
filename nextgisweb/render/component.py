@@ -6,19 +6,14 @@ import transaction
 from sqlalchemy.dialects import postgresql, sqlite
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import Component, DBSession, gettext, require
+from nextgisweb.env import Component, DBSession, require
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.core import CoreComponent, KindOfData, maintenance_hook
+from nextgisweb.core import CoreComponent, maintenance_hook
 
 vacuum_freepage_coeff = 0.5
-
-
-class TileCacheData(KindOfData):
-    identity = "tile_cache"
-    display_name = gettext("Tile cache")
 
 
 class RenderComponent(Component):
@@ -139,22 +134,6 @@ class RenderComponent(Component):
             deleted_files,
             deleted_tables,
         )
-
-    def estimate_storage(self):
-        from .model import ResourceTileCache as RTC
-
-        for tc in RTC.filter_by(enabled=True).all():
-            tilestor, lock = tc.get_tilestor()
-
-            # 16 bytes stand for 4 int columns (z, x, y)
-            query_tile = "SELECT coalesce(sum(length(data) + 16), 0) FROM tile"
-            size_img = tilestor.execute(query_tile).fetchone()[0]
-
-            query = sa.text('SELECT count(1) FROM tile_cache."{}"'.format(tc.uuid.hex))
-            count = DBSession.execute(query).scalar()
-            size_color = count * 20  # 5x int columns
-
-            yield TileCacheData, tc.resource_id, size_img + size_color
 
     option_annotations = (
         Option("check_origin", bool, default=False, doc="Check request Origin header."),

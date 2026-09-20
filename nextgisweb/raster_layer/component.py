@@ -9,8 +9,6 @@ from nextgisweb.core import CoreComponent, maintenance_hook
 from nextgisweb.file_storage.component import maintenance as file_storage_maintenance
 from nextgisweb.file_upload import FileUploadComponent
 
-from .kind_of_data import RasterLayerData
-from .model import RasterBand, RasterLayer, RasterLayerMeta, estimate_raster_layer_data
 from .util import band_color_interp
 from .workdir import WorkdirMixin
 
@@ -37,16 +35,15 @@ class RasterLayerComponent(WorkdirMixin, Component):
         api.setup_pyramid(self, config)
 
     def build_missing_overviews(self):
+        from .model import RasterLayer
+
         logger.info("Building missing raster overviews...")
         for resource in RasterLayer.filter_by(cog=False):
             resource.build_overview(missing_only=True)
 
-    def estimate_storage(self):
-        for resource in RasterLayer.filter(RasterLayer.storage_id.is_(None)):
-            size = estimate_raster_layer_data(resource)
-            yield RasterLayerData, resource.id, size
-
     def populate_missing_columns(self):
+        from .model import RasterBand, RasterLayer, RasterLayerMeta
+
         with transaction.manager:
             for resource in DBSession.query(RasterLayer).filter(
                 or_(

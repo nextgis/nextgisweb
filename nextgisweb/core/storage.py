@@ -1,5 +1,6 @@
+from collections.abc import Iterator
 from threading import Thread
-from typing import ClassVar
+from typing import ClassVar, Protocol
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -7,6 +8,7 @@ import transaction
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Component, DBSession, gettext, gettextf
+from nextgisweb.env.hook import ComponentHook, ComponentHookProtocol
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.i18n import TrStr
@@ -166,21 +168,20 @@ class StorageComponentMixin(Component, mixin=True):
                 details = storage_stat_dimension
                 totals = storage_stat_dimension_total
 
-                for comp in self.env.components.values():
-                    if func := getattr(comp, "estimate_storage", None):
-                        logger.debug("Estimating storage of component '%s'...", comp.identity)
-                        for kind_of_data, resource_id, size in func():
-                            con.execute(
-                                details.insert().values(
-                                    dict(
-                                        tstamp=timestamp,
-                                        component=comp.identity,
-                                        kind_of_data=kind_of_data.identity,
-                                        resource_id=resource_id,
-                                        value_data_volume=size,
-                                    )
+                for comp, func in storage_estimate_hook:
+                    logger.debug("Estimating storage of component '%s'...", comp.identity)
+                    for kind_of_data, resource_id, size in func(comp):
+                        con.execute(
+                            details.insert().values(
+                                dict(
+                                    tstamp=timestamp,
+                                    component=comp.identity,
+                                    kind_of_data=kind_of_data.identity,
+                                    resource_id=resource_id,
+                                    value_data_volume=size,
                                 )
                             )
+                        )
 
                 qtotal = (
                     sa.select(
@@ -258,6 +259,16 @@ class StorageComponentMixin(Component, mixin=True):
         for tab in STORAGE_TABLES:
             DBSession.execute(tab.delete())
         mark_changed(DBSession())
+
+
+StorageEstimateResult = Iterator[tuple[type[KindOfData], int, int]]
+
+
+class StorageEstimateProtocol(ComponentHookProtocol, Protocol):
+    def __call__[C: Component](self, comp: C, /) -> StorageEstimateResult: ...
+
+
+storage_estimate_hook = ComponentHook[StorageEstimateProtocol]("storage_estimate_hook")
 
 
 STORAGE_TABLES = (

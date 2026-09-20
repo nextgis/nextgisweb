@@ -6,7 +6,7 @@ from freezegun import freeze_time
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.feature_attachment.component import FeatureAttachmentData
+from nextgisweb.feature_attachment.model import FeatureAttachmentData
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 
