@@ -20,7 +20,7 @@ from nextgisweb.lib.config import ConfigOptions, Option
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
-from nextgisweb.lib.registry import dict_registry
+from nextgisweb.lib.registry import DictRegistry
 
 from .package import pkginfo
 
@@ -28,7 +28,6 @@ if TYPE_CHECKING:
     from .environment import Env
 
 
-@dict_registry
 class Component:
     """Base class for all components in NextGIS Web
 
@@ -47,7 +46,7 @@ class Component:
     ``foo_bar`` corresponds to ``FooBarComponent``.
     """
 
-    registry: ClassVar[Mapping[str, type[Component]]]
+    registry: ClassVar[DictRegistry[type[Component]]] = DictRegistry()
     """Component classes registry"""
 
     identity: ClassVar[str]
@@ -70,8 +69,11 @@ class Component:
     option_annotations: ClassVar[tuple[Option, ...]] = ()
     """Option annotations of component"""
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, *, mixin: bool = False, **kwargs):
         super().__init_subclass__(**kwargs)
+
+        if mixin:
+            return
 
         conv = NamingConventions(cls.__name__, module=cls.__module__)
 
@@ -109,6 +111,8 @@ class Component:
         cls.identity = conv.identity
         cls.basename = conv.basename
         cls.root_path = module_path(conv.module)
+
+        cls.registry.register(cls)
 
     def __new__(cls, *args, **kwargs):
         if cls is Component:

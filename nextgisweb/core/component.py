@@ -40,6 +40,7 @@ class SupportUrl(ABC):
 class CoreComponent(StorageComponentMixin, Component):
     def __init__(self, env, settings):
         super().__init__(env, settings)
+
         self.debug = self.options["debug"]
         self.locale_default = self.options["locale.default"]
         self.locale_available = self.options["locale.available"]

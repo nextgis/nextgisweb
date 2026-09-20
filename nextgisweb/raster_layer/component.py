@@ -15,7 +15,7 @@ from .util import band_color_interp
 from .workdir import WorkdirMixin
 
 
-class RasterLayerComponent(Component, WorkdirMixin):
+class RasterLayerComponent(WorkdirMixin, Component):
     @require("file_upload")
     def initialize(self):
         core = self.env.component(CoreComponent)

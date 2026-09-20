@@ -9,7 +9,7 @@ from nextgisweb.core import CoreComponent
 from nextgisweb.file_storage import FileObj
 
 
-class WorkdirMixin:
+class WorkdirMixin(Component, mixin=True):
     def workdir_path(
         self,
         fobj: FileObj,

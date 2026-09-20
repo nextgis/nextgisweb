@@ -6,7 +6,7 @@ import sqlalchemy.event as sa_event
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import DBSession, gettext, gettextf
+from nextgisweb.env import Component, DBSession, gettext, gettextf
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.i18n import TrStr
@@ -30,7 +30,7 @@ class KindOfData:
     display_name: ClassVar[TrStr]
 
 
-class StorageComponentMixin:
+class StorageComponentMixin(Component, mixin=True):
     def initialize(self):
         super().initialize()
 
