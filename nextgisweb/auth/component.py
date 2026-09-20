@@ -19,7 +19,7 @@ from nextgisweb.pyramid.util import gensecret
 
 from .exception import UserDisabledException
 from .model import Group, User
-from .oauth import OAuthAToken, OAuthHelper, OAuthPToken
+from .oauth import OAuthHelper
 from .policy import AP_INVITE, AuthMethod, AuthState, SecurityPolicy
 
 
@@ -247,11 +247,6 @@ class AuthComponent(Component):
                         "Maximum number of local users is reached. Your current plan local user number limit is {}."
                     ).format(limit)
                 )
-
-    def backup_configure(self, config):
-        super().backup_configure(config)
-        config.exclude_table_data("public", OAuthAToken.__tablename__)
-        config.exclude_table_data("public", OAuthPToken.__tablename__)
 
     # fmt: off
     option_annotations = OptionAnnotations((

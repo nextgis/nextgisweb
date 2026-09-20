@@ -13,9 +13,6 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent, KindOfData, maintenance_hook
 
-from .model import TIMESTAMP_EPOCH
-from .model import ResourceTileCache as RTC
-
 vacuum_freepage_coeff = 0.5
 
 
@@ -41,6 +38,9 @@ class RenderComponent(Component):
         view.setup_pyramid(self, config)
 
     def cleanup(self):
+        from .model import TIMESTAMP_EPOCH
+        from .model import ResourceTileCache as RTC
+
         logger.info("Cleaning up tile cache tables...")
 
         tile_cache_path = os.path.abspath(self.tile_cache_path)
@@ -140,11 +140,9 @@ class RenderComponent(Component):
             deleted_tables,
         )
 
-    def backup_configure(self, config):
-        super().backup_configure(config)
-        config.exclude_table_data("tile_cache", "*")
-
     def estimate_storage(self):
+        from .model import ResourceTileCache as RTC
+
         for tc in RTC.filter_by(enabled=True).all():
             tilestor, lock = tc.get_tilestor()
 

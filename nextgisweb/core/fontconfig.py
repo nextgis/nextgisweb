@@ -12,7 +12,7 @@ from msgspec import Meta, Struct
 
 from nextgisweb.env import gettextf, inject
 
-from .backup import BackupBase
+from .backup import BackupBase, BackupObjectsResult, backup_objects_hook, restore_prepare_hook
 from .component import CoreComponent
 from .exception import ValidationError
 
@@ -122,13 +122,19 @@ class FontConfig:
             if re.match(FONT_PATTERN, file.name) and file.is_file():
                 yield file
 
-    def backup_objects(self):
-        for file in self.iterfiles():
-            yield FontBackup(dict(component="core", filename=file.name))
 
-    def restore_prepare(self):
-        for file in self.iterfiles():
-            file.unlink()
+@backup_objects_hook()
+def backup_objects(comp: CoreComponent) -> BackupObjectsResult:
+    return (
+        FontBackup(dict(component="core", filename=file.name))
+        for file in comp.fontconfig.iterfiles()
+    )
+
+
+@restore_prepare_hook()
+def restore_prepare(comp: CoreComponent) -> None:
+    for file in comp.fontconfig.iterfiles():
+        file.unlink()
 
 
 class FontBackup(BackupBase):

@@ -18,7 +18,6 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.core import CoreComponent, maintenance_hook
 
 from . import uacompat
-from .model import Session, SessionStore
 from .tomb import Configurator, Request, iter_routes
 from .util import StaticMap, gensecret
 
@@ -143,6 +142,8 @@ class PyramidComponent(Component):
         self.client_types.append(tdef)
 
     def cleanup(self):
+        from .model import Session
+
         logger.info("Cleaning up sessions...")
 
         with transaction.manager:
@@ -150,11 +151,6 @@ class PyramidComponent(Component):
             deleted_sessions = Session.filter(Session.last_activity < actual_date).delete()
 
         logger.info("Deleted: %d sessions", deleted_sessions)
-
-    def backup_configure(self, config):
-        super().backup_configure(config)
-        config.exclude_table_data("public", Session.__tablename__)
-        config.exclude_table_data("public", SessionStore.__tablename__)
 
     # fmt: off
     option_annotations = OptionAnnotations((

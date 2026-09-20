@@ -1,6 +1,6 @@
 import os
 import shutil
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from time import monotonic, sleep
 from typing import Any
 
@@ -20,7 +20,7 @@ from ..is_ready import is_ready_hook
 
 
 @cli.command()
-def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metavar="SEC")):
+def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metavar="SEC")) -> None:
     """Wait for required services and exit
 
     :param timeout: Seconds to wait or fail"""
@@ -29,7 +29,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
     messages = dict()
 
-    def log_messages(logfunc):
+    def log_messages(logfunc: Callable) -> None:
         for comp, it in components:
             if messages[comp] is not None:
                 logfunc("Message from [%s]: %s", comp.identity, messages[comp])
@@ -77,7 +77,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 def psql(
     self: UninitializedEnvCommand,
     arg: list[str] = arg(nargs="..."),
-):
+) -> None:
     """Launch psql connected to database
 
     The psql executable must be installed and available in shell search path
@@ -107,7 +107,7 @@ def maintenance(
     one_shot: bool = opt(False),
     *,
     core: CoreComponent = inject.arg(),
-):
+) -> None:
     """Perform housekeeping tasks
 
     :param estimate_storage: Execute storage estimation after maintenance
@@ -129,7 +129,7 @@ def maintenance(
 
 
 @cli.command()
-def check_integrity(self: EnvCommand):
+def check_integrity(self: EnvCommand) -> None:
     """Check data integrity"""
 
     fail = False

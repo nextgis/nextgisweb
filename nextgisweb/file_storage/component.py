@@ -3,24 +3,17 @@ import os.path
 import re
 from datetime import datetime as dt
 from datetime import timedelta, timezone
-from operator import itemgetter
 from pathlib import Path
-from shutil import copyfileobj
-from typing import BinaryIO
 
 import transaction
 
-from nextgisweb.env import Component, inject
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import query_unreferenced
 
-from nextgisweb.core import BackupBase, CoreComponent, maintenance_hook
-
-from .model import FileObj
-
-BUF_SIZE = 1024 * 1024
+from nextgisweb.core import CoreComponent, maintenance_hook
 
 
 class FileStorageComponent(Component):
@@ -31,15 +24,15 @@ class FileStorageComponent(Component):
         if "path" not in self.options:
             self.env.component(CoreComponent).mksdir(self)
 
-    def backup_objects(self):
-        for fileobj in FileObj.query().order_by(FileObj.component, FileObj.uuid):
-            yield FileObjBackup(dict(component=fileobj.component, uuid=fileobj.uuid))
-
     def fileobj(self, component):
+        from .model import FileObj
+
         obj = FileObj(component=component)
         return obj
 
     def filename(self, fileobj, makedirs=False):
+        from .model import FileObj
+
         if isinstance(fileobj, FileObj):
             component = fileobj.component
             uuid = fileobj.uuid
@@ -65,6 +58,8 @@ class FileStorageComponent(Component):
             self.cleanup_orphaned(dry_run=dry_run)
 
     def cleanup_unreferenced(self, *, dry_run):
+        from .model import FileObj
+
         query = query_unreferenced(FileObj, FileObj.id)
 
         if dry_run:
@@ -76,6 +71,8 @@ class FileStorageComponent(Component):
         logger.info("%d unreferenced file records found", records)
 
     def cleanup_orphaned(self, *, dry_run):
+        from .model import FileObj
+
         deleted_files = deleted_bytes = 0
         kept_files = kept_bytes = 0
 
@@ -128,29 +125,6 @@ class FileStorageComponent(Component):
         Option("cleanup_keep_interval", timedelta, default=timedelta(days=2)),
     )
     # fmt: on
-
-
-class FileObjBackup(BackupBase):
-    identity = "fileobj"
-    blob = True
-
-    plget = itemgetter("component", "uuid")
-
-    @inject()
-    def backup(self, dst: BinaryIO, *, component: FileStorageComponent = inject.arg()) -> None:
-        with open(component.filename(self.plget(self.payload)), "rb") as fd:
-            copyfileobj(fd, dst, length=BUF_SIZE)
-
-    @inject()
-    def restore(self, src: BinaryIO, *, component: FileStorageComponent = inject.arg()) -> None:
-        fn = component.filename(self.plget(self.payload), makedirs=True)
-        if os.path.isfile(fn):
-            logger.debug(
-                "Skipping restoration of fileobj %s: file already exists!", self.payload["uuid"]
-            )
-        else:
-            with open(fn, "wb") as fd:
-                copyfileobj(src, fd, length=BUF_SIZE)
 
 
 @maintenance_hook()

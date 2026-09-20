@@ -1,17 +1,26 @@
 from __future__ import annotations
 
+import os
+import os.path
 import uuid
+from operator import itemgetter
 from pathlib import Path
 from shutil import copyfile, copyfileobj
-from typing import Any
+from typing import Any, BinaryIO
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
 from sqlalchemy.orm import Mapped, mapped_column
 
-from nextgisweb.env import Base
+from nextgisweb.env import Base, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.imptool import module_from_stack
+from nextgisweb.lib.logging import logger
+
+from nextgisweb.core import BackupBase
+from nextgisweb.core.backup import BackupObjectsResult, backup_objects_hook
+
+from .component import FileStorageComponent
 
 
 def _size_default(context):
@@ -76,6 +85,40 @@ class FileObj(Base):
             fd.write(content)
         self.size = len(content)
         return self
+
+
+BUF_SIZE = 1 << 20  # 1 MiB
+
+
+class FileObjBackup(BackupBase):
+    identity = "fileobj"
+    blob = True
+
+    plget = itemgetter("component", "uuid")
+
+    @inject()
+    def backup(self, dst: BinaryIO, *, component: FileStorageComponent = inject.arg()) -> None:
+        with open(component.filename(self.plget(self.payload)), "rb") as fd:
+            copyfileobj(fd, dst, length=BUF_SIZE)
+
+    @inject()
+    def restore(self, src: BinaryIO, *, component: FileStorageComponent = inject.arg()) -> None:
+        fn = component.filename(self.plget(self.payload), makedirs=True)
+        if os.path.isfile(fn):
+            logger.debug(
+                "Skipping restoration of fileobj %s: file already exists!", self.payload["uuid"]
+            )
+        else:
+            with open(fn, "wb") as fd:
+                copyfileobj(src, fd, length=BUF_SIZE)
+
+
+@backup_objects_hook()
+def backup_objects(comp: FileStorageComponent) -> BackupObjectsResult:
+    return (
+        FileObjBackup(dict(component=fileobj.component, uuid=fileobj.uuid))
+        for fileobj in FileObj.query().order_by(FileObj.component, FileObj.uuid)
+    )
 
 
 @sa_event.listens_for(FileObj, "before_insert")

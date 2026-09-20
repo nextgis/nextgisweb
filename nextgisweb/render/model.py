@@ -26,8 +26,10 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import mapper_table
 
+from nextgisweb.core.backup import BackupConfiguration, backup_configure_hook
 from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SAttribute, Serializer
 
+from .component import RenderComponent
 from .interface import IRenderableNonCached, IRenderableStyle
 from .util import TILE_SIZE, imgcolor, pack_color, unpack_color
 
@@ -518,3 +520,8 @@ class TileCacheSerializer(Serializer, resource=Resource):
 
         if self.obj.tile_cache is not None:
             self.obj.tile_cache.initialize()
+
+
+@backup_configure_hook()
+def backup_configure(comp: RenderComponent, config: BackupConfiguration) -> None:
+    config.exclude_table_data("tile_cache", "*")

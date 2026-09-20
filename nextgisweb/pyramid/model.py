@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 import sqlalchemy as sa
@@ -7,6 +9,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base
 
+from nextgisweb.core.backup import BackupConfiguration, backup_configure_hook
+
+from .component import PyramidComponent
+
 
 class Session(Base):
     __tablename__ = "pyramid_session"
@@ -15,7 +21,7 @@ class Session(Base):
     created: Mapped[datetime] = mapped_column(sa.DateTime)
     last_activity: Mapped[datetime] = mapped_column(sa.DateTime)
 
-    store: Mapped[list["SessionStore"]] = orm.relationship(
+    store: Mapped[list[SessionStore]] = orm.relationship(
         cascade="all,delete-orphan",
         back_populates="session",
     )
@@ -35,3 +41,9 @@ class SessionStore(Base):
         foreign_keys=session_id,
         back_populates="store",
     )
+
+
+@backup_configure_hook()
+def backup_configure(comp: PyramidComponent, config: BackupConfiguration) -> None:
+    config.exclude_table_data("public", Session.__tablename__)
+    config.exclude_table_data("public", SessionStore.__tablename__)

@@ -23,6 +23,7 @@ from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import maintenance_hook
+from nextgisweb.core.backup import BackupConfiguration, backup_configure_hook
 from nextgisweb.core.exception import ForbiddenError
 
 from .permission import Permission
@@ -358,3 +359,9 @@ class PasswordHashValue:
                 return False
         else:
             raise NotImplementedError()
+
+
+@backup_configure_hook()
+def backup_configure(comp: AuthComponent, config: BackupConfiguration) -> None:
+    config.exclude_table_data("public", OAuthAToken.__tablename__)
+    config.exclude_table_data("public", OAuthPToken.__tablename__)

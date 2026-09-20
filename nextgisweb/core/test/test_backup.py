@@ -6,7 +6,7 @@ from ..backup import IndexFile, IndexRecord, backup, parse_pg_dump_version
 
 
 def test_index_file_read_write(tmp_path):
-    ifile = IndexFile(str(tmp_path / "index"))
+    ifile = IndexFile(tmp_path / "$index")
 
     data = [
         IndexRecord(1, "none-value", None),
@@ -35,4 +35,4 @@ def test_parse_pg_dump_version(output, expected):
 
 @pytest.mark.usefixtures("ngw_env")
 def test_dummy_backup(tmp_path):
-    backup(str(tmp_path))
+    backup(tmp_path)

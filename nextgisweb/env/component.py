@@ -88,12 +88,15 @@ class Component:
                 raise TypeError(f"{cls.__name__}.{a} class attribute is forbidden")
 
         for a in (
+            "backup_configure",
+            "backup_objects",
             "check_integrity",
             "client_codegen",
             "healthcheck",
             "is_service_ready",
             "maintenance",
             "query_stat",
+            "restore_prepare",
             "stylesheets",
             "sys_info",
             "template_include",
@@ -141,15 +144,6 @@ class Component:
         pass
 
     def initialize_db(self):
-        pass
-
-    def backup_configure(self, config):
-        pass
-
-    def backup_objects(self):
-        return ()
-
-    def restore_prepare(self):
         pass
 
     def setup_pyramid(self, config):

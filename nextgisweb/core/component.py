@@ -266,12 +266,6 @@ class CoreComponent(StorageComponentMixin, Component):
     def backup_filename(self, filename):
         return os.path.join(self.options["backup.path"], filename)
 
-    def backup_objects(self):
-        yield from self.fontconfig.backup_objects()
-
-    def restore_prepare(self):
-        self.fontconfig.restore_prepare()
-
     # fmt: off
     option_annotations = (
         # Database options
