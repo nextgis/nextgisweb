@@ -1,3 +1,7 @@
+__all__ = [
+    "s3_storage_creds",
+]
+
 import pytest
 
 

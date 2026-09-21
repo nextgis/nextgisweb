@@ -13,6 +13,7 @@ from .core import *
 from .env import *
 from .file_upload import *
 from .pyramid import *
+from .raster_layer import *
 from .resource import *
 
 
