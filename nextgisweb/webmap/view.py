@@ -3,7 +3,6 @@ from typing import Any
 from urllib.parse import unquote, urljoin, urlparse
 
 from msgspec import Struct
-from pyramid.renderers import render_to_response
 
 from nextgisweb.env import COMP_ID, gettext
 
@@ -11,7 +10,7 @@ from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
 from nextgisweb.pyramid.api import csetting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request, render_to_response
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import ResourceFactory, ResourceScope, Widget
 
@@ -170,7 +169,7 @@ def cs_nominatim_url(comp: WebMapComponent, request: Request) -> str:
     return comp.options["nominatim.url"].rstrip("/")
 
 
-def setup_pyramid(comp: WebMapComponent, config):
+def setup_pyramid(comp: WebMapComponent, config: Configurator):
     resource_factory = ResourceFactory(context=WebMap)
 
     config.add_route(

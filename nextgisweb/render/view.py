@@ -45,7 +45,3 @@ class TMSLink(ExternalAccessLink):
 def resource_section_legend_symbols(obj, **kwargs):
     enabled = RenderComponent.current().options["legend_symbols_section"]
     return enabled and ILegendSymbols.providedBy(obj)
-
-
-def setup_pyramid(comp: RenderComponent, config):
-    pass

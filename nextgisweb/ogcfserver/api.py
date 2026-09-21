@@ -1,6 +1,4 @@
 from msgspec import UNSET
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import Response
 from shapely.geometry import box
 
 from nextgisweb.lib.datetime import utcnow_naive
@@ -10,7 +8,7 @@ import nextgisweb.feature_layer.api as feature_layer_api
 from nextgisweb.feature_layer import Feature, IWritableFeatureLayer
 from nextgisweb.feature_layer.api import query_feature_or_not_found
 from nextgisweb.pyramid import JSONType
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request, Response
 from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 
 from .component import OGCFServerComponent
@@ -177,18 +175,16 @@ def collections(resource, request: Request) -> JSONType:
     )
 
 
-def collection(resource, request: Request) -> JSONType:
+def collection(resource, request: Request, collection_id: str) -> JSONType:
     request.resource_permission(ServiceScope.connect)
-    collection_id = request.matchdict["collection_id"]
     for c in resource.collections:
         if c.keyname == collection_id:
             return collection_to_ogc(c, request)
     raise HTTPNotFound()
 
 
-def create(resource, request: Request) -> JSONType:
+def create(resource, request: Request, collection_id: str) -> JSONType:
     request.resource_permission(ServiceScope.connect)
-    collection_id = request.matchdict["collection_id"]
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
@@ -208,9 +204,8 @@ def create(resource, request: Request) -> JSONType:
     return dict(id=fid)
 
 
-def items(resource, request: Request) -> JSONType:
+def items(resource, request: Request, collection_id: str) -> JSONType:
     request.resource_permission(ServiceScope.connect)
-    collection_id = request.matchdict["collection_id"]
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.read, c.resource)
@@ -276,10 +271,8 @@ def items(resource, request: Request) -> JSONType:
     return HTTPNotFound()
 
 
-def iget(resource, request: Request) -> JSONType:
+def iget(resource, request: Request, collection_id: str, item_id: int) -> JSONType:
     request.resource_permission(ServiceScope.connect)
-    collection_id = request.matchdict["collection_id"]
-    item_id = int(request.matchdict["item_id"])
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.read, c.resource)
@@ -314,10 +307,8 @@ def iget(resource, request: Request) -> JSONType:
     raise HTTPNotFound()
 
 
-def iput(resource, request: Request) -> JSONType:
+def iput(resource, request: Request, collection_id: str, item_id: int) -> JSONType:
     request.resource_permission(ServiceScope.connect)
-    collection_id = request.matchdict["collection_id"]
-    item_id = int(request.matchdict["item_id"])
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
@@ -331,10 +322,8 @@ def iput(resource, request: Request) -> JSONType:
     return dict(id=feature.id)
 
 
-def idelete(resource, request: Request) -> JSONType:
+def idelete(resource, request: Request, collection_id: str, item_id: int) -> JSONType:
     request.resource_permission(ServiceScope.connect)
-    collection_id = request.matchdict["collection_id"]
-    item_id = int(request.matchdict["item_id"])
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
@@ -342,17 +331,16 @@ def idelete(resource, request: Request) -> JSONType:
                 c.resource.feature_delete(item_id)
 
 
-def options(resource, request: Request):
+def options(resource, request: Request, collection_id: str):
     request.resource_permission(ServiceScope.connect)
-    collection_id = request.matchdict["collection_id"]
-    item_id = request.matchdict.get("item_id")
+    has_item_id = "item_id" in request.path_param
     allow = []
     for c in resource.collections:
         if c.keyname == collection_id:
             if c.resource.has_permission(DataScope.read, request.user):
                 allow.append("GET")
             if c.resource.has_permission(DataScope.write, request.user):
-                if item_id is not None:
+                if has_item_id:
                     allow.extend(["PUT", "DELETE"])
                 else:
                     allow.append("POST")
@@ -550,7 +538,7 @@ def openapi(resource, request: Request) -> JSONType:
     return oas
 
 
-def setup_pyramid(comp: OGCFServerComponent, config):
+def setup_pyramid(comp: OGCFServerComponent, config: Configurator):
     service_factory = ResourceFactory(context=OGCFService)
 
     config.add_route(

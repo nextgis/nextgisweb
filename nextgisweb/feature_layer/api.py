@@ -16,7 +16,7 @@ from nextgisweb.core.exception import ValidationError
 from nextgisweb.llm_core import LLMCoreComponent
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -857,7 +857,7 @@ def filter_generate(resource, request: Request, *, body: FilterGenerateBody) -> 
 
     llm_core = request.env.component(LLMCoreComponent)
     if not llm_core.available:
-        from pyramid.httpexceptions import HTTPNotFound
+        from nextgisweb.pyramid.tomb import HTTPNotFound
 
         raise HTTPNotFound()
 
@@ -889,7 +889,7 @@ def filter_generate(resource, request: Request, *, body: FilterGenerateBody) -> 
     return json_loads(tool_call.function.arguments)["expression"]
 
 
-def setup_pyramid(comp: FeatureLayerComponent, config):
+def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
     config.add_route(

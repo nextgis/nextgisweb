@@ -6,14 +6,12 @@ from typing import Annotated, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from PIL import Image, ImageDraw, ImageFont
-from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.response import Response
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, Query, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPBadRequest, Request, Response
 from nextgisweb.resource import (
     DataScope,
     Resource,
@@ -563,7 +561,7 @@ def resource_legend_symbols(
     return ResourceLegendSymbolsResponse(items=items)
 
 
-def setup_pyramid(comp: RenderComponent, config):
+def setup_pyramid(comp: RenderComponent, config: Configurator):
     config.add_route(
         "render.tile",
         "/api/component/render/tile",

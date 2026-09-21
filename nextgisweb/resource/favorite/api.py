@@ -2,14 +2,13 @@ from datetime import datetime
 from inspect import Parameter, signature
 
 from msgspec import UNSET, Struct, UnsetType, to_builtins
-from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AsJSON, EmptyObject, annotate, make_union
 from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
 from nextgisweb.resource import ResourceCls, ResourceRef
 
 from ..component import ResourceComponent
@@ -162,7 +161,7 @@ def idelete(request: Request, id: int) -> EmptyObject:
         DBSession.delete(obj)
 
 
-def setup_pyramid(comp: ResourceComponent, config):
+def setup_pyramid(comp: ResourceComponent, config: Configurator):
     config.add_route(
         "resource.favorite.schema",
         "/api/component/resource/favorite/schema",

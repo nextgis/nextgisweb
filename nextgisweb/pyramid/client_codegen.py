@@ -5,7 +5,6 @@ from json import dumps as json_dumps
 from typing import Any, Literal, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
-from pyramid.response import Response
 
 from nextgisweb.lib.apitype import unannotate
 from nextgisweb.lib.fileutil import update_text_file
@@ -14,7 +13,7 @@ from nextgisweb.jsrealm.client_codegen import client_codegen_hook
 from nextgisweb.jsrealm.tsgen import TSGenerator
 
 from .component import PyramidComponent
-from .tomb import Configurator, iter_routes
+from .tomb import Configurator, Response, iter_routes
 
 
 @client_codegen_hook()

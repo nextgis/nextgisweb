@@ -1,12 +1,11 @@
 import re
 from base64 import b64decode
 from shutil import copyfileobj
-from typing import Annotated
+from typing import Annotated, Any, cast
 
 import magic
 import pyramid.httpexceptions as exc
 from msgspec import UNSET, Meta, Struct, UnsetType
-from pyramid.response import Response
 
 from nextgisweb.env import gettext, inject
 from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
@@ -14,7 +13,7 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import UserException
 from nextgisweb.core.storage import StorageInsufficient
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request, Response
 
 from .component import FileUploadComponent
 from .exception import FileUploadStorageInsufficient
@@ -161,8 +160,8 @@ def _collection_post_form(request: Request, *, comp: FileUploadComponent = injec
         file.seek(0)
         return size
 
-    # Determine if multi-file upload is taking place
-    post = request.POST
+    # Determine if multi-file upload is taking place. Does anybody actually use this?
+    post = cast(Any, request.POST)
     ufiles = post.getall("files[]") if "files[]" in post else [post["file"]]
 
     upload_meta = []
@@ -225,8 +224,7 @@ class FileUploadFactory:
         self.incomplete_ok = incomplete_ok
 
     def __call__(self, request: Request) -> FileUpload:
-        id = request.matchdict[self.key]
-        assert isinstance(id, str)
+        id = request.path_param[self.key]
         try:
             return FileUpload(id=id, incomplete_ok=True)
         except FileUploadNotFound as exc:
@@ -381,7 +379,7 @@ def _tus_decode_upload_metadata(value):
     return result
 
 
-def setup_pyramid(comp: FileUploadComponent, config):
+def setup_pyramid(comp: FileUploadComponent, config: Configurator):
     tus_cors_headers = dict(
         request=(
             "Upload-Offset",

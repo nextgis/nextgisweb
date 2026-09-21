@@ -60,7 +60,7 @@ class FontConfig:
         # Let fontconfig know about the generated file
         environ["FONTCONFIG_FILE"] = str(fonts_conf)
 
-    def enumerate(self) -> list[BaseFont]:
+    def enumerate(self) -> list[CustomFont | SystemFont]:
         props = ("file", "family", "style", "fontformat")
         fmt = "".join([f"<{f}>%{{{f}|xmlescape}}</{f}>" for f in props])
         out = check_output(["fc-list", "--format", f"<item>{fmt}</item>"], text=True)

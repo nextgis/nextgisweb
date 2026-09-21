@@ -4,7 +4,6 @@ from typing import Annotated
 import zope.event
 import zope.event.classhandler
 from msgspec import Meta
-from pyramid.httpexceptions import HTTPFound
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload, with_polymorphic
 
@@ -16,9 +15,9 @@ from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import JSONType, PyramidComponent
 from nextgisweb.pyramid.breadcrumb import Breadcrumb
-from nextgisweb.pyramid.tomb import Request
-from nextgisweb.resource.component import ResourceComponent
+from nextgisweb.pyramid.tomb import Configurator, HTTPFound, Request
 
+from .component import ResourceComponent
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
@@ -186,11 +185,8 @@ class OnResourceCreateView:
 
 
 @react_renderer("@nextgisweb/resource/composite")
-def create(request: Request):
+def create(request: Request, *, cls: str):
     request.resource_permission(ResourceScope.manage_children)
-
-    cls = request.GET.get("cls")
-    assert cls is not None
 
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
     setup = dict(operation="create", cls=cls, parent=request.context.id)
@@ -278,7 +274,7 @@ def resource_section_external_access(obj, *, request: Request, **kwargs):
     return {"links": links} if len(links) > 0 else None
 
 
-def setup_pyramid(comp: ResourceComponent, config):
+def setup_pyramid(comp: ResourceComponent, config: Configurator):
     def resource_permission(request: Request, permission, resource=None):
         if resource is None:
             resource = request.context

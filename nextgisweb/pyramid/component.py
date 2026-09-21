@@ -7,7 +7,6 @@ from typing import Any
 
 import transaction
 from pyramid.interfaces import ITweens
-from pyramid.response import Response
 
 from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option, OptionAnnotations
@@ -18,7 +17,7 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.core import CoreComponent, maintenance_hook
 
 from . import uacompat
-from .tomb import Configurator, Request, iter_routes
+from .tomb import Configurator, Request, Response, iter_routes
 from .util import StaticMap, gensecret
 
 

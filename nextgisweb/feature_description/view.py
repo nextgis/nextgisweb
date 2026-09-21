@@ -1,10 +1,8 @@
-from pyramid.httpexceptions import HTTPNotFound
-
 from nextgisweb.env import gettext
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.gui import react_renderer
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
 from nextgisweb.resource import DataScope, resource_factory
 
 from .component import FeatureDescriptionComponent
@@ -25,7 +23,7 @@ def description(request: Request):
     )
 
 
-def setup_pyramid(comp: FeatureDescriptionComponent, config):
+def setup_pyramid(comp: FeatureDescriptionComponent, config: Configurator):
     config.add_route(
         "feature_description.page",
         r"/resource/{id:uint}/descriptions",

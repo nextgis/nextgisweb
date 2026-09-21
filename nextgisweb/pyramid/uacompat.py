@@ -5,13 +5,11 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from pyramid.events import NewRequest
-from pyramid.httpexceptions import HTTPSeeOther
-from pyramid.response import Response
 
 from nextgisweb.lib.config import Option, OptionAnnotations, OptionType
 
 from . import component
-from .tomb import Request
+from .tomb import Configurator, HTTPSeeOther, Request, Response
 from .util import viewargs
 
 FAMILIES = dict()
@@ -204,6 +202,6 @@ def page(request: Request):
     return ctx
 
 
-def setup_pyramid(comp: component.PyramidComponent, config):
+def setup_pyramid(comp: component.PyramidComponent, config: Configurator):
     config.add_subscriber(subscriber, NewRequest)
     config.add_route("pyramid.uacompat", "/uacompat").add_view(page)

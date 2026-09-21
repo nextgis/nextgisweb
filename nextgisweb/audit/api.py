@@ -7,14 +7,13 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import Meta, Struct
 from msgspec.json import decode as msgspec_decode
-from pyramid.response import Response
 
 from nextgisweb.env import DBSession, inject
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, DatetimeNaive
 from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request, Response
 
 from .backend import require_backend
 from .component import AuditComponent
@@ -188,7 +187,7 @@ def dbase(
         )  # ty: ignore[invalid-return-type]
 
 
-def setup_pyramid(comp: AuditComponent, config):
+def setup_pyramid(comp: AuditComponent, config: Configurator):
     config.add_route(
         "audit.dbase",
         "/api/component/audit/dbase",

@@ -7,8 +7,6 @@ from urllib.parse import parse_qsl, urlencode
 import zope.event
 from msgspec import Meta, Struct
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
-from pyramid.renderers import render_to_response
 from pyramid.security import forget, remember
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import undefer
@@ -20,7 +18,14 @@ from nextgisweb.core.exception import UserException
 from nextgisweb.gui import REACT_RENDERER, react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import SessionStore, WebSession, client_setting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import (
+    Configurator,
+    HTTPFound,
+    HTTPNotFound,
+    HTTPUnauthorized,
+    Request,
+    render_to_response,
+)
 from nextgisweb.pyramid.view import ModelFactory
 
 from . import permission
@@ -110,12 +115,12 @@ def session_invite(request: Request):
         return response
 
 
-def alink(request: Request):
+def alink(request: Request, token: str):
     if not request.env.component(AuthComponent).options["alink"]:
         raise HTTPNotFound()
 
     try:
-        user = User.filter_by(alink_token=request.matchdict["token"]).one()
+        user = User.filter_by(alink_token=token).one()
     except NoResultFound:
         raise ALinkException(
             message=gettext(
@@ -450,7 +455,7 @@ def cs_oauth(comp: AuthComponent, request: Request) -> AuthOAuthClientSetting:
     )
 
 
-def setup_pyramid(comp: AuthComponent, config):
+def setup_pyramid(comp: AuthComponent, config: Configurator):
     config.add_route("auth.login", "/login", get=login)
     config.add_route("auth.session_invite", "/session-invite").add_view(session_invite)
     config.add_route("auth.alink", "/alink/{token:str}").add_view(alink)

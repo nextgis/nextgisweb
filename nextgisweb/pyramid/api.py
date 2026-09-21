@@ -6,7 +6,6 @@ from inspect import Parameter, signature
 from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
-from pyramid.response import FileResponse, Response
 
 from nextgisweb.env import COMP_ID, Component, DBSession, gettext, gettextf, inject
 from nextgisweb.env.package import pkginfo
@@ -39,7 +38,7 @@ from . import client
 from .client import client_setting
 from .component import CompanyLogo, CompanyUrl, HelpPageUrl, LinkPreviewDefaults, PyramidComponent
 from .permission import cors_manage, cors_view
-from .tomb import Configurator, Request, UnsafeFileResponse
+from .tomb import Configurator, FileResponse, Request, Response, UnsafeFileResponse
 from .util import gensecret, restart_delayed
 
 LOGO_MAX_SIZE = 128 * (1 << 10)  # 128 KB
@@ -251,8 +250,11 @@ def font_cread(request: Request) -> AsJSON[list[SystemFont | CustomFont]]:
 
     :returns: List of available fonts"""
     request.require_administrator()
+
     unordered = request.env.component(CoreComponent).fontconfig.enumerate()
-    return sorted(unordered, key=lambda i: (not isinstance(i, CustomFont), i.label))
+    ordered = sorted(unordered, key=lambda i: (not isinstance(i, CustomFont), i.label))
+
+    return ordered
 
 
 class FontCUpdateBody(Struct, kw_only=True):
@@ -423,7 +425,7 @@ class csetting:
             core.settings_set(*cskey, gensecret(8))
 
 
-def setup_pyramid_csettings(comp: PyramidComponent, config):
+def setup_pyramid_csettings(comp: PyramidComponent, config: Configurator):
     NoneDefault = Annotated[None, Meta(description="Resets the setting to its default value.")]
     fld_unset = lambda n, t: (n, t | UnsetType, UNSET)
     fld_reset = lambda n, t: (n, t | NoneDefault | UnsetType, UNSET)
@@ -721,7 +723,7 @@ def preview_link_data(
     return defaults
 
 
-def setup_pyramid(comp: PyramidComponent, config):
+def setup_pyramid(comp: PyramidComponent, config: Configurator):
     from . import api_cors
 
     config.include(api_cors)

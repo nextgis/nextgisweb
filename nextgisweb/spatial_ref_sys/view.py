@@ -1,10 +1,13 @@
+from typing import Annotated
+
 from msgspec import Struct
 
 from nextgisweb.env import gettext
+from nextgisweb.lib.apitype.param import Path
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import client_setting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 
 from .component import CatalogSource, SpatialRefSysComponent
 from .model import SRS, SRSRef
@@ -52,12 +55,8 @@ def catalog_browse(request: Request):
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/catalog-import")
-def catalog_import(request: Request):
+def catalog_import(request: Request, catalog_id: Annotated[int, Path(name="id")]):
     request.user.require_permission(SRS.permissions.manage)
-
-    catalog_id = request.matchdict["id"]
-    assert isinstance(catalog_id, str)
-    catalog_id = int(catalog_id)
 
     catalog_url = request.env.component(SpatialRefSysComponent).options["catalog.url"]
     item_url = (catalog_url + "/srs/" + str(catalog_id)) if catalog_url else None
@@ -92,7 +91,7 @@ def cs_catalog(
     )
 
 
-def setup_pyramid(comp: SpatialRefSysComponent, config):
+def setup_pyramid(comp: SpatialRefSysComponent, config: Configurator):
     config.add_route("srs.browse", "/srs/", get=srs_browse)
     config.add_route("srs.create", "/srs/create", get=srs_create)
     config.add_route("srs.edit", "/srs/{id}", factory=srs_factory, get=srs_edit)

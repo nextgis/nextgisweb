@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Annotated, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal, ogr
-from pyramid.response import FileResponse, Response
 from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import gettext, gettextf
@@ -14,7 +13,7 @@ from nextgisweb.lib.apitype import ContentType, Query, make_literal
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, FileResponse, Request, Response
 from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceID
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
@@ -484,7 +483,7 @@ def export_multi(
         return _zip_response(request, tmp_dir, "layers")
 
 
-def setup_pyramid(comp: FeatureLayerComponent, config):
+def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
     config.add_route(

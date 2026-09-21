@@ -4,7 +4,6 @@ from urllib.parse import urlencode, urlparse
 
 import sqlalchemy as sa
 import transaction
-from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import defer, undefer
 
@@ -15,6 +14,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import Session, SessionStore
+from nextgisweb.pyramid.tomb import HTTPForbidden
 from nextgisweb.pyramid.util import gensecret
 
 from .exception import UserDisabledException

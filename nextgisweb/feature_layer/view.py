@@ -1,7 +1,6 @@
 from typing import Literal
 
 from msgspec import Struct
-from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import gettext
 
@@ -9,7 +8,7 @@ from nextgisweb.feature_layer.api import query_feature_or_not_found
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
 from nextgisweb.resource import DataScope, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
@@ -51,12 +50,15 @@ def feature_browse(request: Request):
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-display")
-def feature_show(request: Request):
+def feature_show(request: Request, feature_id: int):
     request.resource_permission(DataScope.read)
 
     resource_id = request.context.id
-    feature_id = int(request.matchdict["feature_id"])
-    query_feature_or_not_found(request.context.feature_query(), resource_id, feature_id)
+    query_feature_or_not_found(
+        request.context.feature_query(),
+        resource_id,
+        feature_id,
+    )
 
     return dict(
         obj=request.context,
@@ -67,11 +69,10 @@ def feature_show(request: Request):
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-editor")
-def feature_update(request: Request):
+def feature_update(request: Request, feature_id: int):
     request.resource_permission(DataScope.write)
 
     resource_id = request.context.id
-    feature_id = int(request.matchdict["feature_id"])
     query_feature_or_not_found(request.context.feature_query(), resource_id, feature_id)
 
     return dict(
@@ -184,7 +185,7 @@ def cs_versioning(
     return FeatureLayerVersioningClientSetting(default=comp.versioning_default)
 
 
-def setup_pyramid(comp: FeatureLayerComponent, config):
+def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     config.add_route(
         "feature_layer.export_multiple",
         r"/resource/export_multiple",
@@ -212,10 +213,7 @@ def setup_pyramid(comp: FeatureLayerComponent, config):
         "resource.history",
         r"/resource/{id:uint}/history",
         factory=resource_factory,
-    ).add_view(
-        history,
-        context=IFeatureLayer,
-    )
+    ).add_view(history, context=IFeatureLayer)
 
     config.add_view(
         export,

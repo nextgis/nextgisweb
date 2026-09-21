@@ -3,7 +3,7 @@ from nextgisweb.env import gettext
 from nextgisweb.basemap.model import BasemapLayer
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.gui import react_renderer
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import IRenderableStyle
 from nextgisweb.resource import DataScope, resource_factory
@@ -23,7 +23,7 @@ def preview_map(request: Request):
     )
 
 
-def setup_pyramid(comp: LayerPreviewComponent, config):
+def setup_pyramid(comp: LayerPreviewComponent, config: Configurator):
     config.add_route(
         "layer_preview.map",
         r"/resource/{id:uint}/preview",

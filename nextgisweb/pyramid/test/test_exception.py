@@ -1,11 +1,10 @@
 from unittest.mock import ANY, patch
 
-from pyramid.response import Response
-
 from nextgisweb.core.exception import UserException
 from nextgisweb.pyramid.test import WebTestApp
 
 from .. import exception
+from ..tomb import Response
 
 
 class ErrorTest(UserException):

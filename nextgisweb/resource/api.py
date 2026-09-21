@@ -8,7 +8,6 @@ import zope.event
 from msgspec import UNSET, DecodeError, Meta, Struct, UnsetType, defstruct, field, to_builtins
 from msgspec import ValidationError as MsgspecValidationError
 from msgspec.json import Decoder
-from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import with_polymorphic
 from sqlalchemy.sql import exists
@@ -27,7 +26,7 @@ from nextgisweb.core.exception import InsufficientPermissions, UserException, Va
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.pyramid import AsJSON, JSONType, client_setting
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPBadRequest, Request
 
 from .category import ResourceCategory, ResourceCategoryIdentity
 from .component import ResourceComponent
@@ -1177,7 +1176,7 @@ def cs_resource_export(comp: ResourceComponent, request: Request) -> ResourceExp
     return csetting.registry[COMP_ID]["resource_export"].getter()
 
 
-def setup_pyramid(comp: ResourceComponent, config):
+def setup_pyramid(comp: ResourceComponent, config: Configurator):
     config.add_route(
         "resource.blueprint",
         "/api/component/resource/blueprint",

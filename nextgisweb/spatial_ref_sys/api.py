@@ -16,7 +16,7 @@ from nextgisweb.lib.reqext import response_diagnostics
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 
 from .component import CatalogSource, SpatialRefSysComponent
 from .model import SRS, WKT_EPSG_4326, SRSRef
@@ -502,7 +502,7 @@ def remote_catalog_item(catalog_id: int) -> CatalogEntry:
     )
 
 
-def setup_pyramid(comp: SpatialRefSysComponent, config):
+def setup_pyramid(comp: SpatialRefSysComponent, config: Configurator):
     config.add_route(
         "spatial_ref_sys.collection",
         "/api/component/spatial_ref_sys/",

@@ -7,7 +7,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AsJSON, make_union
 from nextgisweb.lib.datetime import utcnow_naive
 
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.resource.exception import ResourceInterfaceNotSupported
 
@@ -25,12 +25,12 @@ Started = Annotated[datetime, Meta(description="Start timestamp", tz=False)]
 Commited = Annotated[datetime, Meta(description="Commit timestamp", tz=False)]
 
 
-class TransactionFactory(ResourceFactory):
+class TransactionFactory:
     def __init__(self):
-        super().__init__(context=IFeatureLayer)
+        self.resource_factory = ResourceFactory(context=IFeatureLayer)
 
     def __call__(self, request: Request) -> Transaction:
-        resource = super().__call__(request)
+        resource = self.resource_factory(request)
         request.resource_permission(DataScope.write, resource)
 
         if not IFeatureLayer.providedBy(resource):
@@ -40,7 +40,7 @@ class TransactionFactory(ResourceFactory):
             DBSession.query(Transaction)
             .with_for_update()
             .filter_by(
-                id=int(request.matchdict["tid"]),
+                id=request.path_param["tid"],
                 resource_id=resource.id,
                 user_id=request.user.id,
             )
@@ -53,7 +53,10 @@ class TransactionFactory(ResourceFactory):
 
     @property
     def annotations(self):
-        return dict(super().annotations, tid=Annotated[int, Meta(description="Transaction ID")])
+        return dict(
+            self.resource_factory.annotations,
+            tid=Annotated[int, Meta(description="Transaction ID")],
+        )
 
 
 class TransactionCreateBody(Struct, kw_only=True):
@@ -213,7 +216,7 @@ def ipost(txn: Transaction, request: Request) -> AsJSON[CommitErrors | CommitSuc
     return CommitSuccess(committed=txn.committed)
 
 
-def setup_pyramid(comp: FeatureLayerComponent, config):
+def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     config.add_route(
         "feature_layer.transaction.collection",
         "/api/resource/{id}/feature/transaction/",

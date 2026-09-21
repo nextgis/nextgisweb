@@ -7,7 +7,6 @@ from msgspec import NODEFAULT, UNSET
 from msgspec.inspect import Metadata, type_info
 from msgspec.json import schema_components
 from msgspec.msgpack import Decoder as MsgpackDecoder
-from pyramid.response import Response
 
 from nextgisweb.env import Component, inject
 from nextgisweb.lib.apitype import ContentType as CType
@@ -16,7 +15,7 @@ from nextgisweb.lib.apitype import StatusCode as SCode
 from nextgisweb.lib.apitype.util import decompose_union
 
 from ..component import PyramidComponent
-from ..tomb import is_json_type, iter_routes
+from ..tomb import Response, is_json_type, iter_routes
 from .docstring import Docstring
 
 

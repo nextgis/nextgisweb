@@ -5,9 +5,9 @@ import numpy as np
 import pytest
 import transaction
 from PIL import Image, ImageDraw
-from pyramid.response import Response
 
 from nextgisweb.pyramid.test import WebTestApp
+from nextgisweb.pyramid.tomb import Response
 from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857, SRS
 
 from ..model import TMSConnection, TMSLayer

@@ -2,13 +2,12 @@ from tempfile import NamedTemporaryFile
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from lxml import etree, html
-from pyramid.response import FileResponse
 
 from nextgisweb.lib.apitype import EmptyObject
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.file_upload import FileUpload
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, FileResponse, Request
 from nextgisweb.resource import DataScope, ResourceFactory
 
 from .api_import import descriptions_import
@@ -59,7 +58,7 @@ def import_description(resource, request: Request) -> EmptyObject:
         descriptions_import(resource, fupload.data_path, replace=replace)
 
 
-def setup_pyramid(comp: FeatureDescriptionComponent, config):
+def setup_pyramid(comp: FeatureDescriptionComponent, config: Configurator):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
     config.add_route(

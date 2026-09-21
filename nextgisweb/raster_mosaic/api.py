@@ -1,13 +1,12 @@
 from typing import Annotated
 
-from pyramid.response import FileResponse
 from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import ContentType
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, FileResponse, Request
 from nextgisweb.resource import DataScope
 
 from .component import RasterMosaicComponent
@@ -43,7 +42,7 @@ def export(
     return response
 
 
-def setup_pyramid(comp: RasterMosaicComponent, config):
+def setup_pyramid(comp: RasterMosaicComponent, config: Configurator):
     config.add_view(
         export,
         route_name="resource.export",

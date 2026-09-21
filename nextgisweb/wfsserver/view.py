@@ -5,7 +5,6 @@ from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
-from .component import WFSServerComponent
 from .model import Service
 
 
@@ -27,7 +26,3 @@ class WFSLink(ExternalAccessLink):
     @classmethod
     def url_factory(cls, obj, request: Request) -> str:
         return request.route_url("wfsserver.wfs", id=obj.id)
-
-
-def setup_pyramid(comp: WFSServerComponent, config):
-    pass

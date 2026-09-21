@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from nextgisweb.env import DBSession, gettext
 
 from nextgisweb.gui import react_renderer
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.pyramid.view import template_include_hook
 
 from ..component import ResourceComponent
@@ -56,7 +56,7 @@ def config_value(request: Request):
     )
 
 
-def setup_pyramid(comp: ResourceComponent, config):
+def setup_pyramid(comp: ResourceComponent, config: Configurator):
     config.add_route(
         "resource.favorite.page",
         "/resource/favorite/",

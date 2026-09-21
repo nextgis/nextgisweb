@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING, Annotated, cast
 
 import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
-from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
 from pyramid.security import forget
 from sqlalchemy.orm import aliased, undefer
@@ -20,7 +19,7 @@ from nextgisweb.lib.apitype import (
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPUnauthorized, Request
 from nextgisweb.pyramid.util import gensecret
 
 from .component import AuthComponent
@@ -647,7 +646,7 @@ def permission(request: Request) -> AsJSON[dict[PermissionItem, str]]:
     return {k: tr(v.label) for k, v in Permission.registry.items()}
 
 
-def setup_pyramid(comp: AuthComponent, config):
+def setup_pyramid(comp: AuthComponent, config: Configurator):
     config.add_route(
         "auth.user.collection",
         "/api/component/auth/user/",

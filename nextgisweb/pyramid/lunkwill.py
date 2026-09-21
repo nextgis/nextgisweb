@@ -1,15 +1,13 @@
 from urllib.parse import urlunparse
 
 import urllib3
-from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.response import Response
 
 from nextgisweb.env import gettext, inject
 
 from nextgisweb.core.exception import NotConfigured
 
 from .component import PyramidComponent
-from .tomb import Request
+from .tomb import Configurator, HTTPBadRequest, Request, Response
 
 
 class LunkwillNotConfigured(NotConfigured):
@@ -30,7 +28,7 @@ def ensure_interception(*, comp: PyramidComponent = inject.arg()):
         raise LunkwillIntercepionExpected
 
 
-def setup_pyramid(comp: PyramidComponent, config):
+def setup_pyramid(comp: PyramidComponent, config: Configurator):
     config.add_route(
         "lunkwill.summary",
         "/api/lunkwill/{id:str}/summary",
@@ -113,10 +111,13 @@ def proxy(request: Request):
     pool = request.registry.settings["lunkwill.pool"]
     resp = pool.request(request.method, url, headers=headers, retries=False, preload_content=False)
     return Response(
-        status=resp.status, headerlist=list(resp.headers.items()), app_iter=resp.stream()
+        status=resp.status,
+        headerlist=list(resp.headers.items()),
+        app_iter=resp.stream(),
     )
 
 
 def hmux(request: Request):
     ensure_interception()
+
     assert False, "Unreachable"

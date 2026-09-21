@@ -7,7 +7,7 @@ from shapely.geometry import Polygon, mapping
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import Query
 
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import DataScope, ResourceRef
 
 from .component import RasterLayerComponent
@@ -131,7 +131,7 @@ def pixel_geometry(geotransform: tuple, col: int, row: int) -> dict:
     return mapping(Polygon([tl, tr, br, bl]))
 
 
-def setup_pyramid(comp: RasterLayerComponent, config):
+def setup_pyramid(comp: RasterLayerComponent, config: Configurator):
     config.add_route(
         "raster_layer.identify",
         "/api/component/raster_layer/identify",

@@ -3,7 +3,7 @@ from io import BytesIO
 from itertools import count
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
-from typing import Annotated
+from typing import Annotated, Any
 from urllib.parse import quote_plus
 from zipfile import ZIP_DEFLATED, ZipFile
 
@@ -11,7 +11,6 @@ from msgspec import Meta, Struct
 from msgspec.json import encode as msgspec_dumpb
 from PIL import Image
 from PIL.Image import Resampling
-from pyramid.response import FileResponse, Response
 from sqlalchemy.sql import select
 
 from nextgisweb.env import DBSession
@@ -23,7 +22,13 @@ from nextgisweb.feature_layer.api import FeatureID, query_feature_or_not_found
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
-from nextgisweb.pyramid.tomb import Request, UnsafeFileResponse
+from nextgisweb.pyramid.tomb import (
+    Configurator,
+    FileResponse,
+    Request,
+    Response,
+    UnsafeFileResponse,
+)
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 
 from .api_import import attachments_import
@@ -114,7 +119,8 @@ def image(
     ext = image.format
 
     try:
-        exif = image._getexif()
+        # ty: ignore[unresolved-attribute]
+        exif: dict[int, Any] = image._getexif()
     except Exception:
         pass
     else:
@@ -334,7 +340,7 @@ def bundle(
         return response
 
 
-def setup_pyramid(comp: FeatureAttachmentComponent, config):
+def setup_pyramid(comp: FeatureAttachmentComponent, config: Configurator):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
     itmurl = "/api/resource/{id}/feature/{fid}/attachment/{aid}"

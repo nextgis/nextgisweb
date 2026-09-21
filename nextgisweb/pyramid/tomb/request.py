@@ -2,7 +2,6 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, overload
 
 from pyramid.request import Request as BaseRequest
-from pyramid.response import Response
 
 from nextgisweb.env import Env
 
@@ -11,6 +10,8 @@ if not TYPE_CHECKING:
 
 else:
     from nextgisweb.auth import User
+
+    from .response import Response
 
     class Request[C](BaseRequest):
         @property

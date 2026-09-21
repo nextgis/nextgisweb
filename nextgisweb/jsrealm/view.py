@@ -3,7 +3,7 @@ from pathlib import Path
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import viewargs
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 
 from .component import JSRealmComponent
 
@@ -19,7 +19,10 @@ def testentry_browse(request: Request):
 
 @viewargs(renderer="mako")
 def testentry(request: Request):
-    selected = "/".join(request.matchdict["selected"])
+    subpath = request.matchdict["selected"]
+    assert isinstance(subpath, tuple)
+    selected = "/".join(subpath)
+
     return dict(
         entrypoint=JSENTRY,
         selected=selected,
@@ -27,7 +30,7 @@ def testentry(request: Request):
     )
 
 
-def setup_pyramid(comp: JSRealmComponent, config):
+def setup_pyramid(comp: JSRealmComponent, config: Configurator):
     dist_path = Path(comp.options["dist_path"])
     for p in filter(lambda p: p.is_dir(), dist_path.iterdir()):
         pn = p.name

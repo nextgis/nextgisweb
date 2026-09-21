@@ -4,9 +4,7 @@ from typing import Annotated, Any, Protocol, Self
 import pyramid.httpexceptions as httpexceptions
 from msgspec import UNSET, Struct, UnsetType
 from msgspec import DecodeError as MsgspecDecodeError
-from pyramid.renderers import render_to_response
 from pyramid.request import RequestLocalCache
-from pyramid.response import Response
 
 from nextgisweb.env import gettext, inject
 from nextgisweb.lib import json
@@ -17,14 +15,14 @@ from nextgisweb.core.exception import UserException, UserExceptionContact
 from nextgisweb.gui import REACT_RENDERER
 from nextgisweb.jsrealm import TSExport, jsentry
 
-from .tomb import Request
+from .tomb import Configurator, Request, Response, render_to_response
 from .tomb.exception import MalformedJSONBody
 from .tomb.predicate import ErrorRendererPredicate
 
 JSENTRY = jsentry("@nextgisweb/pyramid/error-page")
 
 
-def includeme(config):
+def includeme(config: Configurator):
     DB_TFACTORY = "nextgisweb.pyramid.db.tween_factory"
 
     ERR_TFACTORY = "nextgisweb.pyramid.exception.handled_exception_tween_factory"

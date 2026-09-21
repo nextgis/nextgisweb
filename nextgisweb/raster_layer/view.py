@@ -1,12 +1,11 @@
 from msgspec import Struct, field
-from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import gettext
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
@@ -70,7 +69,7 @@ def cs_cog_default(comp: RasterLayerComponent, request: Request) -> bool:
     return comp.cog_default
 
 
-def setup_pyramid(comp: RasterLayerComponent, config):
+def setup_pyramid(comp: RasterLayerComponent, config: Configurator):
     config.add_view(
         export,
         route_name="resource.export.page",

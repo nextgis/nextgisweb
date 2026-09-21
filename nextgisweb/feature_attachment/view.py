@@ -1,12 +1,11 @@
 from msgspec import Struct
-from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import gettext
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import client_setting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
 from nextgisweb.resource import DataScope, resource_factory
 
 from .component import FeatureAttachmentComponent
@@ -38,7 +37,7 @@ def cs_webmap(
     return FeatureAttachmentWebmapClientSettings(bundle=comp.options["webmap.bundle"])
 
 
-def setup_pyramid(comp: FeatureAttachmentComponent, config):
+def setup_pyramid(comp: FeatureAttachmentComponent, config: Configurator):
     config.add_route(
         "feature_attachment.page",
         r"/resource/{id:uint}/attachments",

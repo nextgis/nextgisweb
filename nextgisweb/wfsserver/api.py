@@ -1,7 +1,5 @@
-from pyramid.response import Response
-
 from nextgisweb.core.exception import InsufficientPermissions, UserException
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request, Response
 from nextgisweb.resource import ResourceFactory, ServiceScope
 
 from .component import WFSServerComponent
@@ -51,7 +49,7 @@ def error_renderer(*, exc: UserException, request: Request, **kwargs):
     )
 
 
-def setup_pyramid(comp: WFSServerComponent, config):
+def setup_pyramid(comp: WFSServerComponent, config: Configurator):
     service_factory = ResourceFactory(context=Service)
 
     config.add_route(

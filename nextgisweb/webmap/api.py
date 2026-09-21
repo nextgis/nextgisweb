@@ -6,9 +6,6 @@ from typing import TYPE_CHECKING, Annotated, Any, ForwardRef, Literal, TypeAlias
 
 import shapely.wkb
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.renderers import render
-from pyramid.response import Response
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype.util import EmptyObject
@@ -20,7 +17,7 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request, Response, render
 from nextgisweb.render import IRenderableScaleRange
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
@@ -746,7 +743,7 @@ def display_config(obj, request: Request) -> DisplayConfig:
     )
 
 
-def setup_pyramid(comp: WebMapComponent, config):
+def setup_pyramid(comp: WebMapComponent, config: Configurator):
     webmap_factory = ResourceFactory(context=WebMap)
 
     config.add_route(

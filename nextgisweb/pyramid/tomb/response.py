@@ -2,7 +2,9 @@ import os.path
 from mimetypes import guess_type
 
 from pyramid.httpexceptions import HTTPNotFound
+from pyramid.response import FileIter as FileIter  # Reexport for future extension
 from pyramid.response import FileResponse
+from pyramid.response import Response as Response  # Reexport for future extension
 
 from .request import Request
 

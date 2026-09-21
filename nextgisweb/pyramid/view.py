@@ -14,12 +14,10 @@ from markupsafe import Markup
 from msgspec import Struct
 from psutil import Process
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound
-from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 from sqlalchemy.exc import NoResultFound
 
-from nextgisweb.env import Component, DBSession, env, gettext, inject
+from nextgisweb.env import Component, DBSession, gettext, inject
 from nextgisweb.env.hook import ComponentHook, ComponentHookProtocol
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import JSONType, QueryString
@@ -41,7 +39,15 @@ from .component import CompanyLogo, CompanyUrl, HelpPageUrl, PyramidComponent
 from .exception import ErrorHandler
 from .openapi import openapi
 from .session import WebSession
-from .tomb import Configurator, Request, StaticFileResponse
+from .tomb import (
+    Configurator,
+    FileResponse,
+    HTTPFound,
+    HTTPNotFound,
+    Request,
+    Response,
+    StaticFileResponse,
+)
 from .uacompat import FAMILIES
 from .uacompat import parse_header as ua_parse_header
 from .util import StaticMap, StaticSourcePredicate, set_output_buffering, viewargs
@@ -82,27 +88,10 @@ def template_include(comp: PyramidComponent) -> Iterable[str]:
     return ("nextgisweb:pyramid/template/update.mako",)
 
 
-def asset(request: Request):
-    component = request.matchdict["component"]
-    subpath = request.matchdict["subpath"]
-
-    assert isinstance(component, str) and isinstance(subpath, tuple)
-
-    try:
-        comp_obj = env.components[component]
-    except KeyError:
-        raise HTTPNotFound()
-
-    pth = comp_obj.resource_path("/".join(("asset", *subpath)))
-    if pth.is_file():
-        return FileResponse(pth, request=request, cache_max_age=3600)
-    else:
-        raise HTTPNotFound()
-
-
-def static_view(request: Request):
+@inject()
+def static_view(request: Request, skey: str, *, comp: PyramidComponent = inject.arg()):
     static_path = request.environ["static_path"]
-    cache = request.matchdict["skey"] == request.env.component(PyramidComponent).static_key[1:]
+    cache = skey == comp.static_key[1:]
     return StaticFileResponse(str(static_path), cache=cache, request=request)
 
 
@@ -218,14 +207,10 @@ def control_panel(request: Request, *, comp: PyramidComponent = inject.arg()):
     )
 
 
-def locale(request: Request):
+def locale(request: Request, locale: str):
     @request.add_response_callback
     def callback(request: Request, response):
-        response.set_cookie(
-            "ngw_slg",
-            request.matchdict["locale"],
-            **WebSession.cookie_settings(request),
-        )
+        response.set_cookie("ngw_slg", locale, **WebSession.cookie_settings(request))
 
     return HTTPFound(location=request.GET.get("next", request.application_url))
 
@@ -306,11 +291,20 @@ def backup_browse(request: Request):
     )
 
 
-def backup_download(request: Request):
-    if not request.env.component(PyramidComponent).options["backup.download"]:
+@inject()
+def backup_download(
+    request: Request,
+    filename: str,
+    *,
+    comp: PyramidComponent = inject.arg(),
+    core: CoreComponent = inject.arg(),
+):
+    if not comp.options["backup.download"]:
         raise HTTPNotFound()
+
     request.require_administrator()
-    fn = request.env.component(CoreComponent).backup_filename(request.matchdict["filename"])
+
+    fn = core.backup_filename(filename)
     return FileResponse(fn)
 
 
@@ -736,6 +730,7 @@ def setup_pyramid(comp: PyramidComponent, config: Configurator):
     config.add_route(
         "pyramid.test_api",
         "/api/test/request",
+        openapi=False,
         **{
             m: test_request_view
             for m in ("head", "get", "post", "put", "delete", "options", "patch")

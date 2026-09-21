@@ -4,11 +4,11 @@ from http.cookies import SimpleCookie
 import pytest
 import transaction
 from freezegun import freeze_time
-from pyramid.response import Response
 
 from nextgisweb.pyramid.test import WebTestApp
 
 from .. import Session, SessionStore
+from ..tomb import Response
 
 prefix = "_test_"
 

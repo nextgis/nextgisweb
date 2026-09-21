@@ -1,9 +1,9 @@
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from inspect import signature
 from sys import _getframe
+from types import FunctionType
 from typing import TYPE_CHECKING, Annotated, Any
-from warnings import warn
 
 from msgspec import NODEFAULT, Meta
 from msgspec import DecodeError as MsgspecDecodeError
@@ -12,14 +12,13 @@ from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 from pyramid.exceptions import ConfigurationError
-from pyramid.response import Response
 
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import ContentType, EmptyObject, JSONType, PathParam, QueryParam
 from nextgisweb.lib.apitype.query_string import QueryParamError, QueryParamRequired
 from nextgisweb.lib.apitype.schema import _AnyOfRuntime
-from nextgisweb.lib.apitype.util import disannotate, is_struct_type
+from nextgisweb.lib.apitype.util import EmptyInstance, disannotate, is_struct_type
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
@@ -30,6 +29,7 @@ from .helper import RouteHelper
 from .inspect import iter_routes
 from .predicate import ErrorRendererPredicate, RequestMethodPredicate, RouteMeta, ViewMeta
 from .request import Request
+from .response import Response
 from .util import push_stacklevel
 
 
@@ -48,49 +48,49 @@ def _json_msgspec_factory(typedef):
 
 
 def _view_driver_factory(
-    view,
-    pass_context,
+    view: Callable,
+    pass_context: bool,
     *,
     path_params: Mapping[str, PathParam],
     query_params: Mapping[str, QueryParam],
     body: tuple[str, Any] | None,
     result: Any,
-):
-    extract = list()
-
-    extract.extend(
-        # NOTE: Decoded twice (the first one in request.path_param)
-        (arg, lambda req, name=param.name, dec=param.decoder: dec(req.matchdict[name]))
-        for arg, param in path_params.items()
+) -> Callable:
+    # NOTE: Path parameters are decoded twice (the first time in request.path_param) because
+    # different constraints may apply: one from the route and another from the view.
+    extract = (
+        *((arg, _path_extractor(pp.name, pp.decoder)) for arg, pp in path_params.items()),
+        *((arg, _query_extractor(qp.decoder)) for arg, qp in query_params.items()),
+        *((body,) if body is not None else ()),
     )
 
-    extract.extend(
-        (arg, lambda req, dec=param.decoder: dec(req.qs_parser))
-        for arg, param in query_params.items()
-    )
-
-    if body is not None:
-        extract.append(body)
-
-    convert = None
-    if result is EmptyObject:
-        convert = lambda v, empty=EmptyObject(): empty if v is None else v
+    convert = _convert_empty_object if result is EmptyObject else None
 
     if len(extract) == 0 and convert is None:
         return view
 
-    if convert is None:
-        convert = lambda x: x
-
-    def _view(context, request: Request):
+    def _view(context: Any, request: Request) -> Any:
         try:
             kw = {k: f(request) for k, f in extract}
         except QueryParamError as exc:
             raise _describe_query_param_error(exc)
-        return convert(view(context, request, **kw) if pass_context else view(request, **kw))
+        result = view(context, request, **kw) if pass_context else view(request, **kw)
+        return result if convert is None else convert(result)
 
     _view.__doc__ = view.__doc__
     return _view
+
+
+def _path_extractor(name: str, decoder: Callable) -> Callable:
+    return lambda req: decoder(req.matchdict[name])
+
+
+def _query_extractor(decoder: Callable) -> Callable:
+    return lambda req: decoder(req.qs_parser)
+
+
+def _convert_empty_object(value: Any) -> Any:
+    return value if value is not None else EmptyInstance
 
 
 def _describe_query_param_error(exc):
@@ -230,13 +230,13 @@ class Configurator(PyramidConfigurator):
             client = kwargs.pop("client")
             assert client is False, "client=False is the only valid route predicate"
 
-        if pattern is not None:
+        if component is None:
+            # Legacy static view, probably from nextgisweb_threedim
+            logger.debug(f"No component found for {name=!r}, {pattern=!r}!")
+
+        elif pattern is not None:
             if not pattern.startswith("/"):
-                warn(
-                    f"The route pattern must begin with '/', but got '{pattern}'. This will be "
-                    "enforced and cause an error in nextgisweb >= 5.1.0.dev0.",
-                    stacklevel=stacklevel + 1,
-                )
+                raise ValueError(f"The route pattern must begin with '/', but got {pattern!r}.")
 
             opattern = pattern
             rtypes = dict()
@@ -251,6 +251,7 @@ class Configurator(PyramidConfigurator):
             #   pattern:    /param/{name:regexp}  for Pyramid framework
             #   itemplate:  /param/{0}            with numeric placeholders
             #   ktemplate:  /param/{name}         with string placeholders
+
             lastpos, pattern, itemplate, ktemplate = 0, "", "", ""
             for idx, m in enumerate(PATH_PARAM_RE.finditer(opattern)):
                 leader = opattern[lastpos : m.start()]
@@ -264,6 +265,7 @@ class Configurator(PyramidConfigurator):
 
                 if type_or_regexp:
                     if pdef := PATH_TYPES.get(type_or_regexp):
+                        # ty: ignore[unresolved-attribute]
                         mpattern = type_info(pdef).extra["route_pattern"]
                     else:
                         mpattern = type_or_regexp
@@ -307,7 +309,7 @@ class Configurator(PyramidConfigurator):
         stacklevel = push_stacklevel(kwargs, False, True)
         component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
 
-        if view is not None:
+        if view is not None and component is not None:
             # Extract attrs missing in kwargs from view.__pyramid_{attr}__
             attrs = {"renderer", "query_params", "react_renderer"}.difference(set(kwargs.keys()))
 
@@ -408,9 +410,9 @@ class Configurator(PyramidConfigurator):
                 react_renderer=kwargs.pop("react_renderer", None),
             )
 
-        if renderer := kwargs.get("renderer"):
-            assert view is not None
-            if renderer == "mako":
+        if (renderer := kwargs.get("renderer")) is not None:
+            assert isinstance(renderer, str)
+            if renderer == "mako" and isinstance(view, FunctionType):
                 renderer = view.__name__ + ".mako"
             if renderer.endswith(".mako") and (":" not in renderer):
                 renderer = find_template(renderer, view)

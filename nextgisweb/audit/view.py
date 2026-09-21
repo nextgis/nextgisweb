@@ -4,7 +4,7 @@ from nextgisweb.env import gettext
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import client_setting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 
 from .backend import is_backend_configured, require_backend
 from .component import AuditComponent
@@ -39,7 +39,7 @@ def audit_context(request: Request, model, id):
     request.environ["audit.context"] = (model, id)
 
 
-def setup_pyramid(comp: AuditComponent, config):
+def setup_pyramid(comp: AuditComponent, config: Configurator):
     config.add_request_method(audit_context)
 
     config.add_route(

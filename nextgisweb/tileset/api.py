@@ -1,10 +1,8 @@
 from typing import Annotated
 
-from pyramid.response import FileResponse, Response
-
 from nextgisweb.lib.apitype import ContentType
 
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, FileResponse, Request, Response
 from nextgisweb.resource import DataScope
 
 from .component import TilesetComponent
@@ -29,7 +27,7 @@ def export(
     return response
 
 
-def setup_pyramid(comp: TilesetComponent, config):
+def setup_pyramid(comp: TilesetComponent, config: Configurator):
     config.add_view(
         export,
         route_name="resource.export",

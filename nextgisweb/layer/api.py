@@ -1,8 +1,7 @@
 from msgspec import Struct
-from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.feature_layer.api import NgwExtent
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
 from nextgisweb.resource import DataScope, resource_factory
 
 from .component import LayerComponent
@@ -25,7 +24,7 @@ def extent(resource, request: Request) -> Extent:
     return Extent(extent=impl.extent)
 
 
-def setup_pyramid(comp: LayerComponent, config):
+def setup_pyramid(comp: LayerComponent, config: Configurator):
     config.add_route(
         "layer.extent",
         "/api/resource/{id}/extent",

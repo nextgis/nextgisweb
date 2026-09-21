@@ -3,8 +3,6 @@ from uuid import uuid4
 
 from msgspec import UNSET, Meta, UnsetType
 from osgeo import gdal, ogr
-from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
-from pyramid.response import Response
 from shapely.geometry import box
 from sqlalchemy.exc import NoResultFound
 
@@ -13,7 +11,7 @@ from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNoContent, HTTPNotFound, Request, Response
 from nextgisweb.render.api import TileX, TileY, TileZ
 from nextgisweb.resource import DataScope, Resource
 from nextgisweb.resource.exception import ResourceNotFound
@@ -135,7 +133,7 @@ def mvt(
         gdal.Unlink(vsibuf)
 
 
-def setup_pyramid(comp: FeatureLayerComponent, config):
+def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     config.add_route(
         "feature_layer.mvt",
         "/api/component/feature_layer/mvt",

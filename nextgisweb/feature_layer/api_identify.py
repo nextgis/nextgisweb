@@ -5,7 +5,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .component import FeatureLayerComponent
@@ -61,11 +61,13 @@ def identify(request: Request, *, body: IdentifyBody) -> JSONType:
 
             # Add name of parent resource to identification results,
             # if there is no way to get layer name by id on the client
-            allow = layer.parent.has_permission(ResourceScope.read, request.user)
+            parent = layer.parent
+            assert parent is not None
+            allow = parent.has_permission(ResourceScope.read, request.user)
 
             if allow:
                 for feature in features:
-                    feature["parent"] = layer.parent.display_name
+                    feature["parent"] = parent.display_name
 
             result[layer_id_str] = dict(features=features, featureCount=len(features))
 
@@ -76,7 +78,7 @@ def identify(request: Request, *, body: IdentifyBody) -> JSONType:
     return result
 
 
-def setup_pyramid(comp: FeatureLayerComponent, config):
+def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     config.add_route(
         "feature_layer.identify",
         "/api/feature_layer/identify",

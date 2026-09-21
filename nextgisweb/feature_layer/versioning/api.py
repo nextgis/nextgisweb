@@ -8,7 +8,6 @@ import sqlalchemy as sa
 from msgspec import Meta, Struct
 from msgspec.msgpack import decode as msgspec_decode
 from msgspec.msgpack import encode as msgspec_encode
-from pyramid.httpexceptions import HTTPNoContent
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import (
@@ -21,7 +20,7 @@ from nextgisweb.lib.apitype import (
 )
 
 from nextgisweb.auth.api import UserReadBrief, UserRef, serialize_principal
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, HTTPNoContent, Request
 from nextgisweb.resource import DataScope, resource_factory
 from nextgisweb.spatial_ref_sys import SRSRef
 
@@ -500,7 +499,7 @@ def version_iget(resource, request: Request, vid: VersionID) -> VersionRead:
     )
 
 
-def setup_pyramid(comp: FeatureLayerComponent, config):
+def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     config.add_route(
         "feature_layer.changes_check",
         "/api/resource/{id:uint}/feature/changes/check",

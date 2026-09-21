@@ -9,10 +9,9 @@ class WFSServerComponent(Component):
         self._force_schema_validation = False
 
     def setup_pyramid(self, config):
-        from . import api, view
+        from . import api, view  # noqa: F401
 
         api.setup_pyramid(self, config)
-        view.setup_pyramid(self, config)
 
     @contextmanager
     def force_schema_validation(self):

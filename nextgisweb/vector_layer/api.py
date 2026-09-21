@@ -3,7 +3,7 @@ from msgspec import Struct
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.file_upload.exception import UnsupportedFile
 from nextgisweb.pyramid import client_setting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 
 from .component import VectorLayerComponent
 from .util import msg_supported_formats, read_dataset_vector
@@ -32,7 +32,7 @@ def cs_msg_supported_formats(comp: VectorLayerComponent, request: Request) -> st
     return request.translate(msg_supported_formats)
 
 
-def setup_pyramid(comp: VectorLayerComponent, config):
+def setup_pyramid(comp: VectorLayerComponent, config: Configurator):
     config.add_route(
         "vector_layer.inspect",
         "/api/component/vector_layer/inspect",

@@ -1,9 +1,8 @@
 from pyramid.interfaces import IRoutesMapper
-from pyramid.response import Response
 
 from nextgisweb.core import CoreComponent
 
-from .tomb import Request
+from .tomb import Configurator, Request, Response
 from .tomb.predicate import RouteMeta
 from .util import parse_origin
 
@@ -103,7 +102,7 @@ def tween_factory(handler, registry):
     return cors_tween
 
 
-def includeme(config):
+def includeme(config: Configurator):
     config.add_request_method(check_origin)
     config.add_tween(
         f"{__name__}.{tween_factory.__name__}",

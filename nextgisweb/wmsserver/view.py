@@ -5,7 +5,6 @@ from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
-from .component import WMSServerComponent
 from .model import Service
 
 
@@ -70,7 +69,3 @@ class WMTSRESTLink(ExternalAccessLink):
     @classmethod
     def url_factory(cls, obj, request: Request) -> str:
         return request.route_url("wmsserver.wmts_rest", id=obj.id)
-
-
-def setup_pyramid(comp: WMSServerComponent, config):
-    pass

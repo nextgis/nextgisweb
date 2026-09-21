@@ -9,7 +9,7 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.lib.reqext import response_diagnostics
 
 from nextgisweb.core.exception import ExternalServiceError
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import ConnectionScope, ResourceFactory
 from nextgisweb.tmsclient.component import TMSClientComponent
 
@@ -90,7 +90,7 @@ def inspect_connection(resource, request: Request) -> InspectResponse:
     return InspectResponse(layers=layers)
 
 
-def setup_pyramid(comp: TMSClientComponent, config):
+def setup_pyramid(comp: TMSClientComponent, config: Configurator):
     config.add_route(
         "tmsclient.connection.inspect",
         "/api/resource/{id}/tmsclient/inspect",

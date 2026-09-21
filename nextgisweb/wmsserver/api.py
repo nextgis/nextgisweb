@@ -5,9 +5,6 @@ from urllib.parse import quote
 from lxml import etree, html
 from lxml.builder import ElementMaker
 from PIL import Image, ImageColor, ImageDraw, ImageFont
-from pyramid.httpexceptions import HTTPBadRequest, HTTPUnauthorized
-from pyramid.renderers import render as render_template
-from pyramid.response import Response
 from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.lib.geometry import Geometry
@@ -17,7 +14,14 @@ from nextgisweb.lib.ows import SRSParseError, parse_request, parse_srs
 from nextgisweb.lib.pilhelper import reproject_render
 
 from nextgisweb.core.exception import InsufficientPermissions, UserException, ValidationError
-from nextgisweb.pyramid.tomb import Configurator, Request
+from nextgisweb.pyramid.tomb import (
+    Configurator,
+    HTTPBadRequest,
+    HTTPUnauthorized,
+    Request,
+    Response,
+)
+from nextgisweb.pyramid.tomb import render as render_template
 from nextgisweb.render import (
     COMPRESSION_DEFAULT,
     COMPRESSION_FAST,

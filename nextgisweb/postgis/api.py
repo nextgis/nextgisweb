@@ -9,7 +9,7 @@ from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import ConnectionScope, ResourceFactory, ResourceScope
 
 from .component import PostgisComponent
@@ -66,7 +66,12 @@ class ColumnObject(Struct, kw_only=True):
     type: str
 
 
-def inspect_table(request: Request) -> AsJSON[list[ColumnObject]]:
+def inspect_table(
+    request: Request,
+    table_name: str,
+    *,
+    schema: str | None = None,
+) -> AsJSON[list[ColumnObject]]:
     """Inspect PostGIS table
 
     :returns: Inspection results for the specified table"""
@@ -79,8 +84,7 @@ def inspect_table(request: Request) -> AsJSON[list[ColumnObject]]:
     except SQLAlchemyError as exc:
         raise ExternalDatabaseError(message="Failed to inspect database.", sa_error=exc)
 
-    table_name = request.matchdict["table_name"]
-    schema = request.GET.get("schema", "public")
+    schema = schema or "public"
 
     result = []
     try:
@@ -217,7 +221,7 @@ def diagnostics(request: Request, *, body: CheckBody) -> CheckResponse:
     return result
 
 
-def setup_pyramid(comp: PostgisComponent, config):
+def setup_pyramid(comp: PostgisComponent, config: Configurator):
     postgis_connection_factory = ResourceFactory(context=PostgisConnection)
 
     config.add_route(

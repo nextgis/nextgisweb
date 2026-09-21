@@ -1,6 +1,5 @@
-from pyramid.renderers import render_to_response
-
 from nextgisweb.jsrealm import jsentry
+from nextgisweb.pyramid.tomb import Configurator, render_to_response
 
 from .component import GUIComponent
 from .util import REACT_RENDERER
@@ -18,5 +17,5 @@ def react_renderer_factory(info):
     return _render
 
 
-def setup_pyramid(comp: GUIComponent, config):
+def setup_pyramid(comp: GUIComponent, config: Configurator):
     config.add_renderer("react", react_renderer_factory)

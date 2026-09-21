@@ -8,9 +8,7 @@ class LLMCoreComponent(Component):
     _client: OpenAI | None = None
 
     def setup_pyramid(self, config):
-        from . import view
-
-        view.setup_pyramid(self, config)
+        from . import view  # noqa: F401
 
     @property
     def available(self):

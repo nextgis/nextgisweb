@@ -2,12 +2,10 @@ from typing import Annotated
 
 import zipstream
 from msgspec import Meta
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import FileResponse, Response
 
 from nextgisweb.lib.apitype import ContentType
 
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, FileResponse, HTTPNotFound, Request, Response
 from nextgisweb.resource import ResourceScope
 
 from .component import SVGMarkerLibraryComponent
@@ -47,7 +45,7 @@ def export(resource, request: Request) -> Annotated[Response, ContentType("appli
     )
 
 
-def setup_pyramid(comp: SVGMarkerLibraryComponent, config):
+def setup_pyramid(comp: SVGMarkerLibraryComponent, config: Configurator):
     config.add_view(
         file_download,
         route_name="resource.file_download",

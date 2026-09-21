@@ -87,6 +87,9 @@ class EmptyObjectStruct(Struct, kw_only=True):
     pass
 
 
+EmptyInstance = EmptyObjectStruct()
+
+
 if TYPE_CHECKING:
     EmptyObject = EmptyObjectStruct | None
 else:

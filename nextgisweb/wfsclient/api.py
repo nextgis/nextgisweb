@@ -2,7 +2,7 @@ from typing import Annotated
 
 from msgspec import Meta, Struct
 
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import ConnectionScope, ResourceFactory
 
 from .component import WFSClientComponent
@@ -41,19 +41,18 @@ class InspectLayerResponse(Struct, kw_only=True):
     fields: list[FieldObject]
 
 
-def inspect_layer(resource, request: Request) -> InspectLayerResponse:
+def inspect_layer(resource, request: Request, layer: str) -> InspectLayerResponse:
     """Inspect WFS client layer
 
     :returns: WFS client layer inspection result"""
     request.resource_permission(ConnectionScope.connect)
 
-    layer_name = request.matchdict["layer"]
-    fields = resource.get_fields(layer_name)
+    fields = resource.get_fields(layer)
 
     return InspectLayerResponse(fields=fields)
 
 
-def setup_pyramid(comp: WFSClientComponent, config):
+def setup_pyramid(comp: WFSClientComponent, config: Configurator):
     wfsconnection_factory = ResourceFactory(context=WFSConnection)
 
     config.add_route(

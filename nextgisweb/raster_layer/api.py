@@ -5,15 +5,20 @@ from typing import TYPE_CHECKING, Annotated
 
 from msgspec import Meta, Struct
 from osgeo import gdal
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import FileIter, FileResponse, Response
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AnyOf, ContentType, Query, StatusCode, make_literal
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import XMLType, client_setting
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import (
+    Configurator,
+    FileIter,
+    FileResponse,
+    HTTPNotFound,
+    Request,
+    Response,
+)
 from nextgisweb.pyramid.util import set_output_buffering
 from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
@@ -300,7 +305,7 @@ def cs_msg_supported_formats(comp: RasterLayerComponent, request: Request) -> st
     return request.translate(msg_supported_formats)
 
 
-def setup_pyramid(comp: RasterLayerComponent, config):
+def setup_pyramid(comp: RasterLayerComponent, config: Configurator):
     config.add_view(
         export,
         route_name="resource.export",

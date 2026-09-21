@@ -12,7 +12,3 @@ def cs_max_size(comp: FileUploadComponent, request: Request) -> int:
 @client_setting("chunkSize")
 def cs_chunk_size(comp: FileUploadComponent, request: Request) -> int:
     return comp.chunk_size
-
-
-def setup_pyramid(comp: FileUploadComponent, config):
-    pass
