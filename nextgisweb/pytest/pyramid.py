@@ -1,4 +1,7 @@
+from contextlib import contextmanager
 from unittest.mock import patch
+
+import pytest
 
 __all__ = [
     "ngw_httptest_app",
@@ -9,10 +12,6 @@ __all__ = [
     "ngw_webtest_factory",
     "ngw_wsgi_test_helper",
 ]
-
-from contextlib import contextmanager
-
-import pytest
 
 
 @pytest.fixture(scope="session")

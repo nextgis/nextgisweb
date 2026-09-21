@@ -1,12 +1,12 @@
-__all__ = [
-    "s3_storage_creds",
-]
-
 import pytest
 
+__all__ = [
+    "ngw_raster_layer_s3_storage",
+]
 
-@pytest.fixture()
-def s3_storage_creds(ngw_env):
+
+@pytest.fixture(scope="session")
+def ngw_raster_layer_s3_storage(ngw_env):
     opts = ngw_env.core.options.with_prefix("test.storage")
 
     for o in ("endpoint", "bucket", "access_key", "secret_key"):

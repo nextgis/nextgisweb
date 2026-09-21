@@ -8,6 +8,8 @@ module level as it is loaded during pytest initialization phase. Otherwise,
 pytest-cov won't be able to measure code coverage correctly.
 """
 
+# ruff: file-ignore[F403]
+
 from .auth import *
 from .core import *
 from .env import *

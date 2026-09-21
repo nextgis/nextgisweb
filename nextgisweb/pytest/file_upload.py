@@ -1,10 +1,10 @@
-__all__ = [
-    "ngw_file_upload",
-]
-
 from pathlib import Path
 
 import pytest
+
+__all__ = [
+    "ngw_file_upload",
+]
 
 
 @pytest.fixture(scope="session")

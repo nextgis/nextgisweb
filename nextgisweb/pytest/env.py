@@ -1,3 +1,9 @@
+from collections.abc import Sequence
+from functools import cache
+from pathlib import Path
+
+import pytest
+
 __all__ = [
     "ngw_current_request",
     "ngw_data_path",
@@ -5,12 +11,6 @@ __all__ = [
     "ngw_skip_disabled_component",
     "ngw_sql_compare",
 ]
-
-from collections.abc import Sequence
-from functools import cache
-from pathlib import Path
-
-import pytest
 
 
 def pytest_addoption(parser):

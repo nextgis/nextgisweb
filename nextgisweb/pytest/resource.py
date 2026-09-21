@@ -1,14 +1,14 @@
-__all__ = [
-    "ngw_resource_defaults",
-    "ngw_resource_group",
-    "ngw_resource_group_sub",
-]
-
 from datetime import datetime
 from secrets import token_urlsafe
 from uuid import uuid4
 
 import pytest
+
+__all__ = [
+    "ngw_resource_defaults",
+    "ngw_resource_group",
+    "ngw_resource_group_sub",
+]
 
 
 @pytest.fixture(scope="session")
