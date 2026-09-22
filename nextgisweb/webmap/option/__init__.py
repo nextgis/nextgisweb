@@ -8,6 +8,14 @@ from .base import (
     WebMapOption,
 )
 
+__all__ = [
+    "IdentificationCategory",
+    "MiscellaneousCategory",
+    "PanelCategory",
+    "ToolCategory",
+    "WebMapOption",
+]
+
 
 class IdentificationAttributesOption(WebMapOption):
     name = "identification_attributes"

@@ -6,11 +6,6 @@ exclude = ["nextgisweb/raster_layer/validate_cog.py"]
 select = ["E", "F", "W", "I", "TID251", "RUF022"]
 ignore = ["E501", "E731"]
 
-
-[tool.ruff.lint.per-file-ignores]
-"nextgisweb/webmap/option/__init__.py" = ["F401"]
-"nextgisweb/webmap/plugin/__init__.py" = ["F401"]
-
 [tool.ruff.lint.isort]
 variables = ["_"]
 # Absolute imports are more readable, relative ones are circuitous. So, let's

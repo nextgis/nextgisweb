@@ -1,4 +1,1 @@
-# ruff: noqa: F401
-
-# https://bugs.python.org/issue47082
-import numpy
+import numpy  # noqa: F401, https://bugs.python.org/issue47082
