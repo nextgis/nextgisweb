@@ -42,7 +42,7 @@ export function SearchResultsTree({
     setResultSelected(resultInfo);
 
     if (navigationMode === "pan") {
-      display.map.searchGeom(resultInfo.geometry);
+      display.map.panToGeom(resultInfo.geometry);
     } else {
       display.map.zoomToGeom(resultInfo.geometry);
     }
