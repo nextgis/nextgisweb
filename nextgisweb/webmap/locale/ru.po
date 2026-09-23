@@ -6,7 +6,7 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: component.py:28
+#: component.py:26
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
@@ -256,7 +256,7 @@ msgstr "Показывать легенду"
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-component/URLLayer.tsx:15
+#: nodepkg/map-component/URLLayer.tsx:16
 msgid "Unable to load tile"
 msgstr "Ошибка загрузки тайла"
 
@@ -672,25 +672,34 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:375
+#: nodepkg/panel/search/SearchPanel.tsx:34
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:474
-msgid "Identify object"
-msgstr "Идентифицировать объект"
-
-#: nodepkg/panel/search/SearchPanel.tsx:493
+#: nodepkg/panel/search/SearchPanel.tsx:104
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:497
+#: nodepkg/panel/search/SearchPanel.tsx:108
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
+
+#: nodepkg/panel/search/component/SearchResultsTree.tsx:85
+msgid "Identify object"
+msgstr "Идентифицировать объект"
 
 #: nodepkg/panel/search/plugin.tsx:16
 msgid "Search"
 msgstr "Поиск"
+
+#: nodepkg/panel/search/util/parseCoordinatesInput.ts:35
+msgid "Coordinates"
+msgstr "Координаты"
+
+#: nodepkg/panel/search/util/searchByNominatim.ts:79
+#: nodepkg/panel/search/util/searchByYandex.ts:104
+msgid "Places"
+msgstr "Места"
 
 #: nodepkg/panel/share/SharePanel.tsx:44
 msgid ""
@@ -833,7 +842,7 @@ msgstr "К пересечениям"
 msgid "Stop editing layer: {layer}"
 msgstr "Завершить редактирование слоя: {layer}"
 
-#: nodepkg/plugin/layer-editor/modes/AttributeMode.tsx:129
+#: nodepkg/plugin/layer-editor/modes/AttributeMode.tsx:130
 msgid "Edit attributes"
 msgstr "Редактировать атрибуты"
 
