@@ -55,6 +55,12 @@ export interface Position {
   center: number[];
 }
 
+interface GeomOptions {
+  srs?: string;
+  format?: "wkt" | "geojson";
+  fit?: FitOptions;
+}
+
 interface Layers {
   [key: string]: CoreLayer;
 }
@@ -427,14 +433,10 @@ export class MapStore {
     this.zoomToExtent(extent, options);
   }
 
-  zoomToGeom(
+  private geomToExtent(
     geom: string | Geometry,
-    opts: {
-      srs?: string;
-      format?: "wkt" | "geojson";
-      fit?: FitOptions;
-    } = { srs: "EPSG:3857", format: "wkt" }
-  ): void {
+    opts: GeomOptions = { srs: "EPSG:3857", format: "wkt" }
+  ): Extent {
     const dataProjection = opts.srs ?? "EPSG:3857";
     const viewProj = this.olView.getProjection();
     const isWkt = opts.format === "wkt";
@@ -447,7 +449,35 @@ export class MapStore {
           })
         : geom;
 
-    this.zoomToExtent(geometry.getExtent(), opts?.fit);
+    return geometry.getExtent();
+  }
+
+  zoomToGeom(geom: string | Geometry, opts?: GeomOptions): void {
+    this.zoomToExtent(this.geomToExtent(geom, opts), opts?.fit);
+  }
+
+  searchGeom(geom: string | Geometry, opts?: GeomOptions): void {
+    this.searchExtent(this.geomToExtent(geom, opts), opts?.fit);
+  }
+
+  searchExtent(extent: Extent, fitOpts?: FitOptions): void {
+    const view = this.olMap.getView();
+
+    const viewExtent = view.calculateExtent();
+
+    if (olExtent.containsExtent(viewExtent, extent)) {
+      return;
+    }
+
+    const [width, height] = olExtent.getSize(extent);
+    const [viewWidth, viewHeight] = olExtent.getSize(viewExtent);
+    const fitsInView = width <= viewWidth && height <= viewHeight;
+
+    if (fitsInView) {
+      view.setCenter(olExtent.getCenter(extent));
+    } else {
+      view.fit(extent, fitOpts);
+    }
   }
 
   zoomToExtent(

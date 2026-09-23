@@ -1,0 +1,23 @@
+.ngw-search-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12;
+  width: 300;
+
+  .source-layer-block,
+  .sources-block,
+  .navigation-mode-block,
+  .source-layer-radio {
+    display: flex;
+    flex-direction: column;
+    gap: 4;
+  }
+
+  .source-layer-block,
+  .sources-block,
+  .navigation-mode-block {
+    > :not(:first-child) {
+      margin-left: 8px;
+    }
+  }
+}

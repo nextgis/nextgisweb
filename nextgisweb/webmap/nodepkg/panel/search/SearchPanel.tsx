@@ -1,5 +1,12 @@
 import { observer } from "mobx-react-lite";
-import { createContext, use, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  use,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ChangeEvent, ReactNode } from "react";
 
 import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
@@ -12,7 +19,12 @@ import type { PanelTitleProps } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
 import { SearchResultsTree } from "./component/SearchResultsTree";
-import type { SearchResultGroup } from "./type";
+import {
+  DEFAULT_SEARCH_SETTINGS,
+  SearchSettingsPopover,
+} from "./component/SearchSettingsPopover";
+import type { SearchResultGroup, SearchSettings } from "./type";
+import { getSearchableLayers } from "./util/getSearchableLayers";
 import { search } from "./util/search";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -23,7 +35,14 @@ const SearchPanelContext = createContext<any>(null);
 SearchPanelContext.displayName = "SearchPanelContext";
 
 function SearchPanelTitle({ className, close }: PanelTitleProps) {
-  const { searchText, searchChange, clearSearchText } = use(SearchPanelContext);
+  const {
+    searchText,
+    searchChange,
+    clearSearchText,
+    searchSettings,
+    changeSearchSettings,
+    availableLayers,
+  } = use(SearchPanelContext);
   return (
     <div className={className}>
       <Input
@@ -40,6 +59,11 @@ function SearchPanelTitle({ className, close }: PanelTitleProps) {
           onClick={() => clearSearchText()}
         />
       )}
+      <SearchSettingsPopover
+        value={searchSettings}
+        onChange={changeSearchSettings}
+        availableLayers={availableLayers}
+      />
       <PanelTitle.ButtonClose close={close} />
     </div>
   );
@@ -54,6 +78,9 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
   const [searchController, setSearchController] = useState<
     AbortControllerHelper | undefined
   >(undefined);
+  const [searchSettings, setSearchSettings] = useState<SearchSettings>(
+    DEFAULT_SEARCH_SETTINGS
+  );
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
     () => new Set()
   );
@@ -67,25 +94,39 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     setLoading(false);
   };
 
-  const runSearch = async (text: string) => {
+  const availableLayers = useMemo(
+    () =>
+      getSearchableLayers(display).map((item) => ({
+        id: item.layerId,
+        label: item.label,
+      })),
+    [display]
+  );
+
+  const runSearch = async (text: string, settings: SearchSettings) => {
     clearResults();
     setLoading(true);
     const controller = new AbortControllerHelper();
     setSearchController(controller);
-    const results = await search(text, controller, display);
+    const results = await search(text, controller, display, settings);
     setSearchResults(results);
     setLoading(false);
   };
 
-  const _search = useDebounce((text: string) => runSearch(text), 1000);
+  const _search = useDebounce(
+    (text: string) => runSearch(text, searchSettings),
+    1000
+  );
 
   const latestSearchRef = useRef({
     searchText,
+    searchSettings,
     runSearch,
     cancelSearch: _search.cancel,
   });
   latestSearchRef.current = {
     searchText,
+    searchSettings,
     runSearch,
     cancelSearch: _search.cancel,
   };
@@ -98,12 +139,25 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
       isFirstTreeStamp.current = false;
       return;
     }
-    const { searchText, runSearch, cancelSearch } = latestSearchRef.current;
+    const { searchText, searchSettings, runSearch, cancelSearch } =
+      latestSearchRef.current;
     if (searchText && searchText.trim().length > 1) {
       cancelSearch();
-      runSearch(searchText);
+      runSearch(searchText, searchSettings);
     }
   }, [treeStamp]);
+
+  const changeSearchSettings = (next: SearchSettings) => {
+    const affectsResults =
+      next.usedLayers !== searchSettings.usedLayers ||
+      next.sources.geocoder !== searchSettings.sources.geocoder ||
+      next.sources.coordinates !== searchSettings.sources.coordinates;
+    setSearchSettings(next);
+    if (affectsResults && searchText && searchText.trim().length > 1) {
+      _search.cancel();
+      runSearch(searchText, next);
+    }
+  };
 
   const searchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -124,6 +178,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
       <SearchResultsTree
         groups={groups}
         display={display}
+        navigationMode={searchSettings.navigationMode}
         collapsedGroups={collapsedGroups}
         onCollapsedGroupsChange={setCollapsedGroups}
       />
@@ -160,6 +215,9 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         searchText,
         searchChange,
         clearSearchText,
+        searchSettings,
+        changeSearchSettings,
+        availableLayers,
       }}
     >
       <PanelContainer
