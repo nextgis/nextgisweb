@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { createContext, use, useState } from "react";
+import { createContext, use, useEffect, useRef, useState } from "react";
 import type { ChangeEvent, ReactNode } from "react";
 
 import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
@@ -67,15 +67,43 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     setLoading(false);
   };
 
-  const _search = useDebounce(async (searchText: string) => {
+  const runSearch = async (text: string) => {
     clearResults();
     setLoading(true);
     const controller = new AbortControllerHelper();
     setSearchController(controller);
-    const results = await search(searchText, controller, display);
+    const results = await search(text, controller, display);
     setSearchResults(results);
     setLoading(false);
-  }, 1000);
+  };
+
+  const _search = useDebounce((text: string) => runSearch(text), 1000);
+
+  const latestSearchRef = useRef({
+    searchText,
+    runSearch,
+    cancelSearch: _search.cancel,
+  });
+  latestSearchRef.current = {
+    searchText,
+    runSearch,
+    cancelSearch: _search.cancel,
+  };
+
+  const isFirstTreeStamp = useRef(true);
+  const treeStamp = display.treeStore.deepTreeStamp;
+
+  useEffect(() => {
+    if (isFirstTreeStamp.current) {
+      isFirstTreeStamp.current = false;
+      return;
+    }
+    const { searchText, runSearch, cancelSearch } = latestSearchRef.current;
+    if (searchText && searchText.trim().length > 1) {
+      cancelSearch();
+      runSearch(searchText);
+    }
+  }, [treeStamp]);
 
   const searchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
