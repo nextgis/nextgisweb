@@ -684,7 +684,15 @@ msgstr "Не найдено"
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
-#: nodepkg/panel/search/component/SearchResultsTree.tsx:85
+#: nodepkg/panel/search/component/SearchResultPopover.tsx:14
+msgid "Matched fields"
+msgstr "Поля с совпадениями"
+
+#: nodepkg/panel/search/component/SearchResultPopover.tsx:15
+msgid "Failed to load matched fields"
+msgstr "Не удалось загрузить поля с совпадениями"
+
+#: nodepkg/panel/search/component/SearchResultsTree.tsx:83
 msgid "Identify object"
 msgstr "Идентифицировать объект"
 
