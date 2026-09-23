@@ -7,6 +7,7 @@ interface FeatureResponse {
   id: number;
   label: string;
   geom: any;
+  search_context?: number[];
 }
 
 export const searchByLayers: SearchFunction = async (
@@ -44,8 +45,8 @@ export const searchByLayers: SearchFunction = async (
           dt_format: "iso",
           fields: [],
           extensions: [],
-          // @ts-expect-error not in tsgen api yet
-          ilike: criteria,
+          text_search: criteria,
+          text_search_context: "fields",
         },
         signal,
       }
@@ -73,6 +74,7 @@ export const searchByLayers: SearchFunction = async (
         geometry: geoJSON.readGeometry(feature.geom),
         key: limit,
         featureId: feature.id,
+        searchContext: feature.search_context,
       });
       limit = limit - 1;
       isExceeded = limit < 1;
