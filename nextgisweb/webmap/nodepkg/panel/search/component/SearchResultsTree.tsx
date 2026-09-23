@@ -56,7 +56,7 @@ export function SearchResultsTree({
   };
 
   const groupKey = (group: SearchResultGroup) =>
-    group.type === "layers" ? `layers-${group.resourceId}` : group.type;
+    group.type === "layers" ? `layers-${group.styleId}` : group.type;
 
   const makeResultNode = (
     group: SearchResultGroup,

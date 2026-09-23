@@ -20,11 +20,11 @@ export const searchByLayers: SearchFunction = async (
   const requests: {
     layerName: string;
     layerId: number;
+    styleId: number;
     identifiable: boolean;
     request: Promise<FeatureResponse[]>;
   }[] = [];
   visibleItems.forEach((item) => {
-    const layerId = item.layerId;
     if (!item.isLayer()) {
       return;
     }
@@ -35,22 +35,25 @@ export const searchByLayers: SearchFunction = async (
     if (pluginConfig === undefined || !pluginConfig.likeSearch) return;
 
     const signal = controller.makeSignal();
-    const request = route("feature_layer.feature.collection", layerId).get({
-      query: {
-        limit: limit,
-        geom_format: "geojson",
-        label: true,
-        dt_format: "iso",
-        fields: [],
-        extensions: [],
-        // @ts-expect-error not in tsgen api yet
-        ilike: criteria,
-      },
-      signal,
-    });
+    const request = route("feature_layer.feature.collection", item.layerId).get(
+      {
+        query: {
+          limit: limit,
+          geom_format: "geojson",
+          label: true,
+          dt_format: "iso",
+          fields: [],
+          extensions: [],
+          // @ts-expect-error not in tsgen api yet
+          ilike: criteria,
+        },
+        signal,
+      }
+    );
     requests.push({
       layerName: item.label,
-      layerId,
+      layerId: item.layerId,
+      styleId: item.styleId,
       identifiable: item.identifiable,
       request,
     });
@@ -61,7 +64,7 @@ export const searchByLayers: SearchFunction = async (
   let isExceeded = false;
   results.forEach((r, index) => {
     if (r.status !== "fulfilled" || !r.value || limit < 1) return;
-    const { layerName, layerId, identifiable } = requests[index];
+    const { layerName, layerId, styleId, identifiable } = requests[index];
     const children: SearchResult[] = [];
     r.value.forEach((feature) => {
       if (isExceeded) return;
@@ -79,6 +82,7 @@ export const searchByLayers: SearchFunction = async (
         type: "layers",
         label: layerName,
         resourceId: layerId,
+        styleId,
         identifiable,
         children,
       });
