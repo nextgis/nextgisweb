@@ -1,8 +1,8 @@
-import type { Display } from "@nextgisweb/webmap/display";
 import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
+import type { TreeStore } from "@nextgisweb/webmap/store";
 
-export const getSearchableLayers = (display: Display) =>
-  display.treeStore
+export const getSearchableLayers = (treeStore: TreeStore) =>
+  treeStore
     .filter({ type: "layer" })
     .filter(
       (item) =>
