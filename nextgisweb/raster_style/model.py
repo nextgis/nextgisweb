@@ -52,18 +52,19 @@ class RasterStyle(Resource):
 
     @property
     def srs(self):
-        return self.parent.srs
+        return self.ensure_parent().srs
 
     def render_request(self, srs, cond=None):
         return RenderRequest(self, srs, cond)
 
     def render_image(self, extent, size):
         result = Image.new("RGBA", size, (0, 0, 0, 0))
+        parent = self.ensure_parent()
 
-        if self.parent.cls == "raster_layer":
-            parent_ds = self.parent.gdal_dataset()
-        elif self.parent.cls == "raster_mosaic":
-            parent_ds = self.parent.gdal_dataset(extent=extent, size=size)
+        if parent.cls == "raster_layer":
+            parent_ds = parent.gdal_dataset()
+        elif parent.cls == "raster_mosaic":
+            parent_ds = parent.gdal_dataset(extent=extent, size=size)
 
         if parent_ds is None:
             return result

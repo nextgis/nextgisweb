@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Literal, Self
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import requests
@@ -322,9 +322,8 @@ class WMSLayer(Resource, SpatialLayerMixin):
         cascade="save-update,merge",
     )
 
-    @classmethod
     @orm.declared_attr
-    def srs(cls):
+    def srs(cls: type[Self]):
         return orm.relationship(SRS, foreign_keys=[cls.srs_id], lazy="joined")
 
     remote_srs: Mapped[SRS] = orm.relationship(

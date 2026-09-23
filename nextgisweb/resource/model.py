@@ -241,7 +241,7 @@ class Resource(Base, metaclass=ResourceMeta):
         return reversed(result)
 
     def ensure_id(self) -> int:
-        """Returns existing resource ID or generates one for new object
+        """Return existing resource ID or generate one for new object
 
         If the resource does not have a persistent ID, this method will generate
         one using the database sequence and assign it to the resource. The
@@ -262,6 +262,17 @@ class Resource(Base, metaclass=ResourceMeta):
         self.id = session.connection().scalar(sql)
 
         return self.id
+
+    def ensure_parent(self) -> "Resource":
+        """Ensure the resource has a parent and return it
+
+        Helpful for narrowing type of the parent resource, as only the main resource group can
+        have no parent in persistent state. If a resource has no parent, this method will raise a
+        ``TypeError``."""
+
+        if (result := self.parent) is None:
+            raise TypeError("Resource must have a parent")
+        return result
 
     # Permissions
 

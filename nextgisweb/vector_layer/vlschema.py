@@ -692,9 +692,8 @@ class AlterGeomColumn(DDLElement):
 
 @compiles(AlterGeomColumn)
 def _compile_alter_geometry_column(element, compiler, **kw):
-    regex = re.compile(r"(MULTI|)(POINT|LINESTRING|POLYGON)(Z|)")
-    om, ob, oz = regex.match(element.old_type.geometry_type).groups()
-    nm, nb, nz = regex.match(element.new_type.geometry_type).groups()
+    om, ob, oz = _split_geometry_type(element.old_type.geometry_type)
+    nm, nb, nz = _split_geometry_type(element.new_type.geometry_type)
 
     if nb != ob:
         raise ValueError(f"Incompatible base types: {nb} and {ob}")
@@ -724,6 +723,18 @@ def _compile_alter_geometry_column(element, compiler, **kw):
         element.new_type.compile(compiler.dialect),
         expr,
     )
+
+
+def _split_geometry_type(
+    value: str,
+    *,
+    regex=re.compile(r"(MULTI|)(POINT|LINESTRING|POLYGON)(Z|)"),
+) -> tuple[str, str, str]:
+    m = regex.fullmatch(value)
+    assert m is not None
+    groups = tuple(m.groups())
+    assert len(groups) == 3
+    return groups
 
 
 @dc.dataclass

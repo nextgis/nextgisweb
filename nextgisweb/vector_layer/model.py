@@ -9,7 +9,7 @@ import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from osgeo import gdal, ogr
-from sqlalchemy import inspect, select, text
+from sqlalchemy import CursorResult, inspect, select, text
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
@@ -430,6 +430,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
             data["vid"] = vobj.version_id
 
         result = session.execute(query, data)
+        assert isinstance(result, CursorResult)
         if result.rowcount:
             if vobj:
                 vobj.mark_changed()
@@ -447,11 +448,14 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
 
         if vobj := self.fversioning_vobj:
             result = session.execute(query, dict(vid=vobj.version_id))
+            assert isinstance(result, CursorResult)
             row_count = result.rowcount
             if row_count > 0:
                 vobj.mark_features_deleted(feature_id)
         else:
-            row_count = session.execute(query).rowcount
+            result = session.execute(query)
+            assert isinstance(result, CursorResult)
+            row_count = result.rowcount
 
         if row_count == 0:
             raise FeatureNotFound(self.id, feature_id)
@@ -482,6 +486,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
             data["p_vid"] = vobj.version_id
 
         result = session.execute(query, data)
+        assert isinstance(result, CursorResult)
         if result.rowcount:
             if vobj:
                 vobj.mark_changed()
@@ -499,10 +504,12 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
 
         if vobj := self.fversioning_vobj:
             result = session.execute(query, dict(vid=vobj.version_id))
+            assert isinstance(result, CursorResult)
             if result.rowcount > 0:
                 vobj.mark_features_deleted(all=True)
         else:
             result = session.execute(query)
+            assert isinstance(result, CursorResult)
 
         if result.rowcount > 0:
             mark_changed(session)
@@ -646,11 +653,13 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
                     **{restore_bmap[k]: getattr(row, query.fields[k].name) for k in restore_bmap},
                 )
                 restore_result = session.execute(restore_query, data)
+                assert isinstance(restore_result, CursorResult)
                 assert restore_result.rowcount == 1
                 result = result or True
             elif row.current and not row.previous:
                 data = dict(p_fid=row.fid, vid=new_vid)
                 delete_result = session.execute(delete_query, data)
+                assert isinstance(delete_result, CursorResult)
                 assert delete_result.rowcount == 1
                 result = result or True
             else:
@@ -661,6 +670,7 @@ class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
                     **{update_bmap[k]: getattr(row, query.fields[k].name) for k in update_bmap},
                 )
                 update_result = session.execute(update_query, data)
+                assert isinstance(update_result, CursorResult)
                 result = result or (update_result.rowcount == 1)
 
         if result:
