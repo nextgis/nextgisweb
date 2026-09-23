@@ -7,7 +7,7 @@ import type { SearchSettings } from "../type";
 
 import SettingsIcon from "@nextgisweb/icon/material/tune";
 
-import "./SearchResultPopover.less";
+import "./SearchSettingsPopover.less";
 
 export const DEFAULT_SEARCH_SETTINGS: SearchSettings = {
   usedLayers: "visible",
