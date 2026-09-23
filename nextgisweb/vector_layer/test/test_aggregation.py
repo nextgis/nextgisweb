@@ -1,5 +1,8 @@
 import pytest
 
+from nextgisweb.feature_layer.test import FeatureLayerAPI
+from nextgisweb.resource.test import ResourceAPI
+
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 # Dataset summary (from conftest.FILTER_DATASET):
@@ -187,3 +190,112 @@ def test_mixed_aggregations(ngw_webtest_app, vector_layer_filter_dataset):
     )
     assert result["items"][0] == {"type": "min_max", "min": 25, "max": 35}
     assert [b["key"] for b in result["items"][1]["buckets"]] == ["LA", "NYC", "SF"]
+
+
+def test_sum_integer(ngw_webtest_app, vector_layer_filter_dataset):
+    result = aggregate(
+        ngw_webtest_app, vector_layer_filter_dataset, [{"type": "sum", "field": "age"}]
+    )
+    assert result["items"] == [{"type": "sum", "sum": 150}]
+
+
+def test_sum_real(ngw_webtest_app, vector_layer_filter_dataset):
+    result = aggregate(
+        ngw_webtest_app, vector_layer_filter_dataset, [{"type": "sum", "field": "score"}]
+    )
+    assert result["items"] == [{"type": "sum", "sum": 39.0}]
+
+
+def test_sum_field_by_id(ngw_webtest_app, vector_layer_filter_dataset):
+    info = ngw_webtest_app.get(f"/api/resource/{vector_layer_filter_dataset}").json
+    age_id = next(f["id"] for f in info["feature_layer"]["fields"] if f["keyname"] == "age")
+    result = aggregate(
+        ngw_webtest_app, vector_layer_filter_dataset, [{"type": "sum", "field": age_id}]
+    )
+    assert result["items"] == [{"type": "sum", "sum": 150}]
+
+
+def test_sum_with_filter(ngw_webtest_app, vector_layer_filter_dataset):
+    # NYC: Alice=25, Charlie=35, Eve=32
+    result = aggregate(
+        ngw_webtest_app,
+        vector_layer_filter_dataset,
+        [{"type": "sum", "field": "age"}],
+        filter=["==", ["get", "city"], "NYC"],
+    )
+    assert result["items"] == [{"type": "sum", "sum": 92}]
+
+
+def test_sum_empty_result(ngw_webtest_app, vector_layer_filter_dataset):
+    result = aggregate(
+        ngw_webtest_app,
+        vector_layer_filter_dataset,
+        [{"type": "sum", "field": "age"}],
+        filter=["==", ["get", "city"], "Berlin"],
+    )
+    assert result["items"] == [{"type": "sum", "sum": None}]
+
+
+def test_sum_batched_with_min_max(ngw_webtest_app, vector_layer_filter_dataset):
+    result = aggregate(
+        ngw_webtest_app,
+        vector_layer_filter_dataset,
+        [
+            {"type": "sum", "field": "age"},
+            {"type": "min_max", "field": "age"},
+        ],
+    )
+    assert result["items"] == [
+        {"type": "sum", "sum": 150},
+        {"type": "min_max", "min": 25, "max": 35},
+    ]
+
+
+def test_sum_string_field(ngw_webtest_app, vector_layer_filter_dataset):
+    result = aggregate(
+        ngw_webtest_app,
+        vector_layer_filter_dataset,
+        [{"type": "sum", "field": "name"}],
+        status=422,
+    )
+    assert result["exception"].endswith("ValidationError")
+
+
+def test_sum_bigint(ngw_webtest_app):
+    value = 10**10
+    rapi = ResourceAPI(ngw_webtest_app)
+    rid = rapi.create(
+        "vector_layer",
+        {
+            "vector_layer": {
+                "geometry_type": "NONE",
+                "fields": [{"keyname": "value", "datatype": "BIGINT", "display_name": "Value"}],
+            }
+        },
+    )
+    fapi = FeatureLayerAPI(rid, client=ngw_webtest_app)
+    fapi.feature_create({"fields": {"value": value}})
+    fapi.feature_create({"fields": {"value": value}})
+
+    result = aggregate(ngw_webtest_app, rid, [{"type": "sum", "field": "value"}])
+    assert result["items"] == [{"type": "sum", "sum": 2 * value}]
+
+
+def test_sum_bigint_out_of_safe_range(ngw_webtest_app):
+    value = 2**53 + 1
+    rapi = ResourceAPI(ngw_webtest_app)
+    rid = rapi.create(
+        "vector_layer",
+        {
+            "vector_layer": {
+                "geometry_type": "NONE",
+                "fields": [{"keyname": "value", "datatype": "BIGINT", "display_name": "Value"}],
+            }
+        },
+    )
+    fapi = FeatureLayerAPI(rid, client=ngw_webtest_app)
+    fapi.feature_create({"fields": {"value": value}})
+    fapi.feature_create({"fields": {"value": value}})
+
+    result = aggregate(ngw_webtest_app, rid, [{"type": "sum", "field": "value"}])
+    assert result["items"] == [{"type": "sum", "sum": str(2 * value)}]

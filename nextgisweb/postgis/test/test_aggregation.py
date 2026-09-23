@@ -187,3 +187,61 @@ def test_mixed_aggregations(ngw_webtest_app, postgis_filter_layer_id):
     )
     assert result["items"][0] == {"type": "min_max", "min": 25, "max": 35}
     assert [b["key"] for b in result["items"][1]["buckets"]] == ["LA", "NYC", "SF"]
+
+
+def test_sum_integer(ngw_webtest_app, postgis_filter_layer_id):
+    result = aggregate(ngw_webtest_app, postgis_filter_layer_id, [{"type": "sum", "field": "age"}])
+    assert result["items"] == [{"type": "sum", "sum": 150}]
+
+
+def test_sum_real(ngw_webtest_app, postgis_filter_layer_id):
+    result = aggregate(
+        ngw_webtest_app, postgis_filter_layer_id, [{"type": "sum", "field": "score"}]
+    )
+    assert result["items"] == [{"type": "sum", "sum": 39.0}]
+
+
+def test_sum_with_filter(ngw_webtest_app, postgis_filter_layer_id):
+    # NYC: Alice=25, Charlie=35, Eve=32
+    result = aggregate(
+        ngw_webtest_app,
+        postgis_filter_layer_id,
+        [{"type": "sum", "field": "age"}],
+        filter=["==", ["get", "city"], "NYC"],
+    )
+    assert result["items"] == [{"type": "sum", "sum": 92}]
+
+
+def test_sum_empty_result(ngw_webtest_app, postgis_filter_layer_id):
+    result = aggregate(
+        ngw_webtest_app,
+        postgis_filter_layer_id,
+        [{"type": "sum", "field": "age"}],
+        filter=["==", ["get", "city"], "Berlin"],
+    )
+    assert result["items"] == [{"type": "sum", "sum": None}]
+
+
+def test_sum_string_field(ngw_webtest_app, postgis_filter_layer_id):
+    result = aggregate(
+        ngw_webtest_app,
+        postgis_filter_layer_id,
+        [{"type": "sum", "field": "name"}],
+        status=422,
+    )
+    assert result["exception"].endswith("ValidationError")
+
+
+def test_sum_batched_with_min_max(ngw_webtest_app, postgis_filter_layer_id):
+    result = aggregate(
+        ngw_webtest_app,
+        postgis_filter_layer_id,
+        [
+            {"type": "sum", "field": "age"},
+            {"type": "min_max", "field": "age"},
+        ],
+    )
+    assert result["items"] == [
+        {"type": "sum", "sum": 150},
+        {"type": "min_max", "min": 25, "max": 35},
+    ]

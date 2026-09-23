@@ -1,3 +1,7 @@
+#: aggregation.py:67
+msgid "Aggregation '{}' is not applicable to fields of type '{}'."
+msgstr "Агрегация '{}' не применима к полям типа '{}'."
+
 #: api.py:121 api_identify.py:29
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
@@ -6,7 +10,7 @@ msgstr "Невалидная геометрия"
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:490 api_export.py:219
+#: api.py:490 api_export.py:218
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -26,31 +30,31 @@ msgstr "Агрегация '{}' не поддерживается для это�
 msgid "Field '{}' not found."
 msgstr "Поле '{}' не найдено."
 
-#: api_export.py:112
+#: api_export.py:111
 msgid "Couldn't add FID field '{}'. Such field already exists."
 msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
-#: api_export.py:258
+#: api_export.py:257
 msgid "The selected format does not support {} geometry type."
 msgstr "Выбранный формат не поддерживает тип геометрии {}."
 
-#: api_export.py:271
+#: api_export.py:270
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:284
+#: api_export.py:283
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:295
+#: api_export.py:294
 msgid "Filter expressions are not supported."
 msgstr "Выражения фильтра не поддерживаются."
 
-#: api_export.py:469
+#: api_export.py:468
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
-#: api_mvt.py:96
+#: api_mvt.py:94
 msgid "Resource (ID={}) has no geometry, MVT tiles are not available."
 msgstr "Ресурс (ID={}) не имеет геометрии, MVT-тайлы недоступны."
 
@@ -92,7 +96,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:28 view.py:46
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:28 view.py:45
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -132,21 +136,21 @@ msgstr "Экспорт"
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:39
+#: nodepkg/attribute-editor/AttributeEditorFields.tsx:34
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:40
+#: nodepkg/attribute-editor/AttributeEditorFields.tsx:35
 msgid "There are no attributes in the vector layer"
 msgstr "В векторном слое нет атрибутов"
 
-#: nodepkg/attribute-editor/plugin.ts:14
+#: nodepkg/attribute-editor/plugin.ts:17
 msgid "Attributes"
 msgstr "Атрибуты"
 
 #: nodepkg/control-panel-plugin.tsx:11
 #: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:112
-#: view.py:155
+#: view.py:156
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -578,7 +582,7 @@ msgid "Last changed"
 msgstr "Последнее изменение"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:27
-#: nodepkg/resource-action-plugin.tsx:63 view.py:91 view.py:115
+#: nodepkg/resource-action-plugin.tsx:63 view.py:92 view.py:116
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -685,7 +689,7 @@ msgstr "{filtered_count} из {total_count}"
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: nodepkg/geometry-editor/plugin.ts:14
+#: nodepkg/geometry-editor/plugin.ts:17
 msgid "Geometry"
 msgstr "Геометрия"
 
@@ -755,7 +759,7 @@ msgstr "Объекты"
 msgid "Table"
 msgstr "Таблица"
 
-#: nodepkg/resource-action-plugin.tsx:45 view.py:104
+#: nodepkg/resource-action-plugin.tsx:45 view.py:105
 msgid "Version history"
 msgstr "История изменений"
 
@@ -1052,15 +1056,15 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:64 view.py:80
+#: view.py:66 view.py:81
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:122
+#: view.py:123
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:124
+#: view.py:125
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."

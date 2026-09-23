@@ -4,8 +4,12 @@ import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy import func, select
 
+from nextgisweb.env import gettextf
+
+from nextgisweb.core.exception import ValidationError
+
 from .dtutil import DT_DATATYPES, DT_DUMPERS
-from .interface import FIELD_TYPE
+from .interface import FIELD_TYPE, FeatureLayerFieldDatatype
 from .numutil import BIGINT_DUMPERS
 
 
@@ -20,12 +24,20 @@ class UniqueValuesSpec(Struct, tag="unique_values", tag_field="type", kw_only=Tr
     include_counts: bool = True
 
 
-AggregationSpec = MinMaxSpec | UniqueValuesSpec
+class SumSpec(Struct, tag="sum", tag_field="type", kw_only=True):
+    field: str | int
+
+
+AggregationSpec = MinMaxSpec | UniqueValuesSpec | SumSpec
 
 
 class MinMaxResult(Struct, tag="min_max", tag_field="type", kw_only=True):
     min: Any
     max: Any
+
+
+class SumResult(Struct, tag="sum", tag_field="type", kw_only=True):
+    sum: Any
 
 
 class UniqueValuesBucket(Struct, kw_only=True):
@@ -38,12 +50,24 @@ class UniqueValuesResult(Struct, tag="unique_values", tag_field="type", kw_only=
     overflow: bool
 
 
-AggregationResult = MinMaxResult | UniqueValuesResult
+AggregationResult = MinMaxResult | UniqueValuesResult | SumResult
 
 
 class Aggregation:
     identity: str
     display_name: str
+    datatypes: tuple[FeatureLayerFieldDatatype, ...] | None = None
+
+    def validate(self, resource, spec):
+        if self.datatypes is None:
+            return
+
+        datatype = resource.field_by_keyname(spec.field).datatype
+        if datatype not in self.datatypes:
+            msg = gettextf("Aggregation '{}' is not applicable to fields of type '{}'.").format(
+                self.identity, datatype
+            )
+            raise ValidationError(msg)
 
 
 class MinMaxAggregation(Aggregation):
@@ -56,13 +80,19 @@ class UniqueValuesAggregation(Aggregation):
     display_name = "Unique field values"
 
 
+class SumAggregation(Aggregation):
+    identity = "sum"
+    display_name = "Field sum"
+    datatypes = (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT, FIELD_TYPE.REAL)
+
+
 def dump_field_value(datatype, value):
     if value is None:
         return None
     if datatype in DT_DATATYPES:
         return DT_DUMPERS["iso"][datatype](value)
     if datatype == FIELD_TYPE.BIGINT:
-        return BIGINT_DUMPERS["compat"](value)
+        return BIGINT_DUMPERS["compat"](int(value))
     return value
 
 
@@ -90,6 +120,18 @@ class PgMinMaxAggregation(MinMaxAggregation, ScalarAggregation):
             min=dump_field_value(field.datatype, getattr(row, f"{prefix}_min")),
             max=dump_field_value(field.datatype, getattr(row, f"{prefix}_max")),
         )
+
+
+class PgSumAggregation(SumAggregation, ScalarAggregation):
+    def sql_columns(self, col_map, spec: SumSpec, prefix):
+        col = col_map[spec.field]
+        return [func.sum(col).label(f"{prefix}_sum")]
+
+    def extract_result(self, row, spec: SumSpec, prefix) -> SumResult:
+        field = self.resource.field_by_keyname(spec.field)
+        value = getattr(row, f"{prefix}_sum")
+        sum_datatype = field.datatype if field.datatype == FIELD_TYPE.REAL else FIELD_TYPE.BIGINT
+        return SumResult(sum=dump_field_value(sum_datatype, value))
 
 
 class PgUniqueValuesAggregation(UniqueValuesAggregation):

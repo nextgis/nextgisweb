@@ -3,6 +3,7 @@ from nextgisweb.lib.registry import DictRegistry
 
 from nextgisweb.feature_layer.aggregation import (
     PgMinMaxAggregation,
+    PgSumAggregation,
     PgUniqueValuesAggregation,
     ScalarAggregation,
     pg_batch_scalars,
@@ -21,6 +22,11 @@ class UniqueValuesAggregation(PgUniqueValuesAggregation):
     pass
 
 
+@vector_aggregations.register
+class SumAggregation(PgSumAggregation):
+    pass
+
+
 def aggregate(feature_query, specs):
     """Execute aggregations using the feature query's table and WHERE context."""
     _, _, col_map, where = feature_query.build_query_context()
@@ -30,6 +36,7 @@ def aggregate(feature_query, specs):
     other_specs = []
     for idx, identity, spec in specs:
         impl = vector_aggregations[identity](resource)
+        impl.validate(resource, spec)
         if isinstance(impl, ScalarAggregation):
             scalar_specs.append((idx, impl, spec))
         else:
