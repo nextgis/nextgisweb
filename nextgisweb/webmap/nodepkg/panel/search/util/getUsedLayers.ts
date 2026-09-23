@@ -11,7 +11,7 @@ export const getUsedLayers = (
   const layers = getSearchableLayers(treeStore);
   if (mode === "visible") return layers.filter((layer) => layer.visible);
   if (typeof mode === "number") {
-    return layers.filter((layer) => layer.layerId === mode);
+    return layers.filter((layer) => layer.styleId === mode);
   }
   return layers;
 };
