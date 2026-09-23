@@ -96,9 +96,16 @@ class MapLibreStyleLayerRenderer extends LayerRenderer<MapLibreStyleLayer> {
     mapLibreMap.on("idle", () => this.setReady(true));
 
     mapLibreMap.setStyle(this.styleUrl, {
-      transformStyle: (_previous, next) => {
-        const { terrain: _, ...result } = next;
-        return result;
+      transformStyle: (_previousStyle, nextStyle) => {
+        const { terrain: _, ...result } = nextStyle;
+
+        return {
+          ...result,
+          projection: {
+            // Prevent globe view at low zoom levels.
+            type: "mercator",
+          },
+        };
       },
     });
 
