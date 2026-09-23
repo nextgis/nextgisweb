@@ -94,14 +94,15 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     setLoading(false);
   };
 
-  const availableLayers = useMemo(
-    () =>
-      getSearchableLayers(display.treeStore).map((item) => ({
-        id: item.styleId,
-        label: item.label,
-      })),
-    [display]
-  );
+  const treeStamp = display.treeStore.deepTreeStamp;
+
+  const availableLayers = useMemo(() => {
+    void treeStamp;
+    return getSearchableLayers(display.treeStore).map((item) => ({
+      id: item.styleId,
+      label: item.label,
+    }));
+  }, [display, treeStamp]);
 
   const runSearch = async (text: string, settings: SearchSettings) => {
     clearResults();
@@ -132,7 +133,6 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
   };
 
   const isFirstTreeStamp = useRef(true);
-  const treeStamp = display.treeStore.deepTreeStamp;
 
   useEffect(() => {
     if (isFirstTreeStamp.current) {
@@ -141,11 +141,21 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }
     const { searchText, searchSettings, runSearch, cancelSearch } =
       latestSearchRef.current;
+
+    let nextSettings = searchSettings;
+    if (
+      typeof searchSettings.usedLayers === "number" &&
+      !availableLayers.some((layer) => layer.id === searchSettings.usedLayers)
+    ) {
+      nextSettings = { ...searchSettings, usedLayers: "visible" };
+      setSearchSettings(nextSettings);
+    }
+
     if (searchText && searchText.trim().length > 1) {
       cancelSearch();
-      runSearch(searchText, searchSettings);
+      runSearch(searchText, nextSettings);
     }
-  }, [treeStamp]);
+  }, [availableLayers]);
 
   const changeSearchSettings = (next: SearchSettings) => {
     const affectsResults =
