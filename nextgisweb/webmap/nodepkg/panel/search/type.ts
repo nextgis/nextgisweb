@@ -27,5 +27,15 @@ export type SearchFunction = (
   limit: number,
   display: Display,
   controller: AbortControllerHelper,
-  geoJSON: GeoJSON
+  geoJSON: GeoJSON,
+  settings: SearchSettings
 ) => Promise<SearchStepResult>;
+
+export interface SearchSettings {
+  usedLayers: "visible" | "all" | number;
+  sources: {
+    geocoder: boolean;
+    coordinates: boolean;
+  };
+  navigationMode: "zoom" | "pan";
+}

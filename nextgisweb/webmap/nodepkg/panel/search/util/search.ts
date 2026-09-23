@@ -3,7 +3,11 @@ import GeoJSON from "ol/format/GeoJSON";
 import type { AbortControllerHelper } from "@nextgisweb/pyramid/util";
 import type { Display } from "@nextgisweb/webmap/display";
 
-import type { SearchResultGroup } from "../type";
+import type {
+  SearchFunction,
+  SearchResultGroup,
+  SearchSettings,
+} from "../type";
 
 import { parseCoordinatesInput } from "./parseCoordinatesInput";
 import { searchByLayers } from "./searchByLayers";
@@ -12,17 +16,19 @@ import { searchByYandex } from "./searchByYandex";
 
 const GEO_JSON_FORMAT = new GeoJSON();
 
-const searchSteps = [
-  parseCoordinatesInput,
-  searchByLayers,
-  searchByNominatim,
-  searchByYandex,
-];
+const getSearchSteps = (settings: SearchSettings): SearchFunction[] => {
+  const steps: SearchFunction[] = [];
+  if (settings.sources.coordinates) steps.push(parseCoordinatesInput);
+  steps.push(searchByLayers);
+  if (settings.sources.geocoder) steps.push(searchByNominatim, searchByYandex);
+  return steps;
+};
 
 export const search = async (
   criteria: string,
   controller: AbortControllerHelper,
-  display: Display
+  display: Display,
+  settings: SearchSettings
 ): Promise<[SearchResultGroup[], boolean] | undefined> => {
   let searchGroups: SearchResultGroup[] = [],
     isExceeded = false,
@@ -31,14 +37,15 @@ export const search = async (
 
   controller.makeSignal();
 
-  for (const searchStep of searchSteps) {
+  for (const searchStep of getSearchSteps(settings)) {
     try {
       [limit, groups, isExceeded] = await searchStep(
         criteria,
         limit,
         display,
         controller,
-        GEO_JSON_FORMAT
+        GEO_JSON_FORMAT,
+        settings
       );
       searchGroups = searchGroups.concat(groups);
     } catch (err) {
