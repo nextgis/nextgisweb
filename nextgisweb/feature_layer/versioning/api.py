@@ -239,7 +239,7 @@ def change_fetch(
             p_fid_last=cursor_obj.fid_last,
             p_fid_limit=fid_limit,
         ),
-    ).first()
+    ).one()
 
     final = fid_max is None
     operations = list()
@@ -415,7 +415,7 @@ def version_cget(
                 p_fid_last=None,
                 p_fid_limit=(1 << 31) - 1,
             ),
-        ).first()
+        ).one()
         return resource.fversioning_summary(
             initial=initial,
             target=target,

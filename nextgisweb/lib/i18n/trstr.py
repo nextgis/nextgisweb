@@ -10,10 +10,14 @@ from ..logging import logger
 
 
 class Translatable(Protocol):
+    __slots__ = ()
+
     def __translate__(self, translator: Translator) -> str: ...
 
 
 class Translator(Protocol):
+    __slots__ = ()
+
     def translate(
         self,
         msg: str,
@@ -31,7 +35,7 @@ ModArgument = ModScalar | tuple[ModScalar, ...] | Mapping[str, ModScalar]
 
 
 class TrStr(Translatable):
-    __slots__ = ["msg", "plural", "number", "context", "domain"]
+    __slots__ = ("msg", "plural", "number", "context", "domain", "_filename", "_lineno")
 
     def __init__(
         self,
@@ -113,7 +117,7 @@ class TrStrConcat(Translatable):
 
 
 class TrTpl(Translatable):
-    __slots__ = ["msg", "plural", "number", "context", "domain"]
+    __slots__ = ("msg", "plural", "number", "context", "domain")
 
     def __init__(
         self,

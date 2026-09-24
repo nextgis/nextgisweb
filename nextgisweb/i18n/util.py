@@ -25,19 +25,21 @@ def write_po(path, catalog, ignore_obsolete=False):
                 fd.truncate()
 
 
-def parse_locale(ident):
-    return babel_parse_locale(ident, "_" if "_" in ident else "-")
+def parse_locale(ident: str) -> tuple[str, str | None]:
+    sep = "_" if "_" in ident else "-"
+    parsed = babel_parse_locale(ident, sep)
+    return tuple(parsed[:2])
 
 
-def to_gettext_locale(ident):
-    tup = list(parse_locale(ident))
-    if tup[1] is not None:
-        tup[1] = tup[1].upper()
-    return get_locale_identifier(tup, sep="_")
+def to_gettext_locale(ident: str) -> str:
+    a, b = parse_locale(ident)
+    if b is not None:
+        b = b.upper()
+    return get_locale_identifier((a, b), sep="_")
 
 
-def to_http_locale(ident):
-    tup = list(parse_locale(ident))
-    if tup[1] is not None:
-        tup[1] = tup[1].lower()
-    return get_locale_identifier(tup, sep="-")
+def to_http_locale(ident: str) -> str:
+    a, b = parse_locale(ident)
+    if b is not None:
+        b = b.upper()
+    return get_locale_identifier((a, b), sep="-")

@@ -139,7 +139,7 @@ class FVersioningMeta(Base):
         setattr(self, "_vobj", value)
 
     def next(self):
-        insp = inspect(self)
+        insp = inspect(self, raiseerr=True)
         if insp.pending or self.latest is None:
             self.latest = 1
             return 1
@@ -152,7 +152,7 @@ class FVersioningMeta(Base):
                 assert self.resource_id
                 qlast = qlast.filter_by(resource_id=self.resource_id).with_for_update()
                 vnext = session.scalar(qlast)
-                assert vnext >= self.latest
+                assert vnext is not None and vnext >= self.latest
                 orm.attributes.set_committed_value(self, "latest", vnext)
             return self.latest + 1
 

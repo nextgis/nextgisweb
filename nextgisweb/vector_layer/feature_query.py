@@ -31,6 +31,7 @@ from nextgisweb.feature_layer.filter import text_search_match_clause
 from nextgisweb.spatial_ref_sys import SRS
 
 from . import aggregation
+from .vlschema import get_fields
 
 
 @implementer(
@@ -145,7 +146,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             table = vls.query_pit(self._pit_version)
 
         idcol = table.columns.fid
-        fields = table.fields
+        fields = get_fields(table)
         columns_mapping = {"id": idcol}
         columns_mapping.update(fields)
         where = []

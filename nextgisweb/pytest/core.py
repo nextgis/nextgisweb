@@ -204,8 +204,9 @@ def test_model_ddl(mock_table_comment, *, request):
         sql.append(Raw(f"/*** Table: {t.name} ***/"))
         sql.append(CreateTable(t))
         sql.append(SetTableComment(t))
-        sql.extend(CreateIndex(idx) for idx in sorted(t.indexes, key=lambda x: x.name))
+        sql.extend(CreateIndex(idx) for idx in sorted(t.indexes, key=lambda x: x.name or ""))
 
+        # ty: ignore[unresolved-attribute]
         for listener in t.dispatch.after_create:
             if isinstance(listener, DDL):
                 sql.append(listener)

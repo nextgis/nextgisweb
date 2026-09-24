@@ -8,7 +8,7 @@ from nextgisweb.env.test import sql_compare
 from nextgisweb.lib.saext import Geometry
 
 from ..model import VectorLayer, VectorLayerField
-from ..vlschema import SCHEMA, VLSchema
+from ..vlschema import SCHEMA, VLSchema, get_fields
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
@@ -126,7 +126,10 @@ def test_aliased(ngw_txn):
     a = alias(ctab, "a")
     b = alias(ctab, "b")
 
-    sql = str(select(a.fields["foo"].label("foo"), b.fields["bar"].label("bar")))
+    af = get_fields(a)
+    bf = get_fields(b)
+
+    sql = str(select(af["foo"].label("foo"), bf["bar"].label("bar")))
     assert sql.replace("\n", " ").replace("  ", " ") == (
         f"SELECT a.fld_{foo.fld_uuid} AS foo, b.fld_{bar.fld_uuid} AS bar "
         f"FROM {SCHEMA}.layer_{res.tbl_uuid} AS a, {SCHEMA}.layer_{res.tbl_uuid} AS b"

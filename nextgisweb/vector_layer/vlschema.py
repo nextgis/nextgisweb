@@ -1,6 +1,6 @@
 import dataclasses as dc
 import re
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from functools import cached_property, lru_cache
 from typing import Literal
 
@@ -83,9 +83,7 @@ class VLSchema(MetaData):
         cols.extend(fields_columns)
         if self.has_geom:
             cols.append(self._geom_index())
-        result = FieldsTable(self._table_name(), self, *cols)
-        result._fields = fields_mapping
-        return result
+        return FieldsTable(self._table_name(), self, *cols, fields=fields_mapping)
 
     @cached_property
     def ctab_fk(self):
@@ -132,8 +130,8 @@ class VLSchema(MetaData):
                 (literal_column("int4range(fid, fid, '[]')"), "&&"),
                 name=f"{table_name}_vid_nid_fid_idx",
             ),
+            fields=fields_mapping,
         )
-        result._fields = fields_mapping
         return result
 
     # DDL generation
@@ -213,7 +211,7 @@ class VLSchema(MetaData):
 
         qu = union_all(qh, qe).subquery(subquery)
         fnames = {k: f"fld_{idx}" for idx, k in enumerate(ct.fields.keys(), start=1)}
-        qu.fields = {k: qu.c[n] for k, n in fnames.items()}
+        set_fields(qu, {k: qu.c[n] for k, n in fnames.items()})
         return qu
 
     def query_revert(self, version, *, where=lambda s: ()):
@@ -251,7 +249,7 @@ class VLSchema(MetaData):
         ).where(text("current != previous OR (current AND previous)"))
 
         fnames = {k: f"fld_{idx}" for idx, k in enumerate(ht.fields.keys(), start=1)}
-        q.fields = {k: q.selected_columns[n] for k, n in fnames.items()}
+        set_fields(q, {k: q.selected_columns[n] for k, n in fnames.items()})
         return q
 
     def query_changed_fids(self):
@@ -666,10 +664,22 @@ def _lat_changes_u(count):
     ).lateral("lat_u")
 
 
+def set_fields(obj: object, fields: Mapping) -> None:
+    setattr(obj, "fields", fields)
+
+
+def get_fields(obj: object) -> Mapping:
+    return getattr(obj, "fields")
+
+
 class FieldsTable(Table):
+    def __init__(self, *args, fields: dict, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._fields = fields
+
     def alias(self, *args, **kwargs):
         obj = super().alias(*args, **kwargs)
-        obj.fields = self._fields_mapping(obj)
+        set_fields(obj, self._fields_mapping(obj))
         return obj
 
     @cached_property
