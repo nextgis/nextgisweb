@@ -14,7 +14,14 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
 
   return (
     <PanelSection icon={<DescriptionIcon />} title={gettext("Description")}>
-      <DescriptionHtml variant="compact" content={description as string} />
+      <DescriptionHtml
+        variant="compact"
+        content={description as string}
+        onLinkClick={(e) => {
+          e?.currentTarget.setAttribute("target", "_blank");
+          return false;
+        }}
+      />
     </PanelSection>
   );
 };
