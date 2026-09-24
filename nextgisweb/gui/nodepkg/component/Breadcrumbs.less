@@ -1,0 +1,85 @@
+.ngw-gui-breadcrumbs {
+  display: flex;
+  position: relative;
+  align-items: center;
+  min-width: 0;
+  min-height: 24px;
+  overflow: hidden;
+  color: var(--theme-color-text-tertiary);
+  font-weight: normal;
+
+  > .breadcrumb-item,
+  > .breadcrumb-overflow {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+
+    &::before {
+      flex-shrink: 0;
+      opacity: 0.5;
+      margin: 4px 6px;
+      content: "●";
+      font-size: 6px;
+    }
+  }
+
+  > :first-child::before {
+    display: none;
+  }
+
+  > .breadcrumb-item:first-child,
+  > .breadcrumb-overflow {
+    flex-shrink: 0;
+  }
+
+  .breadcrumb-item[aria-current] {
+    color: var(--theme-color-text);
+  }
+
+  .breadcrumb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    min-width: 0;
+    height: auto;
+    color: inherit;
+    font: inherit;
+    unicode-bidi: isolate;
+    text-decoration: none;
+
+    > svg,
+    .breadcrumb-icon {
+      flex-shrink: 0;
+      opacity: 0.75;
+    }
+
+    &:is(a, button):hover {
+      color: var(--theme-color-link-active);
+
+      > svg,
+      .breadcrumb-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  .breadcrumb-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .breadcrumb-overflow > button {
+    color: inherit;
+  }
+
+  &.breadcrumb-measure {
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+    inset-inline-start: 0;
+    width: max-content;
+  }
+}

@@ -2,6 +2,7 @@
   .ant-card-head {
     margin-bottom: 0;
     padding: 0 12px;
+    font-size: unset;
   }
 
   .ant-card-body {
@@ -17,22 +18,7 @@
   }
 
   .resource-breadcrumb {
-    .ant-breadcrumb-link {
-      display: inline-flex;
-
-      .resource-breadcrumb-item {
-        max-width: 220px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .active {
-        color: var(--text-base);
-
-        .icon {
-          color: var(--text-base);
-        }
-      }
-    }
+    flex: 1;
+    min-width: 0;
   }
 }

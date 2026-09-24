@@ -3,6 +3,8 @@ import { StrictMode, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import { Modal, Spin, useToken } from "@nextgisweb/gui/antd";
+import { Breadcrumbs } from "@nextgisweb/gui/component/Breadcrumbs";
+import type { BreadcrumbItem } from "@nextgisweb/gui/component/Breadcrumbs";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 
 import { CBlock } from "../cblock";
@@ -10,8 +12,6 @@ import { EntrypointSuspense } from "../component/EntrypointSuspense";
 import { resolveControlPanelDynMenuItems } from "../control-panel/resolveControlPanelDynMenuItems";
 import { useAbortController } from "../hook";
 
-import { Breadcrumbs } from "./Breadcrumbs";
-import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Attrmenu } from "./attrmenu/Attrmenu";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import type { DynMenuItem } from "./dynmenu/Dynmenu";
@@ -37,8 +37,8 @@ interface BaseProps {
   maxheight?: boolean;
   layoutMode?: "headerOnly" | "main" | "content" | "nullSpace";
   entrypoint: string;
-  entrypointProps: Record<string, unknown>;
   breadcrumbs: BreadcrumbItem[];
+  entrypointProps: Record<string, unknown>;
   dynMenuResourceId?: number;
   hideResourceFilter?: boolean;
 }

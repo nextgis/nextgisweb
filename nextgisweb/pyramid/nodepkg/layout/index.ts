@@ -3,7 +3,6 @@ export { HeaderComponents } from "./header/HeaderComponents";
 export { Menu } from "./Menu";
 export { PageTitle } from "./PageTitle";
 export { Dynmenu } from "./dynmenu/Dynmenu";
-export { Breadcrumbs } from "./Breadcrumbs";
 export { Base } from "./Base";
 export { Header } from "./header/Header";
 export { layoutStore } from "./store";

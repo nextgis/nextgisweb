@@ -1,5 +1,6 @@
 export { AutoCompleteHoneypot } from "./AutoCompleteHoneypot";
 export { AutoCompleteInput } from "./AutoCompleteInput";
+export { Breadcrumbs } from "./Breadcrumbs";
 export { CentralLoading } from "./CentralLoading";
 export { InputOpacity } from "./InputOpacity";
 export { InputScaleDenom } from "./InputScaleDenom";

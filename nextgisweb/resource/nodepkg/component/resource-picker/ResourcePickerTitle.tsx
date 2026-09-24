@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
-import { Button, Col, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Flex, Space } from "@nextgisweb/gui/antd";
 import { CloseIcon, SearchIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -25,11 +25,18 @@ interface SearchPanelProps {
 
 const SearchPanel = observer(({ store, onCancelSearch }: SearchPanelProps) => {
   return (
-    <Space.Compact>
-      <Button icon={<ArrowBack />} onClick={onCancelSearch} />
+    <Space.Compact block>
+      <Button
+        icon={<ArrowBack />}
+        title={gettext("Back")}
+        onClick={onCancelSearch}
+      />
       <ResourcesFilter
-        cls={store.requireClass || undefined}
-        onChange={(v, opt) => {
+        autoFocus
+        showAdvancedSearch={false}
+        popupMatchSelectWidth
+        cls={store.requireClass}
+        onChange={(_, opt) => {
           store.changeParentTo(Number(opt.key));
           onCancelSearch();
         }}
@@ -47,34 +54,37 @@ interface PathPanelProps {
 
 export const PathPanel = observer(
   ({ store, onEnterSearchMode }: PathPanelProps) => {
-    const { initParentId: initialParentId, parentId, allowMoveInside } = store;
+    const { initParentId, parentId, allowMoveInside } = store;
     return (
-      <Row>
-        <Col style={{ width: "30px" }}>
-          <a onClick={onEnterSearchMode}>
-            <SearchIcon />
-          </a>
-        </Col>
-        <Col flex="auto" className="resource-breadcrumb">
-          <ResourcePickerBreadcrumb store={store} />
-        </Col>
-        {parentId !== initialParentId && allowMoveInside && (
-          <Col style={{ width: "30px" }}>
-            <Tooltip title={msgGotoInitialGroup}>
-              <a onClick={() => store.returnToInitial()}>
-                <StartIcon />
-              </a>
-            </Tooltip>
-          </Col>
+      <>
+        <Button
+          type="text"
+          size="small"
+          icon={<SearchIcon />}
+          title={gettext("Search")}
+          aria-label={gettext("Search")}
+          onClick={onEnterSearchMode}
+        />
+        <ResourcePickerBreadcrumb store={store} />
+        {parentId !== initParentId && allowMoveInside && (
+          <Button
+            type="text"
+            size="small"
+            icon={<StartIcon />}
+            title={msgGotoInitialGroup}
+            aria-label={msgGotoInitialGroup}
+            onClick={() => store.returnToInitial()}
+          />
         )}
-        <Col style={{ width: "30px" }}>
-          <Tooltip title={msgRefresh}>
-            <a onClick={() => store.refresh()}>
-              <SyncIcon />
-            </a>
-          </Tooltip>
-        </Col>
-      </Row>
+        <Button
+          type="text"
+          size="small"
+          icon={<SyncIcon />}
+          title={msgRefresh}
+          aria-label={msgRefresh}
+          onClick={() => store.refresh()}
+        />
+      </>
     );
   }
 );
@@ -97,22 +107,23 @@ export const ResourcePickerTitle = observer(
     }, [searchMode, store]);
 
     return (
-      <Row justify="space-between">
-        <Col flex="auto">
-          {searchMode ? (
-            <SearchPanel store={store} onCancelSearch={stopSearch} />
-          ) : (
-            <PathPanel store={store} onEnterSearchMode={startSearch} />
-          )}
-        </Col>
-        {showClose && (
-          <Col>
-            <a color="primary" onClick={onClose}>
-              <CloseIcon />
-            </a>
-          </Col>
+      <Flex align="center" gap="small">
+        {searchMode ? (
+          <SearchPanel store={store} onCancelSearch={stopSearch} />
+        ) : (
+          <PathPanel store={store} onEnterSearchMode={startSearch} />
         )}
-      </Row>
+        {showClose && (
+          <Button
+            type="text"
+            size="small"
+            icon={<CloseIcon />}
+            title={gettext("Close")}
+            aria-label={gettext("Close")}
+            onClick={onClose}
+          />
+        )}
+      </Flex>
     );
   }
 );
