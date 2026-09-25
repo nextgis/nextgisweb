@@ -1,6 +1,6 @@
-import { getFeatureFieldValue } from "@nextgisweb/feature-layer/util/getFeatureFieldValue";
 import { route } from "@nextgisweb/pyramid/api";
 import type { FieldDataItem } from "@nextgisweb/webmap/panel/identify/fields";
+import { lookup } from "@nextgisweb/webmap/panel/identify/lookup";
 
 export const loadSearchContext = async (
   resourceId: number,
@@ -32,14 +32,27 @@ export const loadSearchContext = async (
 
   return Promise.all(
     matchedFields.map(async (field) => {
-      const value = await getFeatureFieldValue(
-        feature.fields[field.keyname],
-        field
-      );
+      const rawValue = feature.fields[field.keyname];
+      let value: string;
+
+      if (rawValue === null || rawValue === undefined) {
+        value = "";
+      } else {
+        value = String(rawValue);
+        if (field.lookup_table) {
+          const label = await lookup(field.lookup_table.id, value, {
+            signal,
+          });
+          if (label !== null) {
+            value = `[${value}] ${label}`;
+          }
+        }
+      }
+
       return {
         key: field.id,
         attr: field.display_name,
-        value: value === null || value === undefined ? "" : String(value),
+        value,
       };
     })
   );
