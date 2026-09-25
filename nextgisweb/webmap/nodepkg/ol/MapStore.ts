@@ -456,11 +456,11 @@ export class MapStore {
     this.zoomToExtent(this.geomToExtent(geom, opts), opts?.fit);
   }
 
-  searchGeom(geom: string | Geometry, opts?: GeomOptions): void {
-    this.searchExtent(this.geomToExtent(geom, opts), opts?.fit);
+  panToGeom(geom: string | Geometry, opts?: GeomOptions): void {
+    this.panToExtent(this.geomToExtent(geom, opts), opts?.fit);
   }
 
-  searchExtent(extent: Extent, fitOpts?: FitOptions): void {
+  panToExtent(extent: Extent, fitOpts?: FitOptions): void {
     const view = this.olMap.getView();
 
     const viewExtent = view.calculateExtent();
