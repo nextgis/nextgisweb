@@ -34,7 +34,7 @@ class TMSLink(ExternalAccessLink):
     interface = IRenderableStyle
 
     @classmethod
-    def url_factory(cls, obj: Resource, request: Request) -> str:
+    def url_factory(cls, obj: Resource, request: Request) -> str | None:
         return (
             request.route_url("render.tile", _query=dict(resource=obj.id, nd=204))
             + "&z={z}&x={x}&y={y}"

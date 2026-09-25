@@ -12,7 +12,7 @@ from nextgisweb.pyramid import client_setting
 from nextgisweb.pyramid.api import csetting
 from nextgisweb.pyramid.tomb import Configurator, Request, render_to_response
 from nextgisweb.render.view import TMSLink
-from nextgisweb.resource import ResourceFactory, ResourceScope, Widget
+from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
 
 from .adapter import WebMapAdapter
 from .component import WebMapComponent
@@ -131,9 +131,19 @@ class WebMapTMSLink(TMSLink):
     interface = None
 
     @classmethod
-    def url_factory(cls, obj, request: Request) -> str:
-        rids = ",".join(map(str, webmap_items_to_tms_ids_list(obj)))
-        return request.route_url("render.tile") + "?resource=" + rids + "&nd=204&z={z}&x={x}&y={y}"
+    def url_factory(cls, obj: Resource, request: Request) -> str | None:
+        assert isinstance(obj, WebMap)
+
+        ids = webmap_items_to_tms_ids_list(obj)
+        if len(ids) == 0:
+            return None
+
+        return (
+            request.route_url("render.tile")
+            + "?resource="
+            + ",".join(map(str, ids))
+            + "&nd=204&z={z}&x={x}&y={y}"
+        )
 
 
 class WebMapAdapterCS(Struct, kw_only=True):

@@ -1,26 +1,28 @@
-def webmap_items_to_tms_ids_list(webmap):
-    if not webmap:
-        raise TypeError
+from collections.abc import Iterable, Sequence
+from sys import maxsize
 
-    root = webmap.root_item
-    webmap_items = []
+from .model import WebMap, WebMapItem
 
-    def iterate(children):
+
+def webmap_items_to_tms_ids_list(webmap: WebMap) -> Sequence[int]:
+    items: list[tuple[int, int]] = []  # List of (draw_order_position, layer_style_id)
+
+    def iterate(children: Iterable[WebMapItem]):
+        nonlocal items
         for item in children:
             if item.item_type == "layer" and item.layer_style_id:
-                webmap_items.append(item)
+                draw_order_position = item.draw_order_position
+                if draw_order_position is None:
+                    draw_order_position = maxsize
+                items.append((draw_order_position, item.layer_style_id))
             if item.children:
                 iterate(item.children)
 
-    iterate(root.children)
+    iterate(webmap.root_item.children)
 
     if webmap.draw_order_enabled:
-        webmap_items.sort(
-            key=lambda i: (
-                (0, i.draw_order_position) if i.draw_order_position is not None else (1, 0)
-            )
-        )
+        items.sort(key=lambda i: i[0])
 
-    webmap_items.reverse()
+    items.reverse()
 
-    return [i.layer_style_id for i in webmap_items]
+    return [i[1] for i in items]

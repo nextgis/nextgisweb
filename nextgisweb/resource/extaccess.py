@@ -29,8 +29,8 @@ class ExternalAccessLink:
 
     @classmethod
     def factory(cls, obj: Resource, request: Request) -> ExternalAccessLink | None:
-        if cls.is_applicable(obj, request):
-            return cls(cls.url_factory(obj, request))
+        if cls.is_applicable(obj, request) and (url := cls.url_factory(obj, request)):
+            return cls(url)
 
     @classmethod
     def is_applicable(cls, obj: Resource, request: Request) -> bool:
@@ -49,5 +49,5 @@ class ExternalAccessLink:
         return True
 
     @classmethod
-    def url_factory(cls, obj: Resource, request: Request) -> str:
+    def url_factory(cls, obj: Resource, request: Request) -> str | None:
         raise NotImplementedError
