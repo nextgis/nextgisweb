@@ -65,7 +65,6 @@ export function useAddItem({ display }: { display: Display }) {
   const addLayers = useCallback(() => {
     showResourcePicker({
       pickerOptions: {
-        requireClass: "point_cloud_style",
         requireInterface: "IRenderableStyle",
         multiple: true,
         initParentId: parent,

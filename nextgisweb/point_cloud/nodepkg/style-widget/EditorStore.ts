@@ -1,5 +1,6 @@
 import { action, computed, observable } from "mobx";
 
+import settings from "@nextgisweb/point-cloud/client-settings";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
   EditorStoreOptions,
@@ -24,7 +25,7 @@ interface StyleConfig {
   mode: StyleMode;
   point_size: number;
   opacity: number;
-  point_budget?: number;
+  point_budget: number;
   use_percentile_clip: boolean;
   elevation_min_percent: number;
   elevation_max_percent: number;
@@ -48,10 +49,6 @@ const DEFAULT_CAPABILITIES: Capabilities = {
   hasClassification: false,
   hasReturns: false,
 };
-
-export const DEFAULT_POINT_BUDGET = 120000;
-export const MIN_POINT_BUDGET = 1000;
-export const MAX_POINT_BUDGET = 1000000;
 
 function parseClassificationColors(
   value: string
@@ -78,7 +75,7 @@ export class EditorStore implements IEditorStore<
   @observable.ref accessor mode: StyleMode = "elevation";
   @observable.ref accessor pointSize = 2;
   @observable.ref accessor opacity = 100;
-  @observable.ref accessor pointBudget = DEFAULT_POINT_BUDGET;
+  @observable.ref accessor pointBudget = settings.pointBudget.default;
   @observable.ref accessor usePercentileClip = true;
   @observable.ref accessor elevationMinPercent = 2;
   @observable.ref accessor elevationMaxPercent = 98;
@@ -102,7 +99,7 @@ export class EditorStore implements IEditorStore<
     this.mode = cfg.mode;
     this.pointSize = cfg.point_size;
     this.opacity = cfg.opacity;
-    this.pointBudget = cfg.point_budget ?? DEFAULT_POINT_BUDGET;
+    this.pointBudget = cfg.point_budget;
     this.usePercentileClip = cfg.use_percentile_clip;
     this.elevationMinPercent = cfg.elevation_min_percent;
     this.elevationMaxPercent = cfg.elevation_max_percent;
@@ -141,8 +138,8 @@ export class EditorStore implements IEditorStore<
     if (this.pointSize <= 0) return false;
     if (this.opacity < 0 || this.opacity > 100) return false;
     if (
-      this.pointBudget < MIN_POINT_BUDGET ||
-      this.pointBudget > MAX_POINT_BUDGET
+      this.pointBudget < settings.pointBudget.min ||
+      this.pointBudget > settings.pointBudget.max
     ) {
       return false;
     }

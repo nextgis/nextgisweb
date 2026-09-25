@@ -7,11 +7,11 @@ import {
   Select,
 } from "@nextgisweb/gui/antd";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
+import settings from "@nextgisweb/point-cloud/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 import { ColorInput } from "@nextgisweb/sld/style-editor/field/ColorInput";
 
-import { MAX_POINT_BUDGET, MIN_POINT_BUDGET } from "./EditorStore";
 import type { EditorStore } from "./EditorStore";
 
 const [
@@ -108,11 +108,13 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
         <Lot label={msgPointBudget} help={msgPointBudgetHelp}>
           <InputNumber
             value={store.pointBudget}
-            min={MIN_POINT_BUDGET}
-            max={MAX_POINT_BUDGET}
+            min={settings.pointBudget.min}
+            max={settings.pointBudget.max}
             step={10000}
             onChange={(pointBudget) =>
-              store.update({ pointBudget: pointBudget ?? MIN_POINT_BUDGET })
+              store.update({
+                pointBudget: pointBudget ?? settings.pointBudget.min,
+              })
             }
             style={{ width: "100%" }}
           />

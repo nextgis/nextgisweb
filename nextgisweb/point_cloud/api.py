@@ -1,118 +1,84 @@
-import os
-from io import DEFAULT_BUFFER_SIZE
-from typing import Annotated, Literal
+from pathlib import Path
 
-from msgspec import UNSET, Struct, UnsetType
-from pyramid.response import FileIter, FileResponse, Response
-
-from nextgisweb.lib.apitype import StatusCode
+from msgspec import Struct
+from pyramid.response import FileResponse, Response
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_upload import FileUploadRef
+from nextgisweb.raster_layer.api import RangeFileWrapper
 from nextgisweb.resource import DataScope, ResourceFactory
-from nextgisweb.spatial_ref_sys import SRS, SRSRef
 
-from .model import PointCloud
-from .validation import PointCloudExtent, validate_external_url, validate_upload
+from .model import PointCloudLayer
+from .validation import find_srs_candidates, inspect_copc
 
 POINT_CLOUD_CONTENT_TYPE = "application/octet-stream"
 
 
-class RangeFileWrapper(FileIter):
-    def __init__(self, file, block_size=DEFAULT_BUFFER_SIZE, offset=0, length=0):
-        super().__init__(file=file, block_size=block_size)
-        self.file.seek(offset, os.SEEK_SET)
-        self.remaining = length
-
-    def __next__(self):
-        if self.remaining <= 0:
-            raise StopIteration()
-        data = self.file.read(min(self.remaining, self.block_size))
-        if not data:
-            raise StopIteration()
-        self.remaining -= len(data)
-        return data
+class InspectCRS(Struct, kw_only=True):
+    display_name: str
+    auth: str | None
+    vertical_display_name: str | None
+    vertical_auth: str | None
 
 
-def _exception_message(exc: ValidationError) -> str:
-    message = getattr(exc, "message", None)
-    if message is None:
-        return str(exc)
-    return str(message)
+class InspectSRS(Struct, kw_only=True):
+    id: int
+    display_name: str
 
 
-class ValidateBody(Struct, kw_only=True):
-    source_type: Literal["upload", "external_url"]
-    file_upload: FileUploadRef | UnsetType = UNSET
-    url: str | UnsetType = UNSET
-    srs: SRSRef | UnsetType = UNSET
+class InspectResponse(Struct, kw_only=True):
+    crs: InspectCRS | None
+    srs_candidates: list[InspectSRS]
+    point_count: int
+    point_format_id: int
+    has_rgb: bool
 
 
-class ValidateResponse(Struct, kw_only=True):
-    is_valid: bool
-    reason: str | None = None
-    point_count: int | None = None
-    point_format_id: int | None = None
-    epsg: int | None = None
-    wkt: str | None = None
-    srs_required: bool = False
-    extent: PointCloudExtent | None = None
-    minx: float | None = None
-    miny: float | None = None
-    maxx: float | None = None
-    maxy: float | None = None
-    zmin: float | None = None
-    zmax: float | None = None
-    has_rgb: bool = False
-    has_intensity: bool = False
-    has_classification: bool = False
-    has_returns: bool = False
+def inspect_response(path: Path) -> InspectResponse:
+    info = inspect_copc(path)
 
-
-def validate(request, *, body: ValidateBody) -> Annotated[ValidateResponse, StatusCode(200)]:
-    srs = SRS.filter_by(id=body.srs.id).one() if body.srs is not UNSET else None
-
-    try:
-        if body.source_type == "upload":
-            if body.file_upload is UNSET:
-                raise ValidationError(message="file_upload is required.")
-            result = validate_upload(body.file_upload(), srs=srs)
-        else:
-            if body.url is UNSET:
-                raise ValidationError(message="url is required.")
-            result = validate_external_url(body.url, srs=srs)
-    except ValidationError as exc:
-        return ValidateResponse(
-            is_valid=False,
-            reason=_exception_message(exc),
+    crs, candidates = None, []
+    if (fcrs := info.crs) is not None:
+        crs = InspectCRS(
+            display_name=fcrs.display_name,
+            auth=fcrs.auth,
+            vertical_display_name=fcrs.vertical_display_name,
+            vertical_auth=fcrs.vertical_auth,
         )
+        candidates = find_srs_candidates(fcrs)
 
-    return ValidateResponse(
-        is_valid=True,
-        point_count=result.point_count,
-        point_format_id=result.point_format_id,
-        epsg=result.epsg,
-        wkt=result.wkt,
-        srs_required=result.srs_required,
-        extent=result.extent,
-        minx=result.minx,
-        miny=result.miny,
-        maxx=result.maxx,
-        maxy=result.maxy,
-        zmin=result.zmin,
-        zmax=result.zmax,
-        has_rgb=result.has_rgb,
-        has_intensity=result.has_intensity,
-        has_classification=result.has_classification,
-        has_returns=result.has_returns,
+    return InspectResponse(
+        crs=crs,
+        srs_candidates=[
+            InspectSRS(id=srs.id, display_name=srs.display_name) for srs in candidates
+        ],
+        point_count=info.point_count,
+        point_format_id=info.point_format_id,
+        has_rgb=info.has_rgb,
     )
 
 
-def content_head(resource: PointCloud, request) -> Response:
-    request.resource_permission(DataScope.read)
+def inspect(request, *, body: FileUploadRef) -> InspectResponse:
+    """Inspect uploaded COPC file
 
-    if resource.fileobj is None:
-        raise ValidationError(message="Only uploaded point clouds can be proxied.")
+    :returns: Point cloud metadata, its coordinate system and matching
+        coordinate systems registered in NextGIS Web"""
+
+    return inspect_response(body().data_path)
+
+
+def layer_inspect(resource: PointCloudLayer, request) -> InspectResponse:
+    """Inspect COPC file of point cloud layer
+
+    :returns: Point cloud metadata, its coordinate system and matching
+        coordinate systems registered in NextGIS Web"""
+
+    request.resource_permission(DataScope.read)
+    return inspect_response(resource.fileobj.filename())
+
+
+def copc_head(resource: PointCloudLayer, request) -> Response:
+    request.resource_permission(DataScope.read)
 
     filename = resource.fileobj.filename()
     return Response(
@@ -122,11 +88,8 @@ def content_head(resource: PointCloud, request) -> Response:
     )
 
 
-def content_get(resource: PointCloud, request) -> Response:
+def copc_get(resource: PointCloudLayer, request) -> Response:
     request.resource_permission(DataScope.read)
-
-    if resource.fileobj is None:
-        raise ValidationError(message="Only uploaded point clouds can be proxied.")
 
     filename = resource.fileobj.filename()
     file_size = filename.stat().st_size
@@ -160,16 +123,24 @@ def content_get(resource: PointCloud, request) -> Response:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        "point_cloud.validate",
-        "/api/component/point_cloud/validate",
-        post=validate,
+        "point_cloud.inspect",
+        "/api/component/point_cloud/inspect",
+        post=inspect,
     )
 
-    point_cloud_factory = ResourceFactory(context=PointCloud)
+    point_cloud_factory = ResourceFactory(context=PointCloudLayer)
     config.add_route(
-        "point_cloud.content",
-        "/api/resource/{id}/point_cloud/content",
+        "point_cloud.layer_inspect",
+        "/api/resource/{id}/point_cloud/inspect",
         factory=point_cloud_factory,
-        head=content_head,
-        get=content_get,
+        get=layer_inspect,
+    )
+
+    # QGIS recognizes COPC by the file name, so the path has to end with .copc.laz
+    config.add_route(
+        "point_cloud.copc",
+        "/api/resource/{id}/point_cloud.copc.laz",
+        factory=point_cloud_factory,
+        head=copc_head,
+        get=copc_get,
     )

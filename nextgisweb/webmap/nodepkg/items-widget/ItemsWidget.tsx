@@ -25,10 +25,6 @@ import settings from "@nextgisweb/webmap/client-settings";
 
 import { SelectLegendSymbols } from "../component";
 import { useOptionalDisplayContext } from "../display/context";
-import {
-  POINT_CLOUD_ADAPTER,
-  getDefaultAdapterIdentityForStyleCls,
-} from "../utils/webmap-item-utils";
 
 import { DrawOrderTable } from "./DrawOrder";
 import { Group, Layer } from "./Item";
@@ -95,18 +91,6 @@ const adapterOptions = sortBy(
   })),
   "value"
 );
-
-function getAdapterOptions(currentAdapter?: string | null) {
-  if (currentAdapter === POINT_CLOUD_ADAPTER) {
-    return adapterOptions.filter(
-      (option) => option.value === POINT_CLOUD_ADAPTER
-    );
-  }
-
-  return adapterOptions.filter(
-    (option) => option.value !== POINT_CLOUD_ADAPTER
-  );
-}
 
 type ScaleDenomInputProps = ComponentProps<typeof InputScaleDenom> & {
   addon?: ReactNode;
@@ -233,7 +217,7 @@ export const LayerWidget = observer(({ item }: LayerWidgetProps) => {
         component={Select<string>}
         props={{
           style: { width: "100%" },
-          options: getAdapterOptions(item.layerAdapter.value),
+          options: adapterOptions,
         }}
       />
       <LotMV
@@ -265,17 +249,14 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             const displayName = await getEffectiveDisplayName(res, {
               signal: makeSignal(),
             });
-            const styleCls = res.get("resource.cls");
             return new Layer(store, {
               display_name: displayName,
               layer_style_id: res.id,
-              layer_adapter: getDefaultAdapterIdentityForStyleCls(styleCls),
             });
           },
           {
             title: msgLayer,
             pickerOptions: {
-              requireClass: "point_cloud_style",
               requireInterface: "IRenderableStyle",
               multiple: true,
             },

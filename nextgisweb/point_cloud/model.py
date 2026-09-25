@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, Literal, cast
+from typing import Literal
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-from msgspec import UNSET
-from osgeo import ogr, osr
+from msgspec import UNSET, Struct
+from msgspec import field as msgspec_field
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext
+from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
 from nextgisweb.lib import saext
-from nextgisweb.lib.osrhelper import sr_from_epsg, sr_from_wkt
+from nextgisweb.lib.geometry import Geometry, Transformer
 
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.core.storage import StorageEstimateResult, storage_estimate_hook
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.file_upload.model import FileUpload
@@ -28,13 +29,20 @@ from nextgisweb.resource import (
     Serializer,
     SRelationship,
 )
-from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.spatial_ref_sys import SRS, WKT_EPSG_4326, SRSRef
 
-from .validation import PointCloudValidationResult, validate_external_url, validate_upload
+from .component import PointCloudComponent
+from .validation import inspect_copc, resolve_srs
 
 Base.depends_on("resource")
 
-PointCloudSourceType = Literal["upload", "external_url"]
+PointCloudStyleMode = Literal[
+    "elevation",
+    "classification",
+    "intensity",
+    "rgb",
+    "return_number",
+]
 
 
 class PointCloudData(KindOfData):
@@ -42,37 +50,33 @@ class PointCloudData(KindOfData):
     display_name = gettext("Point clouds")
 
 
-def estimate_point_cloud_data(resource: "PointCloud") -> int:
+def estimate_point_cloud_data(resource: PointCloudLayer) -> int:
     return resource.fileobj.size if resource.fileobj is not None else 0
 
 
 @implementer(IBboxLayer)
-class PointCloud(Resource, SpatialLayerMixin):
-    identity = "point_cloud"
-    cls_display_name = gettext("Point cloud")
+class PointCloudLayer(Resource, SpatialLayerMixin):
+    identity = "point_cloud_layer"
+    cls_display_name = gettext("Point cloud layer")
 
     __scope__ = DataScope
 
-    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
-    source_type = sa.Column(saext.Enum("upload", "external_url"), nullable=False, default="upload")
-    external_url = sa.Column(sa.Unicode, nullable=True)
+    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
 
-    point_count = sa.Column(sa.BigInteger, nullable=False, default=0)
-    point_format_id = sa.Column(sa.SmallInteger, nullable=False, default=0)
-    epsg = sa.Column(sa.Integer, nullable=True)
-    wkt = sa.Column(sa.Unicode, nullable=True)
+    point_count = sa.Column(sa.BigInteger, nullable=False)
+    point_format_id = sa.Column(sa.SmallInteger, nullable=False)
 
-    minx = sa.Column(sa.Float, nullable=False, default=0)
-    miny = sa.Column(sa.Float, nullable=False, default=0)
-    maxx = sa.Column(sa.Float, nullable=False, default=0)
-    maxy = sa.Column(sa.Float, nullable=False, default=0)
-    zmin = sa.Column(sa.Float, nullable=False, default=0)
-    zmax = sa.Column(sa.Float, nullable=False, default=0)
+    minx = sa.Column(sa.Float, nullable=False)
+    miny = sa.Column(sa.Float, nullable=False)
+    maxx = sa.Column(sa.Float, nullable=False)
+    maxy = sa.Column(sa.Float, nullable=False)
+    zmin = sa.Column(sa.Float, nullable=False)
+    zmax = sa.Column(sa.Float, nullable=False)
 
-    has_rgb = sa.Column(sa.Boolean, nullable=False, default=False)
-    has_intensity = sa.Column(sa.Boolean, nullable=False, default=False)
-    has_classification = sa.Column(sa.Boolean, nullable=False, default=False)
-    has_returns = sa.Column(sa.Boolean, nullable=False, default=False)
+    has_rgb = sa.Column(sa.Boolean, nullable=False)
+    has_intensity = sa.Column(sa.Boolean, nullable=False)
+    has_classification = sa.Column(sa.Boolean, nullable=False)
+    has_returns = sa.Column(sa.Boolean, nullable=False)
 
     fileobj = orm.relationship(FileObj, foreign_keys=fileobj_id, cascade="all")
 
@@ -80,10 +84,23 @@ class PointCloud(Resource, SpatialLayerMixin):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def _reserve_storage_delta(self, old_size: int):
-        new_size = estimate_point_cloud_data(self)
-        diff = new_size - old_size
-        if diff:
+    def load_file(self, file_upload: FileUpload, *, srs: SRS | None = None):
+        info = inspect_copc(file_upload.data_path)
+        srs = resolve_srs(info.crs, srs)
+
+        old_size = estimate_point_cloud_data(self)
+        self.fileobj = file_upload.to_fileobj()
+        self.srs = srs
+        self.point_count = info.point_count
+        self.point_format_id = info.point_format_id
+        self.minx, self.miny, self.maxx, self.maxy = info.minx, info.miny, info.maxx, info.maxy
+        self.zmin, self.zmax = info.zmin, info.zmax
+        self.has_rgb = info.has_rgb
+        self.has_intensity = info.has_intensity
+        self.has_classification = info.has_classification
+        self.has_returns = info.has_returns
+
+        if diff := estimate_point_cloud_data(self) - old_size:
             env.core.reserve_storage(
                 COMP_ID,
                 PointCloudData,
@@ -91,128 +108,47 @@ class PointCloud(Resource, SpatialLayerMixin):
                 resource=self,
             )
 
-    def _resolve_srs(
-        self, validation: PointCloudValidationResult, explicit_srs: SRS | None
-    ) -> SRS:
-        if explicit_srs is not None:
-            return explicit_srs
-
-        if validation.epsg is not None:
-            srs = SRS.filter_by(id=validation.epsg).one_or_none()
-            if srs is None:
-                srs = SRS.filter_by(auth_name="EPSG", auth_srid=validation.epsg).one_or_none()
-            if srs is not None:
-                return srs
-
-        if validation.wkt:
-            srs = SRS.filter_by(wkt=validation.wkt).one_or_none()
-            if srs is not None:
-                return srs
-
-        raise ValidationError(
-            message=gettext("Spatial reference system could not be detected. Specify it manually.")
-        )
-
-    def _apply_validation(self, validation: PointCloudValidationResult, srs: SRS):
-        self.srs = srs
-        self.point_count = validation.point_count
-        self.point_format_id = validation.point_format_id
-        self.epsg = validation.epsg
-        self.wkt = validation.wkt
-        self.minx = validation.minx
-        self.miny = validation.miny
-        self.maxx = validation.maxx
-        self.maxy = validation.maxy
-        self.zmin = validation.zmin
-        self.zmax = validation.zmax
-        self.has_rgb = validation.has_rgb
-        self.has_intensity = validation.has_intensity
-        self.has_classification = validation.has_classification
-        self.has_returns = validation.has_returns
-
-    def load_upload(self, file_upload: FileUpload, *, srs: SRS | None = None):
-        validation = validate_upload(file_upload, srs=srs)
-        resolved_srs = self._resolve_srs(validation, srs)
-        old_size = estimate_point_cloud_data(self)
-        self.fileobj = file_upload.to_fileobj(component="point_cloud")
-        self.external_url = None
-        self.source_type = "upload"
-        self._apply_validation(validation, resolved_srs)
-        self._reserve_storage_delta(old_size)
-
-    def load_external_url(self, url: str, *, srs: SRS | None = None):
-        validation = validate_external_url(url, srs=srs)
-        resolved_srs = self._resolve_srs(validation, srs)
-        old_size = estimate_point_cloud_data(self)
-        self.fileobj = None
-        self.external_url = url
-        self.source_type = "external_url"
-        self._apply_validation(validation, resolved_srs)
-        self._reserve_storage_delta(old_size)
-
-    def _extent_source_sr(self):
-        if self.wkt:
-            return sr_from_wkt(self.wkt)
-        if self.epsg is not None:
-            return sr_from_epsg(self.epsg)
-        return self.srs.to_osr()
+    def set_srs(self, srs: SRS):
+        # Validate against the coordinate system of the stored file
+        info = inspect_copc(self.fileobj.filename())
+        self.srs = resolve_srs(info.crs, srs)
 
     @property
     def extent(self):
-        src_sr = self._extent_source_sr()
-        dst_sr = sr_from_epsg(4326)
-        ct = osr.CoordinateTransformation(src_sr, dst_sr)
-
-        def transform_point(x: float, y: float) -> tuple[float, float]:
-            point = ogr.Geometry(ogr.wkbPoint)
-            point.AddPoint(x, y)
-            point.Transform(ct)
-            return point.GetX(), point.GetY()
-
-        corners = (
-            transform_point(self.minx, self.miny),
-            transform_point(self.minx, self.maxy),
-            transform_point(self.maxx, self.miny),
-            transform_point(self.maxx, self.maxy),
-        )
-        xs = [c[0] for c in corners]
-        ys = [c[1] for c in corners]
-        return dict(minLon=min(xs), minLat=min(ys), maxLon=max(xs), maxLat=max(ys))
+        box = Geometry.from_box(self.minx, self.miny, self.maxx, self.maxy)
+        bounds = Transformer(self.srs.wkt, WKT_EPSG_4326).transform(box).bounds
+        return dict(minLon=bounds[0], minLat=bounds[1], maxLon=bounds[2], maxLat=bounds[3])
 
     def get_info(self):
-        s = super()
-        source = gettext("Upload") if self.source_type == "upload" else gettext("External URL")
-        info = (
-            (gettext("Source type"), source),
+        return (
+            *(s() if (s := getattr(super(), "get_info", None)) else ()),
             (gettext("Point count"), self.point_count),
             (gettext("Point format"), self.point_format_id),
         )
-        if self.epsg is not None:
-            info += ((gettext("EPSG"), self.epsg),)
-        return (s.get_info() if hasattr(s, "get_info") else ()) + info
+
+
+@storage_estimate_hook()
+def storage_estimate(comp: PointCloudComponent, /) -> StorageEstimateResult:
+    for resource in PointCloudLayer.query():
+        yield PointCloudData, resource.id, estimate_point_cloud_data(resource)
 
 
 class SourceAttr(SAttribute):
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
-        srs = srlzr.obj.srs if srlzr.data.srs is not UNSET else None
-        srlzr.obj.load_upload(value(), srs=srs)
+        srs = srlzr.data.srs
+        srs = SRS.filter_by(id=srs.id).one() if srs is not UNSET else None
+        srlzr.obj.load_file(value(), srs=srs)
 
 
-class ExternalURLAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> str | None:
-        return srlzr.obj.external_url
+class SrsAttr(SRelationship):
+    def get(self, srlzr: Serializer) -> SRSRef:
+        return SRSRef(id=srlzr.obj.srs_id)
 
-    def set(self, srlzr: Serializer, value: str | None, *, create: bool):
-        if value is None:
-            srlzr.obj.external_url = None
+    def set(self, srlzr: Serializer, value: SRSRef, *, create: bool):
+        # Applied along with the source when both are specified
+        if srlzr.data.source is not UNSET:
             return
-
-        value = value.strip()
-        if not value:
-            raise ValidationError(message=gettext("URL must not be empty."))
-
-        srs = srlzr.obj.srs if srlzr.data.srs is not UNSET else None
-        srlzr.obj.load_external_url(value, srs=srs)
+        srlzr.obj.set_srs(SRS.filter_by(id=value.id).one())
 
 
 class SrsProj4Attr(SAttribute):
@@ -221,18 +157,14 @@ class SrsProj4Attr(SAttribute):
         return srs.proj4 if srs is not None else None
 
 
-class PointCloudSerializer(Serializer, resource=PointCloud):
-    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update, required=False)
+class PointCloudLayerSerializer(Serializer, resource=PointCloudLayer):
+    srs = SrsAttr(read=ResourceScope.read, write=DataScope.write, required=False)
     srs_proj4 = SrsProj4Attr(read=ResourceScope.read)
 
-    source_type = SColumn(read=ResourceScope.read)
-    external_url = ExternalURLAttr(read=ResourceScope.read, write=DataScope.write)
-    source = SourceAttr(read=None, write=DataScope.write, required=False)
+    source = SourceAttr(read=None, write=DataScope.write, required=True)
 
     point_count = SColumn(read=ResourceScope.read)
     point_format_id = SColumn(read=ResourceScope.read)
-    epsg = SColumn(read=ResourceScope.read)
-    wkt = SColumn(read=ResourceScope.read)
 
     minx = SColumn(read=ResourceScope.read)
     miny = SColumn(read=ResourceScope.read)
@@ -246,23 +178,117 @@ class PointCloudSerializer(Serializer, resource=PointCloud):
     has_classification = SColumn(read=ResourceScope.read)
     has_returns = SColumn(read=ResourceScope.read)
 
-    def deserialize(self) -> None:
-        obj = cast(PointCloud, self.obj)
-        state = cast(Any, sa.inspect(obj))
-        create = state.pending or state.transient
-        if create:
-            source_count = sum(
-                value is not UNSET
-                for value in (
-                    getattr(self.data, "source", UNSET),
-                    getattr(self.data, "external_url", UNSET),
+
+POINT_BUDGET_DEFAULT = 120000
+POINT_BUDGET_MIN = 1000
+POINT_BUDGET_MAX = 1000000
+
+
+class PointCloudStyleClassificationColor(Struct, kw_only=True):
+    code: int
+    color: str
+
+
+class PointCloudStyleConfig(Struct, kw_only=True):
+    mode: PointCloudStyleMode = "elevation"
+    point_size: float = 2.0
+    opacity: int = 100
+    point_budget: int = POINT_BUDGET_DEFAULT
+    use_percentile_clip: bool = True
+    elevation_min_percent: float = 2.0
+    elevation_max_percent: float = 98.0
+    ramp_start_color: str = "#2b83ba"
+    ramp_end_color: str = "#fdae61"
+    intensity_modulation: bool = False
+    classification_colors: list[PointCloudStyleClassificationColor] = msgspec_field(
+        default_factory=list
+    )
+
+
+class PointCloudStyle(Resource):
+    identity = "point_cloud_style"
+    cls_display_name = gettext("Point cloud style")
+
+    __scope__ = DataScope
+
+    point_cloud_style_value = sa.Column(
+        saext.Msgspec(PointCloudStyleConfig),
+        nullable=False,
+        default=PointCloudStyleConfig,
+    )
+
+    @classmethod
+    def check_parent(cls, parent):
+        return isinstance(parent, PointCloudLayer)
+
+    def validate_config(self, value: PointCloudStyleConfig):
+        if value.point_size <= 0:
+            raise ValidationError(message=gettext("Point size must be greater than zero."))
+        if not 0 <= value.opacity <= 100:
+            raise ValidationError(message=gettext("Opacity must be between 0 and 100."))
+        if not POINT_BUDGET_MIN <= value.point_budget <= POINT_BUDGET_MAX:
+            raise ValidationError(
+                message=gettextf("Point budget must be between {min} and {max}.")(
+                    min=POINT_BUDGET_MIN, max=POINT_BUDGET_MAX
                 )
             )
-            if source_count > 1:
-                raise ValidationError(
-                    message=gettext("Specify either an uploaded file or an external URL, not both.")
+        if not 0 <= value.elevation_min_percent <= 100:
+            raise ValidationError(
+                message=gettext("Minimum elevation percentile must be between 0 and 100.")
+            )
+        if not 0 <= value.elevation_max_percent <= 100:
+            raise ValidationError(
+                message=gettext("Maximum elevation percentile must be between 0 and 100.")
+            )
+        if value.elevation_min_percent >= value.elevation_max_percent:
+            raise ValidationError(
+                message=gettext(
+                    "Minimum elevation percentile must be less than maximum percentile."
                 )
-        super().deserialize()
+            )
 
-        if create and obj.fileobj is None and obj.external_url is None:
-            raise ValidationError(message=gettext("Point cloud source must be provided."))
+        parent = self.parent
+        if value.mode == "rgb" and not parent.has_rgb:
+            raise ValidationError(
+                message=gettext("RGB styling is available only for point clouds with RGB data.")
+            )
+        if value.mode == "classification" and not parent.has_classification:
+            raise ValidationError(
+                message=gettext(
+                    "Classification styling is available only when classification data is present."
+                )
+            )
+        if value.mode == "intensity" and not parent.has_intensity:
+            raise ValidationError(
+                message=gettext(
+                    "Intensity styling is available only when intensity data is present."
+                )
+            )
+        if value.mode == "return_number" and not parent.has_returns:
+            raise ValidationError(
+                message=gettext(
+                    "Return number styling is available only when return information is present."
+                )
+            )
+
+    def get_info(self):
+        s = super()
+        return (s.get_info() if hasattr(s, "get_info") else ()) + (
+            (gettext("Mode"), self.point_cloud_style_value.mode),
+        )
+
+
+DataScope.read.require(DataScope.read, attr="parent", cls=PointCloudStyle)
+
+
+class ValueAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> PointCloudStyleConfig:
+        return srlzr.obj.point_cloud_style_value
+
+    def set(self, srlzr: Serializer, value: PointCloudStyleConfig, *, create: bool):
+        srlzr.obj.validate_config(value)
+        srlzr.obj.point_cloud_style_value = value
+
+
+class PointCloudStyleSerializer(Serializer, resource=PointCloudStyle):
+    value = ValueAttr(read=ResourceScope.read, write=ResourceScope.update)

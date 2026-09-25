@@ -1,190 +1,282 @@
-#: model.py:42
-#, server
+#: model.py:50
 msgid "Point clouds"
 msgstr "Облака точек"
 
-#: model.py:52 nodepkg/editor-widget/EditorWidget.tsx:353
-#, jsrealm, server
-msgid "Point cloud"
-msgstr "Облако точек"
+#: model.py:60 nodepkg/layer-widget/EditorWidget.tsx:220
+msgid "Point cloud layer"
+msgstr "Слой облака точек"
 
-#: model.py:113
-#, server
-msgid "Spatial reference system could not be detected. Specify it manually."
-msgstr "Не удалось определить систему координат. Укажите её вручную."
-
-#: model.py:184 nodepkg/editor-widget/EditorWidget.tsx:35
-#, jsrealm, server
-msgid "External URL"
-msgstr "Внешний URL"
-
-#: model.py:184
-#, server
-msgid "Upload"
-msgstr "Загрузка"
-
-#: model.py:186
-#, server
-msgid "Source type"
-msgstr "Тип источника"
-
-#: model.py:187
-#, server
+#: model.py:125
 msgid "Point count"
 msgstr "Количество точек"
 
-#: model.py:188
-#, server
+#: model.py:126 nodepkg/layer-widget/EditorWidget.tsx:24
 msgid "Point format"
 msgstr "Формат точек"
 
-#: model.py:191
-#, server
-msgid "EPSG"
-msgstr "EPSG"
+#: model.py:210 nodepkg/style-widget/EditorWidget.tsx:215
+msgid "Point cloud style"
+msgstr "Стиль облака точек"
 
-#: model.py:212
-#, server
-msgid "URL must not be empty."
-msgstr "URL не должен быть пустым."
+#: model.py:226
+msgid "Point size must be greater than zero."
+msgstr "Размер точки должен быть больше нуля."
 
-#: model.py:263
-#, server
-msgid "Specify either an uploaded file or an external URL, not both."
-msgstr "Укажите либо загруженный файл, либо внешний URL, но не оба источника сразу."
+#: model.py:228
+msgid "Opacity must be between 0 and 100."
+msgstr "Непрозрачность должна быть от 0 до 100."
 
-#: model.py:268
-#, server
-msgid "Point cloud source must be provided."
-msgstr "Необходимо указать источник облака точек."
+#: model.py:231
+msgid "Point budget must be between {min} and {max}."
+msgstr "Бюджет точек должен быть от {min} до {max}."
 
-#: nodepkg/editor-widget/EditorWidget.tsx:33
-#, jsrealm
+#: model.py:237
+msgid "Minimum elevation percentile must be between 0 and 100."
+msgstr "Минимальный процентиль высоты должен быть от 0 до 100."
+
+#: model.py:241
+msgid "Maximum elevation percentile must be between 0 and 100."
+msgstr "Максимальный процентиль высоты должен быть от 0 до 100."
+
+#: model.py:246
+msgid "Minimum elevation percentile must be less than maximum percentile."
+msgstr "Минимальный процентиль высоты должен быть меньше максимального процентиля."
+
+#: model.py:253
+msgid "RGB styling is available only for point clouds with RGB data."
+msgstr "Стиль RGB доступен только для облаков точек с данными RGB."
+
+#: model.py:258
+msgid "Classification styling is available only when classification data is present."
+msgstr "Стиль по классификации доступен только при наличии данных классификации."
+
+#: model.py:264
+msgid "Intensity styling is available only when intensity data is present."
+msgstr "Стиль по интенсивности доступен только при наличии данных интенсивности."
+
+#: model.py:270
+msgid "Return number styling is available only when return information is present."
+msgstr ""
+"Стиль по номеру отражения доступен только при наличии информации об "
+"отражениях."
+
+#: model.py:277 nodepkg/style-widget/EditorWidget.tsx:30
+msgid "Mode"
+msgstr "Режим"
+
+#: nodepkg/layer-widget/EditorWidget.tsx:20
 msgid "Select a dataset"
 msgstr "Выберите набор данных"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:34
-#, jsrealm
-msgid "Upload point cloud"
-msgstr "Загрузить облако точек"
+#: nodepkg/layer-widget/EditorWidget.tsx:21
+msgid ""
+"Cloud Optimized Point Cloud (COPC) files with point formats 6, 7, and 8 are "
+"supported."
+msgstr ""
+"Поддерживаются файлы Cloud Optimized Point Cloud (COPC) с форматами точек 6, "
+"7 и 8."
 
-#: nodepkg/editor-widget/EditorWidget.tsx:36
-#, jsrealm
-msgid "Keep existing source"
-msgstr "Сохранить текущий источник"
+#: nodepkg/layer-widget/EditorWidget.tsx:22
+msgid "Inspecting point cloud"
+msgstr "Проверка облака точек"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:37
-#, jsrealm
-msgid "Source URL"
-msgstr "URL источника"
+#: nodepkg/layer-widget/EditorWidget.tsx:23
+msgid "Points"
+msgstr "Точки"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:38
-#, jsrealm
-msgid "Validate file"
-msgstr "Проверить файл"
-
-#: nodepkg/editor-widget/EditorWidget.tsx:39
-#, jsrealm
-msgid "Validate URL"
-msgstr "Проверить URL"
-
-#: nodepkg/editor-widget/EditorWidget.tsx:40
-#, jsrealm
+#: nodepkg/layer-widget/EditorWidget.tsx:25
 msgid "Spatial reference system"
 msgstr "Система координат"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:41
-#, jsrealm
-msgid "Optional by default. Required if the point cloud source has no detectable CRS."
-msgstr "По умолчанию необязательно. Требуется, если для источника облака точек не удаётся определить систему координат."
+#: nodepkg/layer-widget/EditorWidget.tsx:26
+msgid "Coordinate system in the file"
+msgstr "Система координат в файле"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:42
-#, jsrealm
+#: nodepkg/layer-widget/EditorWidget.tsx:27
+msgid "Heights"
+msgstr "Высоты"
+
+#: nodepkg/layer-widget/EditorWidget.tsx:28
 msgid ""
-"The remote server did not confirm CORS/range support for browser access. "
-"Validation on the server succeeded, but client-side streaming may still fail "
-"until CORS headers are fixed."
+"The file has no coordinate system info. Select it manually: a wrong choice "
+"will misplace the point cloud."
 msgstr ""
-"Удалённый сервер не подтвердил поддержку CORS/Range для доступа из браузера. "
-"Проверка на сервере выполнена успешно, но потоковая передача на стороне "
-"клиента может не работать, пока не будут исправлены заголовки CORS."
+"В файле нет информации о системе координат. Выберите её вручную: при неверном"
+" выборе облако точек окажется не на своём месте."
 
-#: nodepkg/editor-widget/EditorWidget.tsx:43
-#, jsrealm
-msgid "Run COPC validation for the uploaded file before saving."
-msgstr "Выполните проверку COPC для загруженного файла перед сохранением."
+#: nodepkg/layer-widget/EditorWidget.tsx:29
+msgid "The coordinate system of the file is not registered in NextGIS Web."
+msgstr "Система координат файла не зарегистрирована в NextGIS Web."
 
-#: nodepkg/editor-widget/EditorWidget.tsx:44
-#, jsrealm
-msgid "Validation has not been run yet."
-msgstr "Проверка ещё не выполнялась."
+#: nodepkg/layer-widget/EditorWidget.tsx:30
+msgid "Add to Web GIS"
+msgstr "Добавить в Веб ГИС"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:45
-#, jsrealm
-msgid "Validation failed"
-msgstr "Проверка не пройдена"
+#: nodepkg/layer-widget/EditorWidget.tsx:31
+msgid "Check again"
+msgstr "Проверить снова"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:46
-#, jsrealm
-msgid "Validation succeeded"
-msgstr "Проверка успешно пройдена"
+#: nodepkg/resource-section/default-style/PointCloudResourceSectionDefaultStyle.tsx:14
+msgid "Create default point cloud style"
+msgstr "Создать стиль облака точек по умолчанию"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:118
-#, jsrealm
-msgid "RGB"
-msgstr "RGB"
+#: nodepkg/resource-section/default-style/PointCloudResourceSectionDefaultStyle.tsx:15
+msgid ""
+"Layer created. You can generate a default point cloud style resource using "
+"the button."
+msgstr ""
+"Слой создан. С помощью кнопки можно создать ресурс стиля облака точек по "
+"умолчанию."
 
-#: nodepkg/editor-widget/EditorWidget.tsx:119
-#, jsrealm
-msgid "Intensity"
-msgstr "Интенсивность"
+#: nodepkg/style-widget/EditorWidget.tsx:31
+msgid "Point size"
+msgstr "Размер точки"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:120
-#, jsrealm
-msgid "Classification"
-msgstr "Классификация"
+#: nodepkg/style-widget/EditorWidget.tsx:32
+msgid "Opacity"
+msgstr "Непрозрачность"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:121
-#, jsrealm
-msgid "Returns"
-msgstr "Отражения"
+#: nodepkg/style-widget/EditorWidget.tsx:33
+msgid "Point budget"
+msgstr "Бюджет точек"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:129
-#, jsrealm
-msgid "Manual SRS is required."
-msgstr "Необходимо вручную указать систему координат."
+#: nodepkg/style-widget/EditorWidget.tsx:34
+msgid "Use percentile clipping"
+msgstr "Использовать отсечение по процентилям"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:139
-#, jsrealm
-msgid "WKT"
-msgstr "WKT"
+#: nodepkg/style-widget/EditorWidget.tsx:35
+msgid "Elevation min percentile"
+msgstr "Минимальный процентиль высоты"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:248
-#, jsrealm
-msgid "Validate point cloud"
-msgstr "Проверить облако точек"
+#: nodepkg/style-widget/EditorWidget.tsx:36
+msgid "Elevation max percentile"
+msgstr "Максимальный процентиль высоты"
 
-#: validation.py:51
-#, server
-msgid "Point cloud support requires the laspy package."
-msgstr "Для поддержки облаков точек требуется пакет laspy."
+#: nodepkg/style-widget/EditorWidget.tsx:37
+msgid "Ramp start color"
+msgstr "Начальный цвет шкалы"
 
-#: validation.py:115
-#, server
+#: nodepkg/style-widget/EditorWidget.tsx:38
+msgid "Ramp end color"
+msgstr "Конечный цвет шкалы"
+
+#: nodepkg/style-widget/EditorWidget.tsx:39
+msgid "Modulate by intensity"
+msgstr "Модулировать по интенсивности"
+
+#: nodepkg/style-widget/EditorWidget.tsx:40
+msgid "Classification colors"
+msgstr "Цвета классов"
+
+#: nodepkg/style-widget/EditorWidget.tsx:56
+msgid "Choose how point cloud colors are calculated."
+msgstr "Выберите способ вычисления цветов облака точек."
+
+#: nodepkg/style-widget/EditorWidget.tsx:57
+msgid "Sets the rendered size of each point."
+msgstr "Задаёт отображаемый размер каждой точки."
+
+#: nodepkg/style-widget/EditorWidget.tsx:58
+msgid "Controls overall transparency of the point cloud."
+msgstr "Управляет общей прозрачностью облака точек."
+
+#: nodepkg/style-widget/EditorWidget.tsx:59
+msgid "Maximum number of points rendered in the current view."
+msgstr "Максимальное количество точек, отображаемых в текущей области просмотра."
+
+#: nodepkg/style-widget/EditorWidget.tsx:60
+msgid "Ignore extreme elevation outliers when coloring points."
+msgstr "Игнорировать экстремальные выбросы высоты при окрашивании точек."
+
+#: nodepkg/style-widget/EditorWidget.tsx:61
+msgid "Lower elevation percentile used for color ramp scaling."
+msgstr "Нижний процентиль высоты для масштабирования цветовой шкалы."
+
+#: nodepkg/style-widget/EditorWidget.tsx:62
+msgid "Upper elevation percentile used for color ramp scaling."
+msgstr "Верхний процентиль высоты для масштабирования цветовой шкалы."
+
+#: nodepkg/style-widget/EditorWidget.tsx:63
+msgid "Color assigned to the lowest elevations in range."
+msgstr "Цвет, назначаемый минимальным высотам диапазона."
+
+#: nodepkg/style-widget/EditorWidget.tsx:64
+msgid "Color assigned to the highest elevations in range."
+msgstr "Цвет, назначаемый максимальным высотам диапазона."
+
+#: nodepkg/style-widget/EditorWidget.tsx:65
+msgid "Adjust colors using point intensity values."
+msgstr "Корректировать цвета с учётом значений интенсивности точек."
+
+#: nodepkg/style-widget/EditorWidget.tsx:66
+msgid "Map classification codes to colors, one per line."
+msgstr "Задайте соответствие кодов классификации цветам, по одному на строку."
+
+#: validation.py:48 validation.py:171
+msgid "Unable to parse the point cloud coordinate system."
+msgstr "Не удалось разобрать систему координат облака точек."
+
+#: validation.py:108
+msgid ""
+"The specified coordinate system does not match the coordinate system of the "
+"point cloud file."
+msgstr ""
+"Указанная система координат не соответствует системе координат файла облака "
+"точек."
+
+#: validation.py:117
+msgid "The point cloud file has no coordinate system info. Specify it manually."
+msgstr "В файле облака точек нет информации о системе координат. Укажите её вручную."
+
+#: validation.py:128
+msgid ""
+"Several matching coordinate systems are registered in NextGIS Web. Specify "
+"one of them."
+msgstr ""
+"В NextGIS Web зарегистрировано несколько подходящих систем координат. Укажите"
+" одну из них."
+
+#: validation.py:136
+msgid ""
+"The point cloud coordinate system could not be identified. Make sure the file"
+" has a recognized EPSG coordinate system."
+msgstr ""
+"Система координат облака точек не может быть определена. Убедитесь, что файл "
+"имеет распознанную систему координат EPSG."
+
+#: validation.py:143
+msgid ""
+"The point cloud coordinate system ({auth}) is not registered in NextGIS Web. "
+"Add it to the list of supported coordinate systems first."
+msgstr ""
+"Система координат облака точек ({auth}) не зарегистрирована в NextGIS Web. "
+"Сначала добавьте её в список поддерживаемых систем координат."
+
+#: validation.py:154
 msgid "Invalid COPC point cloud."
 msgstr "Некорректное облако точек COPC."
 
-#: validation.py:122
-#, server
+#: validation.py:161
 msgid "Only COPC point formats 6, 7, and 8 are supported."
 msgstr "Поддерживаются только форматы точек COPC 6, 7 и 8."
 
-#: validation.py:128
-#, server
+#: validation.py:165
 msgid "The COPC hierarchy is empty or corrupted."
 msgstr "Иерархия COPC пуста или повреждена."
 
-#: validation.py:171
-#, server
-msgid "Only HTTP and HTTPS URLs are supported."
-msgstr "Поддерживаются только URL с протоколами HTTP и HTTPS."
+#: view.py:46
+msgid "Cloud Optimized Point Cloud"
+msgstr "Cloud Optimized Point Cloud"
+
+#: view.py:48
+msgid ""
+"A Cloud Optimized Point Cloud (COPC) is a LAZ file with an internal "
+"organization that allows clients to read only the parts they need using HTTP "
+"range requests. To open it in QGIS, use Layer > Add Layer > Add Point Cloud "
+"Layer, select the HTTP(S) protocol and paste this URL."
+msgstr ""
+"Cloud Optimized Point Cloud (COPC) — это LAZ-файл с внутренней организацией, "
+"которая позволяет клиентам читать только нужные части с помощью HTTP-запросов"
+" диапазонов (range requests). Чтобы открыть его в QGIS, выберите Слой > "
+"Добавить слой > Добавить слой облака точек, укажите протокол HTTP(S) и "
+"вставьте этот URL."

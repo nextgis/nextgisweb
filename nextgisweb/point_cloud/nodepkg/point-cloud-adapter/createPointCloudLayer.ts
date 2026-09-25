@@ -14,7 +14,6 @@ import type { FlatStyle } from "ol/style/flat";
 
 import { isAbortError } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import type { CreateDisplayAdapterLayerOptions } from "@nextgisweb/webmap/DisplayLayerAdapter";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
@@ -26,12 +25,13 @@ import {
   viewportFraction,
 } from "./pointCloudLod";
 import type { HierarchyNodeEntry } from "./pointCloudLod";
-import { createPointCloudCoordinateTransform } from "./pointCloudProjection";
+import { ensurePointCloudProjectionKnown } from "./pointCloudProjection";
 import {
   createFeatureColors,
   getPointCloudLayerStyleVariables,
 } from "./pointCloudStyle";
 import type {
+  PointCloudLayerOptions,
   PointCloudResourceItem,
   PointCloudStyleConfig,
   PointCloudStyleResourceItem,
@@ -39,7 +39,6 @@ import type {
   RawPoint,
 } from "./type";
 
-const DEFAULT_POINT_BUDGET = 120000;
 const PAGE_LOAD_LIMIT = 64;
 const HIERARCHY_NODE_CACHE_LIMIT = 8192;
 const MIN_VIEWPORT_FRACTION = 0.02;
@@ -60,8 +59,7 @@ type BootstrapState = {
   parentId: number;
   sourceUrl: string;
   sourceProjection: string;
-  projectionSource: string;
-  pointCloud: PointCloudResourceItem["point_cloud"] & {};
+  pointCloud: PointCloudResourceItem["point_cloud_layer"] & {};
   styleConfig: PointCloudStyleConfig;
   copc: Awaited<ReturnType<typeof Copc.create>>;
   hierarchyNodes: HierarchyNodeEntry[];
@@ -171,11 +169,8 @@ function summarizePoints(points: RawPoint[]) {
   };
 }
 
-function buildPointCloudSourceUrl(
-  resourceId: number,
-  externalUrl?: string | null
-) {
-  return externalUrl || routeURL("point_cloud.content", resourceId);
+function buildPointCloudSourceUrl(resourceId: number) {
+  return routeURL("point_cloud.copc", resourceId);
 }
 
 function buildPointCloudSourceExtent(
@@ -466,10 +461,7 @@ class PointCloudLayer extends CoreLayer<
   private initializing: Promise<void> | null = null;
   private ready = false;
 
-  constructor(
-    item: LayerItemConfig,
-    options?: CreateDisplayAdapterLayerOptions
-  ) {
+  constructor(item: LayerItemConfig, options?: PointCloudLayerOptions) {
     super(
       item.id !== undefined ? String(item.id) : `point-cloud-${item.styleId}`,
       {
@@ -712,52 +704,36 @@ class PointCloudLayer extends CoreLayer<
         cache: false,
         signal,
       })) as PointCloudResourceItem;
-      const pointCloud = pointCloudItem.point_cloud;
+      const pointCloud = pointCloudItem.point_cloud_layer;
       if (!pointCloud) {
         throw new Error("Point cloud resource metadata is missing.");
       }
 
-      const {
-        sourceProjection,
-        projectionSource,
-        transform,
-        inverseTransform,
-      } = createPointCloudCoordinateTransform(
-        pointCloud,
-        this.targetProjection
-      );
-      const sourceUrl = buildPointCloudSourceUrl(
-        parentId,
-        pointCloud.external_url
-      );
+      const sourceProjection = ensurePointCloudProjectionKnown(pointCloud);
+      const sourceUrl = buildPointCloudSourceUrl(parentId);
 
       logInfo("point cloud loaded", {
         resourceId: pointCloudItem.resource.id,
         sourceUrl,
         sourceProjection,
-        projectionSource,
         targetProjection: this.targetProjection,
         pointCloud,
       });
 
-      const transformCoordinate =
-        transform ??
-        ((coordinate: [number, number]) => {
-          const [x, y] = getTransform(
-            sourceProjection,
-            this.targetProjection
-          )(coordinate);
-          return [x, y] as [number, number];
-        });
-      const inverseTransformCoordinate =
-        inverseTransform ??
-        ((coordinate: [number, number]) => {
-          const [x, y] = getTransform(
-            this.targetProjection,
-            sourceProjection
-          )(coordinate);
-          return [x, y] as [number, number];
-        });
+      const transformCoordinate = (coordinate: [number, number]) => {
+        const [x, y] = getTransform(
+          sourceProjection,
+          this.targetProjection
+        )(coordinate);
+        return [x, y] as [number, number];
+      };
+      const inverseTransformCoordinate = (coordinate: [number, number]) => {
+        const [x, y] = getTransform(
+          this.targetProjection,
+          sourceProjection
+        )(coordinate);
+        return [x, y] as [number, number];
+      };
 
       const getter = createRangeGetter(sourceUrl, signal);
       const copc = await Copc.create(getter);
@@ -788,7 +764,6 @@ class PointCloudLayer extends CoreLayer<
         parentId,
         sourceUrl,
         sourceProjection,
-        projectionSource,
         pointCloud,
         styleConfig,
         copc,
@@ -859,8 +834,7 @@ class PointCloudLayer extends CoreLayer<
     force: boolean
   ) {
     const viewState = this.getCurrentViewState(bootstrap);
-    const pointBudget =
-      bootstrap.styleConfig.point_budget ?? DEFAULT_POINT_BUDGET;
+    const pointBudget = bootstrap.styleConfig.point_budget;
     const selection = selectHierarchyNodesForView(
       bootstrap.hierarchyNodes,
       viewState.extent,
@@ -1006,7 +980,7 @@ class PointCloudLayer extends CoreLayer<
 
 export function createPointCloudLayer(
   item: LayerItemConfig,
-  options?: CreateDisplayAdapterLayerOptions
+  options?: PointCloudLayerOptions
 ) {
   return new PointCloudLayer(item, options);
 }

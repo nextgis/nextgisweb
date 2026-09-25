@@ -20,7 +20,7 @@ export interface HierarchyNodeEntry {
   spacing: number;
 }
 
-export interface PointCloudViewSelection {
+interface PointCloudViewSelection {
   selectedNodes: HierarchyNodeEntry[];
   targetLevel: number;
   targetSpacing: number;
@@ -171,10 +171,7 @@ export function buildHierarchyNodeEntry(
   };
 }
 
-export function computeSourceResolution(
-  extent: Extent,
-  size: [number, number]
-) {
+function computeSourceResolution(extent: Extent, size: [number, number]) {
   const width = Math.max(extent[2] - extent[0], 1);
   const height = Math.max(extent[3] - extent[1], 1);
   return Math.max(width / Math.max(size[0], 1), height / Math.max(size[1], 1));
@@ -196,7 +193,7 @@ function getLevelSpacing(nodes: HierarchyNodeEntry[]) {
     .sort((a, b) => a.level - b.level);
 }
 
-export function estimateTargetLevel(
+function estimateTargetLevel(
   nodes: HierarchyNodeEntry[],
   extent: Extent,
   size: [number, number]

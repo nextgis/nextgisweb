@@ -1,3 +1,13 @@
+import type { CreateDisplayAdapterLayerOptions } from "@nextgisweb/webmap/DisplayLayerAdapter";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
+
+// Options not provided by the webmap display yet, to be added along with the
+// webmap integration of point clouds
+export interface PointCloudLayerOptions extends CreateDisplayAdapterLayerOptions {
+  mapProjection?: string;
+  mapStore?: MapStore;
+}
+
 export interface PointCloudStyleClassificationColor {
   code: number;
   color: string;
@@ -7,7 +17,7 @@ export interface PointCloudStyleConfig {
   mode: "elevation" | "classification" | "intensity" | "rgb" | "return_number";
   point_size: number;
   opacity: number;
-  point_budget?: number;
+  point_budget: number;
   use_percentile_clip: boolean;
   elevation_min_percent: number;
   elevation_max_percent: number;
@@ -17,16 +27,13 @@ export interface PointCloudStyleConfig {
   classification_colors: PointCloudStyleClassificationColor[];
 }
 
-export interface PointCloudSrsRef {
+interface PointCloudSrsRef {
   id: number;
 }
 
 export interface PointCloudResourceData {
-  srs?: PointCloudSrsRef | null;
+  srs: PointCloudSrsRef;
   srs_proj4?: string | null;
-  external_url?: string | null;
-  epsg?: number | null;
-  wkt?: string | null;
   minx: number;
   miny: number;
   maxx: number;
@@ -39,11 +46,11 @@ export interface PointCloudResourceData {
   has_returns: boolean;
 }
 
-export interface PointCloudStyleResourceData {
+interface PointCloudStyleResourceData {
   value: PointCloudStyleConfig;
 }
 
-export interface ResourceParentRef {
+interface ResourceParentRef {
   id: number;
 }
 
@@ -53,7 +60,7 @@ export interface PointCloudResourceItem {
     cls: string;
     parent?: ResourceParentRef | null;
   };
-  point_cloud?: PointCloudResourceData;
+  point_cloud_layer?: PointCloudResourceData;
 }
 
 export interface PointCloudStyleResourceItem {
