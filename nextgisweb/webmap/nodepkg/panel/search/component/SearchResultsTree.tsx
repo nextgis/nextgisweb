@@ -8,6 +8,8 @@ import type { Display } from "@nextgisweb/webmap/display";
 
 import type { SearchResult, SearchResultGroup } from "../type";
 
+import { SearchResultPopover } from "./SearchResultPopover";
+
 import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
 import LayersIcon from "@nextgisweb/icon/material/layers";
 import LocationOnIcon from "@nextgisweb/icon/material/location_on";
@@ -70,28 +72,47 @@ export function SearchResultsTree({
         ? { resourceId: group.resourceId, featureId: resultInfo.featureId }
         : undefined;
 
+    const title = (
+      <Row className="tree-item-row" wrap={false} gutter={6}>
+        <Col className="tree-item-title tree-item-title-grow">
+          {resultInfo.label}
+        </Col>
+        {identify && (
+          <Col
+            className="tree-item-action"
+            title={gettext("Identify object")}
+            onClick={(e) =>
+              onIdentifyIconClick(e, identify.resourceId, identify.featureId)
+            }
+          >
+            <IdentifyIcon />
+          </Col>
+        )}
+      </Row>
+    );
+
+    const searchContext = resultInfo.searchContext;
+
     return {
       key: resultInfo.key,
       isLeaf: true,
       result: resultInfo,
-      title: (
-        <Row className="tree-item-row" wrap={false} gutter={6}>
-          <Col className="tree-item-title tree-item-title-grow">
-            {resultInfo.label}
-          </Col>
-          {identify && (
-            <Col
-              className="tree-item-action"
-              title={gettext("Identify object")}
-              onClick={(e) =>
-                onIdentifyIconClick(e, identify.resourceId, identify.featureId)
-              }
-            >
-              <IdentifyIcon />
-            </Col>
-          )}
-        </Row>
-      ),
+      title:
+        group.type === "layers" &&
+        group.resourceId !== undefined &&
+        resultInfo.featureId !== undefined &&
+        searchContext &&
+        searchContext.length > 0 ? (
+          <SearchResultPopover
+            resourceId={group.resourceId}
+            featureId={resultInfo.featureId}
+            searchContext={searchContext}
+          >
+            {title}
+          </SearchResultPopover>
+        ) : (
+          title
+        ),
     };
   };
 
