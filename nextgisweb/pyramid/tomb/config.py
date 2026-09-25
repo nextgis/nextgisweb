@@ -161,13 +161,7 @@ class Configurator(PyramidConfigurator):
     def setup_registry(self, *args, **kwargs):
         super().setup_registry(*args, **kwargs)
 
-        def path_param(request: Request):
-            for p in request.matched_route.predicates:
-                if isinstance(p, RouteMeta):
-                    md = request.matchdict
-                    return {k: v(md[k]) for k, v in p.path_decoders}
-
-        self.add_request_method(path_param, property=True)
+        self.set_request_factory(Request)
 
         def execution_policy(environ, router):
             with router.request_context(environ) as request:

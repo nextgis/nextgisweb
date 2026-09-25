@@ -1,35 +1,61 @@
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
+from functools import cached_property
+from secrets import token_hex
 from typing import TYPE_CHECKING, Any, overload
 
 from pyramid.request import Request as BaseRequest
 
 from nextgisweb.env import Env
+from nextgisweb.lib.apitype import QueryString
 
-if not TYPE_CHECKING:
-    Request = BaseRequest
+from nextgisweb.i18n import Localizer
 
-else:
-    from nextgisweb.auth import User
+from .predicate import RouteMeta
 
-    from .response import Response
 
-    class Request[C](BaseRequest):
-        @property
-        def env(self) -> Env: ...
+class Request[C](BaseRequest):
+    @cached_property
+    def env(self) -> Env:
+        return self.registry.settings["pyramid.env"]
 
-        @property
-        def request_id(self) -> str: ...
+    @cached_property
+    def request_id(self) -> str:
+        return token_hex(8)
 
-        @property
-        def is_api(self) -> bool: ...
+    @cached_property
+    def is_api(self) -> bool:
+        return self.path_info.lower().startswith("/api/")
 
-        @property
-        def path_param(self) -> Mapping[str, Any]: ...
+    @cached_property
+    def qs_parser(self) -> QueryString:
+        return QueryString(self.environ["QUERY_STRING"])
+
+    @cached_property
+    def path_param(self) -> Mapping[str, Any]:
+        for p in self.matched_route.predicates:
+            if isinstance(p, RouteMeta):
+                md = self.matchdict
+                return {k: v(md[k]) for k, v in p.path_decoders}
+        assert False, "RouteMeta predicate not found"
+
+    @cached_property
+    def localizer(self) -> Localizer:
+        return self.registry.settings["pyramid.localizer"](self.locale_name)
+
+    @cached_property
+    def translate(self) -> Callable[[Any], str]:
+        return self.localizer.translate
+
+    if TYPE_CHECKING:
+        from nextgisweb.auth import User
+
+        from .response import Response
 
         @property
         def context(self) -> C: ...
 
-        def translate(self, value) -> Any: ...
+        @property
+        def locale_name(self) -> str: ...
 
         @property
         def user(self) -> User: ...

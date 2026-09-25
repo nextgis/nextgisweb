@@ -29,9 +29,16 @@ class PyramidComponent(Component):
         super().__init__(env, settings)
 
     def make_app(self, settings={}):
-        settings = dict(self._settings, **settings)
-        settings["pyramid.started"] = utcnow_naive().timestamp()
-        settings["pyramid.static_map"] = StaticMap()
+        core = self.env.component(CoreComponent)
+        settings = {
+            **self._settings,
+            **settings,
+            "pyramid.env": self.env,
+            "pyramid.localizer": core.localizer,
+            "pyramid.started": utcnow_naive().timestamp(),
+            "pyramid.static_map": StaticMap(),
+        }
+
         config = Configurator(settings=settings)
 
         # Setup pyramid app for other components

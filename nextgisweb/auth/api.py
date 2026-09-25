@@ -347,8 +347,7 @@ def user_cget(request: Request, *, brief: Brief = False) -> UserCGetResponse:
         q = q.filter_by(system=True)
 
     cls = UserReadBrief if brief else UserRead
-    tr = request.translate
-    return [serialize_principal(o, cls, tr=tr) for o in q]
+    return [serialize_principal(o, cls, tr=request.translate) for o in q]
 
 
 def user_cpost(request: Request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(201)]:
@@ -465,8 +464,7 @@ def group_cget(request: Request, *, brief: Brief = False) -> GroupCGetResponse:
         q = q.filter_by(system=True)
 
     cls = GroupReadBrief if brief else GroupRead
-    tr = request.translate
-    return [serialize_principal(o, cls, tr=tr) for o in q]
+    return [serialize_principal(o, cls, tr=request.translate) for o in q]
 
 
 def group_cpost(request: Request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode(201)]:

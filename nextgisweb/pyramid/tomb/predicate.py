@@ -9,7 +9,8 @@ from pyramid.predicates import as_sorted_tuple
 
 from nextgisweb.lib.apitype import PathParam, QueryParam
 
-from .request import Request
+if TYPE_CHECKING:
+    from .request import Request
 
 
 class MetaPredicateBase:

@@ -4,7 +4,6 @@ from base64 import b64decode
 from datetime import timedelta
 from functools import cache
 from hashlib import md5
-from secrets import token_hex
 from time import sleep
 from typing import Iterable, Protocol
 
@@ -20,7 +19,7 @@ from sqlalchemy.exc import NoResultFound
 from nextgisweb.env import Component, DBSession, gettext, inject
 from nextgisweb.env.hook import ComponentHook, ComponentHookProtocol
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.apitype import JSONType, QueryString
+from nextgisweb.lib.apitype import JSONType
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.json import dumps
@@ -571,17 +570,6 @@ def setup_pyramid(comp: PyramidComponent, config: Configurator):
         over="MAIN",
     )
 
-    # COMMON REQUEST'S ATTRIBUTES
-
-    request_id = lambda req: token_hex(8)
-    qs_parser = lambda req: QueryString(req.environ["QUERY_STRING"])
-    is_api = lambda req: req.path_info.lower().startswith("/api/")
-
-    config.add_request_method(request_id, "request_id", property=True)
-    config.add_request_method(qs_parser, "qs_parser", property=True)
-    config.add_request_method(lambda req: env, "env", property=True)
-    config.add_request_method(is_api, "is_api", property=True)
-
     # ERROR HANGLING
 
     from nextgisweb.auth import view as auth_view
@@ -604,18 +592,6 @@ def setup_pyramid(comp: PyramidComponent, config: Configurator):
     comp.client_type(exception.ErrorResponse)
 
     # INTERNATIONALIZATION
-
-    # Substitute localizer from pyramid with our own, original is
-    # too tied to translationstring, that works strangely with string
-    # interpolation via % operator.
-    def localizer(request: Request, localizer=core.localizer):
-        return localizer(request.locale_name)
-
-    def translate(request: Request):
-        return request.localizer.translate
-
-    config.add_request_method(localizer, "localizer", property=True)
-    config.add_request_method(translate, "translate", property=True)
 
     lg_default = core.locale_default
     lg_ordered = sorted(

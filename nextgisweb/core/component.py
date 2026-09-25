@@ -127,7 +127,7 @@ class CoreComponent(StorageComponentMixin, Component):
         fpath = os.path.join(base, path)
         os.makedirs(fpath, exist_ok=True)
 
-    def localizer(self, locale=None):
+    def localizer(self, locale=None) -> Localizer:
         if locale is None:
             locale = self.locale_default
         if not hasattr(self, "_localizer"):
