@@ -1,4 +1,4 @@
-from nextgisweb.feature_layer import IFeatureLayer, IFeatureQueryLike
+from nextgisweb.feature_layer import IFeatureLayer, IFilterableFeatureLayer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import DataScope
 
@@ -13,5 +13,5 @@ class FeatureLayerPlugin(WebmapLayerPlugin):
         if IFeatureLayer.providedBy(layer):
             return dict(
                 readonly=not layer.has_permission(DataScope.write, user),
-                likeSearch=IFeatureQueryLike.providedBy(layer.feature_query()),
+                likeSearch=IFilterableFeatureLayer.providedBy(layer),
             )

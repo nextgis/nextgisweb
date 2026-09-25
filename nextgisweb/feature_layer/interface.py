@@ -211,29 +211,9 @@ class IFeatureQuery(Interface):  # ty: ignore[unsupported-base]
         """Include extent in request result"""
 
 
-class IFeatureQueryFilter(IFeatureQuery):
-    def filter(self, *args):
-        """Set query rules"""
-
-
-class IFeatureQueryFilterBy(IFeatureQuery):
-    def filter_by(self, **kwargs):
-        """Set query by attributes"""
-
-
 class IFeatureQueryOrderBy(IFeatureQuery):
     def order_by(self, *args):
         """Set sort order"""
-
-
-class IFeatureQueryLike(IFeatureQuery):
-    def like(self, value):
-        """Set query by substring"""
-
-
-class IFeatureQueryIlike(IFeatureQuery):
-    def ilike(self, value):
-        """Set query by substring"""
 
 
 class IFeatureQueryIntersects(IFeatureQuery):

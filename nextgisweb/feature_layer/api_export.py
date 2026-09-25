@@ -2,7 +2,7 @@ import os
 import tempfile
 import zipfile
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal, ogr
@@ -11,6 +11,7 @@ from sqlalchemy.exc import NoResultFound
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.apitype import ContentType, Query, make_literal
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
+from nextgisweb.lib.json import loads as json_loads
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.tomb import Configurator, FileResponse, Request, Response
@@ -21,8 +22,8 @@ from nextgisweb.spatial_ref_sys.api import SRSID
 
 from .component import FeatureLayerComponent
 from .feature import Feature
-from .filter import FilterParser
-from .interface import IFeatureLayer, IFeatureQueryIlike, IFilterableFeatureLayer
+from .filter import FilterParser, str_contains_filter
+from .interface import IFeatureLayer, IFilterableFeatureLayer
 from .model import LayerField
 from .ogrdriver import EXPORT_FORMAT_OGR, OGRDriver
 from .util import unique_name
@@ -286,16 +287,21 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str, *, us
             intersects_geom = options.intersects_geom
         query.intersects(intersects_geom)
 
-    if options.ilike is not None and IFeatureQueryIlike.providedBy(query):
-        query.ilike(options.ilike)
-
-    if options.filter is not None:
+    if options.ilike is not None or options.filter is not None:
         if not IFilterableFeatureLayer.providedBy(resource):
             raise ValidationError(message=gettext("Filter expressions are not supported."))
 
-        filter_parser = FilterParser.from_resource(resource, user=user)
-        filter_program = filter_parser.parse(options.filter)
-        query.set_filter_program(filter_program)
+        expr_parts: list[Any] = []
+        if options.ilike is not None:
+            expr_parts.append(["text_search", options.ilike])
+        if options.filter is not None and str_contains_filter(options.filter):
+            expr_parts.append(json_loads(options.filter))
+
+        if expr_parts:
+            combined = expr_parts[0] if len(expr_parts) == 1 else ["all", *expr_parts]
+            filter_parser = FilterParser.from_resource(resource, user=user)
+            filter_program = filter_parser.parse(combined)
+            query.set_filter_program(filter_program)
 
     if options.fields is not None:
         query.fields(*options.fields)

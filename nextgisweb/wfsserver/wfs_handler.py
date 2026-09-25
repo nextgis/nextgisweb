@@ -3,6 +3,7 @@ from contextlib import ExitStack
 from datetime import date, datetime, time
 from os import path
 from tempfile import NamedTemporaryFile
+from typing import Any
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
@@ -30,6 +31,7 @@ from nextgisweb.feature_layer import (
     Feature,
     IFeatureLayer,
 )
+from nextgisweb.feature_layer.filter import FilterParser
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid.tomb import Request
 from nextgisweb.resource import DataScope
@@ -998,14 +1000,40 @@ class WFSHandler:
 
         if len(__filters) == 1:
             result = self._parse_filter(__filters[0], layer)
+            conditions: list[Any] = []
             if len(result["fids"]) > 0:
-                query.filter(("id", "in", ",".join(str(fid) for fid in result["fids"])))
+                conditions.append(["in", ["fid"], *result["fids"]])
             if result["intersects"] is not None:
                 if self.p_bbox is not None:
                     raise ValidationError("Parameters conflict: BBOX, Intersects")
                 query.intersects(result["intersects"])
-            if len(result["filter"]) > 0:
-                query.filter(*result["filter"])
+            for k, op, v in result["filter"]:
+                left = ["fid"] if k == "id" else ["get", k]
+                if op == "eq":
+                    conditions.append(["==", left, v])
+                elif op == "ne":
+                    conditions.append(["!=", left, v])
+                elif op == "isnull":
+                    conditions.append(["is_null", left])
+                elif op == "gt":
+                    conditions.append([">", left, v])
+                elif op == "ge":
+                    conditions.append([">=", left, v])
+                elif op == "lt":
+                    conditions.append(["<", left, v])
+                elif op == "le":
+                    conditions.append(["<=", left, v])
+                elif op == "like":
+                    conditions.append(["like", left, v])
+                elif op == "ilike":
+                    conditions.append(["ilike", left, v])
+                else:
+                    raise ValidationError("Operator '%s' is not supported." % op)
+            if len(conditions) > 0:
+                expr = conditions[0] if len(conditions) == 1 else ["all", *conditions]
+                query.set_filter_program(
+                    FilterParser.from_resource(feature_layer, user=self.request.user).parse(expr)
+                )
         elif len(__filters) > 1:
             raise ValidationError("Multiple filters not supported.")
 
@@ -1268,7 +1296,7 @@ class WFSHandler:
                                 "Multiple features not supported in update transaction"
                             )
                         query = feature_layer.feature_query()
-                        query.filter_by(id=fids[0])
+                        query.set_filter_program(FilterParser([]).parse(["==", ["fid"], fids[0]]))
 
                         feature = query().one()
 

@@ -33,8 +33,6 @@ from nextgisweb.feature_layer import (
     FeatureSet,
     IFeatureLayer,
     IFeatureQuery,
-    IFeatureQueryFilter,
-    IFeatureQueryFilterBy,
     IFeatureQueryIntersects,
     LayerField,
 )
@@ -706,8 +704,6 @@ class WFSLayerSerializer(Serializer, resource=WFSLayer):
 
 @implementer(
     IFeatureQuery,
-    IFeatureQueryFilter,
-    IFeatureQueryFilterBy,
     IFeatureQueryIntersects,
 )
 class FeatureQueryBase(FeatureQueryIntersectsMixin):
@@ -721,10 +717,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._limit = None
         self._offset = None
 
-        self._filter = None
-
-        self._filter_by = None
-
+        self._filter_program = None
         self._intersects = None
 
     def fields(self, *args):
@@ -747,24 +740,70 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def box(self):
         self._box = True
 
-    def filter(self, *args):
-        self._filter = list(args)
-
-    def filter_by(self, **kwargs):
-        self._filter_by = kwargs
+    def set_filter_program(self, program):
+        self._filter_program = program
 
     def __call__(self):
         params = dict()
-        if self._filter_by is not None:
-            if "id" in self._filter_by:
-                params["fid"] = self._filter_by.pop("id")
-            if len(self._filter_by) > 0:
-                if self._filter is None:
-                    self._filter = list()
-                for k, v in self._filter_by.items():
-                    self._filter.append((k, "eq", v))
-        if self._filter is not None and len(self._filter) > 0:
-            params["filter_"] = self._filter
+        filter_list = None
+        fid = None
+        if self._filter_program is not None:
+            # Minimal translation: flatten simple AND of conditions to old tuple form where possible
+            root = self._filter_program._root if hasattr(self._filter_program, "_root") else None
+            conditions = []
+            if root is not None:
+                from nextgisweb.feature_layer import filter as flt
+
+                def _operand(node):
+                    # Returns (key, literal) when the node is a field or fid
+                    # reference on one side and a literal on the other, else (None, None)
+                    if isinstance(node, flt.FieldNode):
+                        return node.field.key, True
+                    if isinstance(node, flt.FidNode):
+                        return "id", True
+                    return None, False
+
+                def _extract(node):
+                    nonlocal fid
+                    if isinstance(node, flt.AndNode):
+                        for c in node.children:
+                            _extract(c)
+                        return
+                    if isinstance(node, flt.EqualNode):
+                        left, right = node.left, node.right
+                        if isinstance(left, flt.LiteralNode):
+                            left, right = right, left
+                        if isinstance(left, flt.FidNode) and isinstance(right, flt.LiteralNode):
+                            fid = right.value
+                        elif (
+                            key := left.field.key if isinstance(left, flt.FieldNode) else None
+                        ) and (isinstance(right, flt.LiteralNode)):
+                            conditions.append((key, "eq", right.value))
+                        return
+                    for op in (
+                        (flt.NotEqualNode, "ne"),
+                        (flt.GreaterNode, "gt"),
+                        (flt.GreaterEqualNode, "ge"),
+                        (flt.LessNode, "lt"),
+                        (flt.LessEqualNode, "le"),
+                    ):
+                        if isinstance(node, op[0]):
+                            key, has_key = _operand(node.left)
+                            if has_key and isinstance(node.right, flt.LiteralNode):
+                                conditions.append((key, op[1], node.right.value))
+                            return
+                    if isinstance(node, flt.IsNullNode) and isinstance(
+                        node.operand, flt.FieldNode
+                    ):
+                        conditions.append((node.operand.field.key, "isnull", "yes"))
+
+                _extract(root)
+            if conditions:
+                filter_list = conditions
+        if fid is not None:
+            params["fid"] = fid
+        if filter_list is not None:
+            params["filter_"] = filter_list
         if self._limit is not None:
             params["limit"] = self._limit
             params["offset"] = self._offset

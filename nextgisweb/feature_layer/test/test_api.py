@@ -338,6 +338,9 @@ def test_filter(ngw_webtest_app: WebTestApp, vector_layer_id):
 
     ngw_webtest_app.get(url_feature, query=dict(fld_not_exists="no matter"), status=422)
 
+    # The 'startswith' operator is not supported in the new filter format
+    ngw_webtest_app.get(url_feature, query=dict(fld_price__startswith=1), status=422)
+
 
 def test_feature_delete(ngw_webtest_app: WebTestApp, vector_layer_id):
     url_feature = f"/api/resource/{vector_layer_id}/feature/"

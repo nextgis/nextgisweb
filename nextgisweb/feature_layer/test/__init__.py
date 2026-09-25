@@ -7,6 +7,7 @@ import pytest
 
 from nextgisweb.env.test import fixture_value
 
+from nextgisweb.feature_layer.filter import FilterParser, legacy_to_expression
 from nextgisweb.pyramid.test import WebTestApp
 
 
@@ -149,3 +150,13 @@ def parametrize_versioning():
             pytest.param(True, id="versioning_enabled"),
         ],
     )
+
+
+def legacy_to_program(layer, filter_):
+    """Translate a sequence of legacy (key, operator, value) tuples into a
+    FilterProgram."""
+    conditions = legacy_to_expression(layer, filter_)
+    if not conditions:
+        return None
+    expr = conditions[0] if len(conditions) == 1 else ["all", *conditions]
+    return FilterParser.from_resource(layer).parse(expr)

@@ -26,13 +26,11 @@ from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
 from .feature import Feature
-from .filter import FilterParser, str_contains_filter
+from .filter import FilterParser, legacy_to_expression, str_contains_filter
 from .interface import (
     FIELD_TYPE,
     IAggregatableFeatureQuery,
     IFeatureLayer,
-    IFeatureQueryIlike,
-    IFeatureQueryLike,
     IFilterableFeatureLayer,
     IWritableFeatureLayer,
 )
@@ -266,7 +264,9 @@ class Dumper:
 def query_feature_or_not_found(query, resource_id, feature_id):
     """Query one feature by id or return FeatureNotFound exception."""
 
-    query.filter_by(id=feature_id)
+    # Only the "fid" operand is used, so no field metadata is required
+    filter_program = FilterParser([]).parse(["==", ["fid"], feature_id])
+    query.set_filter_program(filter_program)
     query.limit(1)
 
     for feat in query():
@@ -404,7 +404,7 @@ def geometry_info(resource, request: Request, fid: FeatureID) -> JSONType:
     return dict(type=geom_type, area=area, length=length, extent=extent)
 
 
-def apply_fields_filter(query, request: Request):
+def _legacy_fields_filter_to_expression(resource, request: Request) -> list[Any] | None:
     filter_ = []
     for param in request.GET.keys():
         if param.startswith("fld_"):
@@ -417,23 +417,31 @@ def apply_fields_filter(query, request: Request):
         try:
             key, operator = fld_expr.rsplit("__", 1)
         except ValueError:
-            key, operator = (fld_expr, "eq")
-
-        if key != "id":
-            try:
-                query.layer.field_by_keyname(key)
-            except KeyError:
-                raise ValidationError(message="Unknown field '%s'." % key)
+            key, operator = ("id" if fld_expr == "id" else fld_expr, "eq")
 
         filter_.append((key, operator, request.GET[param]))
 
-    if len(filter_) > 0:
-        query.filter(*filter_)
+    conditions = legacy_to_expression(resource, filter_)
 
-    if "like" in request.GET and IFeatureQueryLike.providedBy(query):
-        query.like(request.GET["like"])
-    elif "ilike" in request.GET and IFeatureQueryIlike.providedBy(query):
-        query.ilike(request.GET["ilike"])
+    if "like" in request.GET:
+        value = request.GET["like"]
+        conditions.append(["text_search", value, {"case_sensitive": True}])
+    if "ilike" in request.GET:
+        value = request.GET["ilike"]
+        conditions.append(["text_search", value])
+
+    if not conditions:
+        return None
+    if len(conditions) == 1:
+        return conditions[0]
+    return ["all", *conditions]
+
+
+def apply_fields_filter(query, request: Request):
+    # Kept for compatibility if called directly; new code should not use.
+    expr = _legacy_fields_filter_to_expression(query.layer, request)
+    if expr is not None:
+        apply_filter_expression(query, query.layer, expr, user=request.user)
 
 
 def _filter_expression(filter: str | None, text_search: str | None) -> Any:
@@ -518,12 +526,19 @@ def cget(
     if limit is not None:
         query.limit(limit, offset)
 
-    apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
 
-    program = apply_filter_expression(
-        query, resource, _filter_expression(filter, text_search), user=request.user
-    )
+    expr_parts: list[Any] = []
+    if (legacy := _legacy_fields_filter_to_expression(resource, request)) is not None:
+        expr_parts.append(legacy)
+    if (fe := _filter_expression(filter, text_search)) is not None:
+        expr_parts.append(fe)
+
+    program = None
+    if expr_parts:
+        combined = expr_parts[0] if len(expr_parts) == 1 else ["all", *expr_parts]
+        program = apply_filter_expression(query, resource, combined, user=request.user)
+
     if text_search_context is not None:
         if text_search is None:
             raise ValidationError(
@@ -654,8 +669,11 @@ def has_filters(request: Request, filter, text_search=None):
         return True
     if "intersects" in request.GET:
         return True
-    if request.content_type == "application/json" and "intersects" in request.json_body:
-        return True
+    try:
+        if request.content_type == "application/json" and "intersects" in request.json_body:
+            return True
+    except Exception:
+        pass
     for param in request.GET.keys():
         if param.startswith("fld_") or param == "id" or param.startswith("id__"):
             return True
@@ -690,11 +708,15 @@ def count(
 
     if has_filters(request, filter, text_search):
         filtered_query = resource.feature_query()
-        apply_fields_filter(filtered_query, request)
         apply_intersect_filter(filtered_query, request, resource)
-        apply_filter_expression(
-            filtered_query, resource, _filter_expression(filter, text_search), user=request.user
-        )
+        expr_parts: list[Any] = []
+        if (legacy := _legacy_fields_filter_to_expression(resource, request)) is not None:
+            expr_parts.append(legacy)
+        if (fe := _filter_expression(filter, text_search)) is not None:
+            expr_parts.append(fe)
+        if expr_parts:
+            combined = expr_parts[0] if len(expr_parts) == 1 else ["all", *expr_parts]
+            apply_filter_expression(filtered_query, resource, combined, user=request.user)
         result.filtered_count = filtered_query().total_count
 
     return result
@@ -732,9 +754,15 @@ def cextent(resource, request: Request) -> NgwExtent:
 
     query = resource.feature_query()
 
-    apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
-    apply_filter_expression(query, resource, request.GET.get("filter"), user=request.user)
+    expr_parts: list[Any] = []
+    if (legacy := _legacy_fields_filter_to_expression(resource, request)) is not None:
+        expr_parts.append(legacy)
+    if (fparam := request.GET.get("filter")) is not None and str_contains_filter(fparam):
+        expr_parts.append(json_loads(fparam))
+    if expr_parts:
+        combined = expr_parts[0] if len(expr_parts) == 1 else ["all", *expr_parts]
+        apply_filter_expression(query, resource, combined, user=request.user)
 
     extent = query().extent
     return NgwExtent(**extent)

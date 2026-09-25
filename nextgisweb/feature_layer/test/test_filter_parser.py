@@ -121,6 +121,7 @@ def test_get_supported_operators():
         "ilike",
         "in",
         "is_null",
+        "like",
         "text_search",
     }
     assert operators == expected
