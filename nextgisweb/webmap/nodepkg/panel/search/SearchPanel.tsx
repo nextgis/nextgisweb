@@ -96,7 +96,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
   const availableLayers = useMemo(
     () =>
-      getSearchableLayers(display).map((item) => ({
+      getSearchableLayers(display.treeStore).map((item) => ({
         id: item.layerId,
         label: item.label,
       })),

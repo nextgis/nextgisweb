@@ -19,7 +19,7 @@ export const searchByLayers: SearchFunction = async (
   geoJSON,
   settings
 ) => {
-  const items = getUsedLayers(display, settings.usedLayers);
+  const items = getUsedLayers(display.treeStore, settings.usedLayers);
   const requests: {
     layerName: string;
     layerId: number;
