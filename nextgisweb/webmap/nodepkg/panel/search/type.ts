@@ -8,6 +8,7 @@ export type SearchResultGroup = {
   type: "layers" | "place" | "public";
   label: string;
   resourceId?: number;
+  styleId?: number;
   identifiable?: boolean;
   children: SearchResult[];
 };
