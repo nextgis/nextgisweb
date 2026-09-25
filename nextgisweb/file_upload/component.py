@@ -24,20 +24,6 @@ class FileUploadComponent(Component):
         if "path" not in self.options:
             self.env.component(CoreComponent).mksdir(self)
 
-        # FIXME: Force migration
-        from importlib.machinery import SourceFileLoader
-        from types import SimpleNamespace
-
-        mod = SourceFileLoader(
-            "",
-            os.path.join(
-                os.path.split(__file__)[0],
-                "migration",
-                "3803b726-cleanup-prev-format.py",
-            ),
-        ).load_module()
-        mod.forward(SimpleNamespace(env=self.env))
-
     def setup_pyramid(self, config):
         from . import api, view  # noqa: F401
 
