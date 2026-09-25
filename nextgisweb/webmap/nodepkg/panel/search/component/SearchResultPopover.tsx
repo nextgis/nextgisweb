@@ -73,7 +73,7 @@ export function SearchResultPopover({
       styles={{ root: { width: 300 } }}
       onOpenChange={onOpenChange}
       title={msgTitle}
-      content={popoverContent}
+      content={<div onClick={(e) => e.stopPropagation()}>{popoverContent}</div>}
     >
       {children}
     </Popover>
