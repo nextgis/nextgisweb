@@ -1,8 +1,11 @@
+from collections.abc import Iterable
 from enum import Enum
+from itertools import chain
 from typing import Annotated
 
 from lxml.builder import ElementMaker
 from lxml.etree import QName, tostring
+from lxml.etree import _Element as Element
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, to_builtins
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -41,32 +44,32 @@ class Stroke(Struct):
     width: Size = UNSET
     dash_pattern: DashPattern = UNSET
 
-    def xml(self):
-        _stroke = E_SE.Stroke()
+    def xml(self) -> Element:
+        result = E_SE.Stroke()
         if self.color is not UNSET:
-            _stroke.append(E_SE.SvgParameter(dict(name="stroke"), self.color))
+            result.append(E_SE.SvgParameter(dict(name="stroke"), self.color))
         if self.opacity is not UNSET:
-            _stroke.append(E_SE.SvgParameter(dict(name="stroke-opacity"), str(self.opacity)))
+            result.append(E_SE.SvgParameter(dict(name="stroke-opacity"), str(self.opacity)))
         if self.width is not UNSET:
-            _stroke.append(E_SE.SvgParameter(dict(name="stroke-width"), str(self.width)))
+            result.append(E_SE.SvgParameter(dict(name="stroke-width"), str(self.width)))
         if self.dash_pattern is not UNSET:
             dp = " ".join(map(str, self.dash_pattern))
-            _stroke.append(E_SE.SvgParameter(dict(name="stroke-dasharray"), dp))
-            _stroke.append(E_SE.SvgParameter(dict(name="stroke-linecap"), "butt"))
-        return _stroke
+            result.append(E_SE.SvgParameter(dict(name="stroke-dasharray"), dp))
+            result.append(E_SE.SvgParameter(dict(name="stroke-linecap"), "butt"))
+        return result
 
 
 class Fill(Struct):
     opacity: Opacity = UNSET
     color: Color = UNSET
 
-    def xml(self):
-        _fill = E_SE.Fill()
+    def xml(self) -> Element:
+        result = E_SE.Fill()
         if self.color is not UNSET:
-            _fill.append(E_SE.SvgParameter(dict(name="fill"), self.color))
+            result.append(E_SE.SvgParameter(dict(name="fill"), self.color))
         if self.opacity is not UNSET:
-            _fill.append(E_SE.SvgParameter(dict(name="fill-opacity"), str(self.opacity)))
-        return _fill
+            result.append(E_SE.SvgParameter(dict(name="fill-opacity"), str(self.opacity)))
+        return result
 
 
 class WellKnownName(Enum):
@@ -82,15 +85,15 @@ class Mark(Struct):
     fill: Fill | UnsetType = UNSET
     stroke: Stroke | UnsetType = UNSET
 
-    def xml(self):
-        _mark = E_SE.Mark()
+    def xml(self) -> Element:
+        result = E_SE.Mark()
         if self.well_known_name is not UNSET:
-            _mark.append(E_SE.WellKnownName(self.well_known_name.value))
+            result.append(E_SE.WellKnownName(self.well_known_name.value))
         if self.fill is not UNSET:
-            _mark.append(self.fill.xml())
+            result.append(self.fill.xml())
         if self.stroke is not UNSET:
-            _mark.append(self.stroke.xml())
-        return _mark
+            result.append(self.stroke.xml())
+        return result
 
 
 class Graphic(Struct):
@@ -98,28 +101,28 @@ class Graphic(Struct):
     mark: Mark | UnsetType = UNSET
     size: Size = UNSET
 
-    def xml(self):
-        _graphic = E_SE.Graphic()
+    def xml(self) -> Element:
+        result = E_SE.Graphic()
         if self.opacity is not UNSET:
-            _graphic.append(E_SE.Opacity(str(self.opacity)))
+            result.append(E_SE.Opacity(str(self.opacity)))
         if self.mark is not UNSET:
-            _graphic.append(self.mark.xml())
+            result.append(self.mark.xml())
         if self.size is not UNSET:
-            _graphic.append(E_SE.Size(str(self.size)))
-        return _graphic
+            result.append(E_SE.Size(str(self.size)))
+        return result
 
 
 class PointSymbolizer(Struct, tag="point"):
     graphic: Graphic
 
-    def xml_items(self):
+    def xml_items(self) -> Iterable[Element]:
         return [E_SE.PointSymbolizer(self.graphic.xml())]
 
 
 class LineSymbolizer(Struct, tag="line"):
     stroke: Stroke
 
-    def xml_items(self):
+    def xml_items(self) -> Iterable[Element]:
         return [E_SE.LineSymbolizer(self.stroke.xml())]
 
 
@@ -127,10 +130,9 @@ class PolygonSymbolizer(Struct, tag="polygon"):
     stroke: Stroke | UnsetType = UNSET
     fill: Fill | UnsetType = UNSET
 
-    def xml_items(self):
-        result = []
+    def xml_items(self) -> Iterable[Element]:
         _polygon_symbolizer = E_SE.PolygonSymbolizer()
-        result.append(_polygon_symbolizer)
+        result = [_polygon_symbolizer]
         if self.stroke is not UNSET:
             # https://api.qgis.org/api/3.40/qgssymbollayerutils_8cpp_source.html#l02501
             if self.stroke.dash_pattern is not UNSET:
@@ -147,12 +149,12 @@ class PointPlacement(Struct, tag="point"):
     anchor: Anchor = UNSET
     offset: Offset = UNSET
 
-    def xml(self):
-        _placement = E_SE.PointPlacement()
+    def xml(self) -> Element:
+        result = E_SE.PointPlacement()
         if self.anchor is not UNSET:
             ax = dict(l=1, c=0.5, r=0)[self.anchor[0]]
             ay = dict(t=0, c=0.5, b=1)[self.anchor[1]]
-            _placement.append(
+            result.append(
                 E_SE.AnchorPoint(
                     E_SE.AnchorPointX(str(ax)),
                     E_SE.AnchorPointY(str(ay)),
@@ -160,13 +162,13 @@ class PointPlacement(Struct, tag="point"):
             )
         if self.offset is not UNSET:
             dx, dy = self.offset
-            _placement.append(
+            result.append(
                 E_SE.Displacement(
                     E_SE.DisplacementX(str(dx)),
                     E_SE.DisplacementY(str(dy)),
                 )
             )
-        return _placement
+        return result
 
 
 Placement = PointPlacement
@@ -176,13 +178,13 @@ class Halo(Struct):
     radius: Size = UNSET
     fill: Fill | UnsetType = UNSET
 
-    def xml(self):
-        _halo = E_SE.Halo()
+    def xml(self) -> Element:
+        result = E_SE.Halo()
         if self.radius is not UNSET:
-            _halo.append(E_SE.Radius(str(self.radius)))
+            result.append(E_SE.Radius(str(self.radius)))
         if self.fill is not UNSET:
-            _halo.append(self.fill.xml())
-        return _halo
+            result.append(self.fill.xml())
+        return result
 
 
 class TextSymbolizer(Struct, tag="text"):
@@ -192,21 +194,21 @@ class TextSymbolizer(Struct, tag="text"):
     placement: Placement | UnsetType = UNSET
     halo: Halo | UnsetType = UNSET
 
-    def xml_items(self):
-        _text_symbolizer = E_SE.TextSymbolizer()
+    def xml_items(self) -> Iterable[Element]:
+        result = E_SE.TextSymbolizer()
         _pn = getattr(E, f"{{{NS_OGC}}}PropertyName")(self.field)
-        _text_symbolizer.append(E_SE.Label(_pn))
+        result.append(E_SE.Label(_pn))
         if self.font_size is not UNSET:
-            _text_symbolizer.append(
+            result.append(
                 E_SE.Font(E_SE.SvgParameter(dict(name="font-size"), str(self.font_size)))
             )
         if self.fill is not UNSET:
-            _text_symbolizer.append(self.fill.xml())
+            result.append(self.fill.xml())
         if self.placement is not UNSET:
-            _text_symbolizer.append(E_SE.LabelPlacement(self.placement.xml()))
+            result.append(E_SE.LabelPlacement(self.placement.xml()))
         if self.halo is not UNSET:
-            _text_symbolizer.append(self.halo.xml())
-        return [_text_symbolizer]
+            result.append(self.halo.xml())
+        return [result]
 
 
 class Algorithm(Enum):
@@ -220,7 +222,7 @@ class NormalizeEnhancement(Struct):
     min_value: float
     max_value: float
 
-    def xml(self):
+    def xml(self) -> Element:
         return E_SE.Normalize(
             E.VendorOption(dict(name="algorithm"), self.algorithm.name),
             E.VendorOption(dict(name="minValue"), str(self.min_value)),
@@ -231,7 +233,7 @@ class NormalizeEnhancement(Struct):
 class ContrastEnhancement(Struct):
     normalize: NormalizeEnhancement
 
-    def xml(self):
+    def xml(self) -> Element:
         return E_SE.ContrastEnhancement(self.normalize.xml())
 
 
@@ -245,8 +247,8 @@ class Channels(Struct):
     green: Channel | UnsetType = UNSET
     blue: Channel | UnsetType = UNSET
 
-    def xml(self):
-        _channel_selection = E_SE.ChannelSelection()
+    def xml(self) -> Element:
+        result = E_SE.ChannelSelection()
         for color in ("red", "green", "blue"):
             channel = getattr(self, color)
             if channel is not UNSET:
@@ -255,20 +257,20 @@ class Channels(Struct):
                 )
                 if channel.contrast_enhancement is not UNSET:
                     _channel.append(channel.contrast_enhancement.xml())
-                _channel_selection.append(_channel)
-        return _channel_selection
+                result.append(_channel)
+        return result
 
 
 class RasterSymbolizer(Struct, tag="raster"):
     channels: Channels
     opacity: Opacity = UNSET
 
-    def xml_items(self):
-        _raster_symbolizer = E_SE.RasterSymbolizer()
+    def xml_items(self) -> Iterable[Element]:
+        result = E_SE.RasterSymbolizer()
         if self.opacity is not UNSET:
-            _raster_symbolizer.append(E_SE.Opacity(str(self.opacity)))
-        _raster_symbolizer.append(self.channels.xml())
-        return [_raster_symbolizer]
+            result.append(E_SE.Opacity(str(self.opacity)))
+        result.append(self.channels.xml())
+        return [result]
 
 
 Symbolizer = (
@@ -279,30 +281,28 @@ Symbolizer = (
 class Rule(Struct):
     symbolizers: Annotated[list[Symbolizer], Meta(min_length=1, max_length=1)]
 
-    def xml(self):
-        _rule = E_SE.Rule()
-        for symbolizer in self.symbolizers:
-            _rule.extend(symbolizer.xml_items())
-        return _rule
+    def xml(self) -> Element:
+        return E_SE.Rule(*chain.from_iterable(i.xml_items() for i in self.symbolizers))
 
 
 class Style(Struct):
     rules: Annotated[list[Rule], Meta(min_length=1, max_length=2)]
 
-    def xml(self):
-        _feature_type_style = E_SE.FeatureTypeStyle()
-        for rule in self.rules:
-            _feature_type_style.append(rule.xml())
+    def xml(self) -> Element:
+        xsi_schema_location = QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation")
         return E.StyledLayerDescriptor(
+            # ty: ignore[invalid-argument-type]
             {
-                QName(
-                    "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"
-                ): f"{NS_SLD} StyledLayerDescriptor.xsd",
+                xsi_schema_location: f"{NS_SLD} StyledLayerDescriptor.xsd",
                 "version": "1.1.0",
             },
             E.NamedLayer(
                 getattr(E, f"{{{NS_SE}}}Name")("Style"),
-                E.UserStyle(_feature_type_style),
+                E.UserStyle(
+                    E_SE.FeatureTypeStyle(
+                        *(rule.xml() for rule in self.rules),
+                    ),
+                ),
             ),
         )
 
