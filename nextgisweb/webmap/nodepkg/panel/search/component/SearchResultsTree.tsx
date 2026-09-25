@@ -6,7 +6,7 @@ import type { TreeDataNode } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
 
-import type { SearchResult, SearchResultGroup } from "../type";
+import type { SearchResult, SearchResultGroup, SearchSettings } from "../type";
 
 import { SearchResultPopover } from "./SearchResultPopover";
 
@@ -19,17 +19,21 @@ import "./SearchResultsTree.less";
 
 type ResultTreeNode = TreeDataNode & { result?: SearchResult };
 
+export interface SearchResultsTreeProps {
+  groups: SearchResultGroup[];
+  display: Display;
+  navigationMode: SearchSettings["navigationMode"];
+  collapsedGroups: Set<string>;
+  onCollapsedGroupsChange: (next: Set<string>) => void;
+}
+
 export function SearchResultsTree({
   groups,
   display,
+  navigationMode,
   collapsedGroups,
   onCollapsedGroupsChange,
-}: {
-  groups: SearchResultGroup[];
-  display: Display;
-  collapsedGroups: Set<string>;
-  onCollapsedGroupsChange: (next: Set<string>) => void;
-}) {
+}: SearchResultsTreeProps) {
   const [resultSelected, setResultSelected] = useState<
     SearchResult | undefined
   >(undefined);
@@ -37,7 +41,11 @@ export function SearchResultsTree({
   const selectResult = (resultInfo: SearchResult) => {
     setResultSelected(resultInfo);
 
-    display.map.zoomToGeom(resultInfo.geometry);
+    if (navigationMode === "pan") {
+      display.map.searchGeom(resultInfo.geometry);
+    } else {
+      display.map.zoomToGeom(resultInfo.geometry);
+    }
 
     display.highlighter.highlight({ geom: resultInfo.geometry });
   };

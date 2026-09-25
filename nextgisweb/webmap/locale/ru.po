@@ -672,15 +672,15 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:34
+#: nodepkg/panel/search/SearchPanel.tsx:46
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:104
+#: nodepkg/panel/search/SearchPanel.tsx:151
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:108
+#: nodepkg/panel/search/SearchPanel.tsx:155
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -692,9 +692,57 @@ msgstr "Поля с совпадениями"
 msgid "Failed to load matched fields"
 msgstr "Не удалось загрузить поля с совпадениями"
 
-#: nodepkg/panel/search/component/SearchResultsTree.tsx:83
+#: nodepkg/panel/search/component/SearchResultsTree.tsx:91
 msgid "Identify object"
 msgstr "Идентифицировать объект"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:27
+msgid "Search settings"
+msgstr "Настройки поиска"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:28
+msgid "Search in layers"
+msgstr "Искать в слоях"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:29
+msgid "In visible"
+msgstr "В видимых"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:30
+msgid "In all"
+msgstr "Во всех"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:31
+msgid "In selected"
+msgstr "В выбранном"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:32
+msgid "Select layer"
+msgstr "Выберите слой"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:33
+msgid "Search sources"
+msgstr "Источники поиска"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:34
+msgid "Search by address"
+msgstr "Поиск по адресу"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:35
+msgid "Search by coordinates"
+msgstr "Поиск по координатам"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:36
+msgid "Navigation mode"
+msgstr "Режим навигации"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:37
+msgid "Zoom"
+msgstr "Приближение"
+
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:38
+msgid "Pan"
+msgstr "Перемещение"
 
 #: nodepkg/panel/search/plugin.tsx:16
 msgid "Search"

@@ -1,7 +1,8 @@
 import { route } from "@nextgisweb/pyramid/api";
-import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
 
 import type { SearchFunction, SearchResult, SearchResultGroup } from "../type";
+
+import { getUsedLayers } from "./getUsedLayers";
 
 interface FeatureResponse {
   id: number;
@@ -15,9 +16,10 @@ export const searchByLayers: SearchFunction = async (
   limit,
   display,
   controller,
-  geoJSON
+  geoJSON,
+  settings
 ) => {
-  const visibleItems = display.getVisibleItems();
+  const items = getUsedLayers(display, settings.usedLayers);
   const requests: {
     layerName: string;
     layerId: number;
@@ -25,16 +27,10 @@ export const searchByLayers: SearchFunction = async (
     identifiable: boolean;
     request: Promise<FeatureResponse[]>;
   }[] = [];
-  visibleItems.forEach((item) => {
+  items.forEach((item) => {
     if (!item.isLayer()) {
       return;
     }
-    const pluginConfig = item.plugin[
-      "@nextgisweb/webmap/plugin/feature-layer"
-    ] as FeatureLayerWebMapPluginConfig;
-
-    if (pluginConfig === undefined || !pluginConfig.likeSearch) return;
-
     const signal = controller.makeSignal();
     const request = route("feature_layer.feature.collection", item.layerId).get(
       {
