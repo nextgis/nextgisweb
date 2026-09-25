@@ -3,7 +3,7 @@ from pathlib import Path
 from msgspec import Struct
 from pyramid.response import FileResponse, Response
 
-from nextgisweb.core.exception import ValidationError
+from nextgisweb.core.exception import InsufficientPermissions, ValidationError
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.raster_layer.api import RangeFileWrapper
 from nextgisweb.resource import DataScope, ResourceFactory
@@ -77,8 +77,23 @@ def layer_inspect(resource: PointCloudLayer, request) -> InspectResponse:
     return inspect_response(resource.fileobj.filename())
 
 
+def copc_auth_challenge(request) -> Response | None:
+    try:
+        request.resource_permission(DataScope.read)
+    except InsufficientPermissions:
+        if request.authenticated_userid is None:
+            # Force 401 Unauthorized for unauthenticated users. It's useful for
+            # QGIS, which sends credentials embedded in the URL only after the
+            # authentication challenge. The response is returned, as raised
+            # HTTP errors are rendered without their headers.
+            return Response(status_code=401, headers={"WWW-Authenticate": "Basic"})
+        raise
+    return None
+
+
 def copc_head(resource: PointCloudLayer, request) -> Response:
-    request.resource_permission(DataScope.read)
+    if (challenge := copc_auth_challenge(request)) is not None:
+        return challenge
 
     filename = resource.fileobj.filename()
     return Response(
@@ -89,7 +104,8 @@ def copc_head(resource: PointCloudLayer, request) -> Response:
 
 
 def copc_get(resource: PointCloudLayer, request) -> Response:
-    request.resource_permission(DataScope.read)
+    if (challenge := copc_auth_challenge(request)) is not None:
+        return challenge
 
     filename = resource.fileobj.filename()
     file_size = filename.stat().st_size
