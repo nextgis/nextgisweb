@@ -1,17 +1,17 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { Popover } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import { isAbortError } from "@nextgisweb/gui/error";
+import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { KeyValueTable } from "@nextgisweb/webmap/panel/identify/KeyValueTable";
-import type { FieldDataItem } from "@nextgisweb/webmap/panel/identify/fields";
 
-import { loadSearchContext } from "../util/loadSearchContext";
+import { FeatureInfoSection } from "../../identify/component/FeatureInfoSection";
 
-const msgTitle = gettext("Matched fields");
+import "./SearchResultPopover.less";
+
 const msgError = gettext("Failed to load matched fields");
 
 export interface SearchResultPopoverProps {
@@ -27,27 +27,34 @@ export function SearchResultPopover({
   searchContext,
   children,
 }: SearchResultPopoverProps) {
-  const [fields, setFields] = useState<FieldDataItem[] | undefined>();
+  const [featureItem, setFeatureItem] = useState<FeatureItem | undefined>();
   const [error, setError] = useState(false);
   const { makeSignal, abort } = useAbortController();
 
-  const onOpenChange = (open: boolean) => {
+  const onOpenChange = async (open: boolean) => {
     if (!open) {
       abort();
       return;
     }
-    if (fields !== undefined) {
-      return;
-    }
+
     setError(false);
 
-    loadSearchContext(resourceId, featureId, searchContext, makeSignal())
-      .then(setFields)
-      .catch((err) => {
-        if (!isAbortError(err)) {
-          setError(true);
-        }
-      });
+    const signal = makeSignal();
+
+    const feature = await route(
+      "feature_layer.feature.item",
+      resourceId,
+      featureId
+    ).get({
+      query: {
+        geom: false,
+        dt_format: "iso",
+      },
+      cache: true,
+      signal,
+    });
+
+    setFeatureItem(feature);
   };
 
   let popoverContent: ReactNode;
@@ -56,24 +63,46 @@ export function SearchResultPopover({
   } else {
     popoverContent = (
       <LoadingWrapper
-        loading={!fields}
+        loading={!featureItem}
         rows={searchContext.length}
         title={false}
         style={{ width: 300 }}
       >
-        {fields && <KeyValueTable data={fields} />}
+        {featureItem && (
+          <FeatureInfoSection
+            resourceId={resourceId}
+            featureItem={featureItem}
+            showGeometryInfo={false}
+            showAttributes
+          />
+        )}
       </LoadingWrapper>
     );
   }
-
+  const POPUP_GAP = 8;
   return (
     <Popover
       placement="right"
+      autoAdjustOverflow
+      arrow={false}
       mouseEnterDelay={0.5}
-      styles={{ root: { width: 300 } }}
+      styles={{
+        root: {
+          width: 300,
+
+          paddingBlock: POPUP_GAP,
+        },
+
+        container: {
+          maxHeight: `calc(70dvh - ${POPUP_GAP * 2}px)`,
+          overflowY: "auto",
+          overscrollBehavior: "contain",
+        },
+      }}
       onOpenChange={onOpenChange}
-      title={msgTitle}
-      content={<div onClick={(e) => e.stopPropagation()}>{popoverContent}</div>}
+      content={
+        <div onClick={(event) => event.stopPropagation()}>{popoverContent}</div>
+      }
     >
       {children}
     </Popover>
