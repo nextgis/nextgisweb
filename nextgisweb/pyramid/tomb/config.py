@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import re
-from collections.abc import Callable, Mapping
-from inspect import signature
+from collections.abc import Callable, Iterable, Mapping
+from functools import wraps
+from inspect import signature, unwrap
 from sys import _getframe
 from types import FunctionType
-from typing import TYPE_CHECKING, Annotated, Any
+from typing import TYPE_CHECKING, Annotated, Any, Final, Literal, Self, Unpack
 
 from msgspec import NODEFAULT, Meta
 from msgspec import DecodeError as MsgspecDecodeError
@@ -12,25 +15,32 @@ from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 from pyramid.exceptions import ConfigurationError
+from pyramid.interfaces import IRoutesMapper
+from typing_extensions import TypedDict
 
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import ContentType, EmptyObject, JSONType, PathParam, QueryParam
 from nextgisweb.lib.apitype.query_string import QueryParamError, QueryParamRequired
 from nextgisweb.lib.apitype.schema import _AnyOfRuntime
-from nextgisweb.lib.apitype.util import EmptyInstance, disannotate, is_struct_type
+from nextgisweb.lib.apitype.util import (
+    EmptyInstance,
+    EmptyObjectStruct,
+    disannotate,
+    is_struct_type,
+)
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import ValidationError
 
 from .exception import MalformedJSONBody
-from .helper import RouteHelper
-from .inspect import iter_routes
 from .predicate import ErrorRendererPredicate, RequestMethodPredicate, RouteMeta, ViewMeta
 from .request import Request
 from .response import Response
-from .util import push_stacklevel
+from .types import ContextFactory, CorsHeaders, RequestMethodType, ViewFunc
+from .urldispatch import RoutesMapper
+from .util import ContextRequestViewMapper, push_stacklevel
 
 
 def _json_msgspec_factory(typedef):
@@ -55,7 +65,7 @@ def _view_driver_factory(
     query_params: Mapping[str, QueryParam],
     body: tuple[str, Any] | None,
     result: Any,
-) -> Callable:
+) -> Callable[[object, Request], object]:
     # NOTE: Path parameters are decoded twice (the first time in request.path_param) because
     # different constraints may apply: one from the route and another from the view.
     extract = (
@@ -66,10 +76,8 @@ def _view_driver_factory(
 
     convert = _convert_empty_object if result is EmptyObject else None
 
-    if len(extract) == 0 and convert is None:
-        return view
-
-    def _view(context: Any, request: Request) -> Any:
+    @wraps(view)
+    def _view(context: object, request: Request) -> object:
         try:
             kw = {k: f(request) for k, f in extract}
         except QueryParamError as exc:
@@ -77,7 +85,6 @@ def _view_driver_factory(
         result = view(context, request, **kw) if pass_context else view(request, **kw)
         return result if convert is None else convert(result)
 
-    _view.__doc__ = view.__doc__
     return _view
 
 
@@ -89,7 +96,7 @@ def _query_extractor(decoder: Callable) -> Callable:
     return lambda req: decoder(req.qs_parser)
 
 
-def _convert_empty_object(value: Any) -> Any:
+def _convert_empty_object[T: object](value: T) -> T | EmptyObjectStruct:
     return value if value is not None else EmptyInstance
 
 
@@ -161,32 +168,40 @@ class Configurator(PyramidConfigurator):
     def setup_registry(self, *args, **kwargs):
         super().setup_registry(*args, **kwargs)
 
+        self.registry.registerUtility(RoutesMapper(), IRoutesMapper)
+        self.add_view_deriver(ViewMetaDeriver(), name="view_meta")
+
         self.set_request_factory(Request)
-
-        def execution_policy(environ, router):
-            with router.request_context(environ) as request:
-                try:
-                    getattr(request, "path_info")
-                except UnicodeDecodeError:
-                    return Response(
-                        status=400,
-                        content_type="text/plain",
-                        body="Malformed request URI\n",
-                    )
-                return router.invoke_request(request)
-
-        self.set_execution_policy(execution_policy)
+        self.set_execution_policy(self._execution_policy)
 
     def add_default_tweens(self):
         pass  # Skip pyramid.tweens.excview_tween_factory registration
 
+    def add_default_route_predicates(self):
+        import pyramid.predicates as pp
+
+        self.add_route_predicate("route_meta", RouteMeta.as_predicate())
+        self.add_route_predicate("error_renderer", ErrorRendererPredicate)
+
+        self.add_route_predicate("request_method", RequestMethodPredicate)
+
+        # Default Pyramid predicates, except RequestMethodPredicate
+        self.add_route_predicate("xhr", pp.XHRPredicate)
+        self.add_route_predicate("path_info", pp.PathInfoPredicate)
+        self.add_route_predicate("request_param", pp.RequestParamPredicate)
+        self.add_route_predicate("header", pp.HeaderPredicate)
+        self.add_route_predicate("accept", pp.AcceptPredicate)
+        self.add_route_predicate("is_authenticated", pp.IsAuthenticatedPredicate)
+        self.add_route_predicate("effective_principals", pp.EffectivePrincipalsPredicate)
+        self.add_route_predicate("custom", pp.CustomPredicate)
+        self.add_route_predicate("traverse", pp.TraversePredicate)
+
     def add_default_view_predicates(self):
         import pyramid.predicates as pp
 
-        self.add_view_predicate("meta", ViewMeta.as_predicate())
         self.add_view_predicate("request_method", RequestMethodPredicate)
 
-        # Default pyramid predicates except RequestMethodPredicate
+        # Default Pyramid predicates, except RequestMethodPredicate
         self.add_view_predicate("xhr", pp.XHRPredicate)
         self.add_view_predicate("path_info", pp.PathInfoPredicate)
         self.add_view_predicate("request_param", pp.RequestParamPredicate)
@@ -200,29 +215,37 @@ class Configurator(PyramidConfigurator):
         self.add_view_predicate("effective_principals", pp.EffectivePrincipalsPredicate)
         self.add_view_predicate("custom", pp.CustomPredicate)
 
-    def add_default_route_predicates(self):
-        self.add_route_predicate("meta", RouteMeta.as_predicate())
-        self.add_route_predicate("error_renderer", ErrorRendererPredicate)
-        return super().add_default_route_predicates()
+    class _AddRouteKW(TypedDict, total=False, closed=True):
+        static_source: Literal[True]
+        stacklevel: int
 
     def add_route(
         self,
-        name,
-        pattern=None,
+        name: str,
+        pattern: str | None = None,
         *,
-        types=None,
-        deprecated=False,
-        openapi=True,
-        cors_headers=None,
-        **kwargs,
-    ) -> RouteHelper:
+        types: dict[str, object] | None = None,
+        overloaded: bool = False,
+        client: bool = True,
+        openapi: bool = True,
+        deprecated: bool = False,
+        factory: ContextFactory | None = None,
+        error_renderer: Callable | None = None,
+        cors_headers: CorsHeaders | None = None,
+        # Method handlers shortcuts
+        head: ViewFunc | None = None,
+        get: ViewFunc | None = None,
+        post: ViewFunc | None = None,
+        put: ViewFunc | None = None,
+        delete: ViewFunc | None = None,
+        options: ViewFunc | None = None,
+        patch: ViewFunc | None = None,
+        **kw: Unpack[_AddRouteKW],
+    ) -> ConfiguratorRouteHelper:
+        kwargs: dict[str, object] = {**kw}
+
         stacklevel = push_stacklevel(kwargs, False, True)
         component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
-
-        client = True
-        if "client" in kwargs:
-            client = kwargs.pop("client")
-            assert client is False, "client=False is the only valid route predicate"
 
         if component is None:
             # Legacy static view, probably from nextgisweb_threedim
@@ -233,12 +256,12 @@ class Configurator(PyramidConfigurator):
                 raise ValueError(f"The route pattern must begin with '/', but got {pattern!r}.")
 
             opattern = pattern
-            rtypes = dict()
+            rtypes: dict[str, object] = {}
 
-            if factory := kwargs.get("factory"):
+            if factory is not None:
                 rtypes.update(getattr(factory, "annotations", {}))
 
-            if types:
+            if types is not None:
                 rtypes.update(types)
 
             # Rewrite route pattern in the following formats:
@@ -278,28 +301,61 @@ class Configurator(PyramidConfigurator):
             path_params = {k: PathParam(k, v) for k, v in rtypes.items()}
             path_decoders = [(k, v.decoder) for k, v in path_params.items()]
 
-            overloaded = kwargs.pop("overloaded", False)
-            kwargs["meta"] = RouteMeta(
+            kwargs["route_meta"] = RouteMeta(
                 component=component,
-                itemplate=itemplate,
                 overloaded=overloaded,
                 client=client,
+                cors_headers=cors_headers,
+                itemplate=itemplate,
                 ktemplate=ktemplate,
                 path_params=path_params,
                 path_decoders=path_decoders,
-                cors_headers=cors_headers,
             )
 
-        helper = RouteHelper(name, self, deprecated=deprecated, openapi=openapi)
+        helper = ConfiguratorRouteHelper(self, name, deprecated=deprecated, openapi=openapi)
+        for m, h in (
+            ("HEAD", head),
+            ("GET", get),
+            ("POST", post),
+            ("PUT", put),
+            ("DELETE", delete),
+            ("OPTIONS", options),
+            ("PATCH", patch),
+        ):
+            if h is not None:
+                helper.add_view(h, request_method=m, stacklevel=stacklevel)
 
-        for m in ("head", "get", "post", "put", "delete", "options", "patch"):
-            if v := kwargs.pop(m, None):
-                getattr(helper, m)(v, stacklevel=stacklevel)
+        if factory is not None:
+            kwargs["factory"] = factory
+
+        if error_renderer is not None:
+            kwargs["error_renderer"] = error_renderer
 
         super().add_route(name, pattern=pattern, **kwargs)
+
         return helper
 
-    def add_view(self, view=None, *, deprecated=False, openapi=True, **kwargs):
+    class _AddViewKW(TypedDict, total=False, closed=True):
+        react_renderer: str
+        stacklevel: int
+
+    def add_view(
+        self,
+        view: ViewFunc | None = None,
+        *,
+        route_name: str | None = None,
+        request_method: RequestMethodType | None = None,
+        context: object | None = None,
+        query_params: Iterable | None = None,
+        openapi: bool = True,
+        deprecated: bool = False,
+        **kw: Unpack[_AddViewKW],
+    ):
+        kwargs = {**kw}
+
+        extra_query_params = query_params
+        del query_params
+
         stacklevel = push_stacklevel(kwargs, False, True)
         component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
 
@@ -319,8 +375,8 @@ class Configurator(PyramidConfigurator):
 
             body_type = None
             has_request = has_context = False
-            path_params = dict[str, PathParam]()
-            query_params = dict[str, QueryParam]()
+            path_params: dict[str, PathParam] = {}
+            query_params: dict[str, QueryParam] = {}
             body: tuple[str, Any] | None = None
 
             for idx, (name, p) in enumerate(sig.parameters.items()):
@@ -329,7 +385,7 @@ class Configurator(PyramidConfigurator):
                     continue
                 elif idx == 0:
                     has_context = True
-                    if p.annotation is not p.empty and "context" not in kwargs:
+                    if p.annotation is not p.empty:
                         kwargs["context"] = p.annotation
                     continue
 
@@ -375,6 +431,7 @@ class Configurator(PyramidConfigurator):
             if kwargs.get("renderer") is None and return_renderer is not None:
                 kwargs["renderer"] = return_renderer
 
+            kwargs["mapper"] = ContextRequestViewMapper
             view = _view_driver_factory(
                 view,
                 has_context,
@@ -384,16 +441,19 @@ class Configurator(PyramidConfigurator):
                 result=return_type,
             )
 
-            if extra_query_params := kwargs.pop("query_params", None):
+            if extra_query_params is not None:
                 query_params = query_params.copy()
                 for eqp in extra_query_params:
                     if len(eqp) == 2:
                         eqp = eqp + (NODEFAULT,)
                     query_params[eqp[0]] = QueryParam(*eqp)
 
-            kwargs["meta"] = ViewMeta(
+            react_renderer = kwargs.pop("react_renderer", None)
+            assert react_renderer is None or isinstance(react_renderer, str)
+
+            kwargs["view_meta"] = ViewMeta(
                 func=view,
-                context=kwargs.get("context"),
+                context=context,
                 deprecated=deprecated,
                 openapi=openapi,
                 path_params=path_params,
@@ -401,8 +461,15 @@ class Configurator(PyramidConfigurator):
                 component=component,
                 body_type=body_type,
                 return_type=return_type,
-                react_renderer=kwargs.pop("react_renderer", None),
+                react_renderer=react_renderer,
             )
+
+        if route_name is not None:
+            kwargs["route_name"] = route_name
+        if request_method is not None:
+            kwargs["request_method"] = request_method
+        if context is not None:
+            kwargs["context"] = context
 
         if (renderer := kwargs.get("renderer")) is not None:
             assert isinstance(renderer, str)
@@ -415,15 +482,30 @@ class Configurator(PyramidConfigurator):
         super().add_view(view=view, **kwargs)
 
     def commit(self):
+        from .inspect import iter_routes
+
         super().commit()
 
-        for route in iter_routes(self.introspector):
-            is_api = route.itemplate.startswith("/api/")
+        routes = list(iter_routes(self.introspector))
+        routes.sort(key=lambda r: r.itemplate)
+
+        logger.info("Validating %d routes", len(routes))
+        for route in routes:
             methods = set()
+            is_api = route.is_api
+            logger.debug("%s (%s)", route.ktemplate, route.name)
             for view in route.views:
-                if is_api and not isinstance(view.method, str):
+                method = view.method
+                func = unwrap(view.func)
+                logger.debug(
+                    "    %-8s %s.%s",
+                    method or "any",
+                    getattr(func, "__module__", "<unknown>"),
+                    getattr(func, "__qualname__", "<unknown>"),
+                )
+                if not isinstance(view.method, str):
                     raise ConfigurationError(
-                        f"View {view.func} for route '{route.name}' must have "
+                        f"View {view.func} for route '{route.name}' must have"
                         f"a request method specified."
                     )
 
@@ -457,3 +539,87 @@ class Configurator(PyramidConfigurator):
                 return r"-?0*[1-9][0-9]*|0+"
         else:
             raise ValueError("Type or pattern required")
+
+    def _execution_policy(self, environ, router):
+        with router.request_context(environ) as request:
+            try:
+                getattr(request, "path_info")
+            except UnicodeDecodeError:
+                return Response(
+                    status=400,
+                    content_type="text/plain",
+                    body="Malformed request URI\n",
+                )
+            return router.invoke_request(request)
+
+
+class ConfiguratorRouteHelper:
+    def __init__(self, config: Configurator, name: str, *, deprecated: bool, openapi: bool):
+        self.name: Final = name
+        self.config: Final = config
+        self.deprecated: Final = deprecated
+        self.openapi: Final = openapi
+
+    class _AddViewKW(TypedDict, total=False, closed=True):
+        route_name: str
+        request_method: RequestMethodType
+        openapi: bool
+        deprecated: bool
+        context: object
+        stacklevel: int
+
+    def add_view(self, view: ViewFunc, /, **kwargs: Unpack[_AddViewKW]) -> Self:
+        push_stacklevel(kwargs, True)
+
+        if "route_name" not in kwargs:
+            kwargs["route_name"] = self.name
+
+        kwargs.setdefault("openapi", self.openapi)
+        kwargs.setdefault("deprecated", self.deprecated)
+
+        self.config.add_view(view=view, **kwargs)
+
+        return self
+
+    class _AddMethodKW(TypedDict, total=False, closed=True):
+        route_name: str
+        openapi: bool
+        deprecated: bool
+        context: object
+
+    def head(self, view: ViewFunc, /, **kwargs: Unpack[_AddMethodKW]) -> Self:
+        push_stacklevel(kwargs, True)
+        return self.add_view(view, request_method="HEAD", **kwargs)
+
+    def get(self, view: ViewFunc, /, **kwargs: Unpack[_AddMethodKW]) -> Self:
+        push_stacklevel(kwargs, True)
+        return self.add_view(view, request_method="GET", **kwargs)
+
+    def post(self, view: ViewFunc, /, **kwargs: Unpack[_AddMethodKW]) -> Self:
+        push_stacklevel(kwargs, True)
+        return self.add_view(view, request_method="POST", **kwargs)
+
+    def put(self, view: ViewFunc, /, **kwargs: Unpack[_AddMethodKW]) -> Self:
+        push_stacklevel(kwargs, True)
+        return self.add_view(view, request_method="PUT", **kwargs)
+
+    def delete(self, view: ViewFunc, /, **kwargs: Unpack[_AddMethodKW]) -> Self:
+        push_stacklevel(kwargs, True)
+        return self.add_view(view, request_method="DELETE", **kwargs)
+
+    def options(self, view: ViewFunc, /, **kwargs: Unpack[_AddMethodKW]) -> Self:
+        push_stacklevel(kwargs, True)
+        return self.add_view(view, request_method="OPTIONS", **kwargs)
+
+    def patch(self, view: ViewFunc, /, **kwargs: Unpack[_AddMethodKW]) -> Self:
+        push_stacklevel(kwargs, True)
+        return self.add_view(view, request_method="PATCH", **kwargs)
+
+
+class ViewMetaDeriver:
+    """Dummy view meta deriver which registers `view_meta` option for views."""
+
+    options = ("view_meta",)
+
+    def __call__(self, view, info):
+        return view

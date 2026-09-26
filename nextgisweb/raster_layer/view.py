@@ -27,13 +27,13 @@ class RasterLayerWidget(Widget):
 
 
 @react_renderer("@nextgisweb/raster-layer/export-form")
-def export(request: Request):
-    if not request.context.has_export_permission(request.user):
+def export(context: RasterLayer, request: Request):
+    if not context.has_export_permission(request.user):
         raise HTTPNotFound()
     return dict(
-        obj=request.context,
+        obj=context,
         title=gettext("Save as"),
-        props=dict(id=request.context.id),
+        props=dict(id=context.id),
         maxheight=True,
     )
 
@@ -73,5 +73,6 @@ def setup_pyramid(comp: RasterLayerComponent, config: Configurator):
     config.add_view(
         export,
         route_name="resource.export.page",
+        request_method="GET",
         context=RasterLayer,
     )

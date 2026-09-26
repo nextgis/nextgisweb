@@ -10,8 +10,6 @@ from nextgisweb.lib.apitype import QueryString
 
 from nextgisweb.i18n import Localizer
 
-from .predicate import RouteMeta
-
 
 class Request[C](BaseRequest):
     @cached_property
@@ -32,11 +30,15 @@ class Request[C](BaseRequest):
 
     @cached_property
     def path_param(self) -> Mapping[str, Any]:
-        for p in self.matched_route.predicates:
-            if isinstance(p, RouteMeta):
-                md = self.matchdict
-                return {k: v(md[k]) for k, v in p.path_decoders}
-        assert False, "RouteMeta predicate not found"
+        rmeta = self.matched_route.meta
+        assert rmeta is not None
+
+        mdict = self.matchdict
+        return {
+            name: decoder(mv)
+            for name, decoder in rmeta.path_decoders
+            if isinstance(mv := mdict[name], str)
+        }
 
     @cached_property
     def localizer(self) -> Localizer:
@@ -50,6 +52,8 @@ class Request[C](BaseRequest):
         from nextgisweb.auth import User
 
         from .response import Response
+        from .types import RequestMethodType
+        from .urldispatch import Route
 
         @property
         def context(self) -> C: ...
@@ -89,7 +93,7 @@ class Request[C](BaseRequest):
         def authenticated_userid(self) -> int | None: ...
 
         @property
-        def method(self) -> str: ...
+        def method(self) -> RequestMethodType: ...
 
         @property
         def url(self) -> str: ...
@@ -98,7 +102,7 @@ class Request[C](BaseRequest):
         def path_info(self) -> str: ...
 
         @property
-        def matched_route(self) -> Any: ...
+        def matched_route(self) -> Route: ...
 
         @property
         def matchdict(self) -> dict[str, str | tuple[str, ...]]: ...

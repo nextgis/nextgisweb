@@ -1,3 +1,4 @@
+from typing import Literal
 from urllib.parse import urlunparse
 
 import urllib3
@@ -28,53 +29,14 @@ def ensure_interception(*, comp: PyramidComponent = inject.arg()):
         raise LunkwillIntercepionExpected
 
 
-def setup_pyramid(comp: PyramidComponent, config: Configurator):
-    config.add_route(
-        "lunkwill.summary",
-        "/api/lunkwill/{id:str}/summary",
-        get=proxy,
-    )
-
-    config.add_route(
-        "lunkwill.response",
-        "/api/lunkwill/{id:str}/response",
-        get=proxy,
-    )
-
-    config.add_route(
-        "lunkwill.hmux",
-        "/api/lunkwill/hmux",
-        get=hmux,
-    )
-
-    opts = comp.options.with_prefix("lunkwill")
-
-    if opts["enabled"] and opts["proxy"]:
-        st = config.registry.settings
-
-        def lunkwill_url(*, host=opts["host"], path, query):
-            return urlunparse(
-                ("http", "{}:{}".format(host, opts["port"]), path, None, query, None)
-            )
-
-        st["lunkwill.url"] = lunkwill_url
-        st["lunkwill.pool"] = urllib3.PoolManager()
-
-        def lunkwill(request: Request):
-            v = request.headers.get("X-Lunkwill")
-            if v is not None:
-                v = v.lower()
-                if v not in ("suggest", "require"):
-                    raise HTTPBadRequest(explanation="Invalid X-Lunkwill header")
-                return v
-            return None
-
-        config.add_request_method(lunkwill, reify=True)
-
-        config.add_tween(
-            "nextgisweb.pyramid.lunkwill.tween_factory",
-            under=["nextgisweb.pyramid.api_cors.tween_factory"],
-        )
+def lunkwill_header(request: Request) -> Literal["suggest", "require"] | None:
+    v = request.headers.get("X-Lunkwill")
+    if v is not None:
+        v = v.lower()
+        if v not in ("suggest", "require"):
+            raise HTTPBadRequest(explanation="Invalid X-Lunkwill header")
+        return v
+    return None
 
 
 def tween_factory(handler, registry):
@@ -82,7 +44,7 @@ def tween_factory(handler, registry):
     headers_rm = {h.lower() for h in ("X-Lunkwill",)}
 
     def tween(request: Request):
-        if request.lunkwill is not None:
+        if lunkwill_header(request) is not None:
             url = request.registry.settings["lunkwill.url"](
                 path=request.path, query=request.query_string
             )
@@ -121,3 +83,41 @@ def hmux(request: Request):
     ensure_interception()
 
     assert False, "Unreachable"
+
+
+def setup_pyramid(comp: PyramidComponent, config: Configurator):
+    config.add_route(
+        "lunkwill.summary",
+        "/api/lunkwill/{id:str}/summary",
+        get=proxy,
+    )
+
+    config.add_route(
+        "lunkwill.response",
+        "/api/lunkwill/{id:str}/response",
+        get=proxy,
+    )
+
+    config.add_route(
+        "lunkwill.hmux",
+        "/api/lunkwill/hmux",
+        get=hmux,
+    )
+
+    opts = comp.options.with_prefix("lunkwill")
+
+    if opts["enabled"] and opts["proxy"]:
+        st = config.registry.settings
+
+        def lunkwill_url(*, host=opts["host"], path, query):
+            return urlunparse(
+                ("http", "{}:{}".format(host, opts["port"]), path, None, query, None)
+            )
+
+        st["lunkwill.url"] = lunkwill_url
+        st["lunkwill.pool"] = urllib3.PoolManager()
+
+        config.add_tween(
+            "nextgisweb.pyramid.lunkwill.tween_factory",
+            under=["nextgisweb.pyramid.api_cors.tween_factory"],
+        )

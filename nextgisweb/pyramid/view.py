@@ -620,97 +620,140 @@ def setup_pyramid(comp: PyramidComponent, config: Configurator):
     config.add_renderer("msgspec", renderer.MsgSpec())
     _setup_pyramid_mako(comp, config)
 
-    # Filter for quick translation. Defines function tr, which we can use
-    # instead of request.translate in mako templates.
-    def tr_subscriber(event):
-        def _tr(msg):
-            return event["request"].translate(msg)
-
-        event["tr"] = _tr
-
-    config.add_subscriber(tr_subscriber, BeforeRender)
-
     # OTHERS
+
+    config.add_route("home", "/", client=False, get=home)
 
     config.add_route("pyramid.asset.favicon", "/favicon.ico", get=asset_favicon)
     config.add_route("pyramid.asset.css", "/pyramid/css", get=asset_css)
     config.add_route("pyramid.asset.hlogo", "/pyramid/mlogo", get=asset_hlogo)
     config.add_route("pyramid.asset.blogo", "/pyramid/blogo", get=asset_blogo)
 
-    config.add_route("home", "/", client=False).add_view(home)
     config.add_route(
         "pyramid.contact_administrator.redirect",
         "/redirect/contact-administrator",
         get=contact_administrator_redirect,
     )
 
-    config.add_route("pyramid.openapi_json", "/openapi.json", get=openapi_json)
+    config.add_route(
+        "pyramid.openapi_json",
+        "/openapi.json",
+        get=openapi_json,
+    )
 
-    config.add_route("pyramid.openapi_json_test", "/test/openapi.json", get=openapi_json_test)
+    config.add_route(
+        "pyramid.openapi_json_test",
+        "/test/openapi.json",
+        get=openapi_json_test,
+    )
 
-    config.add_route("pyramid.swagger", "/doc/api", get=swagger)
+    config.add_route(
+        "pyramid.swagger",
+        "/doc/api",
+        get=swagger,
+    )
 
     config.add_route(
         "pyramid.control_panel",
         "/control-panel",
-    ).add_view(control_panel)
+        get=control_panel,
+    )
 
     config.add_route(
         "pyramid.control_panel.sysinfo",
         "/control-panel/sysinfo",
-    ).add_view(sysinfo)
+        get=sysinfo,
+    )
 
     config.add_route(
         "pyramid.control_panel.fonts",
         "/control-panel/fonts",
-    ).add_view(fonts)
-
-    config.add_route("pyramid.control_panel.storage", "/control-panel/storage").add_view(storage)
-
-    config.add_route("pyramid.control_panel.backup.browse", "/control-panel/backup/").add_view(
-        backup_browse
+        get=fonts,
     )
 
     config.add_route(
-        "pyramid.control_panel.backup.download", "/control-panel/backup/{filename:str}"
-    ).add_view(backup_download)
+        "pyramid.control_panel.storage",
+        "/control-panel/storage",
+        get=storage,
+    )
+
+    config.add_route(
+        "pyramid.control_panel.backup.browse",
+        "/control-panel/backup/",
+        get=backup_browse,
+    )
+
+    config.add_route(
+        "pyramid.control_panel.backup.download",
+        "/control-panel/backup/{filename:str}",
+        get=backup_download,
+    )
 
     config.add_route(
         "pyramid.control_panel.cors",
         "/control-panel/cors",
-    ).add_view(cors)
-
-    config.add_route("pyramid.control_panel.custom_css", "/control-panel/custom-css").add_view(
-        custom_css
+        get=cors,
     )
 
-    config.add_route("pyramid.control_panel.logo", "/control-panel/logo").add_view(cp_logo)
-
-    config.add_route("pyramid.control_panel.system_name", "/control-panel/system-name").add_view(
-        system_name
+    config.add_route(
+        "pyramid.control_panel.custom_css",
+        "/control-panel/custom-css",
+        get=custom_css,
     )
 
-    config.add_route("pyramid.control_panel.home_path", "/control-panel/home-path").add_view(
-        home_path
+    config.add_route(
+        "pyramid.control_panel.logo",
+        "/control-panel/logo",
+        get=cp_logo,
+    )
+
+    config.add_route(
+        "pyramid.control_panel.system_name",
+        "/control-panel/system-name",
+        get=system_name,
+    )
+
+    config.add_route(
+        "pyramid.control_panel.home_path",
+        "/control-panel/home-path",
+        get=home_path,
     )
 
     config.add_route(
         "pyramid.control_panel.metrics",
         "/control-panel/metrics",
-    ).add_view(metrics)
+        get=metrics,
+    )
 
-    config.add_route("pyramid.locale", "/locale/{locale:str}").add_view(locale)
+    config.add_route(
+        "pyramid.locale",
+        "/locale/{locale:str}",
+        get=locale,
+    )
 
-    config.add_route("pyramid.test_req", "/test/request").add_view(test_request_view)
+    config.add_route(
+        "pyramid.test_req",
+        "/test/request",
+        head=test_request_view,
+        get=test_request_view,
+        post=test_request_view,
+        put=test_request_view,
+        delete=test_request_view,
+        options=test_request_view,
+        patch=test_request_view,
+    )
 
     config.add_route(
         "pyramid.test_api",
         "/api/test/request",
         openapi=False,
-        **{
-            m: test_request_view
-            for m in ("head", "get", "post", "put", "delete", "options", "patch")
-        },
+        head=test_request_view,
+        get=test_request_view,
+        post=test_request_view,
+        put=test_request_view,
+        delete=test_request_view,
+        options=test_request_view,
+        patch=test_request_view,
     )
 
     config.add_route(
@@ -737,7 +780,11 @@ def setup_pyramid(comp: PyramidComponent, config: Configurator):
         get=test_exception_template,
     )
 
-    config.add_route("pyramid.test_timeout", "/test/timeout").add_view(test_timeout)
+    config.add_route(
+        "pyramid.test_timeout",
+        "/test/timeout",
+        get=test_timeout,
+    )
 
 
 def _setup_static(comp: PyramidComponent, config: Configurator):
@@ -778,7 +825,8 @@ def _setup_static(comp: PyramidComponent, config: Configurator):
         "pyramid.static",
         "/static/{skey:str}/*subpath",
         static_source=True,
-    ).add_view(static_view)
+        get=static_view,
+    )
 
     def static_url(request: Request, path=""):
         return request.route_url("pyramid.static", subpath=path, skey=comp.static_key[1:])
@@ -861,3 +909,10 @@ def _setup_pyramid_mako(comp: PyramidComponent, config: Configurator):
         imports=mako_imports,
     )
     config.add_renderer(".mako", renderer.Mako(opts))
+
+    def tr_subscriber(event) -> None:
+        """Add ``tr`` translation function to Mako templates."""
+        if event["renderer_name"].endswith(".mako"):
+            event["tr"] = event["request"].translate
+
+    config.add_subscriber(tr_subscriber, BeforeRender)

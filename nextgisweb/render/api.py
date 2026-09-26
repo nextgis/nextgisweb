@@ -571,7 +571,8 @@ def setup_pyramid(comp: RenderComponent, config: Configurator):
     config.add_route(
         "render.image",
         "/api/component/render/image",
-    ).get(image, http_cache=0)
+        get=image,
+    )
 
     config.add_route(
         "render.legend",

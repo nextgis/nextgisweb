@@ -35,33 +35,33 @@ class SettingsWidget(Widget):
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-grid")
-def feature_browse(request: Request):
+def feature_browse(context, request: Request):
     request.resource_permission(DataScope.read)
 
-    readonly = not request.context.has_permission(DataScope.write, request.user)
+    readonly = not context.has_permission(DataScope.write, request.user)
 
     return dict(
-        obj=request.context,
+        obj=context,
         title=gettext("Feature table"),
-        props=dict(id=request.context.id, readonly=readonly, editOnNewPage=True),
+        props=dict(id=context.id, readonly=readonly, editOnNewPage=True),
         maxwidth=True,
         maxheight=True,
     )
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-display")
-def feature_show(request: Request, feature_id: int):
+def feature_show(context, request: Request, feature_id: int):
     request.resource_permission(DataScope.read)
 
-    resource_id = request.context.id
+    resource_id = context.id
     query_feature_or_not_found(
-        request.context.feature_query(),
+        context.feature_query(),
         resource_id,
         feature_id,
     )
 
     return dict(
-        obj=request.context,
+        obj=context,
         props=dict(resourceId=resource_id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
         maxheight=True,
@@ -69,14 +69,14 @@ def feature_show(request: Request, feature_id: int):
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-editor")
-def feature_update(request: Request, feature_id: int):
+def feature_update(context, request: Request, feature_id: int):
     request.resource_permission(DataScope.write)
 
-    resource_id = request.context.id
-    query_feature_or_not_found(request.context.feature_query(), resource_id, feature_id)
+    resource_id = context.id
+    query_feature_or_not_found(context.feature_query(), resource_id, feature_id)
 
     return dict(
-        obj=request.context,
+        obj=context,
         props=dict(resourceId=resource_id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
         maxheight=True,
@@ -84,35 +84,35 @@ def feature_update(request: Request, feature_id: int):
 
 
 @react_renderer("@nextgisweb/feature-layer/export-form")
-def export(request: Request):
-    if not request.context.has_export_permission(request.user):
+def export(context, request: Request):
+    if not context.has_export_permission(request.user):
         raise HTTPNotFound()
     return dict(
-        obj=request.context,
+        obj=context,
         title=gettext("Save as"),
-        props=dict(id=request.context.id),
+        props=dict(id=context.id),
         maxheight=True,
     )
 
 
 @react_renderer("@nextgisweb/feature-layer/version-history")
-def history(request: Request):
+def history(context, request: Request):
     request.resource_permission(DataScope.read)
-    if not IVersionableFeatureLayer.providedBy(request.context) or not request.context.fversioning:
+    if not IVersionableFeatureLayer.providedBy(context) or not context.fversioning:
         raise FVersioningNotEnabled()
     return dict(
-        obj=request.context,
+        obj=context,
         title=gettext("Version history"),
-        props=dict(id=request.context.id),
+        props=dict(id=context.id),
         maxwidth=True,
         maxheight=True,
     )
 
 
 @react_renderer("@nextgisweb/feature-layer/export-form")
-def export_multiple(request: Request):
+def export_multiple(context, request: Request):
     return dict(
-        obj=request.context,
+        obj=context,
         title=gettext("Save as"),
         props=dict(multiple=True, pick=True),
         maxheight=True,
@@ -189,35 +189,37 @@ def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     config.add_route(
         "feature_layer.export_multiple",
         r"/resource/export_multiple",
-    ).add_view(export_multiple)
+        get=export_multiple,
+    )
 
     config.add_route(
         "feature_layer.feature.browse",
         r"/resource/{id:uint}/feature/",
         factory=resource_factory,
-    ).add_view(feature_browse)
+    ).get(feature_browse, context=IFeatureLayer)
 
     config.add_route(
         "feature_layer.feature.show",
         r"/resource/{id:uint}/feature/{feature_id:int}",
         factory=resource_factory,
-    ).add_view(feature_show, context=IFeatureLayer)
+    ).get(feature_show, context=IFeatureLayer)
 
     config.add_route(
         "feature_layer.feature.update",
         r"/resource/{id:uint}/feature/{feature_id:int}/update",
         factory=resource_factory,
-    ).add_view(feature_update, context=IFeatureLayer)
+    ).get(feature_update, context=IFeatureLayer)
 
     config.add_route(
         "resource.history",
         r"/resource/{id:uint}/history",
         factory=resource_factory,
-    ).add_view(history, context=IFeatureLayer)
+    ).get(history, context=IFeatureLayer)
 
     config.add_view(
         export,
         route_name="resource.export.page",
+        request_method="GET",
         context=IFeatureLayer,
     )
 

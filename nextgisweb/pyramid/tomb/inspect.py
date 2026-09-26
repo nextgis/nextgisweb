@@ -1,14 +1,18 @@
-from collections.abc import Generator
-from dataclasses import dataclass
+from __future__ import annotations
+
+from dataclasses import dataclass, fields
+from typing import Generator
 
 from pyramid.config.actions import ActionInfo
 
 from .predicate import RouteMeta, ViewMeta
+from .types import RequestMethodType, RequestMethodValues
+from .urldispatch import Route
 
 
 @dataclass
 class ViewInspector(ViewMeta):
-    method: str
+    method: RequestMethodType | None
     info: ActionInfo
 
 
@@ -21,20 +25,26 @@ class RouteInspector(RouteMeta):
 def iter_routes(introspector) -> Generator[RouteInspector, None, None]:
     def views(related) -> Generator[ViewInspector, None, None]:
         for itm in filter(lambda i: i.category_name == "views", related):
-            if meta := ViewMeta.select(itm["predicates"]):
+            if view_meta := itm.get("view_meta"):
+                assert isinstance(view_meta, ViewMeta)
+
                 method = itm["request_methods"]
+                assert method is None or method in RequestMethodValues
+
                 yield ViewInspector(
-                    **meta.__dict__,
+                    **view_meta.__dict__,
                     method=method,
                     info=itm.action_info,
                 )
 
     if routes := introspector.get_category("routes"):
         for itm in routes:
-            route = itm["introspectable"]["object"]
-            if meta := RouteMeta.select(route.predicates):
+            route: Route = itm["introspectable"]["object"]
+            if route_meta := route.meta:
+                assert isinstance(route_meta, RouteMeta)
+
                 yield RouteInspector(
-                    **meta.__dict__,
+                    **{f.name: getattr(route_meta, f.name) for f in fields(route_meta)},
                     name=route.name,
                     views=views(itm["related"]),
                 )

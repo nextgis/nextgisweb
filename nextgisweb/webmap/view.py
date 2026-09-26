@@ -94,11 +94,11 @@ def display_tiny(request: Request):
 
 
 @react_renderer("@nextgisweb/webmap/clone-webmap")
-def clone(request: Request):
+def clone(context: WebMap, request: Request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        props=dict(id=request.context.id),
-        obj=request.context,
+        props=dict(id=context.id),
+        obj=context,
         title=gettext("Clone web map"),
     )
 

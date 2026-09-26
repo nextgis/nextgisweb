@@ -12,13 +12,12 @@ from .component import LayerPreviewComponent
 
 
 @react_renderer("@nextgisweb/layer-preview/preview-layer")
-def preview_map(request: Request):
+def preview_map(context, request: Request):
     request.resource_permission(DataScope.read)
-    resource = request.context
 
     return dict(
-        obj=resource,
-        props=dict(resourceId=resource.id),
+        obj=context,
+        props=dict(resourceId=context.id),
         title=gettext("Preview"),
     )
 
@@ -28,16 +27,16 @@ def setup_pyramid(comp: LayerPreviewComponent, config: Configurator):
         "layer_preview.map",
         r"/resource/{id:uint}/preview",
         factory=resource_factory,
-    ).add_view(
+    ).get(
         preview_map,
         context=IFeatureLayer,
-    ).add_view(
+    ).get(
         preview_map,
         context=IRenderableStyle,
-    ).add_view(
+    ).get(
         preview_map,
         context=RasterLayer,
-    ).add_view(
+    ).get(
         preview_map,
         context=BasemapLayer,
     )

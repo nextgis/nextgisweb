@@ -13,7 +13,7 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import UserException
 from nextgisweb.core.storage import StorageInsufficient
-from nextgisweb.pyramid.tomb import Configurator, Request, Response
+from nextgisweb.pyramid.tomb import Configurator, CorsHeaders, Request, Response
 
 from .component import FileUploadComponent
 from .exception import FileUploadStorageInsufficient
@@ -380,7 +380,7 @@ def _tus_decode_upload_metadata(value):
 
 
 def setup_pyramid(comp: FileUploadComponent, config: Configurator):
-    tus_cors_headers = dict(
+    tus_cors_headers = CorsHeaders(
         request=(
             "Upload-Offset",
             "Upload-Length",

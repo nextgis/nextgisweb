@@ -204,4 +204,4 @@ def page(request: Request):
 
 def setup_pyramid(comp: component.PyramidComponent, config: Configurator):
     config.add_subscriber(subscriber, NewRequest)
-    config.add_route("pyramid.uacompat", "/uacompat").add_view(page)
+    config.add_route("pyramid.uacompat", "/uacompat", get=page)

@@ -3,7 +3,7 @@ import secrets
 import string
 from calendar import timegm
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from functools import cache
 from pathlib import Path
 from threading import Thread
@@ -18,16 +18,16 @@ from nextgisweb.lib.logging import logger
 from .tomb import Request
 
 
-def viewargs(
+def viewargs[T](
     *,
     renderer: str | None = None,
     query_params: Sequence[tuple[str, Any] | tuple[str, Any, Any]] | None = None,
-):
-    def wrap(func):
+) -> Callable[[T], T]:
+    def wrap(func: T) -> T:
         if renderer is not None:
-            func.__pyramid_renderer__ = renderer
+            setattr(func, "__pyramid_renderer__", renderer)
         if query_params is not None:
-            func.__pyramid_query_params__ = query_params
+            setattr(func, "__pyramid_query_params__", query_params)
         return func
 
     return wrap

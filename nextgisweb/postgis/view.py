@@ -22,9 +22,7 @@ class PostgisLayerWidget(Widget):
 
 
 @react_renderer("@nextgisweb/postgis/diagnostics-widget")
-def diagnostics_page(request: Request):
-    context = request.context
-
+def diagnostics_page(context: PostgisConnection | PostgisLayer, request: Request):
     if isinstance(context, PostgisConnection):
         request.resource_permission(ConnectionScope.connect)
         data = dict(connection=dict(id=context.id))
@@ -32,12 +30,12 @@ def diagnostics_page(request: Request):
         request.resource_permission(DataScope.read)
         data = dict(connection=dict(id=context.connection.id), layer=dict(id=context.id))
     else:
-        raise ValueError
+        raise NotImplementedError
 
     return dict(
         props=dict(data=data),
         title=gettext("PostGIS diagnostics"),
-        obj=request.context,
+        obj=context,
     )
 
 
@@ -46,6 +44,10 @@ def setup_pyramid(comp: PostgisComponent, config: Configurator):
         "postgis.diagnostics_page",
         r"/resource/{id:uint}/postgis-diagnostics",
         factory=resource_factory,
-    ).add_view(diagnostics_page, context=PostgisConnection).add_view(
-        diagnostics_page, context=PostgisLayer
+    ).get(
+        diagnostics_page,
+        context=PostgisConnection,
+    ).get(
+        diagnostics_page,
+        context=PostgisLayer,
     )

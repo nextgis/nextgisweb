@@ -34,14 +34,13 @@ def srs_create(request: Request):
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/srs-widget")
-def srs_edit(request: Request):
+def srs_edit(context: SRS, request: Request):
     request.user.require_permission(any, *SRS.permissions.all)
 
-    srs = request.context
     readonly = not request.user.has_permission(SRS.permissions.manage)
     return dict(
-        props=dict(id=srs.id, readonly=readonly),
-        title=srs.display_name,
+        props=dict(id=context.id, readonly=readonly),
+        title=context.display_name,
     )
 
 

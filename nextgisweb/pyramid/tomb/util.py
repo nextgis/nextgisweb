@@ -36,3 +36,13 @@ def is_json_type(t: type) -> bool:
         return True
 
     return False
+
+
+class ContextRequestViewMapper:
+    """No-op view mapper that forces (context, request) calling convention for views."""
+
+    def __init__(self, **kwargs):
+        pass
+
+    def __call__(self, view):
+        return view

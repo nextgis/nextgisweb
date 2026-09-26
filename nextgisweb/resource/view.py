@@ -99,22 +99,21 @@ def resource_breadcrumb(obj, request: Request):
 
 
 @react_renderer("@nextgisweb/resource/page/show")
-def show(request: Request):
+def show(context: Resource, request: Request):
     request.resource_permission(ResourceScope.read)
-    obj = request.context
 
-    sections = list()
+    sections = []
     for section in resource_sections:
-        if not (ctx := section.callback(obj, request=request)):
+        if not (ctx := section.callback(context, request=request)):
             continue
         if not isinstance(ctx, dict):
-            ctx = dict()
+            ctx = {}
         sections.append({"module": section.jsentry, "props": ctx})
 
-    props = {"resourceId": obj.id, "sectionsConfig": sections}
+    props = {"resourceId": context.id, "sectionsConfig": sections}
     return dict(
         props=props,
-        obj=request.context,
+        obj=context,
     )
 
 
@@ -134,23 +133,23 @@ def search_page(request: Request):
 
 
 @react_renderer("@nextgisweb/resource/json-view")
-def json_view(request: Request):
+def json_view(context: Resource, request: Request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        props=dict(id=request.context.id),
+        props=dict(id=context.id),
         title=gettext("JSON view"),
-        obj=request.context,
+        obj=context,
         maxheight=True,
     )
 
 
 @react_renderer("@nextgisweb/resource/effective-permissions")
-def effective_permisssions(request: Request):
+def effective_permisssions(context: Resource, request: Request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        props=dict(resourceId=request.context.id),
+        props=dict(resourceId=context.id),
         title=gettext("User permissions"),
-        obj=request.context,
+        obj=context,
     )
 
 
@@ -185,42 +184,42 @@ class OnResourceCreateView:
 
 
 @react_renderer("@nextgisweb/resource/composite")
-def create(request: Request, *, cls: str):
+def create(context: Resource, request: Request, *, cls: str):
     request.resource_permission(ResourceScope.manage_children)
 
-    zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
-    setup = dict(operation="create", cls=cls, parent=request.context.id)
+    zope.event.notify(OnResourceCreateView(cls=cls, parent=context))
+    setup = dict(operation="create", cls=cls, parent=context.id)
     return dict(
         props=dict(setup=setup),
-        obj=request.context,
+        obj=context,
         title=gettext("Create resource"),
         maxheight=True,
     )
 
 
 @react_renderer("@nextgisweb/resource/composite")
-def update(request: Request):
+def update(context: Resource, request: Request):
     request.resource_permission(ResourceScope.update)
-    setup = dict(operation="update", id=request.context.id)
+    setup = dict(operation="update", id=context.id)
     return dict(
         props=dict(setup=setup),
-        obj=request.context,
+        obj=context,
         title=gettext("Update resource"),
         maxheight=True,
     )
 
 
 @react_renderer("@nextgisweb/resource/delete-page")
-def delete(request: Request):
+def delete(context: Resource, request: Request):
     request.resource_permission(ResourceScope.read)
-    props = dict(resources=[request.context.id])
-    if (parent := request.context.parent) is not None:
+    props: dict[str, object] = dict(resources=[context.id])
+    if (parent := context.parent) is not None:
         props["navigateToId"] = parent.id
     return dict(
         # Delete page is universal for multiple resources deletion which is why resources is an array
         props=props,
         title=gettext("Delete resource"),
-        obj=request.context,
+        obj=context,
         maxheight=True,
     )
 

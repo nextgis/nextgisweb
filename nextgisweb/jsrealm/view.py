@@ -40,5 +40,5 @@ def setup_pyramid(comp: JSRealmComponent, config: Configurator):
         else:
             config.add_static_path(pn, p)
 
-    config.add_route("jsrealm.testentry.browse", "/testentry/").add_view(testentry_browse)
-    config.add_route("jsrealm.testentry", "/testentry/*selected").add_view(testentry)
+    config.add_route("jsrealm.testentry.browse", "/testentry/", get=testentry_browse)
+    config.add_route("jsrealm.testentry", "/testentry/*selected", get=testentry)

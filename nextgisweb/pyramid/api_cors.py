@@ -3,7 +3,6 @@ from pyramid.interfaces import IRoutesMapper
 from nextgisweb.core import CoreComponent
 
 from .tomb import Configurator, Request, Response
-from .tomb.predicate import RouteMeta
 from .util import parse_origin
 
 
@@ -34,8 +33,7 @@ def check_origin(request: Request, origin: str) -> bool:
 
 
 def tween_factory(handler, registry):
-    """Tween adds Access-Control-* headers for simple and preflighted
-    CORS requests"""
+    """Tween adds Access-Control-* headers for simple and preflighted CORS requests."""
 
     def cors_tween(request: Request):
         if (
@@ -50,12 +48,12 @@ def tween_factory(handler, registry):
 
             if (
                 (route := registry.getUtility(IRoutesMapper)(request)["route"])
-                and (meta := RouteMeta.select(route.predicates))
-                and (ch := meta.cors_headers)
+                and (meta := route.meta) is not None
+                and (ch := meta.cors_headers) is not None
             ):
                 route_cors_headers = ch
             else:
-                route_cors_headers = dict()
+                route_cors_headers = {}
 
             # Preflighted request handling
 

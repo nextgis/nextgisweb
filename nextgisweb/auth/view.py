@@ -24,6 +24,7 @@ from nextgisweb.pyramid.tomb import (
     HTTPNotFound,
     HTTPUnauthorized,
     Request,
+    Response,
     render_to_response,
 )
 from nextgisweb.pyramid.view import ModelFactory
@@ -71,48 +72,50 @@ def login(request: Request):
 
 
 @react_renderer("@nextgisweb/auth/session-invite")
-def session_invite(request: Request):
+def session_invite_get(request: Request):
+    next_url = request.params.get("next", request.application_url)
+
+    if any(k not in request.GET for k in ("sid", "expires")):
+        raise HTTPNotFound()
+
+    return dict(
+        title=gettext("Invitation session"),
+        props=dict(
+            sid=request.GET["sid"],
+            expires=request.GET["expires"],
+            next=next_url,
+        ),
+    )
+
+
+def session_invite_post(request: Request) -> Response:
     from nextgisweb.pyramid import PyramidComponent
 
     next_url = request.params.get("next", request.application_url)
 
-    if request.method == "GET":
-        if any(k not in request.GET for k in ("sid", "expires")):
-            raise HTTPNotFound()
+    sid = request.POST["sid"]
+    expires = datetime.fromisoformat(request.POST["expires"])
 
-        return dict(
-            title=gettext("Invitation session"),
-            props=dict(
-                sid=request.GET["sid"],
-                expires=request.GET["expires"],
-                next=next_url,
-            ),
+    try:
+        state = AuthState.from_dict(
+            SessionStore.filter_by(session_id=sid, key="auth.state").one().value
         )
+    except NoResultFound:
+        raise InvalidCredentialsException(message=gettext("Session not found."))
 
-    elif request.method == "POST":
-        sid = request.POST["sid"]
-        expires = datetime.fromisoformat(request.POST["expires"])
+    exp = datetime.fromtimestamp(state.exp)
+    if expires != exp or state.ref != 0:
+        raise InvalidCredentialsException(message=gettext("Invalid 'expires' parameter."))
+    if exp <= utcnow_naive():
+        raise InvalidCredentialsException(message=gettext("Session expired."))
 
-        try:
-            state = AuthState.from_dict(
-                SessionStore.filter_by(session_id=sid, key="auth.state").one().value
-            )
-        except NoResultFound:
-            raise InvalidCredentialsException(message=gettext("Session not found."))
+    cookie_settings = WebSession.cookie_settings(request)
+    cookie_name = request.env.component(PyramidComponent).options["session.cookie.name"]
 
-        exp = datetime.fromtimestamp(state.exp)
-        if expires != exp or state.ref != 0:
-            raise InvalidCredentialsException(message=gettext("Invalid 'expires' parameter."))
-        if exp <= utcnow_naive():
-            raise InvalidCredentialsException(message=gettext("Session expired."))
+    response = HTTPFound(location=next_url)
+    response.set_cookie(cookie_name, value=sid, **cookie_settings)
 
-        cookie_settings = WebSession.cookie_settings(request)
-        cookie_name = request.env.component(PyramidComponent).options["session.cookie.name"]
-
-        response = HTTPFound(location=next_url)
-        response.set_cookie(cookie_name, value=sid, **cookie_settings)
-
-        return response
+    return response
 
 
 def alink(request: Request, token: str):
@@ -357,14 +360,13 @@ def user_create(request: Request):
 
 
 @react_renderer("@nextgisweb/auth/user-widget")
-def user_edit(request: Request):
+def user_edit(context: User, request: Request):
     request.user.require_permission(any, *permission.auth)
 
-    obj = request.context
     readonly = not request.user.has_permission(permission.manage)
     return dict(
-        props=dict(id=obj.id, readonly=readonly),
-        title=obj.display_name,
+        props=dict(id=context.id, readonly=readonly),
+        title=context.display_name,
     )
 
 
@@ -388,14 +390,13 @@ def group_create(request: Request):
 
 
 @react_renderer("@nextgisweb/auth/group-widget")
-def group_edit(request: Request):
+def group_edit(context: Group, request: Request):
     request.user.require_permission(any, *permission.auth)
 
-    obj = request.context
     readonly = not request.user.has_permission(permission.manage)
     return dict(
-        props=dict(id=obj.id, readonly=readonly),
-        title=obj.display_name,
+        props=dict(id=context.id, readonly=readonly),
+        title=context.display_name,
     )
 
 
@@ -457,19 +458,25 @@ def cs_oauth(comp: AuthComponent, request: Request) -> AuthOAuthClientSetting:
 
 def setup_pyramid(comp: AuthComponent, config: Configurator):
     config.add_route("auth.login", "/login", get=login)
-    config.add_route("auth.session_invite", "/session-invite").add_view(session_invite)
-    config.add_route("auth.alink", "/alink/{token:str}").add_view(alink)
-    config.add_route("auth.oauth", "/oauth").add_view(oauth)
+    config.add_route("auth.alink", "/alink/{token:str}", get=alink)
+    config.add_route("auth.oauth", "/oauth", get=oauth)
     config.add_route("auth.logout", "/logout", get=logout)
-    config.add_route("auth.settings", "/settings").add_view(settings)
+    config.add_route("auth.settings", "/settings", get=settings)
+
+    config.add_route(
+        "auth.session_invite",
+        "/session-invite",
+        get=session_invite_get,
+        post=session_invite_post,
+    )
 
     config.add_request_method(_login_url, name="login_url")
 
-    config.add_route("auth.user.browse", "/auth/user/").add_view(user_browse)
+    config.add_route("auth.user.browse", "/auth/user/", get=user_browse)
     config.add_route("auth.user.create", "/auth/user/create", get=user_create)
     config.add_route("auth.user.edit", "/auth/user/{id}", factory=user_factory, get=user_edit)
 
-    config.add_route("auth.group.browse", "/auth/group/").add_view(group_browse)
+    config.add_route("auth.group.browse", "/auth/group/", get=group_browse)
     config.add_route("auth.group.create", "/auth/group/create", get=group_create)
     config.add_route("auth.group.edit", "/auth/group/{id}", factory=group_factory, get=group_edit)
 
