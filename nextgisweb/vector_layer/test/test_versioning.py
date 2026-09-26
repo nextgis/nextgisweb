@@ -11,6 +11,7 @@ from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
 from nextgisweb.feature_layer.exception import FeatureNotFound, RestoreNotDeleted
+from nextgisweb.feature_layer.filter import FilterParser
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource.test import ResourceAPI
 
@@ -82,13 +83,13 @@ def test_model(ngw_txn):
 
     # Compare current and previous versions
     query = res.feature_query()
-    query.filter_by(id=1)
+    query.set_filter_program(FilterParser([]).parse(["==", ["fid"], 1]))
     (cfeat,) = query()
     assert cfeat.fields["foo"] == "2"
 
     query = res.feature_query()
     query.pit(res.fversioning.latest - 1)
-    query.filter_by(id=1)
+    query.set_filter_program(FilterParser([]).parse(["==", ["fid"], 1]))
     (pfeat,) = query()
     assert pfeat.fields["foo"] == "1"
 
@@ -110,7 +111,7 @@ def test_model(ngw_txn):
     assert res.fversioning.latest == next(vcur)
 
     query = res.feature_query()
-    query.filter_by(id=1)
+    query.set_filter_program(FilterParser([]).parse(["==", ["fid"], 1]))
     (pfeat,) = query()
     assert pfeat.fields["foo"] == "2"
 

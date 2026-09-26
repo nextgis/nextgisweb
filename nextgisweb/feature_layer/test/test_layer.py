@@ -13,11 +13,8 @@ from nextgisweb.vector_layer.test import create_feature_layer as create_vector_l
 from nextgisweb.wfsclient import WFSLayer
 from nextgisweb.wfsclient.test import create_feature_layer as create_wfs_layer
 
-from ..interface import (
-    IFeatureQueryFilter,
-    IFeatureQueryFilterBy,
-    IFeatureQueryOrderBy,
-)
+from ..interface import IFeatureQueryOrderBy
+from . import legacy_to_program
 from .data import generate_filter_extents
 
 pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
@@ -132,38 +129,38 @@ def test_attributes(
 
         q = layer.feature_query()
 
-        if IFeatureQueryFilter.providedBy(q):
-            for filter_, ids_expected in filter_cases:
-                # Skip unsupported operations
-                skip = False
-                if isinstance(layer, WFSLayer):
-                    for k, op, v in filter_:
-                        if op == "isnull" and v == "no":
-                            skip = True
-                            break
-                if skip:
-                    continue
-
-                query = layer.feature_query()
-                query.filter(*filter_)
-                ids = [f.id for f in query()]
-                assert sorted(ids) == ids_expected
-
-        if IFeatureQueryFilterBy.providedBy(q):
-            for filter_, ids_expected in filter_cases:
-                filter_by = dict()
-                skip = False
-                for k, o, v in filter_:
-                    if o != "eq":
+        for filter_, ids_expected in filter_cases:
+            # Skip unsupported operations
+            skip = False
+            if isinstance(layer, WFSLayer):
+                for k, op, v in filter_:
+                    if op == "isnull" and v == "no":
                         skip = True
                         break
-                    filter_by[k] = v
-                if skip:
-                    continue
-                query = layer.feature_query()
-                query.filter_by(**filter_by)
-                ids = [f.id for f in query()]
-                assert sorted(ids) == ids_expected
+            if skip:
+                continue
+
+            query = layer.feature_query()
+            query.set_filter_program(legacy_to_program(layer, filter_))
+            ids = [f.id for f in query()]
+            assert sorted(ids) == ids_expected
+
+        for filter_, ids_expected in filter_cases:
+            filter_by = dict()
+            skip = False
+            for k, o, v in filter_:
+                if o != "eq":
+                    skip = True
+                    break
+                filter_by[k] = v
+            if skip:
+                continue
+            query = layer.feature_query()
+            query.set_filter_program(
+                legacy_to_program(layer, [(k, "eq", v) for k, v in filter_by.items()])
+            )
+            ids = [f.id for f in query()]
+            assert sorted(ids) == ids_expected
 
         if IFeatureQueryOrderBy.providedBy(q):
             for order_by, ids_expected in order_by_cases:
@@ -283,7 +280,7 @@ def test_filtered_extent(
         # Filtered extent
         query = layer.feature_query()
         if filter_ is not None:
-            query.filter(filter_)
+            query.set_filter_program(legacy_to_program(layer, (filter_,)))
         actual_extent = query().extent
 
         for k in ("minLat", "maxLat", "minLon", "maxLon"):

@@ -6,6 +6,7 @@ from osgeo import ogr, osr
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE
+from nextgisweb.feature_layer.filter import FilterParser
 from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource.test import ResourceAPI
@@ -184,7 +185,7 @@ def test_fid(fid_source, fid_field, id_expect, ngw_txn, ngw_data_path):
     )
 
     query = res.feature_query()
-    query.filter_by(id=id_expect)
+    query.set_filter_program(FilterParser([]).parse(["==", ["fid"], id_expect]))
     assert query().total_count == 1
 
 

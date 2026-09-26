@@ -3,9 +3,8 @@ from typing import TYPE_CHECKING, ClassVar
 import sqlalchemy as sa
 from msgspec import UNSET
 from shapely.geometry import box
-from sqlalchemy import cast, func
-from sqlalchemy.sql import alias, literal_column, null, select
-from sqlalchemy.sql import operators as sa_operators
+from sqlalchemy import func
+from sqlalchemy.sql import alias, literal_column, select
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
@@ -19,11 +18,7 @@ from nextgisweb.feature_layer import (
     IAggregatableFeatureQuery,
     IFeatureQuery,
     IFeatureQueryClipByBox,
-    IFeatureQueryFilter,
-    IFeatureQueryFilterBy,
-    IFeatureQueryIlike,
     IFeatureQueryIntersects,
-    IFeatureQueryLike,
     IFeatureQueryOrderBy,
     IFeatureQuerySimplify,
 )
@@ -36,10 +31,6 @@ from .vlschema import get_fields
 
 @implementer(
     IFeatureQuery,
-    IFeatureQueryFilter,
-    IFeatureQueryFilterBy,
-    IFeatureQueryLike,
-    IFeatureQueryIlike,
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
     IFeatureQueryClipByBox,
@@ -68,10 +59,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._limit = None
         self._offset = None
 
-        self._filter = None
-        self._filter_by = None
-        self._like = None
-        self._ilike = None
         self._filter_program = None
         self._text_search_context = None
 
@@ -111,12 +98,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._limit = limit
         self._offset = offset
 
-    def filter(self, *args):
-        self._filter = args
-
-    def filter_by(self, **kwargs):
-        self._filter_by = kwargs
-
     def set_filter_program(self, program):
         self._filter_program = program
 
@@ -125,12 +106,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def order_by(self, *args):
         self._order_by = args
-
-    def like(self, value):
-        self._like = value
-
-    def ilike(self, value):
-        self._ilike = value
 
     supported_aggregations = list(aggregation.vector_aggregations.keys())
 
@@ -151,81 +126,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         columns_mapping.update(fields)
         where = []
 
-        if self._filter_by:
-            for k, v in self._filter_by.items():
-                where.append((idcol if k == "id" else fields[k]) == v)
-
-        if self._filter:
-            _where_filter = []
-            for k, o, v in self._filter:
-                supported_operators = (
-                    "eq",
-                    "ne",
-                    "isnull",
-                    "ge",
-                    "gt",
-                    "le",
-                    "lt",
-                    "like",
-                    "ilike",
-                    "in",
-                    "notin",
-                    "startswith",
-                )
-                if o not in supported_operators:
-                    raise ValueError(
-                        "Invalid operator '%s'. Only %r are supported." % (o, supported_operators)
-                    )
-
-                if v and o in ["in", "notin"]:
-                    v = v.split(",")
-
-                if o in [
-                    "ilike",
-                    "in",
-                    "like",
-                    "notin",
-                    "startswith",
-                ]:
-                    o += "_op"
-                elif o == "isnull":
-                    if v == "yes":
-                        o = "is_"
-                    elif v == "no":
-                        o = "isnot"
-                    else:
-                        raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
-                    v = null()
-
-                op = getattr(sa_operators, o)
-                column = idcol if k == "id" else fields[k]
-                if o not in ("is_", "isnot"):
-                    if isinstance(v, list):
-                        v = [sa.type_coerce(item, column.type) for item in v]
-                    else:
-                        v = sa.type_coerce(v, column.type)
-                _where_filter.append(op(column, v))
-
-            if len(_where_filter) > 0:
-                where.append(sa.and_(*_where_filter))
-
         if self._filter_program is not None:
             virtual_operands_mapping = {"fid": idcol}
             clause = self._filter_program.to_clause(columns_mapping, virtual_operands_mapping)
             if clause is not None:
                 where.append(clause)
-
-        if self._like or self._ilike:
-            operands = []
-            text_seach_fields = set(f.keyname for f in self.layer.fields if f.text_search)
-            for fld_k, fld_c in fields.items():
-                if fld_k in text_seach_fields:
-                    operands.append(cast(fld_c, sa.Unicode))
-            if len(operands) == 0:
-                where.append(False)
-            else:
-                method, value = ("like", self._like) if self._like else ("ilike", self._ilike)
-                where.append(sa.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
         if self._intersects and self.layer.geometry_type != GEOM_TYPE.NONE:
             reproject = (

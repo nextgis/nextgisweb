@@ -35,6 +35,69 @@ class FilterExpressionError(ValidationError):
         super().__init__(message=gettext("Invalid filter expression"), data=data)
 
 
+def legacy_to_expression(resource, filter_) -> list[Any]:
+    """Translate legacy (key, operator, value) filter tuples into an expression.
+
+    The tuples mirror the legacy ``fld_*`` / ``id__*`` query-parameter semantics;
+    an ``"id"`` key translates to the virtual ``fid`` operand.
+
+    Returns a flat list of condition expressions (possibly empty).
+    """
+    conditions: list[Any] = []
+    for key, operator, value in filter_:
+        if operator == "startswith":
+            raise ValidationError(
+                message="The 'startswith' operator is not supported in the new filter format."
+            )
+
+        if key == "id":
+            left = ["fid"]
+        else:
+            try:
+                resource.field_by_keyname(key)
+            except KeyError:
+                raise ValidationError(message="Unknown field '%s'." % key)
+            left = ["get", key]
+
+        if operator == "eq":
+            cond = ["==", left, value]
+        elif operator == "ne":
+            cond = ["!=", left, value]
+        elif operator == "gt":
+            cond = [">", left, value]
+        elif operator == "ge":
+            cond = [">=", left, value]
+        elif operator == "lt":
+            cond = ["<", left, value]
+        elif operator == "le":
+            cond = ["<=", left, value]
+        elif operator == "in":
+            vals = value.split(",") if value else []
+            cond = ["in", left, *vals]
+        elif operator == "notin":
+            vals = value.split(",") if value else []
+            cond = ["!in", left, *vals]
+        elif operator == "isnull":
+            if value == "yes":
+                cond = ["is_null", left]
+            elif value == "no":
+                cond = ["!is_null", left]
+            else:
+                raise ValidationError(
+                    message="Invalid value '%s' for operator '%s'." % (value, operator)
+                )
+        elif operator == "like":
+            cond = ["like", left, value]
+        elif operator == "ilike":
+            cond = ["ilike", left, value]
+        else:
+            raise ValidationError(message="Invalid operator '%s'." % operator)
+
+        conditions.append(cond)
+
+    return conditions
+
+
 @dataclass(frozen=True)
 class FieldInfo:
     key: str
@@ -281,6 +344,10 @@ class NotIsNullNode(UnaryConditionNode, operators=("!is_null",)):
     pass
 
 
+class LikeNode(BinaryConditionNode, operators=("like",)):
+    pass
+
+
 class IlikeNode(BinaryConditionNode, operators=("ilike",)):
     pass
 
@@ -385,6 +452,9 @@ class SQLAlchemyCompiler:
 
             case NotIsNullNode(operand=operand):
                 return self._compile_operand(operand).is_not(None)
+
+            case LikeNode(left=left, right=right):
+                return self._compile_operand(left).like(self._compile_operand(right))
 
             case IlikeNode(left=left, right=right):
                 return self._compile_operand(left).ilike(self._compile_operand(right))

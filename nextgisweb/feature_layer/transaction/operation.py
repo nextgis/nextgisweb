@@ -9,6 +9,7 @@ from msgspec.inspect import StructType, type_info
 from nextgisweb.lib.geometry import Geometry
 
 from ..feature import Feature
+from ..filter import FilterParser
 from ..transaction import FeatureLayerTransaction
 from ..versioning import FVersioningMeta
 
@@ -84,7 +85,9 @@ class OperationExecutor(abc.ABC):
 
     def require_feature(self, fid: FeatureIDOrSeqNum, seqnum: SeqNum) -> Literal[True]:
         if isinstance(fid, int):
-            self._feature_query_first.filter_by(id=fid)
+            self._feature_query_first.set_filter_program(
+                FilterParser([]).parse(["==", ["fid"], fid])
+            )
             for _ in self._feature_query_first():
                 return True
             raise OperationError(FeatureNotFound())
@@ -98,7 +101,7 @@ class OperationExecutor(abc.ABC):
         return True
 
     def get_feature(self, fid: FeatureID, *, seqnum: SeqNum) -> Feature:
-        self._feature_query_first.filter_by(id=fid)
+        self._feature_query_first.set_filter_program(FilterParser([]).parse(["==", ["fid"], fid]))
         for feat in self._feature_query_first():
             return feat
         raise OperationError(FeatureNotFound())

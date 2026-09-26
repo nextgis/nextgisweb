@@ -1,5 +1,7 @@
 import pytest
 
+from nextgisweb.feature_layer.test import legacy_to_program
+
 from .. import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
@@ -59,6 +61,6 @@ def test_filter(filter_, length, resource, ngw_txn):
     filtered_value = feature.id if key == "id" else feature.fields[key]
 
     query_filter = resource.feature_query()
-    query_filter.filter(filter_)
+    query_filter.set_filter_program(legacy_to_program(resource, (filter_,)))
     msg = "%s for '%s' should be %s" % (filter_, filtered_value, length)
     assert query_filter().total_count == length, msg
