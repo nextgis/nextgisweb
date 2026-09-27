@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from functools import cached_property, partial
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Self, cast
 
@@ -8,13 +8,15 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from msgspec import Struct
-from sqlalchemy import event, inspect
-from sqlalchemy.orm import object_session
+from sqlalchemy import MetaData, event, inspect
+from sqlalchemy.orm import Mapped, object_session
 from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import or_ as sql_or
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.saext import mapper_table
+
+from nextgisweb.resource import Resource
 
 from .exception import VersioningContextRequired
 from .model import ActColValue, FVersioningMeta, FVersioningMixin, FVersioningObj
@@ -60,7 +62,7 @@ class ExtensionQueries:
 
     def __init__(self, mapper: type[FVersioningExtensionMixin]):
         self.mapper = mapper
-        self.has_id = hasattr(mapper, "extension_id")
+        self.has_id = mapper.extension_id is not None
         self.cols = mapper.fversioning_columns
         self.tables = VersioningTables(
             mapper_table(mapper),
@@ -73,6 +75,7 @@ class ExtensionQueries:
         return sa.select(self.mapper).where(
             self.mapper.resource_id == self.p_rid,
             self.mapper.feature_id == self.p_fid,
+            # ty: ignore[invalid-argument-type]
             *((self.mapper.extension_id == self.p_eid,) if self.has_id else ()),
         )
 
@@ -394,11 +397,14 @@ class ExtensionQueries:
         else:
             raise ValueError
 
-        q.row_sig_values = lambda row: {
-            self.cols[bidx]: row[sc_idx + bidx + 1]
-            for bidx, bit in enumerate(row[sc_idx])
-            if bit == "1"
-        }
+        def row_sig_values(row: Sequence, *, sc_idx=sc_idx) -> dict[str, object]:
+            return {
+                self.cols[bidx]: row[sc_idx + bidx + 1]
+                for bidx, bit in enumerate(row[sc_idx])
+                if bit == "1"
+            }
+
+        _set_row_sig_values(q, row_sig_values)
 
         return q
 
@@ -525,7 +531,20 @@ class ExtensionQueries:
         return query
 
 
+RowSigValues = Callable[[Sequence], dict[str, object]]
+
+
+def _set_row_sig_values(query: object, func: RowSigValues) -> None:
+    setattr(query, "row_sig_values", func)
+
+
+def _get_row_sig_values(query: object) -> RowSigValues:
+    return getattr(query, "row_sig_values")
+
+
 class FVersioningExtensionMixin:
+    __abstract__ = True
+
     fversioning_registry: ClassVar[dict[str, type[FVersioningExtensionMixin]]] = dict()
 
     # Class attributes, descendants must define them
@@ -539,6 +558,16 @@ class FVersioningExtensionMixin:
     fversioning_vobj: FVersioningObj | None = None
     fversioning_initializing: bool
     fversioning_restored: tuple[int, str]
+
+    if TYPE_CHECKING:
+        __tablename__: str
+        metadata: MetaData
+
+        resource_id: Mapped[int]
+        feature_id: Mapped[int]
+        extension_id: Mapped[int] | None
+
+        resource: Mapped[Resource]
 
     def __init_subclass__(cls) -> None:
         cls.fversioning_registry[cls.fversioning_extension] = cls
@@ -722,7 +751,7 @@ class FVersioningExtensionMixin:
         initial = initial or 0
 
         query = cls.fversioning_queries.changes
-        row_sig_values = query.row_sig_values
+        row_sig_values = _get_row_sig_values(query)
 
         qresult = DBSession.execute(
             query,
@@ -736,7 +765,8 @@ class FVersioningExtensionMixin:
         )
 
         for row in qresult:
-            yield cls.fversioning_change_from_query(*row[:4], row_sig_values(row))
+            head: tuple[Any, Any, Any, Any] = tuple(row[:4])
+            yield cls.fversioning_change_from_query(*head, row_sig_values(row))
 
     @classmethod
     def fversioning_change_from_query(
@@ -755,7 +785,7 @@ class FVersioningExtensionMixin:
 
         prefix = cls.__tablename__
         metadata = cls.metadata
-        cls.fversioning_has_id = hasattr(cls, "extension_id")
+        cls.fversioning_has_id = cls.extension_id is not None
 
         cls.fversioning_etab = sa.Table(
             *(f"{prefix}_et", metadata),

@@ -19,12 +19,14 @@ from nextgisweb.resource import Resource
 Base.depends_on("resource", "feature_layer")
 
 
-class FeatureDescription(Base, FVersioningExtensionMixin):
+class FeatureDescription(FVersioningExtensionMixin, Base):
     __tablename__ = "feature_description"
 
     resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
     feature_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     value: Mapped[str] = mapped_column(sa.Unicode)
+
+    extension_id = None  # For FVersioningExtensionMixin
 
     fversioning_metadata_version = 1
     fversioning_extension = "description"

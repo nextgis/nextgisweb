@@ -16,7 +16,7 @@ Base = orm.declarative_base()
 registry = dict()
 
 
-class Simple(Base, FVersioningExtensionMixin):
+class Simple(FVersioningExtensionMixin, Base):
     __tablename__ = "simple"
 
     fversioning_metadata_version = 1
@@ -28,8 +28,10 @@ class Simple(Base, FVersioningExtensionMixin):
     feature_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     value: Mapped[str | None] = mapped_column(sa.Unicode)
 
+    extension_id = None  # For FVersioningExtensionMixin
 
-class Complex(Base, FVersioningExtensionMixin):
+
+class Complex(FVersioningExtensionMixin, Base):
     __tablename__ = "complex"
 
     fversioning_metadata_version = 1

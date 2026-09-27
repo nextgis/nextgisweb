@@ -67,7 +67,7 @@ def _parse_panorama_markers(xmp_desc: dict) -> list[PanoramaMarker] | UnsetType:
     return markers if markers else UNSET
 
 
-class FeatureAttachment(Base, FVersioningExtensionMixin):
+class FeatureAttachment(FVersioningExtensionMixin, Base):
     __tablename__ = "feature_attachment"
 
     resource_id: Mapped[int] = mapped_column(sa.ForeignKey(Resource.id), primary_key=True)
