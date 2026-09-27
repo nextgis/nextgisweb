@@ -69,60 +69,35 @@ resource_registry = DictRegistry[type["Resource"]]()
 
 class ResourceMeta(orm.DeclarativeMeta):
     def __new__(cls, name, bases, nspc):
-        identity = nspc["identity"]
+        if not Base.is_abstract(nspc):
+            identity = nspc["identity"]
 
-        if bases == (Base,):
-            # Resource class itself
-            bres = None
-        else:
-            # First base class, which is subclass of Resource
-            bres = next((c for c in bases if issubclass(c, Resource)), None)
-            assert bres is not None, "Missing resource base class"
+            if bases == (Base,):
+                # Resource class itself
+                bres = None
+            else:
+                # First non-abstract Resource base class
+                for base in bases:
+                    if issubclass(base, Resource) and not Base.is_abstract(base):
+                        bres = base
+                        break
+                else:
+                    raise TypeError(f"No Resource base class found for {name}")
 
-        nspc.setdefault("__tablename__", identity)
+            nspc.setdefault("__tablename__", identity)
 
-        if (id_column := nspc.get("id")) is None:
-            assert bres is not None
-            id_column = bres.id_column()
-            # Place at the beginning for reasonable column order
-            nspc = {"id": id_column, **nspc}
+            if (id_column := nspc.get("id")) is None:
+                assert bres is not None
+                id_column = bres.id_column()
+                # Place at the beginning for reasonable column order
+                nspc = {"id": id_column, **nspc}
 
-        margs = nspc["__mapper_args__"] = nspc.get("__mapper_args__", {})
-        margs.setdefault("polymorphic_identity", identity)
-        if "inherit_condition" not in margs and bres:
-            margs["inherit_condition"] = id_column == bres.id
-
-        if "cls_category" not in nspc:
-            category_auto = None
-            if identity.endswith("_connection"):
-                category_auto = category.ExternalConnectionsCategory
-            elif identity.endswith("_service"):
-                category_auto = category.MapsAndServicesCategory
-            elif identity.endswith(("_layer", "_style")) or nspc.get("__scope__") == DataScope:
-                category_auto = category.LayersAndStylesCategory
-
-            if category_auto:
-                nspc["cls_category"] = category_auto
+            margs = nspc["__mapper_args__"] = nspc.get("__mapper_args__", {})
+            margs.setdefault("polymorphic_identity", identity)
+            if "inherit_condition" not in margs and bres:
+                margs["inherit_condition"] = id_column == bres.id
 
         return super().__new__(cls, name, bases, nspc)
-
-    def __init__(cls, name, bases, nspc):
-        scope = dict()
-
-        for base in cls.__mro__:
-            bscope = base.__dict__.get("__scope__", None)
-            if bscope is None:
-                continue
-            if not hasattr(bscope, "__iter__"):
-                bscope = tuple((bscope,))
-
-            for s in bscope:
-                scope[s.identity] = s
-
-        setattr(cls, "scope", scope)
-        super().__init__(name, bases, nspc)
-
-        resource_registry.register(cls)  # ty: ignore[invalid-argument-type]
 
 
 ResourceScopeType = tuple[type[Scope], ...] | type[Scope]
@@ -136,12 +111,21 @@ class PermissionSets(NamedTuple):
 
 class Resource(Base, metaclass=ResourceMeta):
     identity: ClassVar[str] = "resource"
-    cls_display_name: ClassVar[TrStr] = gettext("Resource")
-    cls_category: ClassVar[type[category.ResourceCategory]] = category.MiscellaneousCategory
-    cls_order: ClassVar[int] = 100
 
-    __scope__: ClassVar[ResourceScopeType] = (ResourceScope,)
-    scope: ClassVar[Mapping[str, Scope]]
+    cls_display_name: ClassVar[TrStr] = gettext("Resource")
+    """Display name of the resource class."""
+
+    cls_category: ClassVar[type[category.ResourceCategory]] = category.MiscellaneousCategory
+    """Category of the resource, used to organize resources in the UI. If not specified in a
+    subclass, the value is calculated based on the class identity and scope."""
+
+    cls_order: ClassVar[int] = 100
+    """Order of the resource in the UI. Lower values are displayed first."""
+
+    scope: ClassVar[Mapping[str, type[Scope]]] = {ResourceScope.identity: ResourceScope}
+    """Mapping of scope identities to corresponding Scope classes. Automatically populated for
+    subclasses by combining scopes defined in the class hierarchy with the subclass's `__scope__`
+    attribute."""
 
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     cls: Mapped[str] = mapped_column(sa.Unicode)
@@ -185,6 +169,14 @@ class Resource(Base, metaclass=ResourceMeta):
         cascade="all,delete-orphan",
         back_populates="resource",
     )
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        if not cls.__dict__.get("__abstract__", False):
+            cls._set_scope()
+            cls._set_cls_category()
+            resource_registry.register(cls)
 
     def __str__(self):
         return self.display_name
@@ -452,6 +444,50 @@ class Resource(Base, metaclass=ResourceMeta):
             q = _query(Resource.id).filter(Resource.display_name == c)
             if not q.scalar():
                 return c
+
+    # Internals
+
+    @classmethod
+    def _set_scope(cls) -> None:
+        scopes: dict[str, type[Scope]] = {}
+
+        for base in cls.__bases__:
+            if (base_scope := getattr(base, "scope", None)) is not None:
+                scopes.update(base_scope)
+
+        if (decl_scope := cls.__dict__.get("__scope__")) is not None:
+            for scope in (
+                (decl_scope,)
+                if isinstance(decl_scope, type) and issubclass(decl_scope, Scope)
+                else decl_scope
+            ):
+                assert issubclass(scope, Scope)
+                scopes[scope.identity] = scope
+
+        cls.scope = scopes
+
+    @classmethod
+    def _set_cls_category(cls) -> None:
+        if "cls_category" in cls.__dict__:
+            return
+
+        identity = cls.identity
+        category_auto: type[category.ResourceCategory] | None = None
+        if identity.endswith("_connection"):
+            category_auto = category.ExternalConnectionsCategory
+        elif identity.endswith("_service"):
+            category_auto = category.MapsAndServicesCategory
+        elif identity.endswith(("_layer", "_style")):
+            category_auto = category.LayersAndStylesCategory
+        elif any(issubclass(s, DataScope) for s in cls.scope.values()):
+            category_auto = category.LayersAndStylesCategory
+
+        if category_auto:
+            cls.cls_category = category_auto
+
+
+# # Register Resource explicitly, since __init_subclass__ is not called for the class itself.
+resource_registry.register(Resource)
 
 
 @event.listens_for(Resource, "after_delete", propagate=True)

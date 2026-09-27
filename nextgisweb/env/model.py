@@ -66,6 +66,17 @@ class Base(metaclass=DeclarativeMeta):
             {"__abstract__": True, "metadata": metadata},
         )
 
+    @staticmethod
+    def is_abstract(td: type | dict, /) -> bool:
+        """Return whether a class is explicitly marked as abstract.
+
+        The argument may be a class, a class namespace, or a class `__dict__`. Only `__abstract__`
+        defined directly on the class is considered; inherited values are ignored.
+        """
+        if isinstance(td, type):
+            td = td.__dict__
+        return bool(td.get("__abstract__", False))
+
     @classmethod
     def depends_on(cls, *other_component_ids: str) -> None:
         for cid in other_component_ids:
