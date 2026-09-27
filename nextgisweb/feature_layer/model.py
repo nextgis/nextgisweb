@@ -27,8 +27,8 @@ from .interface import (
     FeatureLayerFieldDatatype,
     FeatureLayerGeometryType,
     IAggregatableFeatureQuery,
-    IVersionableFeatureLayer,
 )
+from .versioning import FVersioningMixin
 
 Base.depends_on("resource", "lookup_table")
 
@@ -169,7 +169,7 @@ class FeatureLayerMixin:
         return FeatureLayerTransactionContext(self, source, **kwargs)
 
     def feature_transaction_enter(self, ftxn: FeatureLayerTransactionContext) -> None:
-        if IVersionableFeatureLayer.providedBy(self) and self.fversioning:
+        if isinstance(self, FVersioningMixin) and self.fversioning:
             ftxn.vobj = ftxn.enter_context(self.fversioning_context(ftxn.source, **ftxn.kwargs))
 
     def to_ogr(self, ogr_ds, *, name="", fields=None, aliases=None, fid=None):
@@ -356,7 +356,7 @@ class FVersioningUpdate(Struct, kw_only=True):
 class FVersioningAttr(SAttribute):
     def get(self, srlzr: Serializer) -> FVersioningRead | None:
         obj = srlzr.obj
-        if not IVersionableFeatureLayer.providedBy(obj):
+        if not isinstance(obj, FVersioningMixin):
             return None
 
         fversioning = obj.fversioning
@@ -367,7 +367,7 @@ class FVersioningAttr(SAttribute):
 
     def set(self, srlzr: Serializer, value: FVersioningUpdate, *, create: bool):
         obj = srlzr.obj
-        if not IVersionableFeatureLayer.providedBy(obj):
+        if not isinstance(obj, FVersioningMixin):
             raise ValidationError(message=gettext("Versioning not supported"))
 
         if value.enabled is not None:
@@ -395,7 +395,7 @@ class FeatureLayerSerializer(Serializer, resource=FeatureLayerMixin, force_creat
     def deserialize(self):
         from .component import FeatureLayerComponent
 
-        if self.obj.id is None and IVersionableFeatureLayer.providedBy(self.obj):
+        if self.obj.id is None and (isinstance(self.obj, FVersioningMixin)):
             fv = self.data.versioning
             if fv is UNSET:
                 fv = self.data.versioning = FVersioningUpdate()

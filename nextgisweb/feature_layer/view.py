@@ -14,9 +14,9 @@ from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
 from .component import FeatureLayerComponent
-from .interface import GEOM_TYPE, IFeatureLayer, IVersionableFeatureLayer
+from .interface import GEOM_TYPE, IFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST, OGR_DRIVER_NAME_2_EXPORT_FORMATS
-from .versioning import FVersioningNotEnabled
+from .versioning import FVersioningMixin, FVersioningNotEnabled
 
 
 class FeatureLayerFieldsWidget(Widget):
@@ -31,7 +31,7 @@ class SettingsWidget(Widget):
     amdmod = jsentry("@nextgisweb/feature-layer/settings-widget")
 
     def is_applicable(self) -> bool:
-        return IVersionableFeatureLayer.providedBy(self.obj) and super().is_applicable()
+        return isinstance(self.obj, FVersioningMixin) and super().is_applicable()
 
 
 @react_renderer("@nextgisweb/feature-layer/feature-grid")
@@ -98,7 +98,7 @@ def export(context, request: Request):
 @react_renderer("@nextgisweb/feature-layer/version-history")
 def history(context, request: Request):
     request.resource_permission(DataScope.read)
-    if not IVersionableFeatureLayer.providedBy(context) or not context.fversioning:
+    if not isinstance(context, FVersioningMixin) or not context.fversioning:
         raise FVersioningNotEnabled()
     return dict(
         obj=context,

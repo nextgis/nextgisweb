@@ -2,8 +2,6 @@ from nextgisweb.env import gettext
 
 from nextgisweb.core.exception import UserException, ValidationError
 
-from ..interface import IVersionableFeatureLayer
-
 
 class VersioningException(Exception):
     pass
@@ -28,7 +26,9 @@ class FVersioningNotEnabled(ValidationError):
 
     @classmethod
     def disprove(cls, resource):
-        if not IVersionableFeatureLayer.providedBy(resource):
+        from .model import FVersioningMixin
+
+        if not (isinstance(resource, FVersioningMixin)):
             m = gettext("Feature versioning is not supported for this resource.")
         elif not resource.fversioning:
             m = gettext("Feature versioning is not enabled for this resource.")

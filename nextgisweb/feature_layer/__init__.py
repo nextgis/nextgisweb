@@ -20,7 +20,6 @@ from .interface import (
     IFieldEditableFeatureLayer,
     IFilterableFeatureLayer,
     IGeometryEditableFeatureLayer,
-    IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
 from .model import (
@@ -30,7 +29,7 @@ from .model import (
     LayerField,
 )
 from .transaction import FeatureLayerTransaction
-from .versioning import FVersioningMeta, FVersioningObj
+from .versioning import FVersioningMeta, FVersioningMixin, FVersioningObj
 
 __all__ = [
     "FIELD_TYPE",
@@ -40,6 +39,7 @@ __all__ = [
     "GEOM_TYPE_OGR",
     "GEOM_TYPE_OGR_2_GEOM_TYPE",
     "FVersioningMeta",
+    "FVersioningMixin",
     "FVersioningObj",
     "Feature",
     "FeatureExtension",
@@ -61,7 +61,6 @@ __all__ = [
     "IFieldEditableFeatureLayer",
     "IFilterableFeatureLayer",
     "IGeometryEditableFeatureLayer",
-    "IVersionableFeatureLayer",
     "IWritableFeatureLayer",
     "LayerField",
 ]

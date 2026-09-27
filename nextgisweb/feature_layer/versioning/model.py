@@ -20,14 +20,16 @@ from nextgisweb.lib.saext import mapper_table
 from nextgisweb.auth import OnFindReferencesData, Principal, User
 from nextgisweb.resource import Resource
 
-from ..interface import IVersionableFeatureLayer
+from ..interface import IWritableFeatureLayer
 from .exception import VersioningException
 from .util import fversioning_guard
 
 ActColValue = Literal["C", "U", "D", "R"]
 
 
-class FVersioningMixin:
+class FVersioningMixin(Resource):
+    __abstract__ = True
+
     @orm.declared_attr
     def fversioning(cls):
         return orm.relationship(
@@ -110,6 +112,10 @@ class FVersioningMixin:
 
     def fversioning_info(self):
         return ((gettext("Feature versioning"), bool(self.fversioning)),)
+
+
+class IVersionableFeatureLayer(IWritableFeatureLayer):
+    """Interface marker for versionable feature layers"""
 
 
 classImplements(FVersioningMixin, IVersionableFeatureLayer)

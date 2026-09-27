@@ -17,8 +17,9 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import ContentType
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.feature_layer import IFeatureLayer, IVersionableFeatureLayer
+from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.feature_layer.api import FeatureID, query_feature_or_not_found
+from nextgisweb.feature_layer.versioning import FVersioningMixin
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
@@ -68,7 +69,7 @@ def download(
     request.resource_permission(DataScope.read)
 
     search = [FeatureAttachment]
-    if IVersionableFeatureLayer.providedBy(resource) and resource.fversioning:
+    if isinstance(resource, FVersioningMixin) and resource.fversioning:
         search.append(FeatureAttachment.fversioning_htab.c)
 
     for tab in search:

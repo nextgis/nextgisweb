@@ -28,9 +28,7 @@ from ..component import FeatureLayerComponent
 from ..interface import (
     FeatureLayerFieldDatatype,
     FeatureLayerGeometryType,
-    IVersionableFeatureLayer,
 )
-from ..versioning import FVersioningExtensionMixin
 from .exception import (
     FVersioningEpochMismatch,
     FVersioningEpochRequired,
@@ -38,11 +36,13 @@ from .exception import (
     FVersioningNotEnabled,
     FVersioningOutOfRange,
 )
+from .extension import FVersioningExtensionMixin
 from .model import (
     FeatureCreate,
     FeatureDelete,
     FeatureUpdate,
     FVersioningFeatureSummary,
+    FVersioningMixin,
     FVersioningObj,
     registry,
 )
@@ -504,23 +504,23 @@ def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
         "feature_layer.changes_check",
         "/api/resource/{id:uint}/feature/changes/check",
         factory=resource_factory,
-    ).get(change_check, context=IVersionableFeatureLayer)
+    ).get(change_check, context=FVersioningMixin)
 
     config.add_route(
         "feature_layer.changes_fetch",
         "/api/resource/{id:uint}/feature/changes/fetch",
         factory=resource_factory,
-    ).get(change_fetch, context=IVersionableFeatureLayer)
+    ).get(change_fetch, context=FVersioningMixin)
 
     config.add_route(
         "feature_layer.version.collection",
         "/api/resource/{id:uint}/feature/version/",
         factory=resource_factory,
-    ).get(version_cget, context=IVersionableFeatureLayer)
+    ).get(version_cget, context=FVersioningMixin)
 
     config.add_route(
         "feature_layer.version.item",
         "/api/resource/{id}/feature/version/{vid}",
         types=dict(vid=int),
         factory=resource_factory,
-    ).get(version_iget, context=IVersionableFeatureLayer)
+    ).get(version_iget, context=FVersioningMixin)

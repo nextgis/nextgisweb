@@ -182,10 +182,6 @@ class IWritableFeatureLayer(IFeatureLayer):
         """Save feature in a layer"""
 
 
-class IVersionableFeatureLayer(IWritableFeatureLayer):
-    pass
-
-
 class IFeatureQuery(Interface):  # ty: ignore[unsupported-base]
     layer = Attribute(""" IFeatureLayer """)
 

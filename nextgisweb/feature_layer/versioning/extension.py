@@ -16,9 +16,8 @@ from sqlalchemy.sql import or_ as sql_or
 from nextgisweb.env import DBSession
 from nextgisweb.lib.saext import mapper_table
 
-from ..interface import IVersionableFeatureLayer
 from .exception import VersioningContextRequired
-from .model import ActColValue, FVersioningMeta, FVersioningObj
+from .model import ActColValue, FVersioningMeta, FVersioningMixin, FVersioningObj
 
 if TYPE_CHECKING:
     cached_query = cached_property
@@ -562,7 +561,7 @@ class FVersioningExtensionMixin:
 
         session.delete(self)
         resource = self.resource
-        if not IVersionableFeatureLayer.providedBy(resource) or not resource.fversioning:
+        if not isinstance(resource, FVersioningMixin) or not resource.fversioning:
             return
 
         self.fversioning_track(resource)
@@ -858,7 +857,7 @@ class FVersioningExtensionMixin:
     def __instance_init(cls, target, args, kwargs):
         assert target.fversioning_initializing
         resource = kwargs["resource"]
-        if not IVersionableFeatureLayer.providedBy(resource) or not resource.fversioning:
+        if not isinstance(resource, FVersioningMixin) or not resource.fversioning:
             return
 
         session = object_session(resource)
@@ -897,7 +896,7 @@ class FVersioningExtensionMixin:
         if (
             not session._flushing
             and not target.fversioning_vobj
-            and IVersionableFeatureLayer.providedBy(resource)
+            and isinstance(resource, FVersioningMixin)
             and resource.fversioning
         ):
             target.fversioning_track(resource)
@@ -912,7 +911,7 @@ class FVersioningExtensionMixin:
             assert target.resource
 
             if (
-                IVersionableFeatureLayer.providedBy(resource)
+                isinstance(resource, FVersioningMixin)
                 and (fversioning := resource.fversioning) is not None
             ):
                 deleted = insp.session.deleted
