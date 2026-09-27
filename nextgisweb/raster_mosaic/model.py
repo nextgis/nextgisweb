@@ -33,7 +33,7 @@ SUPPORTED_DRIVERS = ("GTiff",)
 
 
 @implementer(IBboxLayer)
-class RasterMosaic(Resource, SpatialLayerMixin):
+class RasterMosaic(SpatialLayerMixin, Resource):
     identity = "raster_mosaic"
     cls_display_name = gettext("Raster mosaic")
 

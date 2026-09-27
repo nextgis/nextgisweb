@@ -273,7 +273,7 @@ class PostgisLayerField(LayerField):
 
 
 @implementer(IFeatureLayer, IFilterableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
-class PostgisLayer(Resource, FeatureLayerMixin):
+class PostgisLayer(FeatureLayerMixin, Resource):
     identity = "postgis_layer"
     cls_display_name = gettext("PostGIS layer")
 

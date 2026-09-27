@@ -305,7 +305,7 @@ class RenderRequest:
 
 
 @implementer(IRenderableStyle, IBboxLayer)
-class WMSLayer(Resource, SpatialLayerMixin):
+class WMSLayer(SpatialLayerMixin, Resource):
     identity = "wmsclient_layer"
     cls_display_name = gettext("WMS layer")
 

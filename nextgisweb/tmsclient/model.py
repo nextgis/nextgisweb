@@ -160,7 +160,7 @@ class RenderRequest:
 
 
 @implementer(IRenderableStyle, IBboxLayer)
-class TMSLayer(Resource, SpatialLayerMixin):
+class TMSLayer(SpatialLayerMixin, Resource):
     identity = "tmsclient_layer"
     cls_display_name = gettext("TMS layer")
 

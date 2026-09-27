@@ -148,7 +148,7 @@ def _vlschema_autoflush(res):
     IWritableFeatureLayer,
     IBboxLayer,
 )
-class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
+class VectorLayer(FVersioningMixin, FeatureLayerMixin, Resource):
     identity = "vector_layer"
     cls_display_name = gettext("Vector layer")
     cls_order = 60

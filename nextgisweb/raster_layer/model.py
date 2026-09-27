@@ -216,7 +216,7 @@ class RasterLayerStorageSerializer(Serializer, resource=RasterLayerStorage):
 
 
 @implementer(IBboxLayer)
-class RasterLayer(Resource, SpatialLayerMixin):
+class RasterLayer(SpatialLayerMixin, Resource):
     identity = "raster_layer"
     cls_display_name = gettext("Raster layer")
     cls_order = 65

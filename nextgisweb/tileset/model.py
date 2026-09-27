@@ -124,7 +124,7 @@ def get_tile_db(db_path):
 
 
 @implementer(IRenderableStyle, IRenderableNonCached, IBboxLayer)
-class Tileset(Resource, SpatialLayerMixin):
+class Tileset(SpatialLayerMixin, Resource):
     identity = "tileset"
     cls_display_name = gettext("Tileset")
 

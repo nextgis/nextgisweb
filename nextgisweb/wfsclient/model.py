@@ -547,7 +547,7 @@ class WFSLayerField(LayerField):
 
 
 @implementer(IFeatureLayer, IBboxLayer)
-class WFSLayer(Resource, FeatureLayerMixin):
+class WFSLayer(FeatureLayerMixin, Resource):
     identity = layer_identity
     cls_display_name = gettext("WFS layer")
 
