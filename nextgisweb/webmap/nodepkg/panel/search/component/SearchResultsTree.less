@@ -17,6 +17,7 @@
 
   .ant-tree-switcher {
     align-self: center;
+    margin-right: 0;
     height: 32px;
     color: inherit;
     line-height: 32px;
@@ -28,6 +29,10 @@
         background-color: transparent;
       }
     }
+  }
+
+  .ant-tree-switcher-noop {
+    display: none;
   }
 
   .ant-tree-node-content-wrapper {
@@ -82,6 +87,7 @@
 
   .tree-item-action {
     display: none;
+    flex-shrink: 0;
     justify-content: center;
     align-items: center;
     cursor: pointer;

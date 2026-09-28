@@ -60,12 +60,18 @@ function SearchPanelTitle({ className, close }: PanelTitleProps) {
           onClick={() => clearSearchText()}
         />
       )}
-      <SearchSettingsPopover
-        value={searchSettings}
-        onChange={changeSearchSettings}
-        availableLayers={availableLayers}
-        defaultSelectedLayerId={defaultSelectedLayerId}
-      />
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <SearchSettingsPopover
+          value={searchSettings}
+          onChange={changeSearchSettings}
+          availableLayers={availableLayers}
+          defaultSelectedLayerId={defaultSelectedLayerId}
+        />
+      </div>
       <PanelTitle.ButtonClose close={close} />
     </div>
   );

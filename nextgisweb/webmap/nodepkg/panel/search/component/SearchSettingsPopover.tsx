@@ -71,7 +71,7 @@ export function SearchSettingsPopover({
   };
 
   const content = (
-    <div className="ngw-search-settings" onClick={(e) => e.stopPropagation()}>
+    <div className="ngw-search-settings">
       {availableLayers.length > 0 && (
         <div className="source-layer-block">
           <span>{msgLayers}</span>

@@ -40,6 +40,9 @@ export function SearchResultsTree({
 
   const selectResult = (resultInfo: SearchResult) => {
     setResultSelected(resultInfo);
+    if (!resultInfo.geometry) {
+      return;
+    }
 
     if (navigationMode === "pan") {
       display.map.panToGeom(resultInfo.geometry);
@@ -76,7 +79,8 @@ export function SearchResultsTree({
       group.type === "layers" &&
       group.identifiable &&
       group.resourceId !== undefined &&
-      resultInfo.featureId !== undefined
+      resultInfo.featureId !== undefined &&
+      resultInfo.geometry
         ? { resourceId: group.resourceId, featureId: resultInfo.featureId }
         : undefined;
 
