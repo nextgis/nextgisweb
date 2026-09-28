@@ -9,7 +9,7 @@ from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .component import FeatureLayerComponent
-from .interface import IFeatureLayer
+from .model import FeatureLayerMixin
 
 
 class IdentifyBody(Struct, kw_only=True):
@@ -38,7 +38,7 @@ def identify(request: Request, *, body: IdentifyBody) -> JSONType:
         if not layer.has_permission(DataScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
 
-        elif not IFeatureLayer.providedBy(layer):
+        elif not isinstance(layer, FeatureLayerMixin):
             result[layer_id_str] = dict(error="Not implemented")
 
         else:

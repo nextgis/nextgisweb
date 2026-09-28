@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from contextlib import ExitStack
-from typing import TYPE_CHECKING, Any, Final, Self, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Self, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -9,6 +10,7 @@ from msgspec import UNSET, Struct, UnsetType
 from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped, declared_attr, mapped_column
+from zope.interface import implementer
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
@@ -18,8 +20,9 @@ from nextgisweb.core.exception import ValidationError
 from nextgisweb.lookup_table import LookupTable
 from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 from nextgisweb.resource.model import ResourceRef
-from nextgisweb.spatial_ref_sys import SRS, SRSRef
+from nextgisweb.spatial_ref_sys import SRS, SRSMixin, SRSRef
 
+from .feature import Feature
 from .interface import (
     FIELD_TYPE,
     FIELD_TYPE_OGR,
@@ -27,6 +30,9 @@ from .interface import (
     FeatureLayerFieldDatatype,
     FeatureLayerGeometryType,
     IAggregatableFeatureQuery,
+    IFeatureLayer,
+    IFieldEditableFeatureLayer,
+    IWritableFeatureLayer,
 )
 from .versioning import FVersioningMixin
 
@@ -93,7 +99,7 @@ else:
 class FeatureLayerTransactionContext(ExitStack):
     vobj: FVersioningObj | None = None
 
-    def __init__(self, resource: FeatureLayerMixin, source: Any, **kwargs: Any):
+    def __init__(self, resource: FeatureLayerWritableMixin, source: Any, **kwargs: Any):
         super().__init__()
         self.resource: Final = resource
         self.source: Final = source
@@ -105,15 +111,17 @@ class FeatureLayerTransactionContext(ExitStack):
         return result
 
     def __exit__(self, *exc_details):
-        assert isinstance(self.resource, Resource)
         # Ensure that feature extensions are valid
         self.resource.require_session().flush()
         return super().__exit__(*exc_details)
 
 
-class FeatureLayerMixin:
-    __field_class__ = LayerField
-    __allow_none_geometry__ = False
+@implementer(IFeatureLayer)
+class FeatureLayerMixin(SRSMixin):
+    __abstract__ = True
+
+    __field_class__: ClassVar[type[LayerField]] = LayerField
+    __allow_none_geometry__: ClassVar[bool] = False
 
     @declared_attr
     def srs_id(cls):
@@ -155,6 +163,7 @@ class FeatureLayerMixin:
 
     @declared_attr
     def feature_label_field(cls):
+        assert isinstance(cls, type)
         return orm.relationship(
             cls.__field_class__,
             uselist=False,
@@ -165,12 +174,15 @@ class FeatureLayerMixin:
             backref=orm.backref("_feature_label_field_backref"),
         )
 
-    def feature_transaction(self, source=None, /, **kwargs) -> FeatureLayerTransactionContext:
-        return FeatureLayerTransactionContext(self, source, **kwargs)
+    def field_by_keyname(self, keyname: str, /) -> LayerField:
+        for f in self.fields:
+            if f.keyname == keyname:
+                return f
+        raise KeyError("Field '%s' not found!" % keyname)
 
-    def feature_transaction_enter(self, ftxn: FeatureLayerTransactionContext) -> None:
-        if isinstance(self, FVersioningMixin) and self.fversioning:
-            ftxn.vobj = ftxn.enter_context(self.fversioning_context(ftxn.source, **ftxn.kwargs))
+    @property
+    def feature_query(self):
+        raise NotImplementedError
 
     def to_ogr(self, ogr_ds, *, name="", fields=None, aliases=None, fid=None):
         if fields is None:
@@ -192,6 +204,41 @@ class FeatureLayerMixin:
         if fid is not None:
             ogr_layer.CreateField(ogr.FieldDefn(fid, ogr.OFTInteger))
         return ogr_layer
+
+
+@implementer(IFieldEditableFeatureLayer)
+class FeatureLayerEditableFieldsMixin(FeatureLayerMixin):
+    __abstract__ = True
+
+    def field_create(self, datatype: str) -> LayerField:
+        raise NotImplementedError
+
+    def field_delete(self, field: LayerField) -> None:
+        raise NotImplementedError
+
+
+@implementer(IWritableFeatureLayer)
+class FeatureLayerWritableMixin(FeatureLayerMixin):
+    __abstract__ = True
+
+    def feature_transaction(self, source=None, /, **kwargs) -> FeatureLayerTransactionContext:
+        return FeatureLayerTransactionContext(self, source, **kwargs)
+
+    def feature_transaction_enter(self, ftxn: FeatureLayerTransactionContext) -> None:
+        if isinstance(self, FVersioningMixin) and self.fversioning:
+            ftxn.vobj = ftxn.enter_context(self.fversioning_context(ftxn.source, **ftxn.kwargs))
+
+    def feature_create(self, feat: Feature, /) -> int:
+        raise NotImplementedError
+
+    def feature_put(self, feat: Feature, /):
+        raise NotImplementedError
+
+    def feature_delete(self, fid: int, /) -> None:
+        raise NotImplementedError
+
+    def feature_delete_all(self, /) -> None:
+        raise NotImplementedError
 
 
 class FeatureLayerFieldRead(Struct, kw_only=True):
@@ -340,7 +387,7 @@ class FieldsAttr(SAttribute):
             obj.field_delete(fld)
 
         obj.fields = new_fields
-        obj.fields.reorder()
+        obj.fields.reorder()  # ty: ignore[unresolved-attribute]
 
 
 class FVersioningRead(Struct, kw_only=True):
@@ -406,12 +453,15 @@ class FeatureLayerSerializer(Serializer, resource=FeatureLayerMixin, force_creat
 
 
 class FeatureQueryIntersectsMixin:
+    if TYPE_CHECKING:
+        layer: ClassVar[Any]
+        srs_supported: Sequence[int]
+
     def __init__(self):
         self._intersects = None
 
     def intersects(self, geom):
         reproject = geom.srid is not None and geom.srid not in self.srs_supported
-
         if reproject:
             srs_from = SRS.filter_by(id=geom.srid).one()
             transformer = Transformer(srs_from.wkt, self.layer.srs.wkt)

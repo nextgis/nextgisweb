@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from functools import cache
 from logging import DEBUG
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NamedTuple, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NamedTuple, cast, overload
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -255,15 +255,18 @@ class Resource(Base, metaclass=ResourceMeta):
 
         return self.id
 
+    @overload
     def ensure_parent(self) -> "Resource":
-        """Ensure the resource has a parent and return it
+        """Ensure the resource has a parent and return it."""
 
-        Helpful for narrowing type of the parent resource, as only the main resource group can
-        have no parent in persistent state. If a resource has no parent, this method will raise a
-        ``TypeError``."""
+    @overload
+    def ensure_parent[P: Resource](self, t: type[P], /) -> P:
+        """Ensure the resource has a parent of the specified type and return it."""
 
+    def ensure_parent(self, t: type["Resource"] | None = None, /) -> "Resource":
         if (result := self.parent) is None:
             raise TypeError("Resource must have a parent")
+        assert t is None or isinstance(result, t)
         return result
 
     # Permissions

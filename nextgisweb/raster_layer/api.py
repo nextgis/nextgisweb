@@ -43,17 +43,20 @@ class ExportParams(Struct, kw_only=True):
     ] = "GTiff"
 
 
-ExportResponse = AnyOf[
-    tuple(
-        Annotated[
-            FileResponse,
-            ContentType(driver.mime),
-        ]
-        for driver in (EXPORT_FORMAT_GDAL[format] for format in EXPORT_FORMAT_GDAL)
-        if driver.mime is not None
-    )
-    + (Annotated[Response, ContentType("application/octet-stream")],)
-]
+ExportResponse = (
+    Response
+    if TYPE_CHECKING
+    else AnyOf[
+        (
+            *(
+                Annotated[FileResponse, ContentType(driver.mime)]
+                for driver in (EXPORT_FORMAT_GDAL[format] for format in EXPORT_FORMAT_GDAL)
+                if driver.mime is not None
+            ),
+            Annotated[Response, ContentType("application/octet-stream")],
+        )
+    ]
+)
 
 
 class VsiFileIter:
@@ -161,9 +164,13 @@ COG_CONTENT_TYPE = "image/tiff; application=geotiff; profile=cloud-optimized"
 
 def cog_file_size(resource: RasterLayer) -> int:
     if resource.storage is not None:
+        assert resource.storage_filename is not None
         resource.storage.configure_gdal()
         return gdal.VSIStatL(resource.storage.vsi_path(resource.storage_filename)).size
-    return resource.fileobj.size
+    elif resource.fileobj is not None:
+        return resource.fileobj.size
+    else:
+        raise NotImplementedError
 
 
 def cog_head(
@@ -218,6 +225,7 @@ def cog_get(
     )
 
     if resource.storage is not None:
+        assert resource.storage_filename is not None
         vsi_path = resource.storage.vsi_path(resource.storage_filename)
         vsi = gdal.VSIFOpenL(vsi_path, "rb")
         try:
@@ -225,14 +233,16 @@ def cog_get(
             response.body = bytes(gdal.VSIFReadL(1, content_length, vsi))
         finally:
             gdal.VSIFCloseL(vsi)
-    else:
+    elif resource.fileobj is not None:
         response.app_iter = RangeFileWrapper(
             open(resource.fileobj.filename(), "rb"),
             offset=content_range.start,
             length=content_length,
         )
-    response.content_length = content_length
+    else:
+        raise NotImplementedError
 
+    response.content_length = content_length
     return response
 
 
@@ -248,6 +258,7 @@ def download(
     content_disposition = "attachment; filename=%s.tif" % request.context.id
 
     if resource.storage is not None:
+        assert resource.storage_filename is not None
         resource.storage.configure_gdal()
         vsi_path = resource.storage.vsi_path(resource.storage_filename)
         file_size = gdal.VSIStatL(vsi_path).size
@@ -258,15 +269,17 @@ def download(
         )
         response.app_iter = VsiFileIter(gdal.VSIFOpenL(vsi_path, "rb"), file_size)
         return response
-
-    response = FileResponse(
-        resource.fileobj.filename(),
-        content_type="image/tiff; application=geotiff",
-        request=request,
-    )
-    response.content_disposition = content_disposition
-    set_output_buffering(request, response, False)
-    return response
+    elif resource.fileobj is not None:
+        response = FileResponse(
+            resource.fileobj.filename(),
+            content_type="image/tiff; application=geotiff",
+            request=request,
+        )
+        response.content_disposition = content_disposition
+        set_output_buffering(request, response, False)
+        return response
+    else:
+        raise NotImplementedError
 
 
 def pam_get(resource: RasterLayer, request: Request) -> XMLType:

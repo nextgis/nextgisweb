@@ -23,8 +23,8 @@ from nextgisweb.spatial_ref_sys.api import SRSID
 from .component import FeatureLayerComponent
 from .feature import Feature
 from .filter import FilterParser, str_contains_filter
-from .interface import IFeatureLayer, IFilterableFeatureLayer
-from .model import LayerField
+from .interface import IFilterableFeatureLayer
+from .model import FeatureLayerMixin, LayerField
 from .ogrdriver import EXPORT_FORMAT_OGR, OGRDriver
 from .util import unique_name
 
@@ -48,7 +48,7 @@ def get_field_map(
 
 
 def _ogr_layer_from_features(
-    layer: IFeatureLayer,
+    layer: FeatureLayerMixin,
     features: Iterable[Feature],
     *,
     ds: gdal.Dataset,
@@ -246,7 +246,7 @@ class ExportParamsPost(ExportParams):
     ]
 
 
-def export(resource: IFeatureLayer, options: ExportOptions, filepath: str, *, user=None):
+def export(resource: FeatureLayerMixin, options: ExportOptions, filepath: str, *, user=None):
     field_map = get_field_map(options.fields, resource.fields, options.use_display_name)
 
     options = options.for_fields([alias for alias, _ in field_map])
@@ -319,12 +319,12 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str, *, us
     srs = options.srs if options.srs is not None else resource.srs
     layer_name = driver.get_layer_name(resource.display_name)
 
-    vtopts = dict(
-        options=[],
-        format=driver.name,
-        layerName=layer_name,
-        geometryType=resource.geometry_type,
-    )
+    vtopts = {
+        "options": [],
+        "format": driver.name,
+        "layerName": layer_name,
+        "geometryType": resource.geometry_type,
+    }
     if srs is not None:
         vtopts["dstSRS"] = srs.wkt
     if driver.fid_support and options.fid_field is None:
@@ -490,7 +490,7 @@ def export_multi(
 
 
 def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
-    feature_layer_factory = ResourceFactory(context=IFeatureLayer)
+    feature_layer_factory = ResourceFactory(context=FeatureLayerMixin)
 
     config.add_route(
         "feature_layer.geojson",
@@ -502,7 +502,7 @@ def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     config.add_view(
         export_single,
         route_name="resource.export",
-        context=IFeatureLayer,
+        context=FeatureLayerMixin,
         request_method="GET",
     )
 

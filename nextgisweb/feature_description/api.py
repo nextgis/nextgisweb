@@ -5,7 +5,7 @@ from lxml import etree, html
 
 from nextgisweb.lib.apitype import EmptyObject
 
-from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer import FeatureLayerMixin
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid.tomb import Configurator, FileResponse, Request
 from nextgisweb.resource import DataScope, ResourceFactory
@@ -59,7 +59,7 @@ def import_description(resource, request: Request) -> EmptyObject:
 
 
 def setup_pyramid(comp: FeatureDescriptionComponent, config: Configurator):
-    feature_layer_factory = ResourceFactory(context=IFeatureLayer)
+    feature_layer_factory = ResourceFactory(context=FeatureLayerMixin)
 
     config.add_route(
         "feature_description.export",

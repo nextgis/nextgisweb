@@ -1,4 +1,5 @@
 from io import BytesIO
+from typing import TYPE_CHECKING
 
 import numpy
 from osgeo import gdal, gdal_array, gdalconst
@@ -8,6 +9,7 @@ from zope.interface import implementer
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib.imptool import module_path
 
+from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import (
     IExtentRenderRequest,
     ILegendableStyle,
@@ -15,6 +17,12 @@ from nextgisweb.render import (
     ITileRenderRequest,
 )
 from nextgisweb.resource import DataScope, Resource
+from nextgisweb.spatial_ref_sys import SRSMixin
+
+if TYPE_CHECKING:
+    from nextgisweb.raster_mosaic import RasterMosaic as RasterMosaicStub
+else:
+    RasterMosaicStub = Resource
 
 Base.depends_on("resource")
 
@@ -52,7 +60,7 @@ class RasterStyle(Resource):
 
     @property
     def srs(self):
-        return self.ensure_parent().srs
+        return self.ensure_parent(SRSMixin).srs
 
     def render_request(self, srs, cond=None):
         return RenderRequest(self, srs, cond)
@@ -61,10 +69,12 @@ class RasterStyle(Resource):
         result = Image.new("RGBA", size, (0, 0, 0, 0))
         parent = self.ensure_parent()
 
-        if parent.cls == "raster_layer":
+        if parent.cls == "raster_layer" and isinstance(parent, RasterLayer):
             parent_ds = parent.gdal_dataset()
-        elif parent.cls == "raster_mosaic":
+        elif parent.cls == "raster_mosaic" and isinstance(parent, RasterMosaicStub):
             parent_ds = parent.gdal_dataset(extent=extent, size=size)
+        else:
+            raise NotImplementedError
 
         if parent_ds is None:
             return result

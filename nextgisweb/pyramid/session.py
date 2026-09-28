@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import transaction
 from pyramid.interfaces import ISession
 from sqlalchemy.exc import NoResultFound
@@ -61,6 +63,7 @@ class WebSession(dict):
                         ).delete(synchronize_session=False)
 
                     activity_delta = pyramid.options["session.activity_delta"]
+                    assert isinstance(self._last_activity, datetime)
                     if utcnow - self._last_activity > activity_delta:
                         DBSession.query(Session).filter_by(
                             id=self._session_id, last_activity=self._last_activity

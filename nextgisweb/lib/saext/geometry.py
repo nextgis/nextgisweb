@@ -51,6 +51,7 @@ def register_geometry_reflection():
     # GeoAlchemy2 will override this if imported after us, so this function
     # should be called after geoalchemy2 is imported (if it is) or right before
     # using introspection.
+    # ty: ignore[invalid-assignment]
     PGDialect.ischema_names["geometry"] = _geometry_from_reflection
 
 

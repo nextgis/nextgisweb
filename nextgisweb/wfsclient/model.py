@@ -31,7 +31,6 @@ from nextgisweb.feature_layer import (
     FeatureLayerMixin,
     FeatureQueryIntersectsMixin,
     FeatureSet,
-    IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryIntersects,
     LayerField,
@@ -546,7 +545,7 @@ class WFSLayerField(LayerField):
     orig_datatype: Mapped[str] = mapped_column(saext.Enum(*FIELD_TYPE_WFS.keys()))
 
 
-@implementer(IFeatureLayer, IBboxLayer)
+@implementer(IBboxLayer)
 class WFSLayer(FeatureLayerMixin, Resource):
     identity = layer_identity
     cls_display_name = gettext("WFS layer")
@@ -639,13 +638,6 @@ class WFSLayer(FeatureLayerMixin, Resource):
             srs_supported = (self.geometry_srid,)
 
         return BoundFeatureQuery
-
-    def field_by_keyname(self, keyname):
-        for f in self.fields:
-            if f.keyname == keyname:
-                return f
-
-        raise KeyError("Field '%s' not found!" % keyname)
 
     # IBboxLayer
 

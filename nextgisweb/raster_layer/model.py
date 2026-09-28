@@ -5,7 +5,7 @@ import subprocess
 from functools import cached_property
 from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory
-from typing import Annotated, Literal
+from typing import Annotated, Literal, cast
 from urllib.parse import urlparse
 from uuid import uuid4
 from zipfile import ZipFile, is_zipfile
@@ -108,6 +108,7 @@ def get_dataset_data_type(ds: gdal.Dataset) -> int:
             data_type = band.DataType
         elif data_type != band.DataType:
             raise ValidationError(gettext("Mixed band data types are not supported."))
+    assert data_type is not None
     return data_type
 
 
@@ -322,8 +323,7 @@ class RasterLayer(SpatialLayerMixin, Resource):
 
         # Convert the mask band to the alpha band
         if mask_flags.count(gdal.GMF_PER_DATASET) == len(mask_flags):
-            bands = [bidx for bidx in range(1, ds.RasterCount + 1)]
-            bands.append("mask")
+            bands = [*(bidx for bidx in range(1, ds.RasterCount + 1)), "mask"]
             alpha_band = len(bands)
             with NamedTemporaryFile(suffix=".tif", delete=False) as tf:
                 topts = gdal.TranslateOptions(bandList=bands)
@@ -516,14 +516,19 @@ class RasterLayer(SpatialLayerMixin, Resource):
 
     def _load_file_s3(self, cmd: list) -> gdal.Dataset:
         storage = self.storage
+        assert storage is not None
+
         if storage.public:
             raise ValidationError(
                 gettext("Uploading files to a public (read-only) bucket is not allowed.")
             )
+
         s3_env = storage.vsi_credentials()
-        if self.storage_filename is None:
-            self.storage_filename = str(uuid4()) + ".tif"
-        s3_path = storage.vsi_path(self.storage_filename)
+        if (storage_filename := self.storage_filename) is None:
+            storage_filename = str(uuid4()) + ".tif"
+            self.storage_filename = storage_filename
+
+        s3_path = storage.vsi_path(storage_filename)
         with TemporaryDirectory() as tmpdir:
             local = os.path.join(tmpdir, "raster.tif")
             subprocess.check_call(cmd + [local])
@@ -538,7 +543,9 @@ class RasterLayer(SpatialLayerMixin, Resource):
         return self._s3_open(s3_path)
 
     def _s3_open(self, s3_path: str) -> gdal.Dataset:
-        self.storage.configure_gdal()
+        storage = self.storage
+        assert storage is not None
+        storage.configure_gdal()
         return gdal.Open(s3_path, gdalconst.GA_ReadOnly)
 
     def load_storage_path(self, path: str):
@@ -548,7 +555,9 @@ class RasterLayer(SpatialLayerMixin, Resource):
         file - it reads metadata from the S3 object as-is. The storage
         attribute must already be set before calling this.
         """
-        ds = self._s3_open(self.storage.vsi_path(path))
+        storage = self.storage
+        assert storage is not None
+        ds = self._s3_open(storage.vsi_path(path))
         if ds is None:
             raise ValidationError(
                 gettext("Failed to open raster file at the specified storage path.")
@@ -601,10 +610,14 @@ class RasterLayer(SpatialLayerMixin, Resource):
     def gdal_dataset(self):
         from .component import RasterLayerComponent
 
-        if self.storage is not None:
-            return self._s3_open(self.storage.vsi_path(self.storage_filename))
-        fn = RasterLayerComponent.current().workdir_path(self.fileobj, self.fileobj_pam)
-        return gdal.Open(str(fn), gdalconst.GA_ReadOnly)
+        if (storage := self.storage) is not None:
+            assert self.storage_filename
+            return self._s3_open(storage.vsi_path(self.storage_filename))
+        elif (fileobj := self.fileobj) is not None:
+            fn = RasterLayerComponent.current().workdir_path(fileobj, self.fileobj_pam)
+            return gdal.Open(str(fn), gdalconst.GA_ReadOnly)
+        else:
+            raise NotImplementedError
 
     def build_overview(self, missing_only=False, fn=None):
         from .component import RasterLayerComponent
@@ -613,6 +626,7 @@ class RasterLayer(SpatialLayerMixin, Resource):
             return
 
         if fn is None:
+            assert self.fileobj is not None
             fn = RasterLayerComponent.current().workdir_path(self.fileobj, self.fileobj_pam)
 
         if missing_only and fn.with_suffix(".ovr").exists():
@@ -693,8 +707,6 @@ class RasterLayer(SpatialLayerMixin, Resource):
     # IBboxLayer implementation:
     @property
     def extent(self):
-        """Возвращает охват слоя"""
-
         src_osr = self.srs.to_osr()
         dst_osr = sr_from_epsg(4326)
 
@@ -849,6 +861,7 @@ class GeoTransform(SAttribute):
     )
 
     def get(self, srlzr: Serializer) -> list[str]:
+        srlzr = cast(RasterLayerSerializer, srlzr)
         return (
             srlzr.obj.geo_transform
             if srlzr.obj.geo_transform is not None
@@ -867,6 +880,7 @@ class ColorInterpretation(SAttribute):
     ctypes = CRUTypes(list[str], list[str], list[str])
 
     def get(self, srlzr: Serializer) -> list[str]:
+        srlzr = cast(RasterLayerSerializer, srlzr)
         return (
             [band.color_interp for band in srlzr.obj.meta.bands]
             if srlzr.obj.meta is not None

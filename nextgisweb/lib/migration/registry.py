@@ -231,6 +231,7 @@ class SQLScriptMigration(Migration):
         return self.fwpath.read_text()
 
     def rewind_script(self):
+        assert self.rwpath is not None
         return self.rwpath.read_text()
 
 

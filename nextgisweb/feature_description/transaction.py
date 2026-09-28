@@ -49,6 +49,7 @@ class DescriptionExecutor(OperationExecutor):
             self.require_feature(operation.fid, seqnum=seqnum)
             if (vid := operation.vid) is not UNSET:
                 self.require_versioning()
+                assert isinstance(operation.fid, int)
                 if Description.fversioning_vid(self.resource, operation.fid, vid) != vid:
                     raise OperationError(DescriptionConflict())
 

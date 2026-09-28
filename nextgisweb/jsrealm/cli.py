@@ -150,6 +150,8 @@ def install(
                 peer_dependencies.update({k: "*" for k in package_dependencies.keys()})
 
     def language(lang):
+        # TODO: Rewrite using babel.plural
+        # ty: ignore[not-iterable]
         nplurals, plural = PLURALS.get(lang, PLURALS.get(lang.split("-")[0]))
         return dict(code=lang, nplurals=nplurals, plural=plural)
 

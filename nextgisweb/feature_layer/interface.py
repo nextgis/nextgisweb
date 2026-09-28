@@ -126,60 +126,19 @@ class IFilterableFeatureLayer(IResourceBase):
 
 
 class IFeatureLayer(IResourceBase):
-    geometry_type = Attribute(""" Layer geometry type GEOM_TYPE """)
-    fields = Attribute(""" List of fields """)
-
-    feature_query = Attribute(""" Feature query class """)
-
-    def field_by_keyname(self, keyname):
-        """Get field by key. If field is not found,
-        KeyError exception should be raised."""
+    """Feature layer interface"""
 
 
 class IFieldEditableFeatureLayer(IFeatureLayer):
     """Feature layer that supports field editing"""
 
-    def field_create(self, datatype):
-        """Create and return a new field without appending to a layer"""
-
-    def field_delete(self, field):
-        """Remove field"""
-
-
-class IGeometryEditableFeatureLayer(IFeatureLayer):
-    """Feature layer that supports geometry type editing"""
-
-    def geometry_type_change(self, geom_type):
-        """Change geometry type"""
-
 
 class IWritableFeatureLayer(IFeatureLayer):
     """Feature layer that supports writing"""
 
-    def feature_transaction(self, source=None, /, **kwargs):
-        """Transaction context"""
 
-    def feature_create(self, feature):
-        """Create new feature with description from feature
-
-        :param feature: feature description
-        :type feature:  dict
-
-        :return:        ID of new feature
-        """
-
-    def feature_delete(self, feature_id):
-        """Remove feature with id
-
-        :param feature_id: feature id
-        :type feature_id:  int or bigint
-        """
-
-    def feature_delete_all(self):
-        """Remove all features"""
-
-    def feature_put(self, feature):
-        """Save feature in a layer"""
+class IVersionableFeatureLayer(IWritableFeatureLayer):
+    """Interface marker for versionable feature layers"""
 
 
 class IFeatureQuery(Interface):  # ty: ignore[unsupported-base]

@@ -19,12 +19,13 @@ from .interface import (
     IFeatureQuerySimplify,
     IFieldEditableFeatureLayer,
     IFilterableFeatureLayer,
-    IGeometryEditableFeatureLayer,
     IWritableFeatureLayer,
 )
 from .model import (
+    FeatureLayerEditableFieldsMixin,
     FeatureLayerMixin,
     FeatureLayerTransactionContext,
+    FeatureLayerWritableMixin,
     FeatureQueryIntersectsMixin,
     LayerField,
 )
@@ -44,11 +45,13 @@ __all__ = [
     "Feature",
     "FeatureExtension",
     "FeatureLayerComponent",
+    "FeatureLayerEditableFieldsMixin",
     "FeatureLayerFieldDatatype",
     "FeatureLayerGeometryType",
     "FeatureLayerMixin",
     "FeatureLayerTransaction",
     "FeatureLayerTransactionContext",
+    "FeatureLayerWritableMixin",
     "FeatureQueryIntersectsMixin",
     "FeatureSet",
     "IAggregatableFeatureQuery",

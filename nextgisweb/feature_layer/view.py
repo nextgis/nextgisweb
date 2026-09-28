@@ -14,19 +14,20 @@ from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
 from .component import FeatureLayerComponent
-from .interface import GEOM_TYPE, IFeatureLayer
+from .interface import GEOM_TYPE
+from .model import FeatureLayerMixin
 from .ogrdriver import MVT_DRIVER_EXIST, OGR_DRIVER_NAME_2_EXPORT_FORMATS
 from .versioning import FVersioningMixin, FVersioningNotEnabled
 
 
 class FeatureLayerFieldsWidget(Widget):
-    interface = IFeatureLayer
+    resource = FeatureLayerMixin
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/feature-layer/fields-widget")
 
 
 class SettingsWidget(Widget):
-    interface = IFeatureLayer
+    resource = FeatureLayerMixin
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/feature-layer/settings-widget")
 
@@ -126,7 +127,7 @@ class MVTLink(ExternalAccessLink):
     )
     docs_url = "docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
 
-    interface = IFeatureLayer
+    resource = FeatureLayerMixin
 
     @classmethod
     def is_applicable(cls, obj, request: Request) -> bool:
@@ -146,7 +147,7 @@ class MVTLink(ExternalAccessLink):
 
 @resource_sections("@nextgisweb/feature-layer/resource-section")
 def resource_section_fields(obj, **kwargs):
-    return IFeatureLayer.providedBy(obj)
+    return isinstance(obj, FeatureLayerMixin)
 
 
 @react_renderer("@nextgisweb/feature-layer/versioning-settings")
@@ -171,6 +172,7 @@ def cs_export_formats(
     comp: FeatureLayerComponent,
     request: Request,
 ) -> list[FeatureLayerExportFormatClientSetting]:
+    # ty: ignore[invalid-argument-type]
     return [FeatureLayerExportFormatClientSetting(**i) for i in OGR_DRIVER_NAME_2_EXPORT_FORMATS]
 
 
@@ -196,31 +198,31 @@ def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
         "feature_layer.feature.browse",
         r"/resource/{id:uint}/feature/",
         factory=resource_factory,
-    ).get(feature_browse, context=IFeatureLayer)
+    ).get(feature_browse, context=FeatureLayerMixin)
 
     config.add_route(
         "feature_layer.feature.show",
         r"/resource/{id:uint}/feature/{feature_id:int}",
         factory=resource_factory,
-    ).get(feature_show, context=IFeatureLayer)
+    ).get(feature_show, context=FeatureLayerMixin)
 
     config.add_route(
         "feature_layer.feature.update",
         r"/resource/{id:uint}/feature/{feature_id:int}/update",
         factory=resource_factory,
-    ).get(feature_update, context=IFeatureLayer)
+    ).get(feature_update, context=FeatureLayerMixin)
 
     config.add_route(
         "resource.history",
         r"/resource/{id:uint}/history",
         factory=resource_factory,
-    ).get(history, context=IFeatureLayer)
+    ).get(history, context=FeatureLayerMixin)
 
     config.add_view(
         export,
         route_name="resource.export.page",
         request_method="GET",
-        context=IFeatureLayer,
+        context=FeatureLayerMixin,
     )
 
     config.add_route(

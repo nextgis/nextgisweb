@@ -1,4 +1,6 @@
+from collections.abc import Iterator
 from datetime import date, datetime, time
+from typing import TYPE_CHECKING
 
 from msgspec import UNSET, UnsetType
 from osgeo import ogr
@@ -42,7 +44,7 @@ class Feature:
 
     @id.setter
     def id(self, value: int | None):
-        if self._id is not None and self._id != int(value):
+        if self._id is not None and value is not None and self._id != int(value):
             raise ValueError("Existing feature ID can't be changed.")
         self._id = value
 
@@ -85,15 +87,6 @@ class Feature:
     def box(self):
         return self._box
 
-    @property
-    def __geo_interface__(self):
-        return dict(
-            type="Feature",
-            id=self.id,
-            properties=self.fields,
-            geometry=self.geom.shape,
-        )
-
     def to_ogr(self, layer_defn, *, aliases=None, fid=None):
         ogr_feature = ogr.Feature(layer_defn)
         ogr_feature.SetFID(self.id)
@@ -131,13 +124,10 @@ class Feature:
 
 
 class FeatureSet:
+    if TYPE_CHECKING:
+
+        def __iter__(self) -> Iterator[Feature]: ...
+
     def one(self):
         data = list(self.__iter__())
         return data[0]
-
-    @property
-    def __geo_interface__(self):
-        return dict(
-            type="FeatureCollection",
-            features=[f.__geo_interface__ for f in self],
-        )

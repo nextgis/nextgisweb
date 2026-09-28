@@ -1,6 +1,6 @@
 from nextgisweb.env import gettext
 
-from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer import FeatureLayerMixin
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
 from nextgisweb.resource import DataScope, Resource, resource_factory
@@ -28,4 +28,4 @@ def setup_pyramid(comp: FeatureDescriptionComponent, config: Configurator):
         "feature_description.page",
         r"/resource/{id:uint}/descriptions",
         factory=resource_factory,
-    ).get(description, context=IFeatureLayer)
+    ).get(description, context=FeatureLayerMixin)

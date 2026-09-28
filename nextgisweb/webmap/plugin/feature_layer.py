@@ -1,4 +1,4 @@
-from nextgisweb.feature_layer import IFeatureLayer, IFilterableFeatureLayer
+from nextgisweb.feature_layer import FeatureLayerMixin, IFilterableFeatureLayer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import DataScope
 
@@ -10,7 +10,7 @@ class FeatureLayerPlugin(WebmapLayerPlugin):
 
     @classmethod
     def get_payload(cls, *, layer, user, **kwargs):
-        if IFeatureLayer.providedBy(layer):
+        if isinstance(layer, FeatureLayerMixin):
             return dict(
                 readonly=not layer.has_permission(DataScope.write, user),
                 likeSearch=IFilterableFeatureLayer.providedBy(layer),

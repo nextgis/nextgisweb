@@ -25,12 +25,7 @@ from nextgisweb.lib.ows import (
 )
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.feature_layer import (
-    FIELD_TYPE,
-    GEOM_TYPE,
-    Feature,
-    IFeatureLayer,
-)
+from nextgisweb.feature_layer import FIELD_TYPE, GEOM_TYPE, Feature, FeatureLayerMixin
 from nextgisweb.feature_layer.filter import FilterParser
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid.tomb import Request
@@ -371,9 +366,11 @@ class WFSHandler:
                         TYPENAME=self.p_typenames,
                     ),
                 )
+
+                # TODO: We need something better than subrequest here!
                 subreq = Request.blank(describe_path)
                 subreq.headers = self.request.headers
-                resp = self.request.invoke_subrequest(subreq)
+                resp = self.request.invoke_subrequest(subreq)  # ty: ignore[unresolved-attribute]
                 describe_root = etree.XML(resp.body)
 
                 opengis_url = "http://schemas.opengis.net"
@@ -485,7 +482,7 @@ class WFSHandler:
             parent.append(__list)
 
     def _parse_filter(self, __filter, layer):
-        filter_result = dict(fids=list(), intersects=None, filter=list())
+        filter_result = {"fids": [], "intersects": None, "filter": []}
         next_target = [(__filter, 0)]
         while len(next_target) > 0:
             __parent, start_index = next_target.pop()
@@ -1038,6 +1035,7 @@ class WFSHandler:
             raise ValidationError("Multiple filters not supported.")
 
         if self.p_propertyname is not None:
+            # ty: ignore[unresolved-attribute]
             self.p_propertyname = [ns_trim(v) for v in self.p_propertyname.split(",")]
             query.fields(*self.p_propertyname)
         elif __query is not None:
@@ -1362,7 +1360,7 @@ def set_feature_data(
     feature: Feature,
     field_data: dict[str, str | None],
     geom_data: "etree.Element | None | UnsetType",
-    feature_layer: IFeatureLayer,
+    feature_layer: FeatureLayerMixin,
 ):
     if geom_data is UNSET:
         pass

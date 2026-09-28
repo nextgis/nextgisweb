@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -17,6 +17,11 @@ from nextgisweb.resource import Resource
 
 from .exception import TransactionOperationConflict
 
+if TYPE_CHECKING:
+    from ..model import FeatureLayerWritableMixin as FeatureLayerWritableMixinStub
+else:
+    FeatureLayerWritableMixinStub = Resource
+
 
 class FeatureLayerTransaction(Base):
     __tablename__ = "feature_layer_transaction"
@@ -28,7 +33,7 @@ class FeatureLayerTransaction(Base):
     started: Mapped[datetime] = mapped_column(sa.DateTime, default=utcnow_naive)
     committed: Mapped[datetime | None] = mapped_column(sa.DateTime)
 
-    resource: Mapped[Resource] = orm.relationship()
+    resource: Mapped[FeatureLayerWritableMixinStub] = orm.relationship(Resource)
 
     user: Mapped[User] = orm.relationship()
 

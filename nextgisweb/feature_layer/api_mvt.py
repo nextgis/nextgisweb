@@ -19,7 +19,8 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .api_export import _ogr_layer_from_features
 from .component import FeatureLayerComponent
-from .interface import GEOM_TYPE, IFeatureLayer, IFeatureQueryClipByBox, IFeatureQuerySimplify
+from .interface import GEOM_TYPE, IFeatureQueryClipByBox, IFeatureQuerySimplify
+from .model import FeatureLayerMixin
 from .ogrdriver import MVT_DRIVER_EXIST
 
 
@@ -84,7 +85,7 @@ def mvt(
         except NoResultFound:
             raise ResourceNotFound(resid)
 
-        if not IFeatureLayer.providedBy(obj):
+        if not isinstance(obj, FeatureLayerMixin):
             raise ValidationError("Resource (ID=%d) is not a feature layer." % resid)
 
         request.resource_permission(DataScope.read, obj)
@@ -122,6 +123,7 @@ def mvt(
             content = bytes(gdal.VSIFReadL(1, size, f))
             gdal.VSIFCloseL(f)
 
+            # ty: ignore[invalid-return-type]
             return Response(
                 content,
                 content_type="application/vnd.mapbox-vector-tile",

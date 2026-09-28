@@ -11,7 +11,7 @@ from nextgisweb.lib.geometry import Geometry
 from ..feature import Feature
 from ..filter import FilterParser
 from ..transaction import FeatureLayerTransaction
-from ..versioning import FVersioningMeta
+from ..versioning import FVersioningMixin, FVersioningObj
 
 SeqNum = Annotated[
     int,
@@ -49,7 +49,7 @@ class OperationExecutor(abc.ABC):
     input_types: ClassVar[dict[str, type[Struct]]] = dict()
     result_types: ClassVar[dict[str, type[Struct]]] = dict()
 
-    def __init__(self, *, txn: FeatureLayerTransaction, vobj: FVersioningMeta | None):
+    def __init__(self, *, txn: FeatureLayerTransaction, vobj: FVersioningObj | None):
         self.txn = txn
         self.resource = txn.resource
         self.vobj = vobj
@@ -271,6 +271,7 @@ class FeatureLayerExecutor(OperationExecutor):
         resource = self.resource
 
         if isinstance(operation, RevertOperation):
+            assert isinstance(resource, FVersioningMixin)
             resource.fversioning_revert_layer(operation.tid)
             return RevertResult()
 
@@ -314,6 +315,7 @@ class FeatureLayerExecutor(OperationExecutor):
             return FeatureDeleteResult()
 
         elif isinstance(operation, FeatureRestoreOperation):
+            assert isinstance(resource, FVersioningMixin)
             resource.feature_restore(feature)
             return FeatureRestoreResult()
 

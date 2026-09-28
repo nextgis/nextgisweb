@@ -23,7 +23,7 @@ class Point(Struct, kw_only=True):
 class RasterLayerIdentifyItem(Struct, kw_only=True):
     resource: ResourceRef
     color_interpretation: list[str]
-    pixel_class: list[str]
+    pixel_class: list[str | None]
     values: list[Any]
     pixel_geom: dict
     srs_id: int

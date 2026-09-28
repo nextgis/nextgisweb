@@ -28,17 +28,15 @@ from nextgisweb.feature_layer import (
     GEOM_TYPE,
     Feature,
     FeatureLayerGeometryType,
-    FeatureLayerMixin,
     FeatureLayerTransactionContext,
+    FeatureLayerWritableMixin,
     FeatureQueryIntersectsMixin,
     FeatureSet,
     IAggregatableFeatureQuery,
-    IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
     IFilterableFeatureLayer,
-    IWritableFeatureLayer,
     LayerField,
 )
 from nextgisweb.feature_layer.filter import FilterParser, text_search_match_clause
@@ -111,6 +109,7 @@ class DBConnection:
 def calculate_extent(layer, where=None, geomcol=None):
     tab = layer._sa_table(True)
 
+    # ty: ignore[invalid-argument-type]
     where_geom_exist = not (where is None and geomcol is None) and len(where) > 0
     geomcol = geomcol if where_geom_exist else tab.columns[layer.column_geom]
 
@@ -118,6 +117,7 @@ def calculate_extent(layer, where=None, geomcol=None):
     extent_fn = st_extent(st_transform(st_setsrid(st_force2d(geomcol), layer.geometry_srid), 4326))
 
     if where_geom_exist:
+        # ty: ignore[not-iterable]
         bbox = sql.select(extent_fn).where(sql_and(True, *where)).label("bbox")
     else:
         bbox = extent_fn.label("bbox")
@@ -183,10 +183,8 @@ class PostgisConnection(Resource):
 
         if self.id in comp._engine:
             engine = comp._engine[self.id]
-
             if engine._credhash == credhash:
                 return engine
-
             else:
                 del comp._engine[self.id]
 
@@ -230,7 +228,7 @@ class PostgisConnection(Resource):
                 "Resource #%d, pool 0x%x, connection 0x%x returned", resid, id(dbapi), id(engine)
             )
 
-        engine._credhash = credhash
+        engine._credhash = credhash  # ty: ignore[unresolved-attribute]
 
         comp._engine[self.id] = engine
         return engine
@@ -272,8 +270,8 @@ class PostgisLayerField(LayerField):
     column_name: Mapped[str] = mapped_column(sa.Unicode)
 
 
-@implementer(IFeatureLayer, IFilterableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
-class PostgisLayer(FeatureLayerMixin, Resource):
+@implementer(IFilterableFeatureLayer, IBboxLayer)
+class PostgisLayer(FeatureLayerWritableMixin, Resource):
     identity = "postgis_layer"
     cls_display_name = gettext("PostGIS layer")
 
@@ -296,20 +294,6 @@ class PostgisLayer(FeatureLayerMixin, Resource):
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
-
-    @property
-    def source(self):
-        source_meta = super().source
-        source_meta.update(
-            dict(
-                schema=self.schema,
-                table=self.table,
-                column_id=self.column_id,
-                column_geom=self.column_geom,
-                geometry_type=self.geometry_type,
-            )
-        )
-        return source_meta
 
     @contextmanager
     def connect(self, tx=False):
@@ -495,13 +479,6 @@ class PostgisLayer(FeatureLayerMixin, Resource):
     @property
     def filter_parser(self):
         return FilterParser.from_resource(self)
-
-    def field_by_keyname(self, keyname):
-        for f in self.fields:
-            if f.keyname == keyname:
-                return f
-
-        raise KeyError("Field '%s' not found!" % keyname)
 
     # IWritableFeatureLayer
 
@@ -830,6 +807,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         if self._order_by:
             for order, k in self._order_by:
                 field = self.layer.field_by_keyname(k)
+                assert isinstance(field, PostgisLayerField)
                 order_criterion.append(
                     dict(asc=sa.asc, desc=sa.desc)[order](tab.columns[field.column_name])
                 )

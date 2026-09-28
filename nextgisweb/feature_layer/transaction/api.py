@@ -9,10 +9,10 @@ from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.resource import DataScope, ResourceFactory
-from nextgisweb.resource.exception import ResourceInterfaceNotSupported
 
 from ..component import FeatureLayerComponent
-from ..interface import IFeatureLayer
+from ..model import FeatureLayerWritableMixin
+from ..versioning import FVersioningMixin
 from ..versioning.exception import FVersioningEpochMismatch, FVersioningEpochRequired
 from .exception import TransactionNotCommitted, TransactionNotFound
 from .model import FeatureLayerTransaction as Transaction
@@ -27,14 +27,11 @@ Commited = Annotated[datetime, Meta(description="Commit timestamp", tz=False)]
 
 class TransactionFactory:
     def __init__(self):
-        self.resource_factory = ResourceFactory(context=IFeatureLayer)
+        self.resource_factory = ResourceFactory(context=FVersioningMixin)
 
     def __call__(self, request: Request) -> Transaction:
         resource = self.resource_factory(request)
         request.resource_permission(DataScope.write, resource)
-
-        if not IFeatureLayer.providedBy(resource):
-            raise ResourceInterfaceNotSupported
 
         qtxn = (
             DBSession.query(Transaction)
@@ -212,15 +209,16 @@ def ipost(txn: Transaction, request: Request) -> AsJSON[CommitErrors | CommitSuc
             result = executor.execute(seqnum, operation)
             txn.write_result(seqnum, result)
 
-    txn.committed = utcnow_naive()
-    return CommitSuccess(committed=txn.committed)
+    committed = utcnow_naive()
+    txn.committed = committed
+    return CommitSuccess(committed=committed)
 
 
 def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
     config.add_route(
         "feature_layer.transaction.collection",
         "/api/resource/{id}/feature/transaction/",
-        factory=ResourceFactory(context=IFeatureLayer),
+        factory=ResourceFactory(context=FeatureLayerWritableMixin),
         post=cpost,
     )
 

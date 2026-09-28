@@ -13,11 +13,12 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 from nextgisweb.lib.json import loads as json_loads
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.feature_layer import FeatureLayerMixin, FeatureLayerWritableMixin
 from nextgisweb.llm_core import LLMCoreComponent
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
 from nextgisweb.pyramid.tomb import Configurator, Request
-from nextgisweb.resource import DataScope, Resource, ResourceFactory
+from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
 from .aggregation import AggregationResult, AggregationSpec
@@ -30,7 +31,6 @@ from .filter import FilterParser, legacy_to_expression, str_contains_filter
 from .interface import (
     FIELD_TYPE,
     IAggregatableFeatureQuery,
-    IFeatureLayer,
     IFilterableFeatureLayer,
     IWritableFeatureLayer,
 )
@@ -69,7 +69,7 @@ class LoaderParams(Struct, kw_only=True):
 
 @dataclass
 class Loader:
-    resource: Resource
+    resource: FeatureLayerMixin
     params: LoaderParams
 
     @cached_property
@@ -163,7 +163,7 @@ class DumperParams(Struct, kw_only=True):
 
 @dataclass
 class Dumper:
-    resource: Resource
+    resource: FeatureLayerMixin
     params: DumperParams
 
     @cached_property
@@ -233,8 +233,8 @@ class Dumper:
 
         return query
 
-    def __call__(self, feature: Feature) -> Any:
-        result = dict(id=feature.id)
+    def __call__(self, feature: Feature) -> dict[str, object]:
+        result: dict[str, object] = {"id": feature.id}
 
         if (vid := feature.version) is not None:
             result["vid"] = vid
@@ -554,7 +554,9 @@ def cget(
     order_by_ = []
     if order_by is not None:
         for order_def in list(order_by.split(",")):
-            order, colname = re.match(r"^(\-|\+|%2B)?(.*)$", order_def).groups()
+            m = re.match(r"^(\-|\+|%2B)?(.*)$", order_def)
+            assert m is not None
+            order, colname = m.groups()
             if colname is not None:
                 order = ["asc", "desc"][order == "-"]
                 order_by_.append([order, colname])
@@ -588,7 +590,11 @@ def cpost(
         loader(feature, request.json_body)
         feature.id = resource.feature_create(feature)
         loader.extensions(feature, request.json_body)
-        result = FeatureChangeResult(id=feature.id)
+
+        fid = feature.id
+        assert fid is not None
+
+        result = FeatureChangeResult(id=fid)
         result.version_from(ftxn.vobj)
 
     return result
@@ -918,7 +924,7 @@ def filter_generate(resource, request: Request, *, body: FilterGenerateBody) -> 
 
 
 def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
-    feature_layer_factory = ResourceFactory(context=IFeatureLayer)
+    feature_layer_factory = ResourceFactory(context=FeatureLayerMixin)
 
     config.add_route(
         "feature_layer.feature.item",
@@ -927,7 +933,7 @@ def setup_pyramid(comp: FeatureLayerComponent, config: Configurator):
         types=dict(fid=FeatureID),
         get=iget,
         put=iput,
-    ).delete(idelete, context=IWritableFeatureLayer)
+    ).delete(idelete, context=FeatureLayerWritableMixin)
 
     config.add_route(
         "feature_layer.feature.geometry_info",

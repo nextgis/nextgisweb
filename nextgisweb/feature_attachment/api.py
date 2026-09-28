@@ -17,7 +17,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import ContentType
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer import FeatureLayerMixin
 from nextgisweb.feature_layer.api import FeatureID, query_feature_or_not_found
 from nextgisweb.feature_layer.versioning import FVersioningMixin
 from nextgisweb.file_storage import FileObj
@@ -310,7 +310,7 @@ def bundle(
         if rid not in valid_rid:
             if (resource := Resource.filter_by(id=rid).first()) is None:
                 raise ValidationError
-            if not IFeatureLayer.providedBy(resource):
+            if not isinstance(resource, FeatureLayerMixin):
                 raise ValidationError
             request.resource_permission(DataScope.read, resource)
             valid_rid.add(rid)
@@ -342,7 +342,7 @@ def bundle(
 
 
 def setup_pyramid(comp: FeatureAttachmentComponent, config: Configurator):
-    feature_layer_factory = ResourceFactory(context=IFeatureLayer)
+    feature_layer_factory = ResourceFactory(context=FeatureLayerMixin)
 
     itmurl = "/api/resource/{id}/feature/{fid}/attachment/{aid}"
     colurl = "/api/resource/{id}/feature/{fid}/attachment/"

@@ -185,6 +185,7 @@ class RasterMosaicItem(Base):
         self.footprint = geom
         self.fileobj = FileStorageComponent.current().fileobj(component="raster_mosaic")
 
+        assert self.fileobj is not None  # Why `fileobj` might be None?
         dst_file = RasterMosaicComponent.current().workdir_path(self.fileobj, None, makedirs=True)
         co = ["COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=YES"]
         if reproject:
@@ -210,6 +211,7 @@ class RasterMosaicItem(Base):
     def build_overview(self, missing_only=False):
         from .component import RasterMosaicComponent
 
+        assert self.fileobj is not None  # Why `fileobj` might be None?
         fn = RasterMosaicComponent.current().workdir_path(self.fileobj, None)
         if missing_only and fn.with_suffix(".ovr").exists():
             return

@@ -14,6 +14,7 @@ from nextgisweb.lib.saext import mapper_table
 
 from nextgisweb.auth import Permission
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.resource import Resource
 
 SRID_MAX = 998999  # PostGIS maximum srid (srs.id)
 SRID_LOCAL = 990001  # First local srid (srs.id)
@@ -239,7 +240,9 @@ sa_event.listen(
 )
 
 
-class SRSMixin:
+class SRSMixin(Resource):
+    __abstract__ = True
+
     @declared_attr
     def srs_id(cls) -> Mapped[int]:
         return mapped_column(sa.ForeignKey(SRS.id))

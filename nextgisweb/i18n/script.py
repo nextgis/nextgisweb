@@ -295,7 +295,7 @@ def group_stat_records(records, keys, with_details=False):
             setattr(agg, a, getattr(agg, a) + getattr(r, a))
 
         if with_details:
-            details.append(r)
+            details.append(r)  # ty: ignore[unresolved-attribute]
 
     result = list(temp.values())
     result.sort(key=lambda r: tuple(getattr(r[0], k) for k in keys))
@@ -425,7 +425,9 @@ class POEditorDescription:
 
     def populate(self):
         details = self.client.view_project_details(self.project_id)
-        self.packages = json.loads(re.search(r"\((.+?)\)", details["description"]).group(1))
+        m = re.search(r"\((.+?)\)", details["description"])
+        assert m is not None
+        self.packages = json.loads(m.group(1))
 
     def update(self, pversions):
         self.packages.update(pversions)

@@ -1,7 +1,7 @@
 from collections import defaultdict
 from inspect import isclass
 from itertools import chain
-from typing import Any
+from typing import Any, cast
 
 from msgspec import NODEFAULT, UNSET
 from msgspec.inspect import Metadata, type_info
@@ -202,7 +202,8 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent = inject.arg
                     rbody["required"] = True
 
             # Responses
-            responses = oper["responses"] = defaultdict(lambda: dict(content=defaultdict(list)))
+            responses = defaultdict(lambda: cast(dict, {"content": defaultdict(list)}))
+            oper["responses"] = responses
             if rtype := view.return_type:
                 for t, sc, ct in iter_anyof(rtype, SCode(200), CType()):
                     ct = _apply_json_content_type(ct, t)

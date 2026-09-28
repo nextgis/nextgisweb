@@ -430,7 +430,8 @@ def version_cget(
             if head is None:
                 head = tail = row
             elif (
-                row.user_id == tail.user_id
+                tail is not None  # Typing, tail can be None here
+                and row.user_id == tail.user_id
                 and abs((tail.tstamp - row.tstamp).total_seconds()) <= tstamp_max_gap
             ):
                 tail = row

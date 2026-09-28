@@ -11,7 +11,7 @@ from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
 from sqlalchemy import inspect
 from sqlalchemy.orm import Mapped, mapped_column, object_session
-from zope.interface import classImplements
+from zope.interface import implementer
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib.datetime import utcnow_naive
@@ -20,13 +20,15 @@ from nextgisweb.lib.saext import mapper_table
 from nextgisweb.auth import OnFindReferencesData, Principal, User
 from nextgisweb.resource import Resource
 
-from ..interface import IWritableFeatureLayer
+from ..feature import Feature
+from ..interface import IVersionableFeatureLayer
 from .exception import VersioningException
 from .util import fversioning_guard
 
 ActColValue = Literal["C", "U", "D", "R"]
 
 
+@implementer(IVersionableFeatureLayer)
 class FVersioningMixin(Resource):
     __abstract__ = True
 
@@ -113,12 +115,8 @@ class FVersioningMixin(Resource):
     def fversioning_info(self):
         return ((gettext("Feature versioning"), bool(self.fversioning)),)
 
-
-class IVersionableFeatureLayer(IWritableFeatureLayer):
-    """Interface marker for versionable feature layers"""
-
-
-classImplements(FVersioningMixin, IVersionableFeatureLayer)
+    def feature_restore(self, feat: Feature, /):
+        raise NotImplementedError
 
 
 class FVersioningMeta(Base):
@@ -181,7 +179,7 @@ class FVersioningObj(Base):
     tstamp: Mapped[datetime] = mapped_column(sa.DateTime)
     user_id: Mapped[int | None] = mapped_column(sa.ForeignKey(User.principal_id))
 
-    resource: Mapped[Resource] = orm.relationship()
+    resource: Mapped[FVersioningMixin] = orm.relationship(Resource)
 
     vmeta: Mapped[FVersioningMeta] = orm.relationship(overlaps="resource")
 

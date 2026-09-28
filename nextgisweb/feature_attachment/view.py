@@ -2,7 +2,7 @@ from msgspec import Struct
 
 from nextgisweb.env import gettext
 
-from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer import FeatureLayerMixin
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import client_setting
 from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
@@ -42,4 +42,4 @@ def setup_pyramid(comp: FeatureAttachmentComponent, config: Configurator):
         "feature_attachment.page",
         r"/resource/{id:uint}/attachments",
         factory=resource_factory,
-    ).get(attachment, context=IFeatureLayer)
+    ).get(attachment, context=FeatureLayerMixin)

@@ -1,7 +1,7 @@
 from nextgisweb.env import gettext
 
 from nextgisweb.basemap.model import BasemapLayer
-from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer import FeatureLayerMixin
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid.tomb import Configurator, Request
 from nextgisweb.raster_layer import RasterLayer
@@ -29,7 +29,7 @@ def setup_pyramid(comp: LayerPreviewComponent, config: Configurator):
         factory=resource_factory,
     ).get(
         preview_map,
-        context=IFeatureLayer,
+        context=FeatureLayerMixin,
     ).get(
         preview_map,
         context=IRenderableStyle,

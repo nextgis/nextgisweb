@@ -23,13 +23,11 @@ from nextgisweb.core.storage import StorageEstimateResult, storage_estimate_hook
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
+    FeatureLayerEditableFieldsMixin,
     FeatureLayerGeometryType,
     FeatureLayerMixin,
-    IFeatureLayer,
-    IFieldEditableFeatureLayer,
+    FeatureLayerWritableMixin,
     IFilterableFeatureLayer,
-    IGeometryEditableFeatureLayer,
-    IWritableFeatureLayer,
     LayerField,
 )
 from nextgisweb.feature_layer.exception import FeatureNotFound, RestoreNotDeleted
@@ -140,15 +138,13 @@ def _vlschema_autoflush(res):
         session.flush()
 
 
-@implementer(
-    IFeatureLayer,
-    IFilterableFeatureLayer,
-    IFieldEditableFeatureLayer,
-    IGeometryEditableFeatureLayer,
-    IWritableFeatureLayer,
-    IBboxLayer,
-)
-class VectorLayer(FVersioningMixin, FeatureLayerMixin, Resource):
+@implementer(IFilterableFeatureLayer, IBboxLayer)
+class VectorLayer(
+    FVersioningMixin,
+    FeatureLayerWritableMixin,
+    FeatureLayerEditableFieldsMixin,
+    Resource,
+):
     identity = "vector_layer"
     cls_display_name = gettext("Vector layer")
     cls_order = 60
@@ -334,13 +330,6 @@ class VectorLayer(FVersioningMixin, FeatureLayerMixin, Resource):
     @property
     def filter_parser(self):
         return FilterParser.from_resource(self)
-
-    def field_by_keyname(self, keyname):
-        for f in self.fields:
-            if f.keyname == keyname:
-                return f
-
-        raise KeyError("Field '%s' not found!" % keyname)
 
     # IFieldEditableFeatureLayer
 
@@ -959,7 +948,7 @@ class FeatureLayerAttr(SAttribute):
         source = Resource.filter_by(id=value.resource.id).one_or_none()
         if (
             source is None
-            or not IFeatureLayer.providedBy(source)
+            or not isinstance(source, FeatureLayerMixin)
             or not source.has_permission(DataScope.read, srlzr.user)
         ):
             raise VE

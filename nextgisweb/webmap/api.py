@@ -12,7 +12,7 @@ from nextgisweb.lib.apitype.util import EmptyObject
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.safehtml import sanitize
 
-from nextgisweb.feature_layer import IFeatureLayer, IFilterableFeatureLayer
+from nextgisweb.feature_layer import FeatureLayerMixin, IFilterableFeatureLayer
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import AsJSON, JSONType
@@ -641,7 +641,7 @@ def display_config(obj, request: Request) -> DisplayConfig:
             identification_mode = None
             if not item.layer_identifiable:
                 pass
-            elif IFeatureLayer.providedBy(layer):
+            elif isinstance(layer, FeatureLayerMixin):
                 identification_mode = "feature_layer"
             elif layer.cls == "raster_layer":
                 identification_mode = "raster_layer"
