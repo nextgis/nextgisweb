@@ -66,7 +66,7 @@ export const GroupWidget = observer(({ item }: { item: Group }) => {
         component={InputValue}
       />
       <Lot>
-        <Space size="middle">
+        <Space size="middle" wrap>
           <CheckboxValue {...item.groupEnabled.cprops()}>
             {msgEnabled}
           </CheckboxValue>

@@ -63,7 +63,12 @@ const GroupPropertiesModal = observer(
     }, [close, draftStore, group, nodeData]);
 
     return (
-      <Modal {...modalProps} title={msgTitle} width={480} onOk={handleOk}>
+      <Modal
+        {...modalProps}
+        title={msgTitle}
+        width="fit-content"
+        onOk={handleOk}
+      >
         <GroupWidget item={group} />
       </Modal>
     );
