@@ -1,24 +1,28 @@
-#: model.py:35 nodepkg/layer-widget/LayerWidget.tsx:222
+#: model.py:35 nodepkg/layer-widget/LayerWidget.tsx:224
 msgid "Basemap"
 msgstr "Подложка веб-карты"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:23
+#: nodepkg/layer-widget/GeoservicesBanner.tsx:7
+msgid "Want to use NextGIS basemaps? Get an API key and URL at {}."
+msgstr "Хотите использовать подложки NextGIS? Получите API-ключ и URL на {}."
+
+#: nodepkg/layer-widget/LayerWidget.tsx:24
 msgid "Pick from QMS"
 msgstr "Выбрать из QMS"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:24
+#: nodepkg/layer-widget/LayerWidget.tsx:25
 msgid "Search for geoservices provided by "
 msgstr "Искать геосервисы, предоставленные "
 
-#: nodepkg/layer-widget/LayerWidget.tsx:25
+#: nodepkg/layer-widget/LayerWidget.tsx:26
 msgid "You can search by name or ID"
 msgstr "Можно искать по имени или по ID"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:26
+#: nodepkg/layer-widget/LayerWidget.tsx:27
 msgid "If a service from QMS is selected, this field cannot be edited."
 msgstr "Пока выбран сервис из QMS, редактирование этих полей отключено."
 
-#: nodepkg/layer-widget/LayerWidget.tsx:27
+#: nodepkg/layer-widget/LayerWidget.tsx:28
 msgid ""
 "Above this zoom level, no new tiles are fetched but tiles from the nearest "
 "allowed zoom are displayed and upscaled."
@@ -26,47 +30,47 @@ msgstr ""
 "Выше этого уровня зума новые тайлы не загружаются, вместо этого показываются "
 "тайлы с ближайшего доступного уровня с увеличением масштаба."
 
-#: nodepkg/layer-widget/LayerWidget.tsx:28
+#: nodepkg/layer-widget/LayerWidget.tsx:29
 msgid "Below this zoom level, the layer is hidden and no new tiles are fetched."
 msgstr "Ниже этого уровня зума слой не показывается, и новые тайлы не загружаются."
 
-#: nodepkg/layer-widget/LayerWidget.tsx:87
+#: nodepkg/layer-widget/LayerWidget.tsx:89
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:95
+#: nodepkg/layer-widget/LayerWidget.tsx:97
 msgid "TMS"
 msgstr "TMS"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:96
+#: nodepkg/layer-widget/LayerWidget.tsx:98
 msgid "Vector tiles"
 msgstr "Векторные тайлы"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:107
+#: nodepkg/layer-widget/LayerWidget.tsx:109
 msgid "Style URL"
 msgstr "URL стиля"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:108
+#: nodepkg/layer-widget/LayerWidget.tsx:110
 msgid "URL"
 msgstr "URL"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:116
+#: nodepkg/layer-widget/LayerWidget.tsx:118
 msgid "Copyright text"
 msgstr "Текст для копирайта"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:124
+#: nodepkg/layer-widget/LayerWidget.tsx:126
 msgid "Copyright URL"
 msgstr "Ссылка на копирайт"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:133
+#: nodepkg/layer-widget/LayerWidget.tsx:135
 msgid "Min zoom level"
 msgstr "Мин. зум"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:145
+#: nodepkg/layer-widget/LayerWidget.tsx:147
 msgid "Max zoom level"
 msgstr "Макс. зум"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:157
+#: nodepkg/layer-widget/LayerWidget.tsx:159
 msgid "EPSG"
 msgstr "EPSG"
 

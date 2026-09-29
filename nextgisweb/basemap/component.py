@@ -97,5 +97,7 @@ class BasemapComponent(Component):
         Option("preset.*.z_max", int, default=None, doc="Preset basemap maximum zoom level"),
         Option("preset.*.z_min", int, default=None, doc="Preset basemap minimum zoom level"),
         Option("qms_url", str, default="https://qms.nextgis.com"),
+        Option("geoservices.url", str, default=None, doc="NextGIS GeoServices URL"),
+        Option("geoservices.banner", bool, default=False, doc="Show NextGIS GeoServices banner"),
     )
     # fmt: on

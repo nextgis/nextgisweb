@@ -16,6 +16,7 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 import { MapControl, URLLayer } from "@nextgisweb/webmap/map-component";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
+import { GeoservicesBanner } from "./GeoservicesBanner";
 import type { LayerStore } from "./LayerStore";
 import { QMSSelect } from "./component/QMSSelect";
 
@@ -42,6 +43,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
         height: "100%",
       }}
     >
+      <GeoservicesBanner />
       <div style={{ flex: "none" }}>
         <Area pad style={{ height: "100%" }} cols={["1fr", "1fr", "1fr"]}>
           <Lot

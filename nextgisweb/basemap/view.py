@@ -34,3 +34,16 @@ class BasemapQmsClientSetting(Struct, kw_only=True):
 @client_setting("qms")
 def cs_qms(comp: BasemapComponent, request: Request) -> BasemapQmsClientSetting:
     return BasemapQmsClientSetting(url=comp.options["qms_url"].rstrip("/"))
+
+
+class BasemapGeoservicesClientSetting(Struct, kw_only=True):
+    url: str | None
+    banner: bool
+
+
+@client_setting("geoservices")
+def cs_geoservices(comp: BasemapComponent, request: Request) -> BasemapGeoservicesClientSetting:
+    return BasemapGeoservicesClientSetting(
+        url=comp.options["geoservices.url"],
+        banner=comp.options["geoservices.banner"],
+    )
