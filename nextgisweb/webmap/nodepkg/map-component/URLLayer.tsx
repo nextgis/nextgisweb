@@ -1,6 +1,7 @@
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 import { useEffect, useRef, useState } from "react";
 
+import type { BasemapType } from "@nextgisweb/basemap/type/api";
 import { createTileLayer } from "@nextgisweb/basemap/util/baselayer";
 import { isValidURL } from "@nextgisweb/gui/arm/validate";
 import { useObjectState } from "@nextgisweb/gui/hook";
@@ -40,15 +41,17 @@ const emptyTile = createEmptyTile();
 
 export interface URLLayerProps {
   url: string;
+  type?: BasemapType;
   opacity?: number;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
   layerOptions?: LayerOptions;
-  sourceOptions?: Pick<XYZSourceOptions, "minZoom" | "maxZoom">;
+  sourceOptions?: Pick<XYZSourceOptions, "minZoom" | "maxZoom" | "projection">;
 }
 
 export function URLLayer({
   url,
+  type = "tms",
   opacity,
   copyrightText,
   copyrightUrl,
@@ -68,6 +71,7 @@ export function URLLayer({
     const abortController = new AbortController();
     if (mapStore && url && isValidURL(url)) {
       createTileLayer({
+        type,
         layer: layerOptionsRef.current,
         copyrightText,
         copyrightUrl,
@@ -96,7 +100,9 @@ export function URLLayer({
           ...sourceOptions,
         },
       }).then((tileLayer) => {
-        if (!abortController.signal.aborted && tileLayer) {
+        if (abortController.signal.aborted) {
+          tileLayer?.dispose();
+        } else if (tileLayer) {
           layerRef.current = tileLayer;
 
           tileLayer.setZIndex(1);
@@ -108,10 +114,12 @@ export function URLLayer({
     return () => {
       abortController.abort();
       if (layerRef.current) {
+        mapStore.removeLayer(layerRef.current);
         layerRef.current.dispose();
+        layerRef.current = undefined;
       }
     };
-  }, [mapStore, copyrightText, copyrightUrl, sourceOptions, url]);
+  }, [mapStore, copyrightText, copyrightUrl, sourceOptions, type, url]);
 
   useEffect(() => {
     if (layer) {

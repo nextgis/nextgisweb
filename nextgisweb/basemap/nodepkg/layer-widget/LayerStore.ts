@@ -11,6 +11,8 @@ import type { EditorStore } from "@nextgisweb/resource/type";
 const {
   qms,
   url,
+  type,
+  epsg,
   copyright_text: copyrightText,
   copyright_url: copyrightUrl,
   z_min: minzoom,
@@ -21,7 +23,10 @@ const {
   $error: mapperError,
 } = mapper<LayerStore, BasemapLayerRead>({
   validateIf: (o) => o.validate,
-  properties: { url: { required: true, url: true } },
+  properties: {
+    url: { required: true, url: true },
+    epsg: { required: true },
+  },
 });
 
 export class LayerStore implements EditorStore<
@@ -32,6 +37,8 @@ export class LayerStore implements EditorStore<
   readonly identity = "basemap_layer";
 
   readonly url = url.init("", this);
+  readonly type = type.init("tms", this);
+  readonly epsg = epsg.init(3857, this);
   readonly qms = qms.init(null, this);
   readonly copyrightText = copyrightText.init("", this);
   readonly copyrightUrl = copyrightUrl.init(null, this);

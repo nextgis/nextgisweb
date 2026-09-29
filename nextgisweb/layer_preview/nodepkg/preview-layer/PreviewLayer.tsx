@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
-import type { QMSService } from "@nextgisweb/basemap/layer-widget/type";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import type { Extent } from "@nextgisweb/layer/type/api";
 import { useRoute } from "@nextgisweb/pyramid/hook";
@@ -27,10 +26,8 @@ export function PreviewLayer({
   );
 
   let layerType: LayerType = "image";
-  let url: string | undefined;
-  let copyrightText: string | null | undefined;
-  let copyrightUrl: string | null | undefined;
-  const isBasemapResource = Boolean(resData?.basemap_layer);
+  const basemap = resData?.basemap_layer;
+  const isBasemapResource = Boolean(basemap);
 
   if (resData) {
     const interfaces = resData.resource.interfaces;
@@ -38,25 +35,6 @@ export function PreviewLayer({
       layerType = "MVT";
     } else if (resData.raster_layer) {
       layerType = "geotiff";
-    }
-
-    if (resData.basemap_layer) {
-      url = resData.basemap_layer.url;
-
-      if (url && "qms" in resData.basemap_layer && resData.basemap_layer.qms) {
-        try {
-          const qms = JSON.parse(resData.basemap_layer.qms) as QMSService;
-          if (!qms.y_origin_top) {
-            url = url.replace("{y}", "{-y}");
-          }
-        } catch {
-          //
-        }
-      }
-
-      const base = resData.basemap_layer;
-      copyrightText = base.copyright_text;
-      copyrightUrl = base.copyright_url;
     }
   }
 
@@ -108,11 +86,17 @@ export function PreviewLayer({
         style={{ height: "75vh", ...style }}
         basemap={!isBasemapResource}
       >
-        {url ? (
+        {basemap?.url ? (
           <URLLayer
-            url={url}
-            copyrightText={copyrightText}
-            copyrightUrl={copyrightUrl}
+            type={basemap.type}
+            url={basemap.url}
+            copyrightText={basemap.copyright_text}
+            copyrightUrl={basemap.copyright_url}
+            layerOptions={{ minZoom: basemap.z_min ?? undefined }}
+            sourceOptions={{
+              projection: `EPSG:${basemap.epsg}`,
+              maxZoom: basemap.z_max ?? undefined,
+            }}
           />
         ) : (
           <NGWLayer resourceId={id} layerType={layerType} zIndex={1} />

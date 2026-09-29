@@ -1,8 +1,14 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
-import { InputInteger, InputValue, Slider } from "@nextgisweb/gui/antd";
+import type { BasemapType } from "@nextgisweb/basemap/type/api";
+import {
+  InputInteger,
+  InputValue,
+  Segmented,
+  Slider,
+} from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -12,7 +18,6 @@ import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import type { LayerStore } from "./LayerStore";
 import { QMSSelect } from "./component/QMSSelect";
-import type { QMSService } from "./type";
 
 /* prettier-ignore */ const
 msgPickQms = gettext("Pick from QMS"),
@@ -23,42 +28,10 @@ msgMaxZoomHelp = gettext("Above this zoom level, no new tiles are fetched but ti
 msgMinZoomHelp = gettext("Below this zoom level, the layer is hidden and no new tiles are fetched.");
 
 export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
-  const [qmsId, setQmsId] = useState<number>();
-
-  const disabled = useMemo(() => qmsId !== undefined, [qmsId]);
-
+  const qmsId = store.qms.value?.id;
+  const disabled = qmsId !== undefined;
   const [opacity, setOpacity] = useState(100);
-
-  const [initialized, setInitialized] = useState(false);
-
-  const qms = useMemo<QMSService | null>(() => {
-    return store.qms.value ? (JSON.parse(store.qms.value) as QMSService) : null;
-  }, [store.qms.value]);
-
-  useEffect(() => {
-    if (store.loaded && qms) {
-      try {
-        setQmsId(qms.id);
-      } finally {
-        setInitialized(true);
-      }
-    }
-  }, [qms, store.loaded]);
-
-  // Clean store qms but do not touch copyright_text and copyright_url
-  useEffect(() => {
-    if (initialized && !qmsId) {
-      store.qms.value = null;
-    }
-  }, [initialized, qmsId, store.qms]);
-
-  const url = useMemo(() => {
-    let urlVal = store.url.value;
-    if (urlVal && qms && !qms.y_origin_top) {
-      urlVal = urlVal.replace("{y}", "{-y}");
-    }
-    return urlVal;
-  }, [qms, store.url.value]);
+  const url = store.url.value;
 
   return (
     <div
@@ -70,7 +43,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
       }}
     >
       <div style={{ flex: "none" }}>
-        <Area pad style={{ height: "100%" }} cols={["1fr", "1fr"]}>
+        <Area pad style={{ height: "100%" }} cols={["1fr", "1fr", "1fr"]}>
           <Lot
             label={msgPickQms}
             row
@@ -86,24 +59,54 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
           >
             <QMSSelect
               value={qmsId}
-              onChange={setQmsId}
+              selected={store.qms.value}
+              onChange={(value) => {
+                if (value === undefined) {
+                  store.qms.value = null;
+                }
+              }}
               onService={(service) => {
+                if (service.type !== "tms" && service.type !== "vector_tiles") {
+                  return;
+                }
+                store.type.value = service.type;
                 store.url.value = service.url;
+                store.epsg.value = service.epsg;
                 store.copyrightText.value = service.copyright_text;
                 store.copyrightUrl.value = service.copyright_url;
-                store.qms.value = JSON.stringify(service);
+                store.qms.value = {
+                  id: service.id,
+                  name: service.name,
+                };
                 store.maxzoom.value = service.z_max;
                 store.minzoom.value = service.z_min;
               }}
             ></QMSSelect>
           </Lot>
-
+          <LotMV
+            label={gettext("Type")}
+            help={disabled ? msgDisabled : undefined}
+            row
+            value={store.type}
+            component={Segmented<BasemapType>}
+            props={{
+              disabled,
+              options: [
+                { value: "tms", label: gettext("TMS") },
+                { value: "vector_tiles", label: gettext("Vector tiles") },
+              ],
+            }}
+          />
           <LotMV
             help={disabled ? msgDisabled : undefined}
             row
             value={store.url}
             component={InputValue}
-            label={gettext("URL")}
+            label={
+              store.type.value === "vector_tiles"
+                ? gettext("Style URL")
+                : gettext("URL")
+            }
             props={{ disabled }}
           />
 
@@ -123,30 +126,44 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
             component={InputValue}
             props={{ disabled }}
           />
-          <LotMV
-            help={disabled ? msgDisabled : msgMinZoomHelp}
-            label={gettext("Min zoom level")}
-            value={store.minzoom}
-            component={InputInteger}
-            props={{
-              disabled,
-              min: 0,
-              max: 24,
-              style: { width: "100%" },
-            }}
-          />
-          <LotMV
-            help={disabled ? msgDisabled : msgMaxZoomHelp}
-            label={gettext("Max zoom level")}
-            value={store.maxzoom}
-            component={InputInteger}
-            props={{
-              disabled,
-              min: 0,
-              max: 24,
-              style: { width: "100%" },
-            }}
-          />
+          {store.type.value !== "vector_tiles" && (
+            <>
+              <LotMV
+                help={disabled ? msgDisabled : msgMinZoomHelp}
+                label={gettext("Min zoom level")}
+                value={store.minzoom}
+                component={InputInteger}
+                props={{
+                  disabled,
+                  min: 0,
+                  max: 24,
+                  style: { width: "100%" },
+                }}
+              />
+              <LotMV
+                help={disabled ? msgDisabled : msgMaxZoomHelp}
+                label={gettext("Max zoom level")}
+                value={store.maxzoom}
+                component={InputInteger}
+                props={{
+                  disabled,
+                  min: 0,
+                  max: 24,
+                  style: { width: "100%" },
+                }}
+              />
+              <LotMV
+                help={disabled ? msgDisabled : undefined}
+                label={gettext("EPSG")}
+                value={store.epsg}
+                component={InputInteger}
+                props={{
+                  disabled,
+                  style: { width: "100%" },
+                }}
+              />
+            </>
+          )}
         </Area>
       </div>
       {url ? (
@@ -182,6 +199,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
             <URLLayer
               url={url}
               key={qmsId}
+              type={store.type.value}
               opacity={opacity}
               copyrightText={store.copyrightText.value}
               copyrightUrl={store.copyrightUrl.value}
@@ -194,6 +212,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                 minZoom: store.minzoom.value ?? undefined,
               }}
               sourceOptions={{
+                projection: `EPSG:${store.epsg.value}`,
                 maxZoom: store.maxzoom.value ?? undefined,
               }}
             />

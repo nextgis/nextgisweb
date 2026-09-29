@@ -17,6 +17,7 @@ interface QMSSelectProps extends Omit<
   SelectProps<number>,
   "options" | "children"
 > {
+  selected?: Pick<QMSService, "id" | "name"> | null;
   onChange: (value: number | undefined) => void;
   onService?: (value: QMSService) => void;
   value: number | undefined;
@@ -41,7 +42,7 @@ async function fetchOptions(
             signal,
           })
         );
-        if (result.type === "tms") {
+        if (result.type === "tms" || result.type === "vector_tiles") {
           results = [result];
         }
       } catch {
@@ -49,11 +50,14 @@ async function fetchOptions(
       }
     } else if (typeof query === "string") {
       if (results.length === 0) {
-        results = await searchCache.promiseFor(query, () =>
-          search(query, {
-            signal,
-          })
+        const services = await Promise.all(
+          (["tms", "vector_tiles"] as const).map((type) =>
+            searchCache.promiseFor(`${type}:${query}`, () =>
+              search(query, { type, signal })
+            )
+          )
         );
+        results = services.flat();
       }
     }
     return results.map((result) => ({
@@ -82,6 +86,7 @@ function QMSLabel({ name, id }: { name: string; id: number }) {
 }
 
 export function QMSSelect({
+  selected,
   onService,
   onChange,
   value,
@@ -118,9 +123,16 @@ export function QMSSelect({
   const handleSelect = useCallback(
     async (id: number) => {
       try {
+        const signal = makeSignal();
         const data = await getCache.promiseFor(String(id), () =>
-          get(Number(id), { signal: makeSignal() })
+          get(Number(id), { signal })
         );
+        if (
+          signal.aborted ||
+          (data.type !== "tms" && data.type !== "vector_tiles")
+        ) {
+          return;
+        }
         if (onService) {
           onService(data);
         }
@@ -173,6 +185,9 @@ export function QMSSelect({
         const option = options.find((o) => o.value === value);
         if (option) {
           return <QMSLabel name={option.result.name} id={option.result.id} />;
+        }
+        if (selected && selected.id === value) {
+          return <QMSLabel name={selected.name} id={selected.id} />;
         }
         return "";
       }}

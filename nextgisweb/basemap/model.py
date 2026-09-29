@@ -1,4 +1,4 @@
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -7,7 +7,9 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, gettext
+from nextgisweb.lib.saext import Enum, Msgspec
 
+from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import (
     CRUTypes,
     DataScope,
@@ -20,6 +22,13 @@ from nextgisweb.resource import (
 )
 from nextgisweb.webmap import WebMap
 
+BasemapType = Annotated[Literal["tms", "vector_tiles"], TSExport("BasemapType")]
+
+
+class QMS(Struct):
+    id: int
+    name: str
+
 
 class BasemapLayer(Resource):
     identity = "basemap_layer"
@@ -28,7 +37,9 @@ class BasemapLayer(Resource):
     __scope__ = DataScope
 
     url: Mapped[str] = mapped_column(sa.Unicode)
-    qms: Mapped[str | None] = mapped_column(sa.Unicode)
+    type: Mapped[BasemapType] = mapped_column(Enum(BasemapType), default="tms")
+    epsg: Mapped[int] = mapped_column(sa.Integer, default=3857)
+    qms: Mapped[QMS | None] = mapped_column(Msgspec(QMS))
     copyright_text: Mapped[str | None] = mapped_column(sa.Unicode)
     copyright_url: Mapped[str | None] = mapped_column(sa.Unicode)
     z_min: Mapped[int | None] = mapped_column(sa.Integer)
@@ -39,9 +50,19 @@ class BasemapLayer(Resource):
         return isinstance(parent, ResourceGroup)
 
 
+class BasemapTypeAttr(SColumn):
+    ctypes = CRUTypes(BasemapType, BasemapType, BasemapType)
+
+
+class QMSAttr(SColumn):
+    ctypes = CRUTypes(QMS | None, QMS | None, QMS | None)
+
+
 class BasemapLayerSerializer(Serializer, resource=BasemapLayer):
     url = SColumn(read=DataScope.read, write=DataScope.write)
-    qms = SColumn(read=DataScope.read, write=DataScope.write)
+    type = BasemapTypeAttr(read=DataScope.read, write=DataScope.write)
+    epsg = SColumn(read=DataScope.read, write=DataScope.write)
+    qms = QMSAttr(read=DataScope.read, write=DataScope.write)
     copyright_text = SColumn(read=DataScope.read, write=DataScope.write)
     copyright_url = SColumn(read=DataScope.read, write=DataScope.write)
     z_min = SColumn(read=DataScope.read, write=DataScope.write)

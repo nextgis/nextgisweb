@@ -2,7 +2,7 @@ import settings from "@nextgisweb/basemap/client-settings";
 
 import type { QMSSearch, QMSService } from "../type";
 
-type QMSType = "tms" | "wms";
+type QMSType = QMSSearch["type"];
 
 const geoservicesApiUrl = `${settings.qms.url}/api/v1/geoservices`;
 

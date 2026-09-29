@@ -4,7 +4,6 @@ import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 
 import type {
   BasemapConfig,
-  QMSService,
   WebmapPluginBaselayer,
 } from "@nextgisweb/basemap/layer-widget/type";
 import { registerEPSG3395Projection } from "@nextgisweb/basemap/util/epsg3395";
@@ -88,11 +87,7 @@ export function prepareBaselayerConfig(
   type?: BasemapConfig["type"];
 } {
   const layer = {} as LayerOptions;
-  let source = {} as XYZSourceOptions;
-
-  let qms: QMSService | undefined;
-  let copyright_text: string | null | undefined;
-  let copyright_url: string | null | undefined;
+  const source = {} as XYZSourceOptions;
 
   const keyname = "keyname" in config ? config.keyname : undefined;
   layer.title = config.display_name;
@@ -113,47 +108,9 @@ export function prepareBaselayerConfig(
     };
   }
 
-  if ("qms" in config && config.qms) {
-    try {
-      qms = JSON.parse(config.qms);
-
-      if (qms) {
-        if (qms.epsg !== 3857 && qms.epsg !== 3395) {
-          console.warn();
-          throw new Error(
-            `CRS ${qms.epsg} is not supported, ${config.display_name} layer.`
-          );
-        }
-
-        copyright_text = qms.copyright_text;
-        copyright_url = qms.copyright_url;
-
-        source = {
-          url: qms.url,
-          minZoom: qms.z_min,
-          maxZoom: qms.z_max,
-          projection: `EPSG:${qms.epsg}`,
-        };
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  } else if (config.url) {
-    source.url = config.url;
-    copyright_text = config.copyright_text;
-    copyright_url = config.copyright_url;
-
-    if ("epsg" in config && config.epsg) {
-      source.projection = `EPSG:${config.epsg}`;
-    }
-  }
-
-  if (source.url) {
-    source.url = source.url.replace(/\{[XYZQ]\}/g, (c) => c.toLowerCase());
-
-    if (qms && !qms.y_origin_top) {
-      source.url = source.url.replace("{y}", "{-y}");
-    }
+  if (config.url) {
+    source.url = config.url.replace(/\{[XYZQ]\}/g, (c) => c.toLowerCase());
+    source.projection = `EPSG:${config.epsg ?? 3857}`;
   }
   if (source.projection === "EPSG:3395") {
     registerEPSG3395Projection();
@@ -189,8 +146,8 @@ export function prepareBaselayerConfig(
     source,
     layer,
     keyname,
-    copyrightText: copyright_text,
-    copyrightUrl: copyright_url,
+    copyrightText: config.copyright_text,
+    copyrightUrl: config.copyright_url,
   };
 }
 

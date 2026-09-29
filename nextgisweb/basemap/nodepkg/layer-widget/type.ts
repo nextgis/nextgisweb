@@ -1,7 +1,11 @@
+import type { BasemapType } from "@nextgisweb/basemap/type/api";
+
 export interface WebmapPluginBaselayer {
   url?: string;
-  /** Serialized to a {@link QMSService} */
-  qms?: string | null;
+  type: BasemapType;
+  epsg: number;
+  z_min: number | null;
+  z_max: number | null;
   display_name: string;
   copyright_text?: string | null;
   copyright_url?: string | null;
@@ -21,7 +25,7 @@ export interface BasemapConfig {
   keyname: string;
   url: string;
   display_name: string;
-  type?: "tms" | "vector_tiles";
+  type?: BasemapType;
   epsg?: number | null;
   opacity?: number | null;
   enabled?: boolean | null;
@@ -36,7 +40,7 @@ export interface QMSSearch {
   guid: string;
   name: string;
   desc: string;
-  type: "tms" | "wms";
+  type: "tms" | "wms" | "vector_tiles";
   epsg: number;
   icon: string | null;
   submitter: string;
@@ -52,13 +56,12 @@ export interface QMSSearch {
 export interface QMSService {
   id: number;
   url: string;
-  type: "tms" | "wms";
-  copyright_text: string;
-  copyright_url: string;
-  y_origin_top: boolean;
+  type: "tms" | "wms" | "vector_tiles";
+  copyright_text: string | null;
+  copyright_url: string | null;
   epsg: number;
-  z_min: number;
-  z_max: number;
+  z_min: number | null;
+  z_max: number | null;
   // The props below are provided but not used.
   cumulative_status: string;
   alt_urls: string[];
