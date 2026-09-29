@@ -167,12 +167,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
         </Area>
       </div>
       {url ? (
-        <div
-          style={{
-            flex: 1,
-            padding: "2em 0px 0px",
-          }}
-        >
+        <div style={{ flex: 1 }}>
           <PreviewMap
             showZoomLevel
             style={{
