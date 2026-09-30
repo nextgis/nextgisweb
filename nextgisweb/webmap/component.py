@@ -1,8 +1,8 @@
 from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option
 
-from nextgisweb.auth import User
 from nextgisweb.core.component import CoreComponent
+from nextgisweb.resource import ResourceGroup
 
 from .model import LegendSymbolsEnum, WebMap, WebMapItem
 
@@ -27,7 +27,7 @@ class WebMapComponent(Component):
             WebMap(
                 parent_id=0,
                 display_name=dispname,
-                owner_user=User.filter_by(keyname="administrator").one(),
+                owner_user=ResourceGroup.filter_by(id=0).one().owner_user,
                 root_item=WebMapItem(item_type="root"),
             ).persist()
 

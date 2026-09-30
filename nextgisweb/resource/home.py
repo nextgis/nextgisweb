@@ -20,7 +20,7 @@ def parent_group(create=False) -> ResourceGroup | None:
         res = ResourceGroup(
             parent_id=0,
             keyname=comp.options["home.keyname"],
-            owner_user=User.filter_by(keyname="administrator").one(),
+            owner_user=ResourceGroup.filter_by(id=0).one().owner_user,
             display_name=translate(gettext("User resources")),
         )
         res.acl.append(

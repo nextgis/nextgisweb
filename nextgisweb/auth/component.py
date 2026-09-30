@@ -39,19 +39,26 @@ class AuthComponent(Component):
         for keyname, display_name in User.system_display_name.items():
             self.initialize_user(keyname, tr(display_name), system=True)
 
-        adm_opts = self.options.with_prefix("provision.administrator")
-        adm_kw = dict(
-            system=False,
-            password=adm_opts["password"],
-            oauth_subject=adm_opts["oauth_subject"],
+        admin = (
+            User.filter(~User.system, User.member_of.any(keyname="administrators"))
+            .order_by(User.principal_id)
+            .first()
         )
-        if adm_kw["password"] is None and adm_kw["oauth_subject"] is None:
-            adm_kw["password"] = "admin"
-        admin = self.initialize_user(
-            "administrator",
-            tr(gettext("Administrator")),
-            **adm_kw,
-        )
+
+        if admin is None:
+            adm_opts = self.options.with_prefix("provision.administrator")
+            adm_kw = dict(
+                system=False,
+                password=adm_opts["password"],
+                oauth_subject=adm_opts["oauth_subject"],
+            )
+            if adm_kw["password"] is None and adm_kw["oauth_subject"] is None:
+                adm_kw["password"] = "admin"
+            admin = self.initialize_user(
+                "administrator",
+                tr(gettext("Administrator")),
+                **adm_kw,
+            )
 
         self.initialize_group(
             "administrators",
