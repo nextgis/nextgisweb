@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useReducer } from "react";
+import { useMemo, useReducer } from "react";
 
 import { isAbortError } from "@nextgisweb/gui/error";
 import { arraySequenceIndexer } from "@nextgisweb/gui/util";
+
+import { useAbortController } from "./useAbortController";
 
 export type CacheObject<V> =
   | { readonly status: "missing" }
@@ -54,8 +56,7 @@ export function useCache<
   // TODO: Rerender only if relevant elements updated
   const rerender = useReducer((i) => i + 1, 0)[1];
 
-  const abort = useMemo(() => new AbortController(), []);
-  useEffect(() => () => abort.abort("Unmounted"), [abort]);
+  const { makeSignal } = useAbortController();
 
   const fetch = (args: A, opts: UseCacheHookOpts = {}) => {
     const id = index(args);
@@ -64,31 +65,33 @@ export function useCache<
 
     if (record === undefined) {
       if (!opts.cachedOnly) {
-        promise = fn(args, { signal: abort.signal });
+        promise = fn(args, { signal: makeSignal() });
         record = [{ status: "loading" as const, promise }];
       } else {
         record = [MISSING];
       }
       cache[id] = record;
     } else if (!opts.cachedOnly && record[0].status === "missing") {
-      promise = fn(args, { signal: abort.signal });
+      promise = fn(args, { signal: makeSignal() });
       record[0] = { status: "loading" as const, promise };
       rerender();
     }
 
     if (promise) {
-      promise.then((data) => {
-        record[0] = { status: "ready" as const, data };
-        rerender();
-      });
-      promise.catch((error) => {
-        if (isAbortError(error)) {
-          delete cache[id];
-        } else {
-          record[0] = { status: "error" as const, error };
+      promise.then(
+        (data) => {
+          record[0] = { status: "ready" as const, data };
+          rerender();
+        },
+        (error) => {
+          if (isAbortError(error)) {
+            delete cache[id];
+          } else {
+            record[0] = { status: "error" as const, error };
+          }
           rerender();
         }
-      });
+      );
     }
 
     return record[0];
