@@ -87,6 +87,7 @@ CREATE TABLE layer_field (
     keyname character varying NOT NULL,
     datatype character varying(50) NOT NULL,
     display_name character varying NOT NULL,
+    grid_aggregation character varying(50),
     grid_visibility boolean NOT NULL,
     text_search boolean NOT NULL,
     required boolean NOT NULL,
@@ -94,6 +95,7 @@ CREATE TABLE layer_field (
     PRIMARY KEY (id),
     UNIQUE (layer_id, keyname) DEFERRABLE INITIALLY DEFERRED,
     UNIQUE (layer_id, display_name) DEFERRABLE INITIALLY DEFERRED,
+    CONSTRAINT layer_field_grid_aggregation_check CHECK (grid_aggregation IS NULL OR datatype IN ('INTEGER', 'BIGINT', 'REAL')),
     FOREIGN KEY (layer_id) REFERENCES resource (id),
     FOREIGN KEY (lookup_table_id) REFERENCES lookup_table (id)
 );

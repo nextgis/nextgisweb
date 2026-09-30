@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from contextlib import ExitStack
+from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar, Final, Self, cast
 
 import sqlalchemy as sa
@@ -14,6 +15,7 @@ from zope.interface import implementer
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
+from nextgisweb.lib.apitype import make_literal
 from nextgisweb.lib.geometry import Transformer
 
 from nextgisweb.core.exception import ValidationError
@@ -43,6 +45,12 @@ _FIELD_TYPE_2_ENUM_REVERSED[FIELD_TYPE.BOOLEAN] = ogr.OFTInteger
 _FIELD_TYPE_2_ENUM_REVERSED[FIELD_TYPE.JSON] = ogr.OFTString
 
 
+class GridAggregation(Enum):
+    SUM = "sum"
+    MIN = "min"
+    MAX = "max"
+
+
 class LayerField(Base):
     __tablename__ = "layer_field"
 
@@ -54,6 +62,9 @@ class LayerField(Base):
     keyname: Mapped[str] = mapped_column(sa.Unicode)
     datatype: Mapped[str] = mapped_column(saext.Enum(*FIELD_TYPE.enum))
     display_name: Mapped[str] = mapped_column(sa.Unicode)
+    grid_aggregation: Mapped[GridAggregation | None] = mapped_column(
+        saext.Enum(GridAggregation), default=None
+    )
     grid_visibility: Mapped[bool] = mapped_column(sa.Boolean, default=True)
     text_search: Mapped[bool] = mapped_column(sa.Boolean, default=True)
     required: Mapped[bool] = mapped_column(sa.Boolean, default=False)
@@ -65,6 +76,10 @@ class LayerField(Base):
     __table_args__ = (
         sa.UniqueConstraint(layer_id, keyname, deferrable=True, initially="DEFERRED"),
         sa.UniqueConstraint(layer_id, display_name, deferrable=True, initially="DEFERRED"),
+        sa.CheckConstraint(
+            "grid_aggregation IS NULL OR datatype IN ('INTEGER', 'BIGINT', 'REAL')",
+            name="layer_field_grid_aggregation_check",
+        ),
     )
 
     layer: Mapped[Resource] = orm.relationship(primaryjoin="Resource.id == LayerField.layer_id")
@@ -83,6 +98,7 @@ class LayerField(Base):
             keyname=source.keyname,
             datatype=source.datatype,
             display_name=source.display_name,
+            grid_aggregation=source.grid_aggregation,
             grid_visibility=source.grid_visibility,
             text_search=source.text_search,
             required=source.required,
@@ -241,12 +257,16 @@ class FeatureLayerWritableMixin(FeatureLayerMixin):
         raise NotImplementedError
 
 
+GridAggregationType = str if TYPE_CHECKING else make_literal(i.value for i in GridAggregation)
+
+
 class FeatureLayerFieldRead(Struct, kw_only=True):
     id: int
     keyname: str
     display_name: str
     datatype: FeatureLayerFieldDatatype
     typemod: Any
+    grid_aggregation: GridAggregationType | None
     label_field: bool
     grid_visibility: bool
     text_search: bool
@@ -261,6 +281,7 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     display_name: str | UnsetType = UNSET
     datatype: FeatureLayerFieldDatatype | UnsetType = UNSET
     typemod: Any | UnsetType = UNSET
+    grid_aggregation: GridAggregationType | None | UnsetType = UNSET
     label_field: bool | UnsetType = UNSET
     grid_visibility: bool | UnsetType = UNSET
     text_search: bool | UnsetType = UNSET
@@ -284,6 +305,11 @@ def _fill_field(fld: LayerField, fldw: FeatureLayerFieldWrite):
 
     if fldw.display_name is not UNSET:
         fld.display_name = fldw.display_name
+
+    if fldw.grid_aggregation is not UNSET:
+        fld.grid_aggregation = (
+            GridAggregation(fldw.grid_aggregation) if fldw.grid_aggregation is not None else None
+        )
 
     if fldw.grid_visibility is not UNSET:
         fld.grid_visibility = fldw.grid_visibility
@@ -310,6 +336,7 @@ class FieldsAttr(SAttribute):
                 display_name=f.display_name,
                 datatype=f.datatype,
                 typemod=None,
+                grid_aggregation=f.grid_aggregation.value if f.grid_aggregation else None,
                 label_field=(f == srlzr.obj.feature_label_field),
                 grid_visibility=f.grid_visibility,
                 text_search=f.text_search,
