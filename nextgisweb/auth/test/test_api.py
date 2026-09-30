@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from itertools import product
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qsl, urlparse
 
 import pytest
 import transaction
@@ -132,19 +132,21 @@ def test_login_no_password(user, ngw_webtest_app: WebTestApp):
     )
 
 
-def test_session_invite(user, ngw_webtest_app: WebTestApp, ngw_env):
-    sid_cookie = ngw_env.pyramid.options["session.cookie.name"]
-
+@pytest.fixture
+def session_invite(user, ngw_env):
     with transaction.manager:
         url = ngw_env.auth.session_invite(user.keyname, "https://no-matter/some/path")
     result = urlparse(url)
+    query = dict(parse_qsl(result.query))
+    with ngw_env.auth.options.override(activity_delta=timedelta(seconds=0)):
+        yield query["sid"], query["expires"], query["next"]
 
-    query = parse_qs(result.query)
-    sid = query["sid"][0]
-    expires = query["expires"][0]
-    expires_dt = datetime.fromisoformat(expires)
-    next_url = query["next"][0]
+
+def test_session_invite(user, session_invite, ngw_webtest_app: WebTestApp, ngw_env):
+    sid, expires, next_url = session_invite
     assert next_url == "/some/path"
+    expires_dt = datetime.fromisoformat(expires)
+    sid_cookie = ngw_env.pyramid.options["session.cookie.name"]
 
     ngw_webtest_app.post(
         "/api/component/auth/login",
@@ -199,6 +201,28 @@ def test_session_invite(user, ngw_webtest_app: WebTestApp, ngw_env):
         data={"sid": sid, "expires": expires},
         status=401,
     )
+
+
+def test_session_invite_last_activity(user, session_invite, ngw_webtest_app: WebTestApp):
+    sid, expires, next_url = session_invite
+
+    last_activity = User.by_keyname(user.keyname).last_activity
+
+    ngw_webtest_app.post(
+        "/session-invite",
+        data={"sid": sid, "expires": expires},
+        status=302,
+    )
+
+    _test_current_user(
+        ngw_webtest_app,
+        user.keyname,
+        auth_medium="session",
+        auth_provider="invite",
+    )
+
+    last_activity_next = User.by_keyname(user.keyname).last_activity
+    assert last_activity_next == last_activity
 
 
 def _user_data():

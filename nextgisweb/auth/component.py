@@ -110,18 +110,19 @@ class AuthComponent(Component):
                 user_id, user_la = user.id, user.last_activity
 
                 delta = self.options["activity_delta"]
-                if (
-                    user_la is None or (utcnow_naive() - user_la) > delta
-                ) and not request.session.get("invite", False):
+                if user_la is None or (utcnow_naive() - user_la) > delta:
+                    if (
+                        state_dict := request.session.get("auth.state")
+                    ) is None or AuthState.from_dict(state_dict).prv != AP_INVITE:
 
-                    def update_last_activity(request: Request):
-                        with transaction.manager:
-                            DBSession.query(User).filter_by(
-                                principal_id=user_id,
-                                last_activity=user_la,
-                            ).update(dict(last_activity=utcnow_naive()))
+                        def update_last_activity(request: Request):
+                            with transaction.manager:
+                                DBSession.query(User).filter_by(
+                                    principal_id=user_id,
+                                    last_activity=user_la,
+                                ).update(dict(last_activity=utcnow_naive()))
 
-                    request.add_finished_callback(update_last_activity)
+                        request.add_finished_callback(update_last_activity)
 
             # Store essential user details request's environ
             environ["auth.user_obj"] = user
