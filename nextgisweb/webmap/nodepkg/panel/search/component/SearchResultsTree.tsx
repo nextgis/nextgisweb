@@ -19,6 +19,8 @@ import "./SearchResultsTree.less";
 
 type ResultTreeNode = TreeDataNode & { result?: SearchResult };
 
+const IsTouchDevice = typeof window !== "undefined" && "ontouchstart" in window;
+
 export interface SearchResultsTreeProps {
   groups: SearchResultGroup[];
   display: Display;
@@ -110,6 +112,7 @@ export function SearchResultsTree({
       isLeaf: true,
       result: resultInfo,
       title:
+        !IsTouchDevice &&
         group.type === "layers" &&
         group.resourceId !== undefined &&
         resultInfo.featureId !== undefined &&
