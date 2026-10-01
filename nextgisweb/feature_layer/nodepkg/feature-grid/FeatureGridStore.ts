@@ -24,6 +24,7 @@ export class FeatureGridStore {
   @observable.ref accessor editOnNewPage: boolean = false;
   @observable.ref accessor cleanSelectedOnFilter: boolean = true;
   @observable.ref accessor settingsOpen: boolean = false;
+  @observable.ref accessor showGridAggregation: boolean = false;
 
   @observable.shallow accessor selectedIds: number[] = [];
   @observable.shallow accessor _queryParams: QueryParams | null = null;
@@ -132,6 +133,11 @@ export class FeatureGridStore {
   @action.bound
   setSettingsOpen(settingsOpen: boolean) {
     this.settingsOpen = settingsOpen;
+  }
+
+  @action.bound
+  setShowGridAggregation(showGridAggregation: boolean) {
+    this.showGridAggregation = showGridAggregation;
   }
 
   @action.bound

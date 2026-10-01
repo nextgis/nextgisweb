@@ -11,6 +11,8 @@ interface HeaderColsProps {
   columnRef: RefObject<Record<number, HTMLDivElement>>;
   scrollBarSize: number;
   userDefinedWidths: Record<number, number>;
+  showGridAggregation: boolean;
+  aggrValues: Map<number, number>;
   toggleSorting: (field: string | typeof $FID, curOrder?: ColOrder) => void;
 }
 
@@ -20,6 +22,8 @@ export function HeaderCols({
   columnRef,
   scrollBarSize,
   userDefinedWidths,
+  showGridAggregation,
+  aggrValues,
   toggleSorting,
 }: HeaderColsProps) {
   return (
@@ -30,6 +34,8 @@ export function HeaderCols({
           column={column}
           orderBy={orderBy}
           userDefinedWidths={userDefinedWidths}
+          showGridAggregation={showGridAggregation}
+          aggrValue={aggrValues.get(column.id)}
           toggleSorting={toggleSorting}
           ref={(element) => {
             if (element) {

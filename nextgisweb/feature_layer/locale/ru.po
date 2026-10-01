@@ -2,7 +2,7 @@
 msgid "Aggregation '{}' is not applicable to fields of type '{}'."
 msgstr "Агрегация '{}' не применима к полям типа '{}'."
 
-#: api.py:121 api_identify.py:29
+#: api.py:119 api_identify.py:29
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
@@ -10,51 +10,51 @@ msgstr "Невалидная геометрия"
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:490 api_export.py:218
+#: api.py:498 api_export.py:219
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:531
+#: api.py:546
 msgid "The 'text_search_context' parameter requires the 'text_search' parameter."
 msgstr "Параметр 'text_search_context' требует наличия параметра 'text_search'."
 
-#: api.py:760
+#: api.py:794
 msgid "Aggregation is not supported for this layer."
 msgstr "Агрегация не поддерживается для этого слоя."
 
-#: api.py:771
+#: api.py:807
 msgid "Aggregation '{}' is not supported for this layer."
 msgstr "Агрегация '{}' не поддерживается для этого слоя."
 
-#: api.py:777 api.py:784
+#: api.py:813 api.py:820
 msgid "Field '{}' not found."
 msgstr "Поле '{}' не найдено."
 
-#: api_export.py:111
+#: api_export.py:112
 msgid "Couldn't add FID field '{}'. Such field already exists."
 msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
-#: api_export.py:257
+#: api_export.py:258
 msgid "The selected format does not support {} geometry type."
 msgstr "Выбранный формат не поддерживает тип геометрии {}."
 
-#: api_export.py:270
+#: api_export.py:271
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:283
+#: api_export.py:284
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:294
+#: api_export.py:292
 msgid "Filter expressions are not supported."
 msgstr "Выражения фильтра не поддерживаются."
 
-#: api_export.py:468
+#: api_export.py:474
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
-#: api_mvt.py:94
+#: api_mvt.py:95
 msgid "Resource (ID={}) has no geometry, MVT tiles are not available."
 msgstr "Ресурс (ID={}) не имеет геометрии, MVT-тайлы недоступны."
 
@@ -96,7 +96,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:28 view.py:45
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:28 view.py:46
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -104,15 +104,15 @@ msgstr "Таблица объектов"
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
-#: model.py:137
+#: model.py:161
 msgid "Spatial reference system"
 msgstr "Система координат"
 
-#: model.py:301
+#: model.py:375
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:371
+#: model.py:445
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
 
@@ -149,8 +149,8 @@ msgid "Attributes"
 msgstr "Атрибуты"
 
 #: nodepkg/control-panel-plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:112
-#: view.py:156
+#: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:116
+#: view.py:157
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -179,7 +179,7 @@ msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
 #: nodepkg/export-form/ExportForm.tsx:334
-#: nodepkg/fields-widget/FieldsWidget.tsx:218
+#: nodepkg/fields-widget/FieldsWidget.tsx:252
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
@@ -364,11 +364,11 @@ msgstr "Некорректное поле"
 msgid "Field not found"
 msgstr "Поле не найдено"
 
-#: nodepkg/feature-filter/testentry.tsx:127
+#: nodepkg/feature-filter/testentry.tsx:134
 msgid "Output JSON"
 msgstr "Вывод JSON"
 
-#: nodepkg/feature-filter/testentry.tsx:128
+#: nodepkg/feature-filter/testentry.tsx:135
 msgid "Current filter state"
 msgstr "Текущее состояние фильтра"
 
@@ -576,13 +576,13 @@ msgstr "Поиск..."
 msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
-#: nodepkg/feature-grid/FeatureTable.tsx:91
+#: nodepkg/feature-grid/FeatureTable.tsx:95
 #: nodepkg/feature-grid/component/TableConfigModal.tsx:98
 msgid "Last changed"
 msgstr "Последнее изменение"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:27
-#: nodepkg/resource-action-plugin.tsx:63 view.py:92 view.py:116
+#: nodepkg/resource-action-plugin.tsx:63 view.py:93 view.py:117
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -597,6 +597,21 @@ msgstr "Быстрый экспорт"
 #: nodepkg/feature-grid/component/ExportAction.tsx:30
 msgid "Filters are applied"
 msgstr "Применяются фильтры"
+
+#: nodepkg/feature-grid/component/HeaderCol.tsx:11
+#: nodepkg/fields-widget/FieldsWidget.tsx:32
+msgid "Sum"
+msgstr "Сумма"
+
+#: nodepkg/feature-grid/component/HeaderCol.tsx:12
+#: nodepkg/fields-widget/FieldsWidget.tsx:34
+msgid "Max value"
+msgstr "Макс. значение"
+
+#: nodepkg/feature-grid/component/HeaderCol.tsx:13
+#: nodepkg/fields-widget/FieldsWidget.tsx:33
+msgid "Min value"
+msgstr "Мин. значение"
 
 #: nodepkg/feature-grid/component/TableConfigModal.tsx:34
 msgid "Configure table columns"
@@ -651,32 +666,40 @@ msgid "Text search"
 msgstr "Текстовый поиск"
 
 #: nodepkg/fields-widget/FieldsWidget.tsx:30
+msgid "Display aggregation"
+msgstr "Отображаемая агрегация"
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:31
+msgid "None"
+msgstr "Нет"
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:35
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:31
+#: nodepkg/fields-widget/FieldsWidget.tsx:36
 msgid "Required"
 msgstr "Обязательное"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:32
+#: nodepkg/fields-widget/FieldsWidget.tsx:37
 msgid "Delete field?"
 msgstr "Удалить поле?"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:33
+#: nodepkg/fields-widget/FieldsWidget.tsx:38
 msgid ""
 "Deleting this field will permanently erase all its version history from this "
 "layer."
 msgstr "Удаление этого поля навсегда сотрёт всю его историю версий в этом слое."
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:34
+#: nodepkg/fields-widget/FieldsWidget.tsx:39
 msgid "Please select"
 msgstr "Выберите тип"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:35
+#: nodepkg/fields-widget/FieldsWidget.tsx:40
 msgid "Not used"
 msgstr "Не используется"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:123
+#: nodepkg/fields-widget/FieldsWidget.tsx:156
 msgid "Field"
 msgstr "Поле"
 
@@ -685,7 +708,7 @@ msgid "{filtered_count} of {total_count}"
 msgstr "{filtered_count} из {total_count}"
 
 #: nodepkg/filtered-count/FilteredCount.tsx:72
-#: nodepkg/filtered-count/FilteredCount.tsx:103
+#: nodepkg/filtered-count/FilteredCount.tsx:106
 msgid "Feature count"
 msgstr "Количество объектов"
 
@@ -759,7 +782,7 @@ msgstr "Объекты"
 msgid "Table"
 msgstr "Таблица"
 
-#: nodepkg/resource-action-plugin.tsx:45 view.py:105
+#: nodepkg/resource-action-plugin.tsx:45 view.py:106
 msgid "Version history"
 msgstr "История изменений"
 
@@ -1015,11 +1038,11 @@ msgstr "Конфликт операций в транзакции"
 msgid "Transaction not committed"
 msgstr "Транзакция не зафиксирована"
 
-#: versioning/exception.py:17
+#: versioning/exception.py:15
 msgid "Not implemented for feature versioning"
 msgstr "Не реализовано для версионирования объектов"
 
-#: versioning/exception.py:19
+#: versioning/exception.py:17
 msgid ""
 "This operation cannot be performed on a resource with feature versioning "
 "enabled. Disable feature versioning for the resource first, and then try "
@@ -1028,7 +1051,7 @@ msgstr ""
 "Операция не может быть выполнена для ресурса с включенным версионированием "
 "объектов. Отключите версионирование и повторите попытку."
 
-#: versioning/exception.py:27
+#: versioning/exception.py:25
 msgid "Feature versioning required"
 msgstr "Требуется версионирование объектов"
 
@@ -1056,15 +1079,15 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:66 view.py:81
+#: view.py:67 view.py:82
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:123
+#: view.py:124
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:125
+#: view.py:126
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."

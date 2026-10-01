@@ -49,6 +49,7 @@ export const FeatureGrid = observer(
       selectedIds,
       visibleFields,
       cleanSelectedOnFilter,
+      showGridAggregation,
       bumpVersion,
       onSelect,
     } = store;
@@ -123,6 +124,7 @@ export const FeatureGrid = observer(
           versioning={store.versioning}
           empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
           total={totalData.total_count}
+          showGridAggregation={showGridAggregation}
           version={version}
           selectedIds={selectedIds}
           loadingCol={loadingCol}

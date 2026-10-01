@@ -15,6 +15,7 @@ import { HeaderHandles } from "./component/HeaderHandles";
 import { $FID, KEY_FIELD_ID, LAST_CHANGED_FIELD_ID } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type { QueryParams } from "./hook/useFeatureTable";
+import { useGridAggregation } from "./hook/useGridAggregation";
 import type {
   ColOrder,
   EffectiveWidths,
@@ -31,6 +32,7 @@ interface FeatureTableProps {
   versioning: boolean;
   fields: FeatureLayerFieldRead[];
   total: number;
+  showGridAggregation: boolean;
   version?: number;
   selectedIds: number[];
   queryParams?: QueryParams;
@@ -48,6 +50,7 @@ function FeatureTable({
   versioning,
   fields,
   total,
+  showGridAggregation,
   version,
   selectedIds,
   queryParams,
@@ -81,6 +84,7 @@ function FeatureTable({
         id: KEY_FIELD_ID,
         display_name: "#",
         datatype: "INTEGER",
+        grid_aggregation: null,
       },
       ...fields,
     ];
@@ -90,6 +94,7 @@ function FeatureTable({
         id: LAST_CHANGED_FIELD_ID,
         display_name: gettext("Last changed"),
         datatype: "STRING",
+        grid_aggregation: null,
       });
     }
 
@@ -120,6 +125,14 @@ function FeatureTable({
     }
     return cols;
   }, [versioning, fields, visibleFields]);
+
+  const aggrValues = useGridAggregation({
+    resourceId,
+    columns,
+    showGridAggregation,
+    queryParams,
+    version,
+  });
 
   const {
     data,
@@ -218,6 +231,8 @@ function FeatureTable({
             columns={columns}
             orderBy={orderBy}
             userDefinedWidths={userDefinedWidths}
+            showGridAggregation={showGridAggregation}
+            aggrValues={aggrValues}
             toggleSorting={toggleSorting}
             columnRef={columnRef}
             scrollBarSize={scrollBarSize}
