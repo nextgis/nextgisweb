@@ -1,4 +1,4 @@
-import { StrictMode, Suspense, useMemo, useRef, useState } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 
 import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
@@ -44,47 +44,41 @@ export function PreviewMap({
   }, []);
 
   return (
-    <StrictMode>
-      <MapComponent
-        basemap={basemap}
-        maxZoom={maxZoom}
-        mapExtent={effectiveExtent}
-        {...props}
-      >
-        <ZoomControl
-          order={-1}
-          extent={
-            homeExtent.current
-              ? convertNgwExtentToWSEN(homeExtent.current.extent)
-              : undefined
-          }
-          showZoomLevel={showZoomLevel}
-          extentProjection={
-            homeExtent.current?.srs.id
-              ? `EPSG:${homeExtent.current.srs.id}`
-              : undefined
-          }
-          fitOptions={{
-            maxZoom,
-            padding: homeExtent.current?.padding,
-          }}
-          position="top-left"
-        />
-        <ToggleControl
-          position="top-left"
-          value={basemap}
-          onChange={setBasemap}
-        >
-          <MapIcon />
-        </ToggleControl>
+    <MapComponent
+      basemap={basemap}
+      maxZoom={maxZoom}
+      mapExtent={effectiveExtent}
+      {...props}
+    >
+      <ZoomControl
+        order={-1}
+        extent={
+          homeExtent.current
+            ? convertNgwExtentToWSEN(homeExtent.current.extent)
+            : undefined
+        }
+        showZoomLevel={showZoomLevel}
+        extentProjection={
+          homeExtent.current?.srs.id
+            ? `EPSG:${homeExtent.current.srs.id}`
+            : undefined
+        }
+        fitOptions={{
+          maxZoom,
+          padding: homeExtent.current?.padding,
+        }}
+        position="top-left"
+      />
+      <ToggleControl position="top-left" value={basemap} onChange={setBasemap}>
+        <MapIcon />
+      </ToggleControl>
 
-        {lazyControls.map(({ key, LazyControl, props }) => (
-          <Suspense key={key}>
-            <LazyControl {...props} />
-          </Suspense>
-        ))}
-        {children}
-      </MapComponent>
-    </StrictMode>
+      {lazyControls.map(({ key, LazyControl, props }) => (
+        <Suspense key={key}>
+          <LazyControl {...props} />
+        </Suspense>
+      ))}
+      {children}
+    </MapComponent>
   );
 }

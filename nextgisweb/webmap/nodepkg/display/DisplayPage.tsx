@@ -1,4 +1,4 @@
-import { StrictMode, useEffect } from "react";
+import { useEffect } from "react";
 
 import { Spin, useToken } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
@@ -28,13 +28,9 @@ export default function DisplayPage({ id }: { id: number }) {
     };
   }, [token]);
 
-  return (
-    <StrictMode>
-      {isLoading || !config ? (
-        <Spin size="large" fullscreen />
-      ) : (
-        <DisplayWidget config={config} />
-      )}
-    </StrictMode>
+  return isLoading || !config ? (
+    <Spin size="large" fullscreen />
+  ) : (
+    <DisplayWidget config={config} />
   );
 }
