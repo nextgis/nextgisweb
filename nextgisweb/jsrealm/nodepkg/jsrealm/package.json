@@ -7,8 +7,8 @@
     "@tanstack/react-virtual": "^3.13.11",
     "@types/geojson": "^7946.0.16",
     "@types/papaparse": "^5.3.16",
-    "@types/react": "^19.2.9",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "color": "^5.0.3",
     "core-js": "3.48.0",
     "dayjs": "^1.11.9",
@@ -17,8 +17,8 @@
     "mobx-react-lite": "^4.1.1",
     "ol": "10.9.0",
     "papaparse": "^5.4.1",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
