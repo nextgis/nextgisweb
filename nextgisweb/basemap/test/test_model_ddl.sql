@@ -3,7 +3,9 @@
 CREATE TABLE basemap_layer (
     id integer NOT NULL,
     url character varying NOT NULL,
-    qms character varying,
+    type character varying(50) NOT NULL,
+    epsg integer NOT NULL,
+    qms jsonb,
     copyright_text character varying,
     copyright_url character varying,
     z_min integer,
