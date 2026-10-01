@@ -10,7 +10,6 @@ import { registerEPSG3395Projection } from "@nextgisweb/basemap/util/epsg3395";
 import { isAbortError } from "@nextgisweb/gui/error";
 import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { RequestQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
-import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
@@ -19,6 +18,15 @@ import { DEFAULT_SOURCE_MAX_ZOOM } from "../constant";
 import type MapLibreAdapter from "../maplibre-adapter/MapLibreAdapter";
 
 type Baselayer = QuadKey | XYZ | MapLibreAdapter;
+
+export interface BaselayerOptions {
+  source: Omit<XYZSourceOptions, "attributions">;
+  layer?: LayerOptions;
+  keyname?: string;
+  copyrightText?: string | null;
+  copyrightUrl?: string | null;
+  type?: BasemapConfig["type"];
+}
 
 const SAFE_URL_RE = new RegExp(pyramidSettings.urlSafePattern);
 
@@ -158,14 +166,7 @@ export async function createTileLayer({
   copyrightText,
   copyrightUrl,
   type = "tms",
-}: {
-  source: Omit<XYZSourceOptions, "attributions">;
-  layer?: LayerOptions;
-  keyname?: string;
-  copyrightText?: string | null;
-  copyrightUrl?: string | null;
-  type?: BasemapConfig["type"];
-}): Promise<Baselayer | undefined> {
+}: BaselayerOptions): Promise<Baselayer | undefined> {
   if (!keyname) {
     keyname = `basemap_${idx++}`;
   }
@@ -197,32 +198,18 @@ export async function createTileLayer({
   }
 }
 
-export async function addBaselayer({
-  map,
-  ...layerOptions
-}: {
-  source: Omit<XYZSourceOptions, "attributions">;
-  layer?: LayerOptions;
-  keyname?: string;
-  copyrightText?: string | null;
-  copyrightUrl?: string | null;
-  type?: BasemapConfig["type"];
-  map: MapStore;
-}): Promise<Baselayer | undefined> {
-  const layer = await createTileLayer(layerOptions);
+export async function createBaselayer(
+  options: BaselayerOptions
+): Promise<Baselayer | undefined> {
+  const layer = await createTileLayer(options);
   if (layer) {
-    if (layer.olLayer.getVisible()) {
-      map.setBaseLayer(layer);
-    }
     layer.isBaseLayer = true;
-    map.addLayer(layer);
-    return layer;
   }
+  return layer;
 }
 
-export async function addBasemaps(
-  basemaps: WebmapPluginBaselayer[] | BasemapConfig[],
-  map: MapStore
+export async function createBasemaps(
+  basemaps: WebmapPluginBaselayer[] | BasemapConfig[]
 ): Promise<Baselayer[]> {
   let isDefaultExisted = false;
   const layers: Baselayer[] = [];
@@ -235,7 +222,7 @@ export async function addBasemaps(
       }
 
       const opts = prepareBaselayerConfig(bm);
-      const layer = await addBaselayer({ ...opts, map });
+      const layer = await createBaselayer(opts);
       if (layer) {
         layers.push(layer);
       }
@@ -244,8 +231,7 @@ export async function addBasemaps(
     }
   }
 
-  const blankLayer = await addBaselayer({
-    map,
+  const blankLayer = await createBaselayer({
     layer: {
       title: "None",
       visible: !isDefaultExisted,

@@ -3,24 +3,11 @@ import { useEffect, useMemo } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
 import type { WebmapPluginConfig } from "@nextgisweb/basemap/layer-widget/type";
-import {
-  addBaselayer,
-  prepareBaselayerConfig,
-} from "@nextgisweb/basemap/util/baselayer";
+import { prepareBaselayerConfig } from "@nextgisweb/basemap/util/baselayer";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
 import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
-import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
-import type { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
-
-function removeBaselayer(map: MapStore, layer: CoreLayer) {
-  if (map.layers[layer.name] === layer) {
-    map.removeLayer(layer);
-  } else {
-    map.olMap.removeLayer(layer.getLayer());
-  }
-  layer.dispose();
-}
+import { useBaselayers } from "@nextgisweb/webmap/map-component/hook/useBaselayers";
 
 const BasemapLayers = observer(
   ({ display, identity }: { display: Display; identity: string }) => {
@@ -34,15 +21,39 @@ const BasemapLayers = observer(
     const disabled = wmplugin.disable;
     const backgroundColor = wmplugin.background_color;
 
-    const basemaps = useMemo(
-      () =>
-        disabled
-          ? []
-          : wmplugin.basemaps.length
-            ? wmplugin.basemaps
-            : settings.basemaps,
-      [disabled, wmplugin.basemaps]
-    );
+    const basemaps = useMemo(() => {
+      if (disabled) return [];
+
+      const sourceBasemaps = wmplugin.basemaps.length
+        ? wmplugin.basemaps
+        : settings.basemaps;
+      let hasDefault = false;
+      const configs = sourceBasemaps.map((sourceBasemap, idx) => {
+        const enabled = Boolean(sourceBasemap.enabled && !hasDefault);
+        if (enabled) hasDefault = true;
+
+        return prepareBaselayerConfig({
+          ...sourceBasemap,
+          keyname:
+            "keyname" in sourceBasemap
+              ? sourceBasemap.keyname
+              : `basemap_${idx}`,
+          enabled,
+        });
+      });
+
+      configs.push({
+        keyname: "blank",
+        layer: {
+          title: gettext("No basemap"),
+          visible: !hasDefault,
+        },
+        source: {},
+      });
+      return configs;
+    }, [disabled, wmplugin.basemaps]);
+
+    useBaselayers({ mapStore, basemaps, baseKey: display.urlParams.base });
 
     useEffect(() => {
       if (!targetElement) {
@@ -55,88 +66,6 @@ const BasemapLayers = observer(
         targetElement.style.backgroundColor = "";
       };
     }, [targetElement, backgroundColor]);
-
-    useEffect(() => {
-      const activeBasemapKey = mapStore.baseLayer
-        ? mapStore.activeBasemapKey
-        : undefined;
-      const preferredBasemapKey = display.urlParams.base ?? activeBasemapKey;
-      const layers: CoreLayer[] = [];
-      let cancelled = false;
-
-      const addLayer = async (
-        config: ReturnType<typeof prepareBaselayerConfig>
-      ) => {
-        const layer = await addBaselayer({ ...config, map: mapStore });
-        if (!layer) {
-          return;
-        }
-        if (cancelled) {
-          removeBaselayer(mapStore, layer);
-          return;
-        }
-
-        layers.push(layer);
-      };
-
-      const setup = async () => {
-        let hasDefault = false;
-
-        for (const [idx, sourceBasemap] of basemaps.entries()) {
-          if (cancelled) {
-            return;
-          }
-
-          const basemap = {
-            ...sourceBasemap,
-            keyname:
-              "keyname" in sourceBasemap
-                ? sourceBasemap.keyname
-                : `basemap_${idx}`,
-          };
-          if (basemap.enabled && !hasDefault) {
-            hasDefault = true;
-          } else {
-            basemap.enabled = false;
-          }
-
-          try {
-            await addLayer(prepareBaselayerConfig(basemap));
-          } catch {
-            //
-          }
-        }
-
-        if (cancelled) {
-          return;
-        }
-        if (!disabled) {
-          try {
-            await addLayer({
-              keyname: "blank",
-              layer: {
-                title: gettext("No basemap"),
-                visible: !hasDefault,
-              },
-              source: {},
-            });
-          } catch {
-            //
-          }
-        }
-
-        if (preferredBasemapKey && !cancelled) {
-          mapStore.switchBasemap(preferredBasemapKey);
-        }
-      };
-
-      setup();
-
-      return () => {
-        cancelled = true;
-        layers.forEach((layer) => removeBaselayer(mapStore, layer));
-      };
-    }, [basemaps, disabled, mapStore, display.urlParams.base]);
 
     return null;
   }

@@ -1,19 +1,17 @@
 import type { ViewOptions } from "ol/View";
 import { get as getProjection } from "ol/proj";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
-import {
-  addBaselayer,
-  prepareBaselayerConfig,
-} from "@nextgisweb/basemap/util/baselayer";
+import { prepareBaselayerConfig } from "@nextgisweb/basemap/util/baselayer";
 import { useObjectState } from "@nextgisweb/gui/hook";
 import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
 import type { MapExtent, MapStore } from "@nextgisweb/webmap/ol/MapStore";
-import type { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type { ExtentWSEN } from "@nextgisweb/webmap/type/api";
 
 import { createMapAdapter } from "../util/createMapAdapter";
+
+import { useBaselayers } from "./useBaselayers";
 
 export interface MapProps extends ViewOptions {
   mapSRSId?: number;
@@ -33,8 +31,6 @@ export function useMapAdapter({
   mapExtent: mapExtentProp,
   ...restViewOptions
 }: MapProps) {
-  const baseRef = useRef<CoreLayer | undefined>(undefined);
-
   const [center] = useObjectState(centerProp);
   const [viewOptions] = useObjectState(restViewOptions);
   const [mapExtent] = useObjectState(mapExtentProp);
@@ -63,6 +59,14 @@ export function useMapAdapter({
       });
     }
   }, [mapSRSId, mapStoreProp, viewOptions]);
+
+  const basemaps = useMemo(() => {
+    if (!basemap) return [];
+    const config = settings.basemaps.find((l) => l.enabled !== false);
+    return config ? [prepareBaselayerConfig(config)] : [];
+  }, [basemap]);
+
+  useBaselayers({ mapStore, basemaps });
 
   useEffect(() => {
     return () => {
@@ -101,32 +105,6 @@ export function useMapAdapter({
       setView();
     }
   }, [mapStore.started, setView]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (mapStore && basemap) {
-      const baselayers = settings.basemaps.filter((l) => l.enabled !== false);
-      if (baselayers.length) {
-        const baselayer = baselayers[0];
-        const opts = prepareBaselayerConfig(baselayer);
-        addBaselayer({ ...opts, map: mapStore }).then((layer) => {
-          if (cancelled) {
-            layer?.dispose();
-          } else {
-            baseRef.current = layer;
-          }
-        });
-      }
-    }
-    return () => {
-      cancelled = true;
-      if (baseRef.current) {
-        baseRef.current.dispose();
-        baseRef.current = undefined;
-      }
-    };
-  }, [basemap, mapStore]);
 
   return { mapStore };
 }
