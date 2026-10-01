@@ -3,17 +3,13 @@ import { useState } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
 import type { BasemapType } from "@nextgisweb/basemap/type/api";
-import {
-  InputInteger,
-  InputValue,
-  Segmented,
-  Slider,
-} from "@nextgisweb/gui/antd";
+import { InputInteger, InputValue, Segmented } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget } from "@nextgisweb/resource/type";
-import { MapControl, URLLayer } from "@nextgisweb/webmap/map-component";
+import { URLLayer } from "@nextgisweb/webmap/map-component";
+import { OpacityControl } from "@nextgisweb/webmap/map-component/control/OpacityControl";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import { GeoservicesBanner } from "./GeoservicesBanner";
@@ -180,19 +176,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
               borderColor: "#d9d9d9",
             }}
           >
-            <MapControl position="top-right">
-              <div style={{ width: 200 }}>
-                <Slider
-                  min={0}
-                  max={100}
-                  value={opacity}
-                  onChange={setOpacity}
-                  tooltip={{
-                    formatter: (value) => `${value}%`,
-                  }}
-                />
-              </div>
-            </MapControl>
+            <OpacityControl value={opacity} onChange={setOpacity} />
             <URLLayer
               url={url}
               key={qmsId}

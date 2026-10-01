@@ -7,6 +7,7 @@ import { useRoute } from "@nextgisweb/pyramid/hook";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { NGWLayer, URLLayer } from "@nextgisweb/webmap/map-component";
 import type { LayerType } from "@nextgisweb/webmap/map-component";
+import { OpacityControl } from "@nextgisweb/webmap/map-component/control/OpacityControl";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import { extentInterfaces, mvtInterfaces } from "../constant";
@@ -41,6 +42,7 @@ export function PreviewLayer({
   const { route: extentRoute } = useRoute("layer.extent", { id });
   const [extentData, setExtentData] = useState<Extent>();
   const [isExtentLoading, setIsExtentLoading] = useState(true);
+  const [opacity, setOpacity] = useState(100);
 
   useEffect(() => {
     const loadExtent = async () => {
@@ -86,10 +88,12 @@ export function PreviewLayer({
         style={{ height: "75vh", ...style }}
         basemap={!isBasemapResource}
       >
+        <OpacityControl value={opacity} onChange={setOpacity} />
         {basemap?.url ? (
           <URLLayer
             type={basemap.type}
             url={basemap.url}
+            opacity={opacity}
             copyrightText={basemap.copyright_text}
             copyrightUrl={basemap.copyright_url}
             layerOptions={{ minZoom: basemap.z_min ?? undefined }}
@@ -99,7 +103,12 @@ export function PreviewLayer({
             }}
           />
         ) : (
-          <NGWLayer resourceId={id} layerType={layerType} zIndex={1} />
+          <NGWLayer
+            resourceId={id}
+            layerType={layerType}
+            zIndex={1}
+            opacity={opacity}
+          />
         )}
         {children}
       </PreviewMap>

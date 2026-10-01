@@ -9,11 +9,13 @@ export function NGWLayer({
   layerType,
   resourceId,
   layerOptions,
+  opacity,
 }: {
   zIndex?: number;
   layerType: LayerType;
   resourceId: number;
   layerOptions?: LayerOptions;
+  opacity?: number;
 }) {
   const { mapStore: adapter } = useMapContext();
 
@@ -37,6 +39,12 @@ export function NGWLayer({
     if (!layer) return;
     layer.setZIndex(zIndex);
   }, [zIndex, layer]);
+
+  useEffect(() => {
+    if (layer && opacity !== undefined) {
+      layer.setOpacity(opacity / 100);
+    }
+  }, [opacity, layer]);
 
   return <>{control}</>;
 }
