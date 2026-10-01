@@ -31,6 +31,7 @@ def test_export_srs(epsg, raster_layer_id, ngw_webtest_app: WebTestApp):
     )
     with NamedTemporaryFile() as f:
         f.write(resp.body)
+        f.flush()
         ds = gdal.OpenEx(f.name)
         srs = osr.SpatialReference()
         srs.ImportFromWkt(ds.GetProjection())
@@ -46,5 +47,6 @@ def test_export_format(format, raster_layer_id, ngw_webtest_app: WebTestApp):
 
     with NamedTemporaryFile() as f:
         f.write(resp.body)
+        f.flush()
         ds = gdal.OpenEx(f.name)
         assert ds.GetDriver().ShortName == format
