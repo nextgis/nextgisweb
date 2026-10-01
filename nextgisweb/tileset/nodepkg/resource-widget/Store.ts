@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, actionBound, computed, observableRef } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -18,9 +18,9 @@ export class Store implements EditorStore<
   readonly identity = "tileset";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor source: FileMeta | null = null;
+  @observableRef accessor source: FileMeta | null = null;
 
-  @observable.ref accessor uploading = false;
+  @observableRef accessor uploading = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;
@@ -63,7 +63,7 @@ export class Store implements EditorStore<
     return base ? base.replace(/\.\w*$/, "") : undefined;
   }
 
-  @action.bound
+  @actionBound
   update(props: Partial<this>) {
     Object.assign(this, props);
   }

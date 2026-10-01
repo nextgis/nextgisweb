@@ -1,4 +1,4 @@
-import { computed, observable } from "mobx";
+import { computed, observableRef } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { RasterLayerStorageRead } from "@nextgisweb/raster-layer/type/api";
@@ -45,7 +45,7 @@ export class StorageStore implements EditorStore<RasterLayerStorageRead> {
   readonly prefix = prefix.init("", this);
   readonly no_sign_request = no_sign_request.init(false, this);
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   load(value: RasterLayerStorageRead) {
     load(this, value);

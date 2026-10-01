@@ -1,4 +1,4 @@
-import { action, observable, runInAction } from "mobx";
+import { action, observableRef, observableShallow, runInAction } from "mobx";
 
 import type { ErrorInfo } from "@nextgisweb/gui/error/extractError";
 import { route } from "@nextgisweb/pyramid/api";
@@ -43,37 +43,37 @@ export class ResourcePickerStore implements Omit<
     ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
   };
 
-  @observable.ref accessor parentItem: ResourcePickerAttr | null = null;
-  @observable.ref accessor blueprint: Blueprint | null = null;
+  @observableRef accessor parentItem: ResourcePickerAttr | null = null;
+  @observableRef accessor blueprint: Blueprint | null = null;
 
-  @observable.shallow accessor resources: ResourcePickerAttr[] | null = null;
-  @observable.shallow accessor allLoadedResources: Map<
+  @observableShallow accessor resources: ResourcePickerAttr[] | null = null;
+  @observableShallow accessor allLoadedResources: Map<
     number,
     ResourcePickerAttr
   > = new Map();
-  @observable.ref accessor parentId: number = 0;
-  @observable.shallow accessor breadcrumbItems: ResourcePickerAttr[] = [];
-  @observable.ref accessor hideUnavailable = false;
-  @observable.shallow accessor disableResourceIds: number[] = [];
-  @observable.shallow accessor requireClass: ResourceCls[] = [];
-  @observable.shallow accessor requireInterface: ResourceInterface[] = [];
-  @observable.ref accessor allowSelection = true;
-  @observable.ref accessor allowMoveInside = true;
-  @observable.shallow accessor traverseClasses: ResourceCls[] | null = null;
-  @observable.ref accessor allowCreateResource = true;
-  @observable.shallow accessor selected: number[] = [];
-  @observable.ref accessor multiple = false;
-  @observable.ref accessor saveLastParentIdGlobal = false;
-  @observable.ref accessor getThisMsg = msgPickThis;
-  @observable.ref accessor getSelectedMsg = msgPickSelected;
-  @observable.shallow accessor errors: Partial<Record<Action, ErrorInfo>> = {};
-  @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
+  @observableRef accessor parentId: number = 0;
+  @observableShallow accessor breadcrumbItems: ResourcePickerAttr[] = [];
+  @observableRef accessor hideUnavailable = false;
+  @observableShallow accessor disableResourceIds: number[] = [];
+  @observableShallow accessor requireClass: ResourceCls[] = [];
+  @observableShallow accessor requireInterface: ResourceInterface[] = [];
+  @observableRef accessor allowSelection = true;
+  @observableRef accessor allowMoveInside = true;
+  @observableShallow accessor traverseClasses: ResourceCls[] | null = null;
+  @observableRef accessor allowCreateResource = true;
+  @observableShallow accessor selected: number[] = [];
+  @observableRef accessor multiple = false;
+  @observableRef accessor saveLastParentIdGlobal = false;
+  @observableRef accessor getThisMsg = msgPickThis;
+  @observableRef accessor getSelectedMsg = msgPickSelected;
+  @observableShallow accessor errors: Partial<Record<Action, ErrorInfo>> = {};
+  @observableShallow accessor loading: Partial<Record<Action, boolean>> = {};
 
-  @observable.shallow accessor selectedParentsRegistry: Map<
+  @observableShallow accessor selectedParentsRegistry: Map<
     number,
     { children: number[]; loading?: boolean }
   > = new Map();
-  @observable.shallow accessor loadingParentsChildren: Set<number> = new Set();
+  @observableShallow accessor loadingParentsChildren: Set<number> = new Set();
 
   readonly onNewGroup: OnNewGroupType | null = null;
   readonly onTraverse: ((parentId: number) => void) | null = null;

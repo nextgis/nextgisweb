@@ -1,11 +1,11 @@
-import { action, observable } from "mobx";
+import { action, observableRef } from "mobx";
 
 export class DescriptionEditorStore {
   readonly identity = "resource.description";
 
-  @observable.ref accessor value: string | null = null;
-  @observable.ref accessor loaded: string | null = null;
-  @observable.ref accessor dirty: boolean = false;
+  @observableRef accessor value: string | null = null;
+  @observableRef accessor loaded: string | null = null;
+  @observableRef accessor dirty: boolean = false;
 
   @action
   setValue(value: string | null) {

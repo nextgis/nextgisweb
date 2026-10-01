@@ -1,4 +1,13 @@
-import { action, computed, observable, reaction, runInAction } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  computedStruct,
+  observableRef,
+  observableShallow,
+  reaction,
+  runInAction,
+} from "mobx";
 
 import { route } from "@nextgisweb/pyramid/api";
 import type { LegendSymbol } from "@nextgisweb/render/type/api";
@@ -33,13 +42,13 @@ interface TreeStoreOptions {
 export class TreeStore {
   rootId: number;
 
-  @observable.shallow accessor items = new Map<number, TreeItemStore>();
-  @observable.shallow accessor childrenIds: number[] = [];
-  @observable.ref accessor visibleItemIds: number[] = [];
+  @observableShallow accessor items = new Map<number, TreeItemStore>();
+  @observableShallow accessor childrenIds: number[] = [];
+  @observableRef accessor visibleItemIds: number[] = [];
 
-  @observable.ref accessor drawOrderEnabled = false;
+  @observableRef accessor drawOrderEnabled = false;
 
-  @observable.ref private accessor _cleanSnapshot: string | null = null;
+  @observableRef private accessor _cleanSnapshot: string | null = null;
 
   private readonly _loadingResourceSymbols = new Set<number>();
 
@@ -110,12 +119,12 @@ export class TreeStore {
     );
   }
 
-  @action.bound
+  @actionBound
   markClean() {
     this._cleanSnapshot = this._snapshot;
   }
 
-  @action.bound
+  @actionBound
   load(rootItem: RootItemConfig) {
     this.rootId = rootItem.id;
     const children = rootItem.children;
@@ -158,7 +167,7 @@ export class TreeStore {
     return ids.length ? Math.max(...ids) + 1 : 1;
   }
 
-  @action.bound
+  @actionBound
   runInAction(fn: () => void) {
     fn();
   }
@@ -198,7 +207,7 @@ export class TreeStore {
   }
 
   // Use only for trigger tree structure change event
-  @computed.struct
+  @computedStruct
   get treeStructureStamp(): number[] {
     const result: number[] = [];
     const stack: number[] = [...this.childrenIds].reverse();
@@ -215,7 +224,7 @@ export class TreeStore {
     return result;
   }
 
-  @computed.struct
+  @computedStruct
   get deepTreeStamp(): string {
     const result: number[] = [];
 
@@ -230,7 +239,7 @@ export class TreeStore {
     return result.join();
   }
 
-  @computed.struct
+  @computedStruct
   get visibleLayerIds(): number[] {
     const ids: number[] = [];
     for (const item of this.items.values()) {
@@ -241,7 +250,7 @@ export class TreeStore {
     return ids;
   }
 
-  @computed.struct
+  @computedStruct
   get visibleLayers(): TreeLayerStore[] {
     return this.visibleLayerIds
       .map((id) => this.items.get(id))
@@ -265,7 +274,7 @@ export class TreeStore {
     return false;
   }
 
-  @computed.struct
+  @computedStruct
   get editableLayers(): TreeLayerStore[] {
     const res: TreeLayerStore[] = [];
     for (const n of this.items.values()) {
@@ -287,7 +296,7 @@ export class TreeStore {
     return res;
   }
 
-  @computed.struct
+  @computedStruct
   get layersInExpandedGroupIds(): number[] {
     const result: number[] = [];
     const stack: number[] = [...this.childrenIds].reverse();
@@ -314,7 +323,7 @@ export class TreeStore {
     return result;
   }
 
-  @computed.struct
+  @computedStruct
   get layersWithoutLegendInfo(): TreeLayerStore[] {
     const res: TreeLayerStore[] = [];
 
@@ -397,7 +406,7 @@ export class TreeStore {
     return someItem(Array.from(this.items.values()), query);
   }
 
-  @action.bound
+  @actionBound
   addItem(
     cfg: TreeChildrenItemConfig,
     parentId: number | null = null,
@@ -416,7 +425,7 @@ export class TreeStore {
     return node;
   }
 
-  @action.bound
+  @actionBound
   insertItem(store: TreeLayerStore, index?: number): TreeLayerStore {
     const id = store.id;
 
@@ -433,7 +442,7 @@ export class TreeStore {
     return store;
   }
 
-  @action.bound
+  @actionBound
   setValue<T extends TreeItemStore, K extends keyof T>(
     item: T,
     key: K,
@@ -481,7 +490,7 @@ export class TreeStore {
     }
   }
 
-  @action.bound
+  @actionBound
   move(itemId: number, newParentId: number | null, index?: number) {
     const node = this.items.get(itemId);
     if (!node) return;
@@ -493,7 +502,7 @@ export class TreeStore {
     this.insert(itemId, newParentId, index);
   }
 
-  @action.bound
+  @actionBound
   deleteItem(itemId: number) {
     const stack = [itemId];
 
@@ -512,7 +521,7 @@ export class TreeStore {
     }
   }
 
-  @action.bound
+  @actionBound
   setItemVisibility(
     itemId: number,
     visibility: boolean,
@@ -521,7 +530,7 @@ export class TreeStore {
     updateItemVisibility(this, itemId, visibility, options);
   }
 
-  @action.bound
+  @actionBound
   setLayerVisibleIds(val: number[]) {
     const visibleIds = new Set(val);
 
@@ -536,7 +545,7 @@ export class TreeStore {
     setParentsVisibility(this, visibleIds, true);
   }
 
-  @action.bound
+  @actionBound
   setItemVisibleIds(val: number[]) {
     const visibleIds = new Set(val);
     const enabledLayerIds: number[] = [];
@@ -555,7 +564,7 @@ export class TreeStore {
     setParentsVisibility(this, enabledLayerIds, true);
   }
 
-  @action.bound
+  @actionBound
   setExpanded(expanded: number[]) {
     Array.from(this.items.values()).forEach((item) => {
       if (item.isGroup()) {
@@ -564,7 +573,7 @@ export class TreeStore {
     });
   }
 
-  @action.bound
+  @actionBound
   setDrawOrderEnabled(enabled: boolean) {
     this.drawOrderEnabled = enabled;
   }
@@ -578,7 +587,7 @@ export class TreeStore {
     );
   };
 
-  @action.bound
+  @actionBound
   async updateResourceLegendSymbols(styleIds: number[]) {
     if (styleIds.length) {
       const newResources = styleIds.filter(
@@ -632,7 +641,7 @@ export class TreeStore {
     }
   }
 
-  @action.bound
+  @actionBound
   recomputeDrawOrderPositions() {
     const layers: TreeLayerStore[] = [];
 

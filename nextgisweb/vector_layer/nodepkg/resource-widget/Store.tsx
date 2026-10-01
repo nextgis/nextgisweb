@@ -1,5 +1,11 @@
 import { isEmpty } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  observableRef,
+  observableShallow,
+} from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -38,11 +44,11 @@ export class Store implements EditorStore<
   readonly identity = "vector_layer";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor mode: Mode | null = "file";
-  @observable.ref accessor copyResource: ResourceRef | null = null;
-  @observable.shallow accessor source: FileMeta | null = null;
-  @observable.ref accessor sourceLayer: string | null = null;
-  @observable.shallow accessor sourceOptions: SourceOptions = {
+  @observableRef accessor mode: Mode | null = "file";
+  @observableRef accessor copyResource: ResourceRef | null = null;
+  @observableShallow accessor source: FileMeta | null = null;
+  @observableRef accessor sourceLayer: string | null = null;
+  @observableShallow accessor sourceOptions: SourceOptions = {
     fix_errors: "LOSSY",
     skip_errors: true,
     cast_geometry_type: null,
@@ -53,13 +59,13 @@ export class Store implements EditorStore<
     skip_other_geometry_types: false,
   };
 
-  @observable.ref accessor geometryType: GeometryType | null = null;
-  @observable.ref accessor geometryTypeInitial: GeometryType | null = null;
+  @observableRef accessor geometryType: GeometryType | null = null;
+  @observableRef accessor geometryTypeInitial: GeometryType | null = null;
 
-  @observable.ref accessor confirm = false;
-  @observable.ref accessor uploading = false;
+  @observableRef accessor confirm = false;
+  @observableRef accessor uploading = false;
 
-  @observable.ref accessor dirty = false;
+  @observableRef accessor dirty = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;
@@ -131,7 +137,7 @@ export class Store implements EditorStore<
     return result;
   }
 
-  @action.bound
+  @actionBound
   updateSourceOptions(sourceOptions: Partial<SourceOptions>) {
     const so = { ...this.sourceOptions };
     Object.entries(sourceOptions).forEach(([key, value]) => {
@@ -164,7 +170,7 @@ export class Store implements EditorStore<
     return base ? base.replace(/\.[a-z0-9]+$/i, "") : undefined;
   }
 
-  @action.bound
+  @actionBound
   update(values: Partial<Omit<this, "source" | "uploading">>) {
     for (const [k, v] of Object.entries(values)) {
       if (this[k as keyof typeof values] === v) {
@@ -182,7 +188,7 @@ export class Store implements EditorStore<
     this.dirty = true;
   }
 
-  @action.bound
+  @actionBound
   setSource(value: this["source"] | undefined) {
     value = value ?? null;
     if (this.source === value) return;
@@ -190,7 +196,7 @@ export class Store implements EditorStore<
     this.dirty = true;
   }
 
-  @action.bound
+  @actionBound
   setUploading(value: this["uploading"]) {
     this.uploading = value;
   }

@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
@@ -70,7 +70,7 @@ export class WfsClientLayerStore implements EditorStore<
   readonly geometrySrid = geometrySrid.init(null, this);
   readonly fields = fields.init("update", this);
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

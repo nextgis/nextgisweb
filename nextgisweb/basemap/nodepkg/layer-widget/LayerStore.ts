@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import type {
   BasemapLayerCreate,
@@ -45,8 +45,8 @@ export class LayerStore implements EditorStore<
   readonly minzoom = minzoom.init(null, this);
   readonly maxzoom = maxzoom.init(null, this);
 
-  @observable.ref accessor loaded = false;
-  @observable.ref accessor validate = false;
+  @observableRef accessor loaded = false;
+  @observableRef accessor validate = false;
 
   @action
   load(value: BasemapLayerRead) {

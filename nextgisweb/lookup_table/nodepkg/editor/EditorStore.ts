@@ -1,5 +1,11 @@
 import { clamp } from "lodash-es";
-import { action, computed, observable, runInAction } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  observableRef,
+  runInAction,
+} from "mobx";
 
 import {
   EdiTableKeyValueRow,
@@ -20,13 +26,13 @@ export class EditorStore
 {
   readonly identity = "lookup_table";
 
-  @observable.ref accessor sort: LookupTableRead["sort"] = "KEY_ASC";
+  @observableRef accessor sort: LookupTableRead["sort"] = "KEY_ASC";
 
   constructor() {
     super({ defaultValue: "", valueFromKey: true });
   }
 
-  @action.bound
+  @actionBound
   setSort(value?: LookupTableRead["sort"]) {
     if (value) this.sort = value;
     this.dirty = true;
@@ -69,7 +75,7 @@ export class EditorStore
     this.dirty = false;
   }
 
-  @action.bound
+  @actionBound
   clear = () => {
     this.items = [];
   };

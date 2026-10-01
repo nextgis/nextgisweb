@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { actionBound, observableRef } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useCallback, useState } from "react";
 
@@ -14,17 +14,17 @@ import { updateTreeGroupFromWebmapItem } from "@nextgisweb/webmap/utils/webmap-i
 const msgTitle = gettext("Properties");
 
 class GroupPropertiesDraftStore implements ItemStore {
-  @observable.ref accessor dirty = false;
-  @observable.ref accessor validate = false;
+  @observableRef accessor dirty = false;
+  @observableRef accessor validate = false;
 
   readonly composite = { parent: null };
 
-  @action.bound
+  @actionBound
   markDirty() {
     this.dirty = true;
   }
 
-  @action.bound
+  @actionBound
   setValidate(value: boolean) {
     this.validate = value;
   }

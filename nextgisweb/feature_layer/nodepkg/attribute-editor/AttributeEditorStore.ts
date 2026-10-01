@@ -1,5 +1,11 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  observableRef,
+  observableShallow,
+} from "mobx";
 
 import type {
   EditorStore,
@@ -20,10 +26,10 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
 
   private _validator?: Validator;
 
-  @observable.shallow accessor value: NgwAttributeValue = {};
-  @observable.shallow private accessor _initValue: NgwAttributeValue = {};
-  @observable.ref accessor isValid = true;
-  @observable.ref accessor loadRevision = 0;
+  @observableShallow accessor value: NgwAttributeValue = {};
+  @observableShallow private accessor _initValue: NgwAttributeValue = {};
+  @observableRef accessor isValid = true;
+  @observableRef accessor loadRevision = 0;
 
   constructor({ parentStore, fields }: EditorStoreConstructorOptions = {}) {
     this._parentStore = parentStore;
@@ -113,7 +119,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
     return true;
   };
 
-  @action.bound
+  @actionBound
   setIsValid(isValid: boolean) {
     this.isValid = isValid;
   }

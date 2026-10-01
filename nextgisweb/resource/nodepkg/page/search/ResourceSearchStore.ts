@@ -1,4 +1,10 @@
-import { action, observable, runInAction } from "mobx";
+import {
+  action,
+  actionBound,
+  observableRef,
+  observableShallow,
+  runInAction,
+} from "mobx";
 
 import type { UserReadBrief } from "@nextgisweb/auth/type/api";
 import { extractError, isAbortError } from "@nextgisweb/gui/error";
@@ -15,28 +21,27 @@ interface BreadcrumbNode {
 }
 
 export class ResourceSearchStore {
-  @observable.ref accessor q: string = "";
-  @observable.shallow accessor keynameIn: string[] = [];
-  @observable.shallow accessor metaFilters: MetaFilterEntry[] = [];
+  @observableRef accessor q: string = "";
+  @observableShallow accessor keynameIn: string[] = [];
+  @observableShallow accessor metaFilters: MetaFilterEntry[] = [];
 
-  @observable.shallow accessor clsIn: ResourceCls[] = [];
-  @observable.shallow accessor ownerUserIn: number[] = [];
-  @observable.ref accessor root: number | null = null;
+  @observableShallow accessor clsIn: ResourceCls[] = [];
+  @observableShallow accessor ownerUserIn: number[] = [];
+  @observableRef accessor root: number | null = null;
 
-  @observable.ref accessor order: string = "";
+  @observableRef accessor order: string = "";
 
-  @observable.shallow accessor results: CompositeRead[] = [];
-  @observable.shallow accessor breadcrumbs: Record<number, BreadcrumbNode[]> =
+  @observableShallow accessor results: CompositeRead[] = [];
+  @observableShallow accessor breadcrumbs: Record<number, BreadcrumbNode[]> =
     {};
-  @observable.ref accessor totalCount: number = 0;
-  @observable.ref accessor loading: boolean = false;
-  @observable.ref accessor loadingMore: boolean = false;
-  @observable.ref accessor error: string | null = null;
+  @observableRef accessor totalCount: number = 0;
+  @observableRef accessor loading: boolean = false;
+  @observableRef accessor loadingMore: boolean = false;
+  @observableRef accessor error: string | null = null;
 
-  @observable.ref accessor settingsVisible: boolean = false;
+  @observableRef accessor settingsVisible: boolean = false;
 
-  @observable.shallow accessor usersById: Map<number, UserReadBrief> =
-    new Map();
+  @observableShallow accessor usersById: Map<number, UserReadBrief> = new Map();
 
   private abortController: AbortController | null = null;
   private usersPromise: Promise<UserReadBrief[]> | null = null;
@@ -212,14 +217,14 @@ export class ResourceSearchStore {
     }
   }
 
-  @action.bound
+  @actionBound
   async applyFilters({
     pushHistory = true,
   }: { pushHistory?: boolean } = {}): Promise<void> {
     await this.fetchPage({ offset: 0, append: false, pushHistory });
   }
 
-  @action.bound
+  @actionBound
   async loadMore(): Promise<void> {
     if (
       this.loading ||
@@ -233,27 +238,27 @@ export class ResourceSearchStore {
     await this.fetchPage({ offset: this.results.length, append: true });
   }
 
-  @action.bound setSearchText(value: string) {
+  @actionBound setSearchText(value: string) {
     this.q = value;
   }
 
-  @action.bound setKeynames(values: string[]) {
+  @actionBound setKeynames(values: string[]) {
     this.keynameIn = values;
   }
 
-  @action.bound setMetaFilters(entries: MetaFilterEntry[]) {
+  @actionBound setMetaFilters(entries: MetaFilterEntry[]) {
     this.metaFilters = entries;
   }
 
-  @action.bound addMetaFilter() {
+  @actionBound addMetaFilter() {
     this.metaFilters = [...this.metaFilters, { key: "", value: "" }];
   }
 
-  @action.bound removeMetaFilter(index: number) {
+  @actionBound removeMetaFilter(index: number) {
     this.metaFilters = this.metaFilters.filter((_, i) => i !== index);
   }
 
-  @action.bound updateMetaFilter(
+  @actionBound updateMetaFilter(
     index: number,
     patch: Partial<MetaFilterEntry>
   ) {
@@ -262,27 +267,27 @@ export class ResourceSearchStore {
     );
   }
 
-  @action.bound setTypes(values: ResourceCls[]) {
+  @actionBound setTypes(values: ResourceCls[]) {
     this.clsIn = values;
   }
 
-  @action.bound setOwners(values: number[]) {
+  @actionBound setOwners(values: number[]) {
     this.ownerUserIn = values;
   }
 
-  @action.bound setRoot(value: number | null) {
+  @actionBound setRoot(value: number | null) {
     this.root = value;
   }
 
-  @action.bound setOrder(value: string) {
+  @actionBound setOrder(value: string) {
     this.order = value;
   }
 
-  @action.bound toggleSettings() {
+  @actionBound toggleSettings() {
     this.settingsVisible = !this.settingsVisible;
   }
 
-  @action.bound onTableSortChange(order: string): void {
+  @actionBound onTableSortChange(order: string): void {
     this.order = order;
     void this.applyFilters({ pushHistory: false });
   }
@@ -303,7 +308,7 @@ export class ResourceSearchStore {
     return this.duplicateMetaKeys().size > 0;
   }
 
-  @action.bound
+  @actionBound
   destroy() {
     this.abortController?.abort();
     this.abortController = null;

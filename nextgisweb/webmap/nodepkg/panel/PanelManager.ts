@@ -1,4 +1,12 @@
-import { action, computed, observable, reaction, runInAction } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  observableRef,
+  observableShallow,
+  reaction,
+  runInAction,
+} from "mobx";
 import type { IReactionDisposer } from "mobx";
 
 import type { Display } from "../display";
@@ -29,11 +37,11 @@ export class PanelManager {
   private _onChangePanel?: (panel?: PanelStore) => void;
   private _pluginDisposers = new Map<string, IReactionDisposer>();
 
-  @observable.ref accessor allowPanels: string[] | null;
+  @observableRef accessor allowPanels: string[] | null;
 
-  @observable.shallow accessor plugins: PanelPlugin[] = [];
-  @observable.shallow accessor panels = new Map<string, PanelStore>();
-  @observable.shallow accessor active: NavigationPanelInfo = {
+  @observableShallow accessor plugins: PanelPlugin[] = [];
+  @observableShallow accessor panels = new Map<string, PanelStore>();
+  @observableShallow accessor active: NavigationPanelInfo = {
     active: undefined,
     source: "init",
   };
@@ -85,7 +93,7 @@ export class PanelManager {
     return this.active.active;
   }
 
-  @action.bound
+  @actionBound
   setAllowPanels(val: string[] | null) {
     this.allowPanels = val;
   }
@@ -145,7 +153,7 @@ export class PanelManager {
     }
   }
 
-  @action.bound
+  @actionBound
   unregisterPlugin(name: string) {
     const panels = new Map(this.panels);
 

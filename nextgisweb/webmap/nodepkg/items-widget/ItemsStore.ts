@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 import type { IObservableArray } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
@@ -39,8 +39,8 @@ export class ItemsStore
     this.markDirty();
   });
 
-  @observable.ref accessor dirty = false;
-  @observable.ref accessor validate = false;
+  @observableRef accessor dirty = false;
+  @observableRef accessor validate = false;
 
   private _loaded = false;
 

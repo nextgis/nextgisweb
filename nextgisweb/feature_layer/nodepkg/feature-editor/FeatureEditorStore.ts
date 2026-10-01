@@ -1,4 +1,10 @@
-import { action, computed, observable } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  observableRef,
+  observableShallow,
+} from "mobx";
 import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
 
@@ -28,25 +34,25 @@ export class FeatureEditorStore {
   readonly resourceId: number;
   readonly featureId: number | null = null;
 
-  @observable.ref accessor saving = false;
-  @observable.ref accessor initLoading = false;
+  @observableRef accessor saving = false;
+  @observableRef accessor initLoading = false;
 
-  @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
-  @observable.shallow accessor featureLayer: FeatureLayerRead | null = null;
+  @observableShallow accessor fields: FeatureLayerFieldRead[] = [];
+  @observableShallow accessor featureLayer: FeatureLayerRead | null = null;
 
   private _featureItem?: FeatureItem;
-  @observable.ref private accessor _geometry: Geometry | null = null;
+  @observableRef private accessor _geometry: Geometry | null = null;
   private _wkt = new WKT();
 
   private _abortController = new AbortControllerHelper();
   private _initializing?: Promise<CompositeRead>;
 
-  @observable.shallow private accessor _attributeStore: EditorStore | null =
+  @observableShallow private accessor _attributeStore: EditorStore | null =
     null;
-  @observable.shallow private accessor _geometryStore: EditorStore<
+  @observableShallow private accessor _geometryStore: EditorStore<
     string | null
   > | null = null;
-  @observable.shallow private accessor _extensionStores: ExtensionStores = {};
+  @observableShallow private accessor _extensionStores: ExtensionStores = {};
 
   constructor({
     featureId,
@@ -184,7 +190,7 @@ export class FeatureEditorStore {
     return json;
   };
 
-  @action.bound
+  @actionBound
   async save(): Promise<CompositeRead | undefined> {
     try {
       this.setSaving(true);
@@ -216,27 +222,27 @@ export class FeatureEditorStore {
     }
   }
 
-  @action.bound
+  @actionBound
   destroy() {
     this._abort();
     this._initializing = undefined;
     this.setInitLoading(false);
   }
 
-  @action.bound
+  @actionBound
   attachAttributeStore(attributeStore: EditorStore) {
     this._attributeStore = attributeStore;
     if (this._featureItem) {
       this._setAttributesValue(this._featureItem.fields);
     }
   }
-  @action.bound
+  @actionBound
   attachGeometryStore(geometryStore: EditorStore<string | null>) {
     this._geometryStore = geometryStore;
     this._setGeometryValue(this._geometry);
   }
 
-  @action.bound
+  @actionBound
   addExtensionStore(key: string, extensionStore: EditorStore) {
     this._extensionStores[key] = extensionStore;
     if (this._featureItem) {
@@ -246,7 +252,7 @@ export class FeatureEditorStore {
     }
   }
 
-  @action.bound
+  @actionBound
   reset() {
     this._setStoreValues(this._featureItem);
   }

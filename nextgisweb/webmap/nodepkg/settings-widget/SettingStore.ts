@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef, observableShallow } from "mobx";
 
 import type { ExtentRowValue } from "@nextgisweb/gui/component";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -22,26 +22,26 @@ export class SettingStore implements EditorStore<
   readonly identity = "webmap";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor editable = true;
-  @observable.ref accessor annotationEnabled = false;
-  @observable.ref accessor annotationDefault: AnnotationDefault = "no";
-  @observable.ref accessor legendSymbols: WebMapRead["legend_symbols"] = null;
-  @observable.ref accessor measureSrs: null | number = null;
-  @observable.ref accessor initialExtent: ExtentRowValue = {
+  @observableRef accessor editable = true;
+  @observableRef accessor annotationEnabled = false;
+  @observableRef accessor annotationDefault: AnnotationDefault = "no";
+  @observableRef accessor legendSymbols: WebMapRead["legend_symbols"] = null;
+  @observableRef accessor measureSrs: null | number = null;
+  @observableRef accessor initialExtent: ExtentRowValue = {
     left: -180,
     right: 180,
     bottom: -90,
     top: 90,
   };
-  @observable.ref accessor constrainingExtent: ExtentRowValue = {
+  @observableRef accessor constrainingExtent: ExtentRowValue = {
     left: null,
     right: null,
     bottom: null,
     top: null,
   };
-  @observable.ref accessor title: string | null = null;
-  @observable.ref accessor bookmarkResource: ResourceRef | null = null;
-  @observable.shallow accessor options: WebMapRead["options"] = {};
+  @observableRef accessor title: string | null = null;
+  @observableRef accessor bookmarkResource: ResourceRef | null = null;
+  @observableShallow accessor options: WebMapRead["options"] = {};
 
   private initialValue: WithoutItems<WebMapUpdate>;
 

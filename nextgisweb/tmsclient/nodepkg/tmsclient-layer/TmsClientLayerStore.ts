@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import { mapper } from "@nextgisweb/gui/arm";
@@ -67,7 +67,7 @@ export class TmsClientLayerStore implements EditorStore<
   readonly maxzoom = maxzoom.init(14, this);
   readonly extent = extent.init(null, this);
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { actionBound, observableRef } from "mobx";
 import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
 
@@ -13,15 +13,15 @@ export interface HighlightEvent {
 const wkt = new WKT();
 
 export class HighlightStore {
-  @observable.ref accessor highlighted: HighlightEvent[] = [];
+  @observableRef accessor highlighted: HighlightEvent[] = [];
 
-  @action.bound
+  @actionBound
   highlight(e: HighlightEvent | HighlightEvent[]) {
     const arr = Array.isArray(e) ? e : [e];
     this.highlighted = arr;
   }
 
-  @action.bound
+  @actionBound
   unhighlight(filter?: (e: HighlightEvent) => boolean) {
     if (!filter) {
       this.highlighted = [];
@@ -30,7 +30,7 @@ export class HighlightStore {
     this.highlighted = this.highlighted.filter((x) => !filter(x));
   }
 
-  @action.bound
+  @actionBound
   async highlightById(featureId: number, layerId: number) {
     const feature = await route("feature_layer.feature.item", {
       id: layerId,

@@ -1,5 +1,11 @@
 import { get, set } from "lodash-es";
-import { action, computed, observable, runInAction } from "mobx";
+import {
+  action,
+  computed,
+  observableRef,
+  observableShallow,
+  runInAction,
+} from "mobx";
 
 import { extractError } from "@nextgisweb/gui/error";
 import type { ErrorInfo } from "@nextgisweb/gui/error/extractError";
@@ -52,11 +58,11 @@ export class CompositeStore {
   #sdnBase: string | null | undefined = undefined;
   #initialValue: CompositeRead | null | undefined = undefined;
 
-  @observable.ref accessor validate = false;
-  @observable.ref accessor members: WidgetMember[] | undefined = undefined;
-  @observable.ref accessor loading = true;
-  @observable.ref accessor saving = false;
-  @observable.shallow accessor error: ErrorInfo | null = null;
+  @observableRef accessor validate = false;
+  @observableRef accessor members: WidgetMember[] | undefined = undefined;
+  @observableRef accessor loading = true;
+  @observableRef accessor saving = false;
+  @observableShallow accessor error: ErrorInfo | null = null;
 
   constructor({ setup: request }: CompositeStoreOptions) {
     this.setup = request;

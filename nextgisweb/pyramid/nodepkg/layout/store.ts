@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { actionBound, computed, observableRef, observableShallow } from "mobx";
 import type { ReactNode } from "react";
 
 import { ModalStore } from "@nextgisweb/gui/show-modal/ModalStore";
@@ -27,22 +27,22 @@ export interface ModalItem {
 class LayoutStore {
   readonly modalStore: ModalStore = new ModalStore();
 
-  @observable.shallow accessor menuItems: MenuItem[] = [];
-  @observable.ref accessor hideMenu = false;
+  @observableShallow accessor menuItems: MenuItem[] = [];
+  @observableRef accessor hideMenu = false;
 
-  @observable.shallow accessor modal: ModalAPI | null = null;
+  @observableShallow accessor modal: ModalAPI | null = null;
 
-  @action.bound
+  @actionBound
   setModalApi(modal: ModalAPI | null) {
     this.modal = modal;
   }
 
-  @action.bound
+  @actionBound
   addMenuItem(item: MenuItem) {
     this.menuItems.push(item);
   }
 
-  @action.bound
+  @actionBound
   setHideMenu(val: boolean) {
     this.hideMenu = val;
   }

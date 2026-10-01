@@ -1,4 +1,10 @@
-import { action, computed, observable } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  observableRef,
+  observableStruct,
+} from "mobx";
 import type { Feature } from "ol";
 import OlMap from "ol/Map";
 import type { MapOptions as OlMapOptions } from "ol/Map";
@@ -84,27 +90,27 @@ export class MapStore {
   readonly displayProjection = `EPSG:${this.displaySrsId}`;
   readonly lonlatProjection = "EPSG:4326";
 
-  @observable.ref accessor hmux: boolean | null;
+  @observableRef accessor hmux: boolean | null;
 
-  @observable.ref accessor olMap: OlMap;
-  @observable.ref accessor olView: View;
+  @observableRef accessor olMap: OlMap;
+  @observableRef accessor olView: View;
 
-  @observable.ref accessor ready = false;
-  @observable.ref accessor started = false;
+  @observableRef accessor ready = false;
+  @observableRef accessor started = false;
 
-  @observable.ref accessor layers: Layers = {};
+  @observableRef accessor layers: Layers = {};
 
-  @observable.ref accessor baseLayer: CoreLayer | null = null;
-  @observable.ref accessor resolution: number | null = null;
-  @observable.struct accessor center: number[] | null = null;
-  @observable.ref accessor zoom: number | null = null;
-  @observable.ref accessor measureSrsId: number | null = null;
-  @observable.struct accessor position: Position | null = null;
-  @observable.ref accessor rotation: number = 0;
+  @observableRef accessor baseLayer: CoreLayer | null = null;
+  @observableRef accessor resolution: number | null = null;
+  @observableStruct accessor center: number[] | null = null;
+  @observableRef accessor zoom: number | null = null;
+  @observableRef accessor measureSrsId: number | null = null;
+  @observableStruct accessor position: Position | null = null;
+  @observableRef accessor rotation: number = 0;
 
-  @observable.ref accessor mapState: string | null = null;
-  @observable.ref accessor isLoading: boolean = false;
-  @observable.ref accessor defaultMapState: string | null = null;
+  @observableRef accessor mapState: string | null = null;
+  @observableRef accessor isLoading: boolean = false;
+  @observableRef accessor defaultMapState: string | null = null;
 
   private _viewUnbindKeys: EventsKey[] = [];
   private _mapUnbindKeys: EventsKey[] = [];
@@ -148,18 +154,18 @@ export class MapStore {
     return this.baseLayer.name;
   }
 
-  @action.bound
+  @actionBound
   setMapState(val: string | null) {
     this.mapState = val;
   }
-  @action.bound
+  @actionBound
   deactivateMapState(val: string) {
     if (this.mapState === val) {
       this.mapState = null;
     }
   }
 
-  @action.bound
+  @actionBound
   setDefaultMapState(val: string | null) {
     this.defaultMapState = val;
   }
@@ -169,7 +175,7 @@ export class MapStore {
     this.baseLayer = layer;
   }
 
-  @action.bound
+  @actionBound
   setMeasureSrsId(measureSrsId: number | null | undefined) {
     this.measureSrsId = measureSrsId ?? null;
   }
@@ -179,8 +185,8 @@ export class MapStore {
     this.isLoading = val;
   }
 
-  @action
-  switchBasemap = (basemapLayerKey: string) => {
+  @actionBound
+  switchBasemap(basemapLayerKey: string) {
     if (!(basemapLayerKey in this.layers)) {
       return false;
     }
@@ -195,7 +201,7 @@ export class MapStore {
     this.baseLayer = newLayer;
 
     return true;
-  };
+  }
 
   async startup(target: string | HTMLElement): Promise<void> {
     return new Promise((resolve) => {
@@ -317,7 +323,7 @@ export class MapStore {
     this.olMap.addLayer(olLayer);
   }
 
-  @action.bound
+  @actionBound
   setLayerZIndex(layerDef: CoreLayer | number, zIndex: number) {
     const layer =
       typeof layerDef === "number" ? this.layers[layerDef] : layerDef;
@@ -338,7 +344,7 @@ export class MapStore {
     return layers;
   }
 
-  @action.bound
+  @actionBound
   removeLayer(layer: CoreLayer): void {
     this.olMap.removeLayer(layer.getLayer());
     const layers = { ...this.layers };

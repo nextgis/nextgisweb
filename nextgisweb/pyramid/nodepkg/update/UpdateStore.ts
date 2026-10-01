@@ -1,5 +1,5 @@
 import { sortBy } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { sleep } from "@nextgisweb/gui/util";
 
@@ -28,7 +28,7 @@ type UpdateStatus =
   | ["has_update", HasUpdateData];
 
 export class UpdateStore {
-  @observable.ref accessor state: UpdateStatus = ["disabled"];
+  @observableRef accessor state: UpdateStatus = ["disabled"];
 
   private forceResolve: () => void = () => {};
 

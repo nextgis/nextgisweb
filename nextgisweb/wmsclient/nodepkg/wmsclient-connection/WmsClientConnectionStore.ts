@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
@@ -56,7 +56,7 @@ export class WmsClientConnectionStore implements EditorStore<
    */
   readonly capcache = capcache.init("query", this);
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   @action
   load(val: WMSConnectionRead) {

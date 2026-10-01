@@ -1,4 +1,10 @@
-import { action, observable } from "mobx";
+import {
+  action,
+  actionBound,
+  observableRef,
+  observableShallow,
+  observableStruct,
+} from "mobx";
 import type { Coordinate } from "ol/coordinate";
 
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
@@ -7,23 +13,23 @@ import type { PrintMapPaper, PrintMapSettings } from "../type";
 import { PrintLayoutStore } from "./PrintLayoutStore";
 
 export class PrintMapStore implements Omit<PrintMapSettings, "layout"> {
-  @observable.shallow accessor printMapPaper: PrintMapPaper | null = null;
-  @observable.shallow accessor webMapItems: TreeWebmapItem[] = [];
+  @observableShallow accessor printMapPaper: PrintMapPaper | null = null;
+  @observableShallow accessor webMapItems: TreeWebmapItem[] = [];
 
-  @observable.ref accessor width = 210;
-  @observable.ref accessor title: boolean | undefined = undefined;
-  @observable.ref accessor scale: number | undefined = undefined;
-  @observable.ref accessor arrow = false;
-  @observable.ref accessor height = 297;
-  @observable.ref accessor margin = 10;
-  @observable.ref accessor legend = false;
-  @observable.ref accessor scaleLine = false;
-  @observable.ref accessor titleText = "";
-  @observable.ref accessor scaleValue = false;
-  @observable.ref accessor legendColumns = 1;
-  @observable.ref accessor graticule = false;
+  @observableRef accessor width = 210;
+  @observableRef accessor title: boolean | undefined = undefined;
+  @observableRef accessor scale: number | undefined = undefined;
+  @observableRef accessor arrow = false;
+  @observableRef accessor height = 297;
+  @observableRef accessor margin = 10;
+  @observableRef accessor legend = false;
+  @observableRef accessor scaleLine = false;
+  @observableRef accessor titleText = "";
+  @observableRef accessor scaleValue = false;
+  @observableRef accessor legendColumns = 1;
+  @observableRef accessor graticule = false;
 
-  @observable.struct accessor center: Coordinate | undefined = undefined;
+  @observableStruct accessor center: Coordinate | undefined = undefined;
 
   layout: PrintLayoutStore;
 
@@ -37,7 +43,7 @@ export class PrintMapStore implements Omit<PrintMapSettings, "layout"> {
     this.webMapItems = webMapItems;
   }
 
-  @action.bound
+  @actionBound
   update(values: Partial<PrintMapSettings>) {
     Object.keys(values).forEach((key) => {
       // @ts-expect-error class settings property access

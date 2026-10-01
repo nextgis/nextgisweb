@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import { actionBound, computed, observableShallow } from "mobx";
 
 import type {
   EditorStoreConstructorOptions,
@@ -15,8 +15,8 @@ class AttachmentEditorStore implements IEditorStore<DataSource[]> {
   readonly featureId: number | null = null;
   readonly resourceId: number;
 
-  @observable.shallow accessor value: DataSource[] = [];
-  @observable.shallow private accessor _initValue: DataSource[] = [];
+  @observableShallow accessor value: DataSource[] = [];
+  @observableShallow private accessor _initValue: DataSource[] = [];
 
   constructor({ parentStore }: EditorStoreConstructorOptions) {
     assert(parentStore);
@@ -46,19 +46,19 @@ class AttachmentEditorStore implements IEditorStore<DataSource[]> {
     return dirty;
   }
 
-  @action.bound
+  @actionBound
   load(value: DataSource[] | null) {
     value ??= [];
     this.value = value;
     this._initValue = value;
   }
 
-  @action.bound
+  @actionBound
   reset() {
     this.value = this._initValue;
   }
 
-  @action.bound
+  @actionBound
   append(value: UploaderMeta[]) {
     const newValue = [...(this.value || [])];
 
@@ -80,7 +80,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[]> {
     this.value = newValue;
   }
 
-  @action.bound
+  @actionBound
   updateItem(item: DataSource, field: string, value: unknown) {
     const old = this.value ? [...this.value] : [];
     const index = findAttachmentIndex(item, old);
@@ -95,7 +95,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[]> {
     }
   }
 
-  @action.bound
+  @actionBound
   deleteItem(item: DataSource) {
     const old = this.value ? [...this.value] : [];
     const index = findAttachmentIndex(item, old);

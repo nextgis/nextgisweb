@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { actionBound, observableShallow } from "mobx";
 import type { ReactNode } from "react";
 
 export interface MenuItem {
@@ -14,18 +14,18 @@ export interface ModalItem {
 }
 
 export class ModalStore {
-  @observable.shallow accessor modalItems: ModalItem[] = [];
+  @observableShallow accessor modalItems: ModalItem[] = [];
 
   has(id: string) {
     return this.modalItems.find((item) => item.id === id);
   }
 
-  @action.bound
+  @actionBound
   add(modalItem: ModalItem) {
     this.modalItems = [...this.modalItems, modalItem];
   }
 
-  @action.bound
+  @actionBound
   update(id: string, element: ReactNode) {
     const modalItems = [...this.modalItems];
     const modalItem = modalItems.find((e) => e.id === id);
@@ -35,11 +35,11 @@ export class ModalStore {
     this.modalItems = modalItems;
   }
 
-  @action.bound
+  @actionBound
   remove(id: string) {
     this.modalItems = this.modalItems.filter((e) => e.id !== id);
   }
-  @action.bound
+  @actionBound
   clean() {
     this.modalItems = [];
   }

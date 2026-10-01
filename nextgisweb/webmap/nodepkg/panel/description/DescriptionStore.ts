@@ -1,9 +1,9 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { PanelStore } from "..";
 
 export default class DescriptionStore extends PanelStore {
-  @observable.ref accessor contentOverride: string | null | undefined =
+  @observableRef accessor contentOverride: string | null | undefined =
     undefined;
 
   @computed

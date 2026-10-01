@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, actionBound, computed, observableRef } from "mobx";
 
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
 import { routeURL } from "@nextgisweb/pyramid/api";
@@ -16,17 +16,17 @@ export class EditorStore implements IEditorStore<
   readonly identity = "social";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor imageExisting: Blob | null = null;
-  @observable.ref accessor imageUpdated: UploaderMeta | null = null;
-  @observable.ref accessor description: string | null = null;
+  @observableRef accessor imageExisting: Blob | null = null;
+  @observableRef accessor imageUpdated: UploaderMeta | null = null;
+  @observableRef accessor description: string | null = null;
 
-  @observable.ref accessor dirty = false;
+  @observableRef accessor dirty = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;
   }
 
-  @action.bound
+  @actionBound
   load(value: apitype.SocialRead) {
     this.imageUpdated = null;
     if (value.image_exists && this.composite.resourceId !== null) {

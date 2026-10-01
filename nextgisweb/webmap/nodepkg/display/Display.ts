@@ -1,4 +1,4 @@
-import { action, computed, observable, reaction } from "mobx";
+import { action, actionBound, computed, observableRef, reaction } from "mobx";
 import type { Extent } from "ol/extent";
 import { transformExtent } from "ol/proj";
 
@@ -40,14 +40,14 @@ export class Display {
   panelManager: PanelManager;
   annotationsManager: AnnotationsManager;
 
-  @observable.ref accessor plugins: Record<string, PluginBase<TreeItemStore>> =
+  @observableRef accessor plugins: Record<string, PluginBase<TreeItemStore>> =
     {};
 
   urlParams: DisplayURLParams;
 
-  @observable.ref accessor mapReady = false;
-  @observable.ref accessor item: TreeItemStore | null = null;
-  @observable.ref accessor isMobile = false;
+  @observableRef accessor mapReady = false;
+  @observableRef accessor item: TreeItemStore | null = null;
+  @observableRef accessor isMobile = false;
 
   constructor({
     config,
@@ -117,12 +117,12 @@ export class Display {
     this._hideNavMenuForGuest();
   }
 
-  @action.bound
+  @actionBound
   setIsMobile(val: boolean) {
     this.isMobile = val;
   }
 
-  @action.bound
+  @actionBound
   setMapReady(status: boolean) {
     this.mapReady = status;
   }
@@ -132,7 +132,7 @@ export class Display {
     return store.filter({ type: "layer", visible: true });
   }
 
-  @action.bound
+  @actionBound
   private _setUpLayersTree() {
     const store = this.treeStore;
     const urlStyles = this.urlParams.styles;
@@ -226,7 +226,7 @@ export class Display {
     return this.plugins;
   }
 
-  @action.bound
+  @actionBound
   private setPlugin(key: string, plugin: PluginBase<TreeItemStore>) {
     this.plugins = {
       ...this.plugins,

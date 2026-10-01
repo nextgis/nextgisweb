@@ -1,4 +1,4 @@
-import { action, computed, observable, observe } from "mobx";
+import { action, computed, observable, observableRef, observe } from "mobx";
 
 import type {
   BasemapWebMapRead,
@@ -33,8 +33,8 @@ export class WebMapStore
   readonly identity = "basemap_webmap";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor dirty = false;
-  @observable.ref accessor validate = false;
+  @observableRef accessor dirty = false;
+  @observableRef accessor validate = false;
 
   readonly basemaps = observable.array<Basemap>([], { deep: false });
   readonly backgroundColor = backgroundColor.init(null, this);

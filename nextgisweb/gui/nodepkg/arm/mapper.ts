@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observableRef, runInAction } from "mobx";
 import type { InputHTMLAttributes } from "react";
 
 import type { ErrorResult, Validator } from "./type";
@@ -52,8 +52,8 @@ export class MappedValue<V = any, O = any, P extends string = string> {
   private readonly owner: O;
   readonly prop: MappedProperty<V, O, P>;
 
-  @observable.ref private accessor _value: V;
-  @observable.ref private accessor _initial: V;
+  @observableRef private accessor _value: V;
+  @observableRef private accessor _initial: V;
 
   constructor(value: V, owner: O, prop: MappedProperty<V, O, P>) {
     this.owner = owner;

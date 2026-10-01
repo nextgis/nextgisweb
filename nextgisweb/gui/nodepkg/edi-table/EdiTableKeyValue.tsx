@@ -1,4 +1,10 @@
-import { action, computed, observable } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  observableRef,
+  observableShallow,
+} from "mobx";
 import { observer } from "mobx-react-lite";
 
 import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
@@ -22,8 +28,8 @@ export class EdiTableKeyValueRow<V> implements RowData<V> {
   readonly id: number;
   readonly store: EdiTableKeyValueStore<V>;
 
-  @observable.ref accessor key: string;
-  @observable.ref accessor value: V;
+  @observableRef accessor key: string;
+  @observableRef accessor value: V;
 
   constructor(store: EdiTableKeyValueStore<V>, { key, value }: RowData<V>) {
     this.id = ++idSeq;
@@ -50,7 +56,7 @@ export class EdiTableKeyValueRow<V> implements RowData<V> {
     return false;
   }
 
-  @action.bound
+  @actionBound
   setKey(value: string) {
     this.update({
       key: value,
@@ -60,7 +66,7 @@ export class EdiTableKeyValueRow<V> implements RowData<V> {
     });
   }
 
-  @action.bound
+  @actionBound
   setValue(value: V) {
     this.update({ value: value });
   }
@@ -122,8 +128,8 @@ export class EdiTableKeyValueStore<V> implements EdiTableStore<
   defaultValue: V;
   valueFromKey: boolean = false;
 
-  @observable.shallow accessor items: EdiTableKeyValueRow<V>[] = [];
-  @observable.ref accessor dirty = false;
+  @observableShallow accessor items: EdiTableKeyValueRow<V>[] = [];
+  @observableRef accessor dirty = false;
 
   constructor({
     defaultValue,
@@ -149,9 +155,8 @@ export class EdiTableKeyValueStore<V> implements EdiTableStore<
 
   // EdiTable
 
-  @observable.ref accessor validate = false;
-  @observable.shallow accessor placeholder: EdiTableKeyValueRow<V> | null =
-    null;
+  @observableRef accessor validate = false;
+  @observableShallow accessor placeholder: EdiTableKeyValueRow<V> | null = null;
 
   @computed
   get rows() {

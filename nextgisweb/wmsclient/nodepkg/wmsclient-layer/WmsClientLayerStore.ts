@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
@@ -54,7 +54,7 @@ export class WmsClientLayerStore implements EditorStore<
   readonly vendor_params = vendor_params.init({}, this);
   readonly remote_srs = remote_srs.init(null, this);
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

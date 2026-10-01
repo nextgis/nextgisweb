@@ -1,4 +1,4 @@
-import { action, computed, observable, observe } from "mobx";
+import { action, computed, observable, observableRef, observe } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -22,8 +22,8 @@ export class ServiceStore
 
   readonly layers = observable.array<Layer>([]);
 
-  @observable.ref accessor dirty = false;
-  @observable.ref accessor validate = false;
+  @observableRef accessor dirty = false;
+  @observableRef accessor validate = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

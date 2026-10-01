@@ -1,4 +1,9 @@
-import { action, observable } from "mobx";
+import {
+  actionBound,
+  observableDeep,
+  observableRef,
+  observableShallow,
+} from "mobx";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -61,19 +66,19 @@ const generateEMptyFilterState = (): FilterState => ({
 });
 
 export class FilterEditorStore {
-  @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
-  @observable.deep accessor filterState: FilterState =
+  @observableShallow accessor fields: FeatureLayerFieldRead[] = [];
+  @observableDeep accessor filterState: FilterState =
     generateEMptyFilterState();
-  @observable.ref accessor valueWidget: FilterValueWidgetComponent | undefined =
+  @observableRef accessor valueWidget: FilterValueWidgetComponent | undefined =
     undefined;
-  @observable accessor activeTab: ActiveTab = "constructor";
-  @observable accessor jsonValue: FilterExpressionString | undefined =
+  @observableRef accessor activeTab: ActiveTab = "constructor";
+  @observableRef accessor jsonValue: FilterExpressionString | undefined =
     undefined;
-  @observable accessor isValid: boolean = true;
-  @observable accessor validationError: string | undefined = undefined;
-  @observable accessor validJsonValue: FilterExpressionString | undefined =
+  @observableRef accessor isValid: boolean = true;
+  @observableRef accessor validationError: string | undefined = undefined;
+  @observableRef accessor validJsonValue: FilterExpressionString | undefined =
     undefined;
-  @observable accessor scrollToItemId: number | null = null;
+  @observableRef accessor scrollToItemId: number | null = null;
 
   private transientIdCounter = 0;
 
@@ -88,7 +93,7 @@ export class FilterEditorStore {
     }
   }
 
-  @action.bound
+  @actionBound
   setActiveTab(tab: ActiveTab) {
     if (tab === this.activeTab) {
       return;
@@ -141,20 +146,20 @@ export class FilterEditorStore {
     this.activeTab = tab;
   }
 
-  @action.bound
+  @actionBound
   setJsonValue(value: FilterExpressionString | undefined) {
     this.jsonValue = value;
     this.validateCurrentState();
   }
 
-  @action.bound
+  @actionBound
   clear() {
     this.jsonValue = stringifyExpresion([]);
     this.filterState = generateEMptyFilterState();
     this.validateCurrentState();
   }
 
-  @action.bound
+  @actionBound
   addCondition(groupId: number) {
     const firstField = getDefaultFieldRef(this.fields);
     if (!firstField) {
@@ -183,7 +188,7 @@ export class FilterEditorStore {
     }
   }
 
-  @action.bound
+  @actionBound
   addGroup(parentGroupId: number, operator: LogicalOp = "all") {
     const newGroup: FilterGroup = {
       id: this.generateTransientId(),
@@ -208,7 +213,7 @@ export class FilterEditorStore {
     }
   }
 
-  @action.bound
+  @actionBound
   updateCondition(conditionId: number, updates: Partial<FilterCondition>) {
     this._updateConditionInTree(
       this.filterState.rootGroup,
@@ -218,7 +223,7 @@ export class FilterEditorStore {
     this.validateCurrentState();
   }
 
-  @action.bound
+  @actionBound
   updateGroupOperator(groupId: number, operator: LogicalOp) {
     const group = this._findGroupById(this.filterState.rootGroup, groupId);
     if (group) {
@@ -227,13 +232,13 @@ export class FilterEditorStore {
     }
   }
 
-  @action.bound
+  @actionBound
   deleteCondition(conditionId: number) {
     this._findAndRemoveCondition(this.filterState.rootGroup, conditionId);
     this.validateCurrentState();
   }
 
-  @action.bound
+  @actionBound
   deleteGroup(groupId: number) {
     if (groupId === this.filterState.rootGroup.id) {
       console.warn(gettext("Cannot delete the root group."));
@@ -243,7 +248,7 @@ export class FilterEditorStore {
     this.validateCurrentState();
   }
 
-  @action.bound
+  @actionBound
   moveConditionToGroup(
     conditionId: number,
     targetGroupId: number,
@@ -271,7 +276,7 @@ export class FilterEditorStore {
     this.validateCurrentState();
   }
 
-  @action.bound
+  @actionBound
   moveGroupToGroup(
     groupId: number,
     targetGroupId: number,
@@ -301,7 +306,7 @@ export class FilterEditorStore {
     this.validateCurrentState();
   }
 
-  @action.bound
+  @actionBound
   moveFilterItem(
     sourceItem: MoveFilterItem,
     target: MoveTargetFilterItem,
@@ -325,7 +330,7 @@ export class FilterEditorStore {
     );
   }
 
-  @action.bound
+  @actionBound
   loadFilter(value: FilterExpressionString) {
     try {
       this.transientIdCounter = 0;
@@ -399,7 +404,7 @@ export class FilterEditorStore {
     return stringifyExpresion(expression);
   }
 
-  @action.bound
+  @actionBound
   setScrollToItemId(id: number | null) {
     this.scrollToItemId = id;
   }
@@ -412,7 +417,7 @@ export class FilterEditorStore {
     return ++this.transientIdCounter;
   };
 
-  @action.bound
+  @actionBound
   private _removeItemFromGroup(
     groupId: number,
     itemId: number,
@@ -441,7 +446,7 @@ export class FilterEditorStore {
     return item;
   }
 
-  @action.bound
+  @actionBound
   private _movePendingItemToGroupByPosition(
     targetGroupId: number,
     pendingItem: FilterCondition | FilterGroup,
@@ -616,7 +621,7 @@ export class FilterEditorStore {
     return [group.operator, ...expressions];
   }
 
-  @action.bound
+  @actionBound
   private validateCurrentState() {
     try {
       let expression: FilterExpression;

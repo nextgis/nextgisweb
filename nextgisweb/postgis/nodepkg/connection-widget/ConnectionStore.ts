@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { PostgisConnectionRead } from "@nextgisweb/postgis/type/api";
@@ -33,7 +33,7 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
   readonly password = password.init("", this);
   readonly database = database.init("", this);
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   @action
   load(value: PostgisConnectionRead) {

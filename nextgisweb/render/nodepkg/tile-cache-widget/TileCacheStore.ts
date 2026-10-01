@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type * as apitype from "@nextgisweb/render/type/api";
@@ -28,8 +28,8 @@ export class TileCacheStore implements EditorStore<Value> {
   readonly ttl = ttl.init(null, this);
   readonly flush = flush.init(false, this);
 
-  @observable.ref accessor dirty = false;
-  @observable.ref accessor validate = false;
+  @observableRef accessor dirty = false;
+  @observableRef accessor validate = false;
 
   @action
   load(value: Value) {

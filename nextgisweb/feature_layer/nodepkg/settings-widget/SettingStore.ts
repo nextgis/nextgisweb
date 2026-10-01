@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import settings from "@nextgisweb/feature-layer/client-settings";
 import type { FeatureLayerRead } from "@nextgisweb/feature-layer/type/api";
@@ -9,10 +9,10 @@ type Value = Pick<FeatureLayerRead, "versioning">;
 export class SettingStore implements EditorStore<Value> {
   readonly identity = "feature_layer";
 
-  @observable.ref accessor dirty = false;
+  @observableRef accessor dirty = false;
 
-  @observable.ref accessor versioningEnabled = settings.versioning.default;
-  @observable.ref accessor versioningExisting = false;
+  @observableRef accessor versioningEnabled = settings.versioning.default;
+  @observableRef accessor versioningExisting = false;
 
   @action
   load(value: Value) {

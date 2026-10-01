@@ -1,5 +1,5 @@
 import { isEmpty } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef, observableShallow } from "mobx";
 
 import type { ResourceRead } from "@nextgisweb/resource/type/api";
 
@@ -26,15 +26,15 @@ export class EditorStore {
   readonly identity = "resource";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor displayName: string | null = null;
-  @observable.ref accessor keyname: string | null = null;
-  @observable.ref accessor parent: number | null = null;
-  @observable.ref accessor ownerUser: number | null = null;
+  @observableRef accessor displayName: string | null = null;
+  @observableRef accessor keyname: string | null = null;
+  @observableRef accessor parent: number | null = null;
+  @observableRef accessor ownerUser: number | null = null;
 
-  @observable.ref accessor sdnBase: string | null = null;
+  @observableRef accessor sdnBase: string | null = null;
 
-  @observable.shallow accessor _loaded: Loaded;
-  @observable.ref accessor dirty: boolean = false;
+  @observableShallow accessor _loaded: Loaded;
+  @observableRef accessor dirty: boolean = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { actionBound, computed, observableRef } from "mobx";
 
 import type { Display } from "@nextgisweb/webmap/display";
 
@@ -20,13 +20,13 @@ interface ManagerOptions {
 export class AnnotationsManager {
   private _display: Display;
 
-  @observable.ref accessor visibleMode: AnnotationVisibleMode | null = null;
-  @observable.ref accessor filter: AccessFilter = {
+  @observableRef accessor visibleMode: AnnotationVisibleMode | null = null;
+  @observableRef accessor filter: AccessFilter = {
     public: true,
     own: true,
     private: false,
   };
-  @observable.ref accessor activeGeometryType: AnnotationGeometryType | null =
+  @observableRef accessor activeGeometryType: AnnotationGeometryType | null =
     null;
 
   constructor({ display }: ManagerOptions) {
@@ -41,7 +41,7 @@ export class AnnotationsManager {
     );
   }
 
-  @action.bound
+  @actionBound
   start(): void {
     if (!this.enabled) {
       this.stop();
@@ -52,33 +52,33 @@ export class AnnotationsManager {
     this.visibleMode = this._getInitialVisibleMode();
   }
 
-  @action.bound
+  @actionBound
   stop(): void {
     this.activeGeometryType = null;
     this.visibleMode = null;
   }
 
-  @action.bound
+  @actionBound
   setVisibleMode(visibleMode: AnnotationVisibleMode | null): void {
     this.visibleMode = visibleMode;
   }
 
-  @action.bound
+  @actionBound
   setFilter(filter: AccessFilter): void {
     this.filter = filter;
   }
 
-  @action.bound
+  @actionBound
   activateAddMode(geometryType: AnnotationGeometryType): void {
     this.activeGeometryType = geometryType;
   }
 
-  @action.bound
+  @actionBound
   deactivateAddMode(): void {
     this.activeGeometryType = null;
   }
 
-  @action.bound
+  @actionBound
   changeGeometryType(geometryType: AnnotationGeometryType): void {
     if (this.activeGeometryType) {
       this.activeGeometryType = geometryType;

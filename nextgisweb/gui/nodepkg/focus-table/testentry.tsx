@@ -1,6 +1,6 @@
 /** @testentry react */
 import * as falso from "@ngneat/falso";
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 import type { IObservableArray } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
@@ -55,7 +55,7 @@ class Base<T extends TypeValue = TypeValue, D extends Common<T> = Common<T>> {
   readonly store: Store;
   readonly type: T;
 
-  @observable.ref accessor parent: Group | null = null;
+  @observableRef accessor parent: Group | null = null;
   title = baseTitle.init("", this);
 
   constructor(store: Store, { type, ...data }: D) {

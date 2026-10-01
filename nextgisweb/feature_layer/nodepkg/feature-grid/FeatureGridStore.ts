@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { actionBound, computed, observableRef, observableShallow } from "mobx";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
@@ -14,42 +14,40 @@ import type { QueryParams } from "./hook/useFeatureTable";
 import type { ActionProps, FeatureGridProps, SetValue } from "./type";
 
 export class FeatureGridStore {
-  @observable.ref accessor id: number;
-  @observable.ref accessor versioning: boolean = false;
-  @observable.ref accessor size: SizeType = "middle";
-  @observable.ref accessor actions: ActionToolbarAction<ActionProps>[] = [];
-  @observable.ref accessor version: number = 0;
-  @observable.ref accessor readonly: boolean = true;
-  @observable.ref accessor canCreate: boolean = true;
-  @observable.ref accessor editOnNewPage: boolean = false;
-  @observable.ref accessor cleanSelectedOnFilter: boolean = true;
-  @observable.ref accessor settingsOpen: boolean = false;
+  @observableRef accessor id: number;
+  @observableRef accessor versioning: boolean = false;
+  @observableRef accessor size: SizeType = "middle";
+  @observableRef accessor actions: ActionToolbarAction<ActionProps>[] = [];
+  @observableRef accessor version: number = 0;
+  @observableRef accessor readonly: boolean = true;
+  @observableRef accessor canCreate: boolean = true;
+  @observableRef accessor editOnNewPage: boolean = false;
+  @observableRef accessor cleanSelectedOnFilter: boolean = true;
+  @observableRef accessor settingsOpen: boolean = false;
 
-  @observable.shallow accessor selectedIds: number[] = [];
-  @observable.shallow accessor _queryParams: QueryParams | null = null;
-  @observable.shallow accessor visibleFields: number[] = [KEY_FIELD_ID];
-  @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
-  @observable.ref accessor globalFilterExpression:
+  @observableShallow accessor selectedIds: number[] = [];
+  @observableShallow accessor _queryParams: QueryParams | null = null;
+  @observableShallow accessor visibleFields: number[] = [KEY_FIELD_ID];
+  @observableShallow accessor fields: FeatureLayerFieldRead[] = [];
+  @observableRef accessor globalFilterExpression:
     | FilterExpressionString
     | undefined = undefined;
-  @observable.ref accessor filterExpression:
-    | FilterExpressionString
-    | undefined = undefined;
+  @observableRef accessor filterExpression: FilterExpressionString | undefined =
+    undefined;
 
-  @observable.ref accessor beforeDelete:
+  @observableRef accessor beforeDelete:
     | ((featureIds: number[]) => void)
     | null = null;
-  @observable.ref accessor deleteError:
-    | ((featureIds: number[]) => void)
-    | null = null;
-  @observable.ref accessor onSelect: ((selected: number[]) => void) | null =
+  @observableRef accessor deleteError: ((featureIds: number[]) => void) | null =
     null;
-  @observable.ref accessor onDelete: ((featureIds: number[]) => void) | null =
+  @observableRef accessor onSelect: ((selected: number[]) => void) | null =
     null;
-  @observable.ref accessor onOpen:
+  @observableRef accessor onDelete: ((featureIds: number[]) => void) | null =
+    null;
+  @observableRef accessor onOpen:
     | ((opt: { featureId: number; resourceId: number }) => void)
     | null = null;
-  @observable.ref accessor onSave:
+  @observableRef accessor onSave:
     | ((value: CompositeRead | undefined) => void)
     | null = null;
 
@@ -93,115 +91,115 @@ export class FeatureGridStore {
     return Object.keys(params).length > 0 ? params : null;
   }
 
-  @action.bound
+  @actionBound
   setId(id: number) {
     this.id = id;
   }
 
-  @action.bound
+  @actionBound
   setVersioning(value: boolean) {
     this.versioning = value;
   }
 
-  @action.bound
+  @actionBound
   setFields(fields: FeatureLayerFieldRead[]) {
     this.fields = fields;
     this.pruneFilterExpressionByFields();
   }
 
-  @action.bound
+  @actionBound
   setVisibleFields(visibleFields: number[]) {
     this.visibleFields = visibleFields;
   }
 
-  @action.bound
+  @actionBound
   setSize(size: SizeType | undefined) {
     this.size = size;
   }
 
-  @action.bound
+  @actionBound
   setActions(actions: ActionToolbarAction<ActionProps>[]) {
     this.actions = actions;
   }
 
-  @action.bound
+  @actionBound
   setVersion(version: number) {
     this.version = version;
   }
 
-  @action.bound
+  @actionBound
   setSettingsOpen(settingsOpen: boolean) {
     this.settingsOpen = settingsOpen;
   }
 
-  @action.bound
+  @actionBound
   bumpVersion() {
     this.version = this.version + 1;
   }
 
-  @action.bound
+  @actionBound
   setReadonly(readonly: boolean) {
     this.readonly = readonly;
   }
 
-  @action.bound
+  @actionBound
   setQueryParams(queryParams: SetValue<QueryParams | null>) {
     this.setValue("_queryParams", queryParams);
   }
 
-  @action.bound
+  @actionBound
   setSelectedIds(selectedIds: SetValue<number[]>) {
     this.setValue("selectedIds", selectedIds);
   }
 
-  @action.bound
+  @actionBound
   setEditOnNewPage(editOnNewPage: boolean) {
     this.editOnNewPage = editOnNewPage;
   }
 
-  @action.bound
+  @actionBound
   setCleanSelectedOnFilter(cleanSelectedOnFilter: boolean) {
     this.cleanSelectedOnFilter = cleanSelectedOnFilter;
   }
 
-  @action.bound
+  @actionBound
   setBeforeDelete(beforeDelete: ((featureIds: number[]) => void) | null) {
     this.beforeDelete = beforeDelete;
   }
 
-  @action.bound
+  @actionBound
   setDeleteError = (deleteError: ((featureIds: number[]) => void) | null) => {
     this.deleteError = deleteError;
   };
 
-  @action.bound
+  @actionBound
   setOnSelect(onSelect: ((selected: number[]) => void) | null) {
     this.onSelect = onSelect;
   }
 
-  @action.bound
+  @actionBound
   setOnDelete(onDelete: ((featureIds: number[]) => void) | null) {
     this.onDelete = onDelete;
   }
 
-  @action.bound
+  @actionBound
   setOnSave(onSave: ((value: CompositeRead | undefined) => void) | null) {
     this.onSave = onSave;
   }
 
-  @action.bound
+  @actionBound
   setGlobalFilterExpression(
     filterExpression: FilterExpressionString | undefined
   ) {
     this.globalFilterExpression = filterExpression;
   }
 
-  @action.bound
+  @actionBound
   setFilterExpression(filterExpression: FilterExpressionString | undefined) {
     this.filterExpression = filterExpression;
   }
 
-  @action.bound
+  @actionBound
   pruneFilterExpressionByFields() {
     const nextFilterExpression = pruneFilterExpressionByFields(
       this.filterExpression,
@@ -232,7 +230,7 @@ export class FeatureGridStore {
     }
   }
 
-  @action.bound
+  @actionBound
   private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
     const isUpdaterFunction = (
       input: unknown

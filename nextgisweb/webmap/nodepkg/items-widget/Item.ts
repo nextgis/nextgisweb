@@ -1,4 +1,4 @@
-import { computed, observable } from "mobx";
+import { computed, observableRef } from "mobx";
 
 import { firstError, mapper } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
@@ -46,7 +46,7 @@ abstract class BaseItem<
   abstract readonly itemType: ItemType;
   readonly store: ItemStore;
 
-  @observable.ref accessor parent: Group | null = null;
+  @observableRef accessor parent: Group | null = null;
   displayName = displayName.init("", this);
 
   constructor(store: ItemStore, data: ItemData<D>) {

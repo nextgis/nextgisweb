@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, observableRef, observableShallow } from "mobx";
 import type {
   ComponentType,
   LazyExoticComponent,
@@ -21,8 +21,8 @@ export interface WebMapTab<P = any> {
 export class WebMapTabsStore {
   _onTabs?: () => void;
 
-  @observable.shallow accessor tabs: WebMapTab[] = [];
-  @observable.ref accessor activeKey: string | null = null;
+  @observableShallow accessor tabs: WebMapTab[] = [];
+  @observableRef accessor activeKey: string | null = null;
 
   constructor({ onTabs }: WebMapTabsStoreProps = {}) {
     this._onTabs = onTabs;

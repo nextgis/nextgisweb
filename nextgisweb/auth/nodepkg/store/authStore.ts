@@ -1,17 +1,17 @@
-import { action, observable } from "mobx";
+import { action, observableRef } from "mobx";
 
 import { BaseAPIError, route } from "@nextgisweb/pyramid/api";
 
 import type { Credentials } from "../login/type";
 
 class AuthStore {
-  @observable.ref accessor loginError = "";
-  @observable.ref accessor isLogining = false;
-  @observable.ref accessor authenticated = !ngwConfig.isGuest;
-  @observable.ref accessor invitationSession = ngwConfig.invitationSession;
-  @observable.ref accessor userDisplayName = ngwConfig.userDisplayName;
-  @observable.ref accessor isAdministrator = ngwConfig.isAdministrator;
-  @observable.ref accessor showLoginModal = true;
+  @observableRef accessor loginError = "";
+  @observableRef accessor isLogining = false;
+  @observableRef accessor authenticated = !ngwConfig.isGuest;
+  @observableRef accessor invitationSession = ngwConfig.invitationSession;
+  @observableRef accessor userDisplayName = ngwConfig.userDisplayName;
+  @observableRef accessor isAdministrator = ngwConfig.isAdministrator;
+  @observableRef accessor showLoginModal = true;
 
   @action
   async login(creds: Credentials) {

@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { actionBound, computed, computedStruct, observableRef } from "mobx";
 
 import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
@@ -6,27 +6,27 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { normalizeExtent } from "../utils/normalizeExtent";
 
 export class ConfigStore implements DisplayConfig {
-  @observable.ref accessor webmapId: DisplayConfig["webmapId"];
-  @observable.ref accessor webmapTitle: DisplayConfig["webmapTitle"];
-  @observable.ref accessor webmapPlugin: DisplayConfig["webmapPlugin"];
-  @observable.ref accessor initialExtent: DisplayConfig["initialExtent"];
-  @observable.ref
+  @observableRef accessor webmapId: DisplayConfig["webmapId"];
+  @observableRef accessor webmapTitle: DisplayConfig["webmapTitle"];
+  @observableRef accessor webmapPlugin: DisplayConfig["webmapPlugin"];
+  @observableRef accessor initialExtent: DisplayConfig["initialExtent"];
+  @observableRef
   accessor constrainingExtent: DisplayConfig["constrainingExtent"];
-  @observable.ref accessor rootItem: DisplayConfig["rootItem"];
-  @observable.ref accessor checkedItems: DisplayConfig["checkedItems"];
-  @observable.ref accessor expandedItems: DisplayConfig["expandedItems"];
-  @observable.ref accessor mid: DisplayConfig["mid"];
-  @observable.ref accessor annotations: DisplayConfig["annotations"];
-  @observable.ref
+  @observableRef accessor rootItem: DisplayConfig["rootItem"];
+  @observableRef accessor checkedItems: DisplayConfig["checkedItems"];
+  @observableRef accessor expandedItems: DisplayConfig["expandedItems"];
+  @observableRef accessor mid: DisplayConfig["mid"];
+  @observableRef accessor annotations: DisplayConfig["annotations"];
+  @observableRef
   accessor webmapDescription: DisplayConfig["webmapDescription"];
-  @observable.ref accessor webmapEditable: DisplayConfig["webmapEditable"];
-  @observable.ref
+  @observableRef accessor webmapEditable: DisplayConfig["webmapEditable"];
+  @observableRef
   accessor webmapLegendVisible: DisplayConfig["webmapLegendVisible"];
-  @observable.ref accessor drawOrderEnabled: DisplayConfig["drawOrderEnabled"];
-  @observable.ref accessor measureSrsId: DisplayConfig["measureSrsId"];
-  @observable.ref accessor printMaxSize: DisplayConfig["printMaxSize"];
-  @observable.ref accessor bookmarkLayerId: DisplayConfig["bookmarkLayerId"];
-  @observable.ref accessor options: DisplayConfig["options"];
+  @observableRef accessor drawOrderEnabled: DisplayConfig["drawOrderEnabled"];
+  @observableRef accessor measureSrsId: DisplayConfig["measureSrsId"];
+  @observableRef accessor printMaxSize: DisplayConfig["printMaxSize"];
+  @observableRef accessor bookmarkLayerId: DisplayConfig["bookmarkLayerId"];
+  @observableRef accessor options: DisplayConfig["options"];
 
   constructor(config: DisplayConfig) {
     const preparedConfig = this._prepareConfig(config);
@@ -51,7 +51,7 @@ export class ConfigStore implements DisplayConfig {
     this.options = preparedConfig.options;
   }
 
-  @action.bound
+  @actionBound
   update(config: DisplayConfig) {
     const preparedConfig = this._prepareConfig(config);
 
@@ -80,27 +80,27 @@ export class ConfigStore implements DisplayConfig {
     return !!(pyramidSettings.lunkwill?.hmux && this.options["webmap.hmux"]);
   }
 
-  @computed.struct
+  @computedStruct
   get webmapPluginKeys() {
     return Object.keys(this.webmapPlugin ?? {});
   }
 
-  @computed.struct
+  @computedStruct
   get layerPluginKeys() {
     return (this.mid.plugin ?? []).sort();
   }
 
-  @computed.struct
+  @computedStruct
   get pluginKeys() {
     return [...this.webmapPluginKeys, ...this.layerPluginKeys].sort();
   }
 
-  @action.bound
+  @actionBound
   setRootItem(rootItem: DisplayConfig["rootItem"]) {
     this.rootItem = rootItem;
   }
 
-  @action.bound
+  @actionBound
   setWebmapPlugin(webmapPlugin: DisplayConfig["webmapPlugin"]) {
     this.webmapPlugin = webmapPlugin;
   }

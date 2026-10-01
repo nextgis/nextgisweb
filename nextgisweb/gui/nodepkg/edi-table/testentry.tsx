@@ -1,7 +1,7 @@
 /** @testentry react */
 import * as falso from "@ngneat/falso";
 import { clamp, range } from "lodash-es";
-import { action, observable } from "mobx";
+import { actionBound, observable, observableRef } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import type { Key } from "react";
@@ -17,14 +17,14 @@ class Row {
   private static keySeq = 0;
   readonly key = ++Row.keySeq;
 
-  @observable.ref accessor name: string = "";
-  @observable.ref accessor phone: string = falso.randPhoneNumber();
+  @observableRef accessor name: string = "";
+  @observableRef accessor phone: string = falso.randPhoneNumber();
 
   constructor(data: Partial<Row> = {}) {
     Object.assign(this, data);
   }
 
-  @action.bound
+  @actionBound
   setName(value: string) {
     this.name = value;
   }
@@ -33,27 +33,27 @@ class Row {
 class Store implements EdiTableStore<Row> {
   readonly rows = observable.array<Row>();
 
-  @observable.ref accessor placeholder = new Row();
+  @observableRef accessor placeholder = new Row();
 
-  @action.bound
+  @actionBound
   rotatePlaceholder() {
     this.rows.push(this.placeholder);
     this.placeholder = new Row();
   }
 
-  @action.bound
+  @actionBound
   cloneRow(row: Row) {
     const { name, phone } = row;
     const idx = this.rows.indexOf(row) + 1;
     this.rows.splice(idx, 0, new Row({ name, phone }));
   }
 
-  @action.bound
+  @actionBound
   deleteRow(row: Row) {
     this.rows.remove(row);
   }
 
-  @action.bound
+  @actionBound
   moveRow(row: Row, index: number) {
     index = clamp(index, 0, this.rows.length - 1);
 

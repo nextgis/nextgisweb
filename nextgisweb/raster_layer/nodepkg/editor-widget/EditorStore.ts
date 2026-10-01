@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import type { FileUploadObject } from "@nextgisweb/file-upload/type/api";
 import settings from "@nextgisweb/raster-layer/client-settings";
@@ -22,16 +22,16 @@ export class EditorStore implements IEditorStore<
   readonly identity = "raster_layer";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor source: FileUploadObject | undefined = undefined;
-  @observable.ref accessor uploading = false;
-  @observable.ref accessor cog = settings.cogDefault;
-  @observable.ref accessor cogInitial: boolean | undefined = undefined;
-  @observable.ref accessor storage: ResourceRef | null = null;
-  @observable.ref accessor storageInitial: ResourceRef | null = null;
-  @observable.ref accessor storageFilename: string = "";
-  @observable.ref accessor mode: Mode;
+  @observableRef accessor source: FileUploadObject | undefined = undefined;
+  @observableRef accessor uploading = false;
+  @observableRef accessor cog = settings.cogDefault;
+  @observableRef accessor cogInitial: boolean | undefined = undefined;
+  @observableRef accessor storage: ResourceRef | null = null;
+  @observableRef accessor storageInitial: ResourceRef | null = null;
+  @observableRef accessor storageFilename: string = "";
+  @observableRef accessor mode: Mode;
 
-  @observable.ref accessor dirty = false;
+  @observableRef accessor dirty = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

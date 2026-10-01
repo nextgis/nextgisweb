@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, actionBound, computed, observableRef } from "mobx";
 import Feature from "ol/Feature";
 import { WKT } from "ol/format";
 import {
@@ -31,9 +31,9 @@ type NonMultiGeometryType = Exclude<FeatureLayerGeometryType, `MULTI${string}`>;
 class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
   readonly _parentStore?: FeatureEditorStore;
 
-  @observable.ref accessor source = new VectorSource();
-  @observable.ref accessor value: FeatureGeometry | null = null;
-  @observable.ref private accessor _initValue: FeatureGeometry | null = null;
+  @observableRef accessor source = new VectorSource();
+  @observableRef accessor value: FeatureGeometry | null = null;
+  @observableRef private accessor _initValue: FeatureGeometry | null = null;
 
   private wkt = new WKT();
 
@@ -135,7 +135,7 @@ class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
     return false;
   }
 
-  @action.bound
+  @actionBound
   setValue(value: FeatureGeometry | null) {
     this.value = value;
   }

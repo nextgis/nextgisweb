@@ -1,5 +1,5 @@
 import { difference } from "lodash-es";
-import { action, computed, observable, observe } from "mobx";
+import { action, computed, observable, observableRef, observe } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
@@ -116,8 +116,8 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
   readonly fields = observable.array<Field>([]);
   readonly existingFields = observable.array<Field>([]);
 
-  @observable.ref accessor dirty = false;
-  @observable.ref accessor validate = false;
+  @observableRef accessor dirty = false;
+  @observableRef accessor validate = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

@@ -1,12 +1,12 @@
-import { action, computed, observable } from "mobx";
+import { action, actionBound, computed, observableRef } from "mobx";
 
 import type { EditorStore as IEditorStore } from "@nextgisweb/feature-layer/type";
 
 type Value = string | null;
 
 class EditorStore implements IEditorStore<Value> {
-  @observable.ref private accessor _value: Value = null;
-  @observable.ref private accessor _initValue: Value = null;
+  @observableRef private accessor _value: Value = null;
+  @observableRef private accessor _initValue: Value = null;
 
   @computed
   get dirty() {
@@ -23,13 +23,13 @@ class EditorStore implements IEditorStore<Value> {
     this._value = value;
   }
 
-  @action.bound
+  @actionBound
   load(value: Value) {
     this._value = value;
     this._initValue = value;
   }
 
-  @action.bound
+  @actionBound
   reset() {
     this.load(this._initValue);
   }

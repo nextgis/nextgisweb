@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import type { NullableProps } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -23,12 +23,12 @@ const isSameOrSubclass = (child: ResourceCls, parent: ResourceCls) =>
 let keySeq = 0;
 
 export class PermissionStoreItem {
-  @observable.ref accessor action: ACLRuleAction | null = null;
-  @observable.ref accessor principal: number | null = null;
-  @observable.ref accessor scope: string | null = null;
-  @observable.ref accessor permission: string | null = null;
-  @observable.ref accessor identity: ResourceCls | "" | null = null;
-  @observable.ref accessor propagate: boolean | null = null;
+  @observableRef accessor action: ACLRuleAction | null = null;
+  @observableRef accessor principal: number | null = null;
+  @observableRef accessor scope: string | null = null;
+  @observableRef accessor permission: string | null = null;
+  @observableRef accessor identity: ResourceCls | "" | null = null;
+  @observableRef accessor propagate: boolean | null = null;
 
   readonly store: PermissionsStore;
   readonly key: number;

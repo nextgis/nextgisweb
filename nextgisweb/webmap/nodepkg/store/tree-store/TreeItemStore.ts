@@ -1,4 +1,10 @@
-import { action, computed, observable } from "mobx";
+import {
+  action,
+  actionBound,
+  computed,
+  observableRef,
+  observableShallow,
+} from "mobx";
 
 import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
 import type { LegendSymbol } from "@nextgisweb/render/type/api";
@@ -17,19 +23,19 @@ abstract class BaseTreeItemStore {
   id: number;
   key: number;
   type: TreeChildrenItemConfig["type"];
-  @observable.ref accessor parentId: number | null;
-  @observable.ref accessor label: string;
-  @observable.ref accessor title: string;
-  @observable.ref accessor visibility: boolean;
-  @observable.ref accessor visible: boolean;
-  @observable.ref accessor plugin: CompositeMembersConfig;
+  @observableRef accessor parentId: number | null;
+  @observableRef accessor label: string;
+  @observableRef accessor title: string;
+  @observableRef accessor visibility: boolean;
+  @observableRef accessor visible: boolean;
+  @observableRef accessor plugin: CompositeMembersConfig;
 
   // increments automatically whenever any property changes
   // used to trigger reactive updates in the UI
-  @observable.ref accessor changeStamp = 0;
+  @observableRef accessor changeStamp = 0;
 
   // Timestamp of the last sync with the server.
-  @observable.ref accessor lastSyncedAt: number | null = null;
+  @observableRef accessor lastSyncedAt: number | null = null;
 
   protected constructor(
     init: Pick<
@@ -59,7 +65,7 @@ abstract class BaseTreeItemStore {
     return this.type === "layer";
   }
 
-  @action.bound
+  @actionBound
   touch() {
     this.changeStamp += 1;
   }
@@ -69,7 +75,7 @@ abstract class BaseTreeItemStore {
     this.lastSyncedAt = time;
   }
 
-  @action.bound
+  @actionBound
   update(values: Partial<this>): void {
     let changed = false;
 
@@ -89,25 +95,25 @@ abstract class BaseTreeItemStore {
 }
 
 export class LegendInfoStore implements LegendInfo {
-  @observable.ref accessor visible: LegendInfo["visible"];
-  @observable.ref accessor has_legend: LegendInfo["has_legend"];
+  @observableRef accessor visible: LegendInfo["visible"];
+  @observableRef accessor has_legend: LegendInfo["has_legend"];
 
-  @observable.ref accessor symbols: LegendSymbol[] | null = null;
+  @observableRef accessor symbols: LegendSymbol[] | null = null;
 
-  @observable.ref accessor changeStamp = 0;
+  @observableRef accessor changeStamp = 0;
 
   constructor({ visible, has_legend }: LegendInfo) {
     this.visible = visible;
     this.has_legend = has_legend;
   }
 
-  @action.bound
+  @actionBound
   load(config: LegendInfo) {
     this.setVisible(config.visible);
     this.setHasLegend(config.has_legend);
   }
 
-  @action.bound
+  @actionBound
   protected touch() {
     this.changeStamp += 1;
   }
@@ -156,29 +162,29 @@ export class TreeLayerStore
 
   readonly type: LayerItemConfig["type"] = "layer";
 
-  @observable.ref accessor adapter: string;
-  @observable.ref accessor layerId: number;
-  @observable.ref accessor styleId: number;
-  @observable.ref accessor symbols: LayerSymbols | null = null;
+  @observableRef accessor adapter: string;
+  @observableRef accessor layerId: number;
+  @observableRef accessor styleId: number;
+  @observableRef accessor symbols: LayerSymbols | null = null;
 
-  @observable.ref accessor filterable: boolean;
-  @observable.ref accessor legendInfo: LegendInfoStore;
-  @observable.ref accessor identifiable: boolean;
-  @observable.ref accessor opacity: number | null;
-  @observable.ref accessor minScaleDenom: number | null;
-  @observable.ref accessor maxScaleDenom: number | null;
+  @observableRef accessor filterable: boolean;
+  @observableRef accessor legendInfo: LegendInfoStore;
+  @observableRef accessor identifiable: boolean;
+  @observableRef accessor opacity: number | null;
+  @observableRef accessor minScaleDenom: number | null;
+  @observableRef accessor maxScaleDenom: number | null;
 
-  @observable.ref accessor identification: LayerIdentification | null;
-  @observable.ref accessor drawOrderPosition: number;
+  @observableRef accessor identification: LayerIdentification | null;
+  @observableRef accessor drawOrderPosition: number;
 
-  @observable.ref accessor isOutOfScaleRange = false;
+  @observableRef accessor isOutOfScaleRange = false;
 
-  @observable.ref accessor drawOrderEnabled: boolean;
-  @observable.ref accessor filter: FilterExpressionString | null = null;
+  @observableRef accessor drawOrderEnabled: boolean;
+  @observableRef accessor filter: FilterExpressionString | null = null;
 
-  @observable.ref accessor minResolution: number | null = null;
-  @observable.ref accessor maxResolution: number | null = null;
-  @observable.ref accessor editable: boolean | null = null;
+  @observableRef accessor minResolution: number | null = null;
+  @observableRef accessor maxResolution: number | null = null;
+  @observableRef accessor editable: boolean | null = null;
 
   constructor(
     init: LayerItemConfig,
@@ -207,7 +213,7 @@ export class TreeLayerStore
     this.identification = init.identification ?? null;
   }
 
-  @action.bound
+  @actionBound
   load(config: LayerItemConfig) {
     this.layerId = config.layerId;
     this.styleId = config.styleId;
@@ -327,9 +333,9 @@ export class TreeGroupStore
 {
   type: GroupItemConfig["type"] = "group";
 
-  @observable.ref accessor expanded: boolean;
-  @observable.ref accessor exclusive: boolean;
-  @observable.shallow accessor childrenIds: number[] = [];
+  @observableRef accessor expanded: boolean;
+  @observableRef accessor exclusive: boolean;
+  @observableShallow accessor childrenIds: number[] = [];
 
   constructor(init: GroupItemConfig, parentId: number | null) {
     super(init, parentId);
@@ -353,7 +359,7 @@ export class TreeGroupStore
     } satisfies GroupItemConfig;
   }
 
-  @action.bound
+  @actionBound
   setChildrenIds(ids: number[]) {
     this.childrenIds = [...ids];
     this.touch();

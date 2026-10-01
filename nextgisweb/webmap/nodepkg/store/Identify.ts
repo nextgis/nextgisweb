@@ -1,4 +1,4 @@
-import { action, observable, reaction } from "mobx";
+import { actionBound, observableRef, reaction } from "mobx";
 import type { Coordinate } from "ol/coordinate";
 import {
   boundingExtent,
@@ -51,9 +51,9 @@ export class Identify {
   map: MapStore;
   display: Display;
 
-  @observable.ref accessor active = true;
-  @observable.ref accessor control: Interaction | null = null;
-  @observable.ref accessor identifyInfo: IdentifyInfo | null = null;
+  @observableRef accessor active = true;
+  @observableRef accessor control: Interaction | null = null;
+  @observableRef accessor identifyInfo: IdentifyInfo | null = null;
 
   constructor(options: IdentifyOptions) {
     this.display = options.display;
@@ -84,12 +84,12 @@ export class Identify {
     );
   }
 
-  @action.bound
+  @actionBound
   setControl(control: Interaction | null) {
     this.control = control;
   }
 
-  @action.bound
+  @actionBound
   activate(): void {
     this.active = true;
   }
@@ -98,7 +98,7 @@ export class Identify {
     this.active = false;
   }
 
-  @action.bound
+  @actionBound
   clear() {
     this.identifyInfo = null;
     this.display.highlighter.unhighlight();
@@ -330,7 +330,7 @@ export class Identify {
     return wkt.writeGeometry(rangeGeom);
   }
 
-  @action.bound
+  @actionBound
   private async openIdentifyPanel({
     features,
     point,

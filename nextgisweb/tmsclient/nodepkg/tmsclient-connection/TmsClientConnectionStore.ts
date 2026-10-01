@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -63,7 +63,7 @@ export class TmsClientConnectionStore implements EditorStore<
   readonly scheme = scheme.init("xyz", this);
   readonly apikey = apikey.init(null, this);
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

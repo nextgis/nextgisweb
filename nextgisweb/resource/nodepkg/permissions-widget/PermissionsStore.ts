@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef, observableShallow } from "mobx";
 
 import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
 import type { ACLRule, ResourceCls } from "@nextgisweb/resource/type/api";
@@ -12,8 +12,8 @@ interface Composite {
 export class PermissionsStore implements EdiTableStore<Item> {
   readonly identity = "resource.permissions";
 
-  @observable.shallow accessor items: Item[] = [];
-  @observable.ref accessor dirty = false;
+  @observableShallow accessor items: Item[] = [];
+  @observableRef accessor dirty = false;
 
   readonly resourceClass: ResourceCls;
 
@@ -51,8 +51,8 @@ export class PermissionsStore implements EdiTableStore<Item> {
 
   // EdiTable
 
-  @observable.ref accessor validate = false;
-  @observable.ref accessor placeholder: Item | null = null;
+  @observableRef accessor validate = false;
+  @observableRef accessor placeholder: Item | null = null;
 
   @computed
   get rows() {

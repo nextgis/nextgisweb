@@ -1,4 +1,4 @@
-import { computed, observable } from "mobx";
+import { computed, observableRef } from "mobx";
 import type { ReactNode } from "react";
 
 import type { Display } from "../display";
@@ -19,9 +19,9 @@ export class PanelStore {
   public readonly plugin: WidgetPanelPlugin;
   public readonly display: Display;
 
-  @observable.ref accessor title: string;
-  @observable.ref accessor order: number;
-  @observable.ref accessor desktopOnly = false;
+  @observableRef accessor title: string;
+  @observableRef accessor order: number;
+  @observableRef accessor desktopOnly = false;
 
   constructor({ plugin, display }: PanelStoreConstructorOptions) {
     this.plugin = plugin;

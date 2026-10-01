@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef, observableShallow } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
@@ -13,8 +13,8 @@ type Value = NonNullable<CompositeRead["svg_marker_library"]>;
 type ValueUpdate = NonNullable<CompositeUpdate["svg_marker_library"]>;
 
 export class File {
-  @observable.ref accessor name: string = "";
-  @observable.ref accessor file: FileMeta | null = null;
+  @observableRef accessor name: string = "";
+  @observableRef accessor file: FileMeta | null = null;
 
   readonly store: Store;
   readonly id: number;
@@ -33,9 +33,9 @@ export class File {
 export class Store {
   readonly identity = "svg_marker_library";
 
-  @observable.shallow accessor files: File[] = [];
-  @observable.ref accessor archive: FileMeta | null = null;
-  @observable.ref accessor dirty = false;
+  @observableShallow accessor files: File[] = [];
+  @observableRef accessor archive: FileMeta | null = null;
+  @observableRef accessor dirty = false;
 
   @action
   load(value: Value) {
@@ -97,7 +97,7 @@ export class Store {
 
   // EdiTable
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   @computed
   get rows() {

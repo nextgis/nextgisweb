@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
@@ -50,7 +50,7 @@ export class WfsClientConnectionStore implements EditorStore<
   readonly password = password.init(null, this);
   readonly version = version.init("2.0.0", this);
 
-  @observable.ref accessor validate = false;
+  @observableRef accessor validate = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;

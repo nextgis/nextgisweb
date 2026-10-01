@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, actionBound, observableShallow } from "mobx";
 
 import type {
   LayoutArr,
@@ -17,7 +17,7 @@ type Layout = keyof Pick<
 export class PrintLayoutStore {
   defaultMargin = 10;
 
-  @observable.shallow accessor legendCoords: LegendRndCoords = {
+  @observableShallow accessor legendCoords: LegendRndCoords = {
     x: 0,
     y: 0,
     width: 0,
@@ -26,7 +26,7 @@ export class PrintLayoutStore {
     legendColumns: 0,
   };
 
-  @observable.shallow accessor titleCoords: RndCoords = {
+  @observableShallow accessor titleCoords: RndCoords = {
     x: 0,
     y: 0,
     width: 0,
@@ -34,7 +34,7 @@ export class PrintLayoutStore {
     displayed: false,
   };
 
-  @observable.shallow accessor mapCoords: RndCoords = {
+  @observableShallow accessor mapCoords: RndCoords = {
     x: 0,
     y: 0,
     width: 0,
@@ -155,7 +155,7 @@ export class PrintLayoutStore {
     ]) as LayoutArr;
   }
 
-  @action.bound
+  @actionBound
   applyLayoutArr(layoutArr: LayoutArr) {
     const [l, t, m] = layoutArr;
 
@@ -182,7 +182,7 @@ export class PrintLayoutStore {
       .join(";");
   }
 
-  @action.bound
+  @actionBound
   strToLayout(str: string): void {
     const parts = str.split(";");
     if (parts.length !== 3) return;

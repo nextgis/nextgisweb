@@ -1,8 +1,8 @@
 import type { Viewer } from "@photo-sphere-viewer/core";
-import { action, observable } from "mobx";
+import { action, observableShallow } from "mobx";
 
 export class PanoramaStore {
-  @observable.shallow accessor viewers: Map<number, Viewer> = new Map();
+  @observableShallow accessor viewers: Map<number, Viewer> = new Map();
 
   @action
   add(id: number, viewer: Viewer) {
