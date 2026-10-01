@@ -4,6 +4,7 @@ from .exception import DisplayNameNotUnique, HierarchyError, ResourceNotFound, V
 from .favorite import ResourceFavoriteModel
 from .interface import IResourceAdapter, IResourceBase, interface_registry
 from .model import (
+    OnResourcePermissions,
     Resource,
     ResourceACLRule,
     ResourceCls,
@@ -27,6 +28,7 @@ __all__ = [
     "HierarchyError",
     "IResourceAdapter",
     "IResourceBase",
+    "OnResourcePermissions",
     "Permission",
     "Resource",
     "ResourceACLRule",

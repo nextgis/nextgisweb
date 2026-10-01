@@ -10,6 +10,7 @@ from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy import event, func, text
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Mapped, mapped_column
+from zope.event import notify
 
 from nextgisweb.env import Base, DBSession, gettext, gettextf, inject
 from nextgisweb.lib.apitype import Gap
@@ -360,6 +361,11 @@ class Resource(Base, metaclass=ResourceMeta):
 
     def permissions(self, user: User) -> set[Permission]:
         sets = self.permission_sets(user)
+
+        event = OnResourcePermissions(self, user, sets)
+        notify(event)
+        sets = event.permissions
+
         return sets.allow - sets.mask - sets.deny
 
     def has_permission(self, permission: Permission, user: User) -> bool:
@@ -522,6 +528,12 @@ ResourceScope.read.require(
     attr="parent",
     attr_empty=True,
 )
+
+
+class OnResourcePermissions(Struct):
+    resource: Resource
+    user: User
+    permissions: PermissionSets
 
 
 class ResourceACLRule(Base):
