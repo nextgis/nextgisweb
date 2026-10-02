@@ -67,11 +67,12 @@ def pkginfo():
         "file_upload",
         "audit",
         "tileset",
+        "point_cloud",
         "basemap",
         "sld",
         "llm_core",
     )
-    optional = {"raster_mosaic"}
+    optional = {"raster_mosaic", "point_cloud"}
     assert all((i in components) for i in optional)
 
     return dict(
