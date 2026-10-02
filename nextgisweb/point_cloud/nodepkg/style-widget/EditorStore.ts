@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, actionBound, computed, observableRef } from "mobx";
 
 import settings from "@nextgisweb/point-cloud/client-settings";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -72,18 +72,18 @@ export class EditorStore implements IEditorStore<
   readonly composite: CompositeStore;
   readonly capabilities: Capabilities;
 
-  @observable.ref accessor mode: StyleMode = "elevation";
-  @observable.ref accessor pointSize = 2;
-  @observable.ref accessor opacity = 100;
-  @observable.ref accessor pointBudget = settings.pointBudget.default;
-  @observable.ref accessor usePercentileClip = true;
-  @observable.ref accessor elevationMinPercent = 2;
-  @observable.ref accessor elevationMaxPercent = 98;
-  @observable.ref accessor rampStartColor = "#2b83ba";
-  @observable.ref accessor rampEndColor = "#fdae61";
-  @observable.ref accessor intensityModulation = false;
-  @observable.ref accessor classificationColors = "";
-  @observable.ref accessor dirty = false;
+  @observableRef accessor mode: StyleMode = "elevation";
+  @observableRef accessor pointSize = 2;
+  @observableRef accessor opacity = 100;
+  @observableRef accessor pointBudget = settings.pointBudget.default;
+  @observableRef accessor usePercentileClip = true;
+  @observableRef accessor elevationMinPercent = 2;
+  @observableRef accessor elevationMaxPercent = 98;
+  @observableRef accessor rampStartColor = "#2b83ba";
+  @observableRef accessor rampEndColor = "#fdae61";
+  @observableRef accessor intensityModulation = false;
+  @observableRef accessor classificationColors = "";
+  @observableRef accessor dirty = false;
 
   constructor({
     composite,
@@ -184,7 +184,7 @@ export class EditorStore implements IEditorStore<
     ];
   }
 
-  @action.bound
+  @actionBound
   update(values: Partial<EditorStore>) {
     Object.assign(this, values);
     this.dirty = true;
