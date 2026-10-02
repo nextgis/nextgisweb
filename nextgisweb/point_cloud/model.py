@@ -55,7 +55,7 @@ def estimate_point_cloud_data(resource: PointCloudLayer) -> int:
 
 
 @implementer(IBboxLayer)
-class PointCloudLayer(Resource, SpatialLayerMixin):
+class PointCloudLayer(SpatialLayerMixin, Resource):
     identity = "point_cloud_layer"
     cls_display_name = gettext("Point cloud layer")
 
