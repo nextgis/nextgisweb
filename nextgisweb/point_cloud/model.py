@@ -8,11 +8,11 @@ from msgspec import field as msgspec_field
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
+from nextgisweb.env import COMP_ID, Base, gettext, gettextf, inject
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry, Transformer
 
-from nextgisweb.core import KindOfData
+from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.core.storage import StorageEstimateResult, storage_estimate_hook
 from nextgisweb.file_storage import FileObj
@@ -84,7 +84,14 @@ class PointCloudLayer(SpatialLayerMixin, Resource):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def load_file(self, file_upload: FileUpload, *, srs: SRS | None = None):
+    @inject()
+    def load_file(
+        self,
+        file_upload: FileUpload,
+        *,
+        srs: SRS | None = None,
+        core: CoreComponent = inject.arg(),
+    ):
         info = inspect_copc(file_upload.data_path)
         srs = resolve_srs(info.crs, srs)
 
@@ -101,7 +108,7 @@ class PointCloudLayer(SpatialLayerMixin, Resource):
         self.has_returns = info.has_returns
 
         if diff := estimate_point_cloud_data(self) - old_size:
-            env.core.reserve_storage(
+            core.reserve_storage(
                 COMP_ID,
                 PointCloudData,
                 value_data_volume=diff,
@@ -247,7 +254,7 @@ class PointCloudStyle(Resource):
                 )
             )
 
-        parent = self.parent
+        parent = self.ensure_parent(PointCloudLayer)
         if value.mode == "rgb" and not parent.has_rgb:
             raise ValidationError(
                 message=gettext("RGB styling is available only for point clouds with RGB data.")
@@ -272,8 +279,8 @@ class PointCloudStyle(Resource):
             )
 
     def get_info(self):
-        s = super()
-        return (s.get_info() if hasattr(s, "get_info") else ()) + (
+        return (
+            *(s() if (s := getattr(super(), "get_info", None)) else ()),
             (gettext("Mode"), self.point_cloud_style_value.mode),
         )
 
