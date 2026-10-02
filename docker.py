@@ -15,8 +15,8 @@ class Package(PackageBase):
 def on_apt(event):
     event.package(
         # uWSGI internal routing support
-        "libpcre3",
-        "libpcre3-dev",
+        "libpcre2-8-0",
+        "libpcre2-dev",
         # For msgfmt and development
         "gettext",
     )
