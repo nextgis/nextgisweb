@@ -32,7 +32,7 @@ class StyleWidget(Widget):
 
     def config(self):
         result = super().config()
-        parent = self.obj.parent
+        parent = self.obj.ensure_parent(PointCloudLayer)
         result["capabilities"] = {
             "hasRgb": parent.has_rgb,
             "hasIntensity": parent.has_intensity,
