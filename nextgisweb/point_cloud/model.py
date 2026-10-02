@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Literal
 
 import sqlalchemy as sa
-import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct
 from msgspec import field as msgspec_field
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
@@ -61,24 +61,24 @@ class PointCloudLayer(SpatialLayerMixin, Resource):
 
     __scope__ = DataScope
 
-    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
+    fileobj_id: Mapped[int] = mapped_column(sa.ForeignKey(FileObj.id), nullable=False)
 
-    point_count = sa.Column(sa.BigInteger, nullable=False)
-    point_format_id = sa.Column(sa.SmallInteger, nullable=False)
+    point_count: Mapped[int] = mapped_column(sa.BigInteger, nullable=False)
+    point_format_id: Mapped[int] = mapped_column(sa.SmallInteger, nullable=False)
 
-    minx = sa.Column(sa.Float, nullable=False)
-    miny = sa.Column(sa.Float, nullable=False)
-    maxx = sa.Column(sa.Float, nullable=False)
-    maxy = sa.Column(sa.Float, nullable=False)
-    zmin = sa.Column(sa.Float, nullable=False)
-    zmax = sa.Column(sa.Float, nullable=False)
+    minx: Mapped[float] = mapped_column(sa.Float, nullable=False)
+    miny: Mapped[float] = mapped_column(sa.Float, nullable=False)
+    maxx: Mapped[float] = mapped_column(sa.Float, nullable=False)
+    maxy: Mapped[float] = mapped_column(sa.Float, nullable=False)
+    zmin: Mapped[float] = mapped_column(sa.Float, nullable=False)
+    zmax: Mapped[float] = mapped_column(sa.Float, nullable=False)
 
-    has_rgb = sa.Column(sa.Boolean, nullable=False)
-    has_intensity = sa.Column(sa.Boolean, nullable=False)
-    has_classification = sa.Column(sa.Boolean, nullable=False)
-    has_returns = sa.Column(sa.Boolean, nullable=False)
+    has_rgb: Mapped[bool] = mapped_column(sa.Boolean, nullable=False)
+    has_intensity: Mapped[bool] = mapped_column(sa.Boolean, nullable=False)
+    has_classification: Mapped[bool] = mapped_column(sa.Boolean, nullable=False)
+    has_returns: Mapped[bool] = mapped_column(sa.Boolean, nullable=False)
 
-    fileobj = orm.relationship(FileObj, foreign_keys=fileobj_id, cascade="all")
+    fileobj: Mapped[FileObj] = relationship(foreign_keys=[fileobj_id], cascade="all")
 
     @classmethod
     def check_parent(cls, parent):
@@ -211,7 +211,7 @@ class PointCloudStyle(Resource):
 
     __scope__ = DataScope
 
-    point_cloud_style_value = sa.Column(
+    point_cloud_style_value: Mapped[PointCloudStyleConfig] = mapped_column(
         saext.Msgspec(PointCloudStyleConfig),
         nullable=False,
         default=PointCloudStyleConfig,
