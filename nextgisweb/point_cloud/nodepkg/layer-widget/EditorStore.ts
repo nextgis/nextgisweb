@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, actionBound, computed, observableRef } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import type * as apitype from "@nextgisweb/point-cloud/type/api";
@@ -19,14 +19,14 @@ export class EditorStore implements IEditorStore<
   readonly identity = "point_cloud_layer";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor source: FileMeta | null = null;
-  @observable.ref accessor inspection: Inspection | null = null;
-  @observable.ref accessor inspectedId: string | null = null;
-  @observable.ref accessor storedInspection: Inspection | null = null;
-  @observable.ref accessor srsId: number | null = null;
-  @observable.ref accessor srsIdInitial: number | null = null;
-  @observable.ref accessor uploading = false;
-  @observable.ref accessor inspecting = false;
+  @observableRef accessor source: FileMeta | null = null;
+  @observableRef accessor inspection: Inspection | null = null;
+  @observableRef accessor inspectedId: string | null = null;
+  @observableRef accessor storedInspection: Inspection | null = null;
+  @observableRef accessor srsId: number | null = null;
+  @observableRef accessor srsIdInitial: number | null = null;
+  @observableRef accessor uploading = false;
+  @observableRef accessor inspecting = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;
@@ -70,7 +70,7 @@ export class EditorStore implements IEditorStore<
     return base ? base.replace(/\.copc\.laz$/i, "") : undefined;
   }
 
-  @action.bound
+  @actionBound
   setSource(value: FileMeta | null) {
     this.source = value;
     // FileUploader runs afterUpload loaders before onChange, so the
@@ -82,7 +82,7 @@ export class EditorStore implements IEditorStore<
     }
   }
 
-  @action.bound
+  @actionBound
   setInspection(fileId: string, value: Inspection) {
     this.inspection = value;
     this.inspectedId = fileId;
@@ -97,22 +97,22 @@ export class EditorStore implements IEditorStore<
     return this.source ? this.inspection : this.storedInspection;
   }
 
-  @action.bound
+  @actionBound
   setStoredInspection(value: Inspection) {
     this.storedInspection = value;
   }
 
-  @action.bound
+  @actionBound
   setSrsId(value: number | null) {
     this.srsId = value;
   }
 
-  @action.bound
+  @actionBound
   setUploading(value: boolean) {
     this.uploading = value;
   }
 
-  @action.bound
+  @actionBound
   setInspecting(value: boolean) {
     this.inspecting = value;
   }
