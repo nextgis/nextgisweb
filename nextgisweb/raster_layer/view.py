@@ -32,7 +32,7 @@ def export(context: RasterLayer, request: Request):
         raise HTTPNotFound()
     return dict(
         obj=context,
-        title=gettext("Save as"),
+        title=gettext("Export"),
         props=dict(id=context.id),
         maxheight=True,
     )

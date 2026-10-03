@@ -32,7 +32,7 @@ registerResourceAction(COMP_ID, {
 registerResourceAction(COMP_ID, {
   key: "export",
   icon: <ExportIcon />,
-  label: gettext("Save as"),
+  label: gettext("Export"),
   menu: { order: 60, group: "resource" },
   attributes: [
     ["resource.has_permission", "data.read"],

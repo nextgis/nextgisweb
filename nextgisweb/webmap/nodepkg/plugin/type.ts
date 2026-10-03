@@ -13,6 +13,7 @@ declare module "@nextgisweb/webmap/type/TreeItems" {
   interface PluginConfig {
     "@nextgisweb/webmap/plugin/feature-layer": FeatureLayerWebMapPluginConfig;
     "@nextgisweb/webmap/plugin/layer-editor": LayerEditorWebMapPluginConfig;
+    "@nextgisweb/webmap/plugin/layer-export": Record<string, never>;
     "@nextgisweb/webmap/plugin/layer-info": DescriptionWebMapPluginConfig;
     "@nextgisweb/webmap/plugin/layer-opacity": Record<string, never>;
     "@nextgisweb/webmap/plugin/zoom-to-layer": Record<string, never>;

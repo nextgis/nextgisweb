@@ -60,7 +60,7 @@ registerResourceAction(COMP_ID, {
 registerResourceAction(COMP_ID, {
   key: "export",
   icon: <DownloadIcon />,
-  label: gettext("Save as"),
+  label: gettext("Export"),
   menu: { order: 60, group: "feature_layer" },
   attributes: [
     ["resource.interfaces"],

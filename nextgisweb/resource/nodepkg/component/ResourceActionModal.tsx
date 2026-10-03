@@ -1,10 +1,14 @@
 import { useState } from "react";
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 import { Button, Flex, Modal, Space } from "@nextgisweb/gui/antd";
 import type { ModalProps } from "@nextgisweb/gui/antd";
 import { FullHeightModal } from "@nextgisweb/gui/full-height-modal/FullHeightModal";
 import { CloseIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+const msgOpenInNewTab = gettext("Open in new tab");
+const msgClose = gettext("Close");
 
 export interface PreviewMapModalProps extends ModalProps {
   children?: ReactNode;
@@ -46,6 +50,7 @@ export function ResourceActionModal({
             href={href}
             target="_blank"
             rel="noopener noreferrer"
+            title={msgOpenInNewTab}
             onClick={(e) => e.stopPropagation()}
           />
         ) : null}
@@ -54,9 +59,11 @@ export function ResourceActionModal({
           type="text"
           size="middle"
           icon={<CloseIcon style={{ fontSize: 18 }} />}
-          onClick={(e) => {
+          title={msgClose}
+          onClick={(e: MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation();
             setOpen(false);
+            onCancel?.(e);
           }}
         />
       </Space>

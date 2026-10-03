@@ -84,13 +84,13 @@ def feature_update(context, request: Request, feature_id: int):
     )
 
 
-@react_renderer("@nextgisweb/feature-layer/export-form")
+@react_renderer("@nextgisweb/feature-layer/export-page")
 def export(context, request: Request):
     if not context.has_export_permission(request.user):
         raise HTTPNotFound()
     return dict(
         obj=context,
-        title=gettext("Save as"),
+        title=gettext("Export"),
         props=dict(id=context.id),
         maxheight=True,
     )
@@ -110,11 +110,11 @@ def history(context, request: Request):
     )
 
 
-@react_renderer("@nextgisweb/feature-layer/export-form")
+@react_renderer("@nextgisweb/feature-layer/export-page")
 def export_multiple(context, request: Request):
     return dict(
         obj=context,
-        title=gettext("Save as"),
+        title=gettext("Export"),
         props=dict(multiple=True, pick=True),
         maxheight=True,
     )
