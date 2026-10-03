@@ -1,41 +1,37 @@
-#: api.py:166 api.py:189
+#: api.py:186 api.py:209
 msgid "Requested raster is not COG."
 msgstr "Запрошенный растр не является COG"
 
-#: api.py:193
+#: api.py:213
 msgid "Range header is missed or invalid."
 msgstr "Заголовок 'Range' пропущен или некорректен."
 
-#: api.py:198
+#: api.py:218
 msgid "Range %s can not be read."
 msgstr "Диапазон %s не может быть прочитан."
-
-#: component.py:47
-msgid "Uncompressed raster size limit"
-msgstr "Максимальный размер несжатого растра"
 
 #: kind_of_data.py:8
 msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
-#: model.py:73
+#: model.py:80
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:91
+#: model.py:98
 msgid "GDAL was unable to parse the raster coordinate system."
 msgstr "GDAL не смог обработать определение системы координат растра."
 
-#: model.py:103
+#: model.py:110
 msgid "Mixed band data types are not supported."
 msgstr "Смешанные типы каналов не поддерживаются."
 
-#: model.py:121 nodepkg/editor-widget/EditorWidget.tsx:19
+#: model.py:129 nodepkg/editor-widget/EditorWidget.tsx:19
 #: nodepkg/storage-widget/StorageWidget.tsx:80
 msgid "Raster layer storage"
 msgstr "Хранилище растровых слоёв"
 
-#: model.py:205
+#: model.py:213
 msgid ""
 "Access key and secret key must both be set (private bucket) or both be empty "
 "(public bucket)."
@@ -43,21 +39,21 @@ msgstr ""
 "Ключ доступа и секретный ключ должны быть оба заполнены (для приватного "
 "бакета) или оба быть пустыми (для публичного бакета)."
 
-#: model.py:214 nodepkg/editor-widget/EditorWidget.tsx:141
+#: model.py:222 nodepkg/editor-widget/EditorWidget.tsx:141
 msgid "Raster layer"
 msgstr "Растровый слой"
 
-#: model.py:270
+#: model.py:291
 msgid "No supported files found in the archive."
 msgstr "В архиве не обнаружены файлы поддерживаемых форматов."
 
-#: model.py:274
+#: model.py:295
 msgid "The archive contains multiple supported files: {supported_zip_items}."
 msgstr ""
 "В архиве обнаружено несколько файлов поддерживаемых форматов: "
 "{supported_zip_items}."
 
-#: model.py:335
+#: model.py:353
 msgid ""
 "The source raster has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -65,19 +61,19 @@ msgstr ""
 "Исходный растр имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: model.py:353
+#: model.py:373
 msgid "Failed to reproject the raster to the target coordinate system."
 msgstr "Не удалось перепроецировать растр в целевую систему координат."
 
-#: model.py:357
+#: model.py:377
 msgid "GDAL error message: %s"
 msgstr "Сообщение об ошибке GDAL: %s"
 
-#: model.py:372
+#: model.py:392
 msgid "Raster too large"
 msgstr "Растр слишком большой"
 
-#: model.py:374
+#: model.py:394
 msgid ""
 "The uncompressed raster size ({uncompressed_size}) exceeds the limit "
 "({max_size}) by {excess_size}. Reduce the raster size to fit the limit."
@@ -86,23 +82,23 @@ msgstr ""
 "({max_size}) на {excess_size}. Уменьшите размер растра, чтобы он не превышал "
 "лимит."
 
-#: model.py:499
+#: model.py:523
 msgid "Uploading files to a public (read-only) bucket is not allowed."
 msgstr "Загрузка файлов в публичный (только для чтения) бакет невоозможна."
 
-#: model.py:532
+#: model.py:563
 msgid "Failed to open raster file at the specified storage path."
 msgstr "Не удалось открыть файл растра по указанному пути в хранилище."
 
-#: model.py:538
+#: model.py:569
 msgid "The raster file must be a Cloud Optimized GeoTIFF (COG)."
 msgstr "Файл растра должен быть Cloud Optimized GeoTIFF (COG)."
 
-#: model.py:546
+#: model.py:577
 msgid "The raster has a local coordinate system and is not supported."
 msgstr "Растр имеет локальную систему координат и не поддерживается."
 
-#: model.py:562
+#: model.py:593
 msgid ""
 "The raster coordinate system could not be identified. Make sure the file has "
 "a recognized EPSG coordinate system."
@@ -110,7 +106,7 @@ msgstr ""
 "Система координат растра не может быть определена. Убедитесь, что файл имеет "
 "распознанную систему координат EPSG."
 
-#: model.py:568
+#: model.py:599
 msgid ""
 "The raster coordinate system ({auth}:{code}) is not registered in NextGIS "
 "Web. Add it to the list of supported coordinate systems first."
@@ -118,30 +114,30 @@ msgstr ""
 "Система координат растра ({auth}:{code}) не зарегистрирована в NextGIS Web. "
 "Сначала добавьте её в список поддерживаемых систем координат."
 
-#: model.py:655
+#: model.py:695
 msgid "{n} band with {t} data type"
 msgid_plural "{n} bands with {t} data type"
 msgstr[0] "{n} канал с типом данных {t}"
 msgstr[1] "{n} канала с типом данных {t}"
 msgstr[2] "{n} каналов с типом данных {t}"
 
-#: model.py:661
+#: model.py:701
 msgid "Band summary"
 msgstr "Сводка по каналам"
 
-#: model.py:662
+#: model.py:702
 msgid "Pixel dimensions"
 msgstr "Размер в пикселях"
 
-#: model.py:663 nodepkg/editor-widget/EditorWidget.tsx:22
+#: model.py:703 nodepkg/editor-widget/EditorWidget.tsx:22
 msgid "Cloud Optimized GeoTIFF (COG)"
 msgstr "Cloud Optimized GeoTIFF (COG)"
 
-#: model.py:664
+#: model.py:704
 msgid "Persistent auxiliary metadata (PAM)"
 msgstr "Вспомогательные метаданные (PAM)"
 
-#: model.py:720
+#: model.py:765
 msgid ""
 "The uncompressed raster you are trying to upload is {uncompressed_size}. At "
 "least {required_space} of storage space is required, but only {storage_free} "
@@ -153,7 +149,7 @@ msgstr ""
 "{storage_free} из {storage_limit}. Уменьшите размер растра или освободите "
 "место в хранилище."
 
-#: model.py:852
+#: model.py:909
 msgid "Storage must be selected before specifying a storage filename."
 msgstr "Необходимо выбрать хранилище перед указанием имени файла в хранилище."
 
@@ -183,33 +179,30 @@ msgstr "Подключить растр из хранилища"
 msgid "Keep existing raster"
 msgstr "Сохранить существующий растровый слой"
 
-#: nodepkg/export-form/ExportForm.tsx:57
+#: nodepkg/export-form/ExportForm.tsx:58
 msgid "Band"
 msgstr "Канал"
 
-#: nodepkg/export-form/ExportForm.tsx:80
+#: nodepkg/export-form/ExportForm.tsx:83
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:92
+#: nodepkg/export-form/ExportForm.tsx:95
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:97
+#: nodepkg/export-form/ExportForm.tsx:100
 msgid "Bands"
 msgstr "Каналы"
 
-#: nodepkg/export-form/ExportForm.tsx:130
-msgid "Save"
-msgstr "Сохранить"
+#: nodepkg/export-form/ExportForm.tsx:133 nodepkg/resource-action-plugin.tsx:35
+#: view.py:35
+msgid "Export"
+msgstr "Экспорт"
 
 #: nodepkg/resource-action-plugin.tsx:13
 msgid "Download"
 msgstr "Скачать"
-
-#: nodepkg/resource-action-plugin.tsx:35 view.py:35
-msgid "Save as"
-msgstr "Сохранить как"
 
 #: nodepkg/storage-widget/StorageWidget.tsx:35
 msgid "Type"
@@ -238,6 +231,10 @@ msgstr "Секретный ключ"
 #: nodepkg/storage-widget/StorageWidget.tsx:70
 msgid "Prefix"
 msgstr "Префикс"
+
+#: sys_info.py:12
+msgid "Uncompressed raster size limit"
+msgstr "Максимальный размер несжатого растра"
 
 #: util.py:8
 msgid ""

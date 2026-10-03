@@ -4,6 +4,7 @@ from . import (
     group_properties,
     group_remove,
     layer_editor,
+    layer_export,
     layer_filter,
     layer_identifiable,
     layer_info,

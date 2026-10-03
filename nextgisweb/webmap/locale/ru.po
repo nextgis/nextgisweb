@@ -49,6 +49,14 @@ msgstr "Группа ресурсов"
 msgid "Display name"
 msgstr "Наименование"
 
+#: nodepkg/component/ComputeExtent.tsx:14
+msgid "Compute extent from all added layers"
+msgstr "Вычислить охват из всех слоев"
+
+#: nodepkg/component/ComputeExtent.tsx:15
+msgid "Use current map extent"
+msgstr "Использовать текущий охват карты"
+
 #: nodepkg/component/SelectLegendSymbols.tsx:5
 #: nodepkg/settings-widget/SettingsWidget.tsx:37
 #: nodepkg/settings/select-options.ts:94
@@ -174,6 +182,7 @@ msgstr "Ресурс"
 
 #: nodepkg/items-widget/ItemsWidget.tsx:45
 #: nodepkg/layer-opacity-slider/LayerOpacitySlider.tsx:8
+#: nodepkg/map-component/control/OpacityControl.tsx:8
 msgid "Opacity"
 msgstr "Непрозрачность"
 
@@ -256,7 +265,7 @@ msgstr "Показывать легенду"
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-component/URLLayer.tsx:16
+#: nodepkg/map-component/URLLayer.tsx:17
 msgid "Unable to load tile"
 msgstr "Ошибка загрузки тайла"
 
@@ -672,15 +681,15 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:46
+#: nodepkg/panel/search/SearchPanel.tsx:54
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:151
+#: nodepkg/panel/search/SearchPanel.tsx:206
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:155
+#: nodepkg/panel/search/SearchPanel.tsx:210
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -692,55 +701,55 @@ msgstr "Поля с совпадениями"
 msgid "Failed to load matched fields"
 msgstr "Не удалось загрузить поля с совпадениями"
 
-#: nodepkg/panel/search/component/SearchResultsTree.tsx:91
+#: nodepkg/panel/search/component/SearchResultsTree.tsx:97
 msgid "Identify object"
 msgstr "Идентифицировать объект"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:27
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:28
 msgid "Search settings"
 msgstr "Настройки поиска"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:28
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:29
 msgid "Search in layers"
 msgstr "Искать в слоях"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:29
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:30
 msgid "In visible"
 msgstr "В видимых"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:30
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:31
 msgid "In all"
 msgstr "Во всех"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:31
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:32
 msgid "In selected"
 msgstr "В выбранном"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:32
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:33
 msgid "Select layer"
 msgstr "Выберите слой"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:33
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:34
 msgid "Search sources"
 msgstr "Источники поиска"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:34
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:35
 msgid "Search by address"
 msgstr "Поиск по адресу"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:35
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:36
 msgid "Search by coordinates"
 msgstr "Поиск по координатам"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:36
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:37
 msgid "Navigation mode"
 msgstr "Режим навигации"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:37
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:38
 msgid "Zoom"
 msgstr "Приближение"
 
-#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:38
+#: nodepkg/panel/search/component/SearchSettingsPopover.tsx:39
 msgid "Pan"
 msgstr "Перемещение"
 
@@ -932,6 +941,10 @@ msgstr "Изменить"
 msgid "Move"
 msgstr "Переместить"
 
+#: nodepkg/plugin/layer-export/LayerExportPlugin.tsx:45
+msgid "Export"
+msgstr "Экспорт"
+
 #: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:18
 msgid "Layer properties"
 msgstr "Свойства слоя"
@@ -976,7 +989,7 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: nodepkg/resource-action-plugin.tsx:44 view.py:103
+#: nodepkg/resource-action-plugin.tsx:44 view.py:102
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
@@ -1041,14 +1054,6 @@ msgstr "Включить"
 #: nodepkg/settings-widget/SettingsWidget.tsx:197
 msgid "Settings"
 msgstr "Настройки"
-
-#: nodepkg/settings-widget/component/ComputeWebmapExtent.tsx:24
-msgid "Compute extent from all added layers"
-msgstr "Вычислить охват из всех слоев"
-
-#: nodepkg/settings-widget/component/ComputeWebmapExtent.tsx:25
-msgid "Use current map extent"
-msgstr "Использовать текущий охват карты"
 
 #: nodepkg/settings/Settings.tsx:63
 msgid "Settings saved"
@@ -1283,15 +1288,15 @@ msgstr "Загрузка"
 msgid "Zoom to filtered features"
 msgstr "Приблизить к найденным объектам"
 
-#: option/__init__.py:14
+#: option/__init__.py:22
 msgid "Feature attributes"
 msgstr "Атрибуты объектов"
 
-#: option/__init__.py:24
+#: option/__init__.py:32
 msgid "Geometry info"
 msgstr "Информация о геометрии"
 
-#: option/__init__.py:34
+#: option/__init__.py:42
 msgid "Request multiplexing"
 msgstr "Мультиплексирование запросов"
 
@@ -1311,10 +1316,10 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: view.py:115
+#: view.py:114
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:126
+#: view.py:125
 msgid "Web map settings"
 msgstr "Настройки веб-карты"

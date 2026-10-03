@@ -130,7 +130,7 @@ export function ExportForm({ id }: { id: number }) {
     >
       <Form.Item>
         <SaveButton onClick={exportRaster} icon={null}>
-          {gettext("Save")}
+          {gettext("Export")}
         </SaveButton>
       </Form.Item>
     </FieldsForm>

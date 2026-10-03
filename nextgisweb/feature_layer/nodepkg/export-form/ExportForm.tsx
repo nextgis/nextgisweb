@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 
 import settings from "@nextgisweb/feature-layer/client-settings";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
@@ -9,7 +10,7 @@ import {
   LoadingWrapper,
   SaveButton,
 } from "@nextgisweb/gui/component";
-import type { ExtentRowProps } from "@nextgisweb/gui/component/extent-row/ExtentRow";
+import type { ExtentRowValue } from "@nextgisweb/gui/component/extent-row/ExtentRow";
 import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
@@ -24,10 +25,12 @@ import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 import type { ExportFeatureLayerOptions } from "../hook/useExportFeatureLayer";
 import { ResourceFeatureFilterModalLazy } from "../resource-feature-filter/ResourceFeatureFilterModalLazy";
 
-interface ExportFormProps {
+export interface ExportFormProps {
   id: number;
-  pick: boolean;
+  pick?: boolean;
+  params: ExportFeatureLayerOptions;
   multiple?: boolean;
+  renderExtentButton?: (onDone: (extent: ExtentRowValue) => void) => ReactNode;
 }
 
 interface SrsOption {
@@ -78,30 +81,36 @@ const fieldListToOptions = (fieldList: FeatureLayerFieldRead[]) => {
 
 function ExtentInput({
   value,
+  renderExtentButton,
   onChange,
 }: {
   value?: (null | number)[];
+  renderExtentButton?: ExportFormProps["renderExtentButton"];
   onChange?: (val: (null | number)[]) => void;
-} & ExtentRowProps) {
+}) {
   const [left, bottom, right, top] = value || [];
+  const handleChange = ({ left, top, right, bottom }: ExtentRowValue) => {
+    onChange?.(
+      [left, bottom, right, top].map((v) => (v !== undefined ? v : null))
+    );
+  };
   return (
     <ExtentRow
       value={{ left, top, right, bottom }}
-      onChange={({ left, top, right, bottom }) => {
-        if (onChange) {
-          onChange(
-            [left, bottom, right, top].map((v) => (v !== undefined ? v : null))
-          );
-        }
-      }}
+      onChange={handleChange}
+      extraButton={renderExtentButton?.(handleChange)}
     />
   );
 }
 
-export function ExportForm({ id, pick, multiple }: ExportFormProps) {
+export function ExportForm({
+  id,
+  pick,
+  params,
+  multiple,
+  renderExtentButton,
+}: ExportFormProps) {
   const [staffLoading, setStaffLoading] = useState(true);
-
-  const [urlParams, setUrlParams] = useState({});
 
   const { exportFeatureLayer, exportLoading } = useExportFeatureLayer({ id });
   const { makeSignal } = useAbortController();
@@ -115,7 +124,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
   const [isReady, setIsReady] = useState(false);
   const [filterExpression, setFilterExpression] = useState<
     FilterExpressionString | undefined
-  >();
+  >(params.filter);
   const form = Form.useForm<FormProps>()[0];
 
   const loading = staffLoading || exportLoading;
@@ -137,7 +146,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
       display_name: false,
       zipped: !!multiple,
       filter: filterExpression,
-      ...urlParams,
+      ...params,
     };
     return initialVals;
   }, [
@@ -145,7 +154,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     fieldOptions,
     format,
     multiple,
-    urlParams,
+    params,
     filterExpression,
   ]);
 
@@ -209,24 +218,8 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
   }, [id, makeSignal]);
 
   useEffect(() => {
-    const {
-      resources: resStr,
-      fields: fieldsStr,
-      filter: filterStr,
-      ...rest
-    } = Object.fromEntries(new URL(location.href).searchParams.entries());
-    const urlParamsToset: Record<string, string | number[]> = { ...rest };
-    if (resStr) {
-      urlParamsToset.resources = resStr.split(",").map(Number);
-    }
-    if (fieldsStr) {
-      urlParamsToset.fields = fieldsStr.split(",").map(Number);
-    }
-    if (filterStr) {
-      setFilterExpression(filterStr as FilterExpressionString);
-    }
-    setUrlParams(urlParamsToset);
-  }, []);
+    setFilterExpression(params.filter);
+  }, [params]);
 
   useEffect(() => {
     load();
@@ -338,7 +331,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
       {
         name: "extent",
         label: gettext("Limit by extent"),
-        formItem: <ExtentInput />,
+        formItem: <ExtentInput renderExtentButton={renderExtentButton} />,
         included: hasGeom,
       },
       {
@@ -387,6 +380,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     filterExpression,
     isFilterFeatureLayer,
     hasGeom,
+    renderExtentButton,
   ]);
 
   if (loading) {
@@ -419,7 +413,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             }}
             icon={null}
           >
-            {gettext("Save")}
+            {gettext("Export")}
           </SaveButton>
         </Form.Item>
       </FieldsForm>

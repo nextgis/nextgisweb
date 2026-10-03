@@ -1,4 +1,6 @@
 import { route } from "@nextgisweb/pyramid/api";
+import { resourceAttrItem } from "@nextgisweb/resource/api/resource-attr";
+import { hasExportPermission } from "@nextgisweb/resource/util/hasExportPermission";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { TreeStore } from "@nextgisweb/webmap/store";
 import type {
@@ -172,6 +174,19 @@ export async function styleToWebmapItem({
   }
 
   const vectorLayer = !!(layerItem.feature_layer || layerItem.vector_layer);
+
+  if (vectorLayer || layerItem.raster_layer) {
+    const resourceItem = await resourceAttrItem({
+      resource: parentId,
+      attributes: [
+        ["resource.has_permission", "data.read"],
+        ["resource.has_permission", "data.write"],
+      ],
+    });
+    if (hasExportPermission(resourceItem)) {
+      plugin["@nextgisweb/webmap/plugin/layer-export"] = {};
+    }
+  }
 
   if (vectorLayer) {
     Object.assign(plugin, {
