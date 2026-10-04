@@ -1,8 +1,7 @@
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component
 
 
 class WMSServerComponent(Component):
-    @require("render")
     def setup_pyramid(self, config):
         from . import api, view  # noqa: F401
 

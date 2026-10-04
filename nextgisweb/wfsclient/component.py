@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
 
@@ -10,7 +10,6 @@ class WFSClientComponent(Component):
 
         self.headers = {"User-Agent": self.options["user_agent"]}
 
-    @require("feature_layer")
     def setup_pyramid(self, config):
         from . import api, view  # noqa: F401
 

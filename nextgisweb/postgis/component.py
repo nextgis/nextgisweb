@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
 
@@ -9,7 +9,6 @@ class PostgisComponent(Component):
         super().initialize()
         self._engine = dict()
 
-    @require("feature_layer")
     def setup_pyramid(self, config):
         from . import api, view
 

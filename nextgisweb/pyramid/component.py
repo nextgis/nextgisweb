@@ -8,7 +8,7 @@ from typing import Any
 import transaction
 from pyramid.interfaces import ITweens
 
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.imptool import module_path
@@ -72,7 +72,6 @@ class PyramidComponent(Component):
         core.init_settings(self.identity, "custom_css.ckey", gensecret(8))
         core.init_settings(self.identity, "company_logo.ckey", gensecret(8))
 
-    @require("resource")
     def setup_pyramid(self, config):
         from . import api, lunkwill, view
         from . import uacompat as uac

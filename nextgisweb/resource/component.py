@@ -191,7 +191,6 @@ class ResourceComponent(Component):
 
             home.parent_group(True)
 
-    @require("auth")
     def setup_pyramid(self, config):
         from . import api, view
 

@@ -2,7 +2,7 @@ from typing import Literal
 
 from msgspec import Struct
 
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
 
@@ -25,7 +25,6 @@ class BasemapComponent(Component):
 
         self.basemaps = self._basemaps()
 
-    @require("resource", "webmap")
     def setup_pyramid(self, config):
         from . import plugin, view  # noqa: F401
 

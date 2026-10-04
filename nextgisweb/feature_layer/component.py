@@ -1,4 +1,4 @@
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
 from nextgisweb.core.component import CoreComponent
@@ -16,7 +16,6 @@ class FeatureLayerComponent(Component):
         self.FeatureExtension = FeatureExtension
         self.export_limit = self.options["export.limit"]
 
-    @require("resource")
     def setup_pyramid(self, config):
         from . import api, view
 

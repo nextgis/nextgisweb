@@ -1,8 +1,7 @@
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component
 
 
 class VectorLayerComponent(Component):
-    @require("feature_layer")
     def setup_pyramid(self, config):
         from . import api, view  # noqa: F401
 

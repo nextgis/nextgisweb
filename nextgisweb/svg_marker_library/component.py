@@ -2,7 +2,7 @@ from os import path
 
 from cachetools import TTLCache
 
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option, OptionAnnotations
 
 from .model import validate_filename
@@ -14,7 +14,6 @@ class SVGMarkerLibraryComponent(Component):
     def initialize(self):
         self.cache = TTLCache(maxsize=128, ttl=60)
 
-    @require("resource")
     def setup_pyramid(self, config):
         from . import api, view  # noqa: F401
 

@@ -6,7 +6,7 @@ import transaction
 from sqlalchemy.dialects import postgresql, sqlite
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import Component, DBSession, require
+from nextgisweb.env import Component, DBSession
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
@@ -25,7 +25,6 @@ class RenderComponent(Component):
         if not os.path.isdir(self.tile_cache_path):
             os.makedirs(self.tile_cache_path)
 
-    @require("resource")
     def setup_pyramid(self, config):
         from . import api, view  # noqa: F401
 
