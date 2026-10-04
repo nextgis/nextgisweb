@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, lru_cache
 from textwrap import dedent
-from typing import Iterable, Literal
+from typing import Literal
 from warnings import warn
 
 import sqlalchemy as sa

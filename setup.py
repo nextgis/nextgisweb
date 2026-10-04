@@ -1,6 +1,7 @@
 import sys
-from setuptools import find_packages, setup
 from subprocess import CalledProcessError, check_output
+
+from setuptools import find_packages, setup
 
 with open("VERSION") as fd:
     VERSION = fd.read().rstrip()

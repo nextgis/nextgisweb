@@ -6,7 +6,6 @@ from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from functools import cache
-from packaging.version import Version
 from pathlib import Path
 from shlex import join as shlex_join
 from subprocess import check_call, check_output
@@ -16,6 +15,7 @@ import sqlalchemy as sa
 import transaction
 from msgspec import Struct
 from msgspec.json import decode
+from packaging.version import Version
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Component, DBSession, env

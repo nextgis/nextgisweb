@@ -1,4 +1,5 @@
-from typing import Any, Callable, Concatenate, Literal, ParamSpec, Protocol, get_args
+from collections.abc import Callable
+from typing import Any, Concatenate, Literal, ParamSpec, Protocol, get_args
 
 from typing_extensions import TypedDict
 

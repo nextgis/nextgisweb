@@ -127,7 +127,7 @@ class User(Principal):
         sa.Index("auth_user_lower_keyname_idx", sa.func.lower(keyname), unique=True),
     )
 
-    member_of: Mapped[list["Group"]] = orm.relationship(
+    member_of: Mapped[list[Group]] = orm.relationship(
         secondary=tab_group_user,
         back_populates="members",
     )

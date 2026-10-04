@@ -1,11 +1,12 @@
 import os
 import sys
+from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from shutil import rmtree
 from tempfile import TemporaryDirectory, mkdtemp, mkstemp
-from typing import IO, Iterator
+from typing import IO
 from zipfile import ZipFile, is_zipfile
 
 import transaction

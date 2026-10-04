@@ -828,8 +828,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     self._features, self._count = self.layer.connection.get_feature(
                         self.layer, **params
                     )
-                for feature in self._features:
-                    yield feature
+
+                yield from self._features
 
             @property
             def total_count(self):

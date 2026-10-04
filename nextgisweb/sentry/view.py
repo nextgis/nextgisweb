@@ -1,4 +1,4 @@
-from typing import Iterable
+from collections.abc import Iterable
 
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid.view import template_include_hook

@@ -73,7 +73,7 @@ def make_union(values: Iterable[type]) -> Any:
     as_tuple = tuple(values)
     if len(as_tuple) <= 1:
         raise TypeError(f"Union must have at least two types, got {as_tuple}")
-    return Union[as_tuple]
+    return Union[as_tuple]  # noqa: UP007
 
 
 def msgspec_metadata(tdef):

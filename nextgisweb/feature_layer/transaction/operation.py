@@ -1,7 +1,8 @@
 import abc
 import dataclasses as dc
+from collections.abc import Callable
 from functools import cached_property
-from typing import Annotated, Any, Callable, ClassVar, Literal, TypedDict
+from typing import Annotated, Any, ClassVar, Literal, TypedDict
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info

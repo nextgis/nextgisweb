@@ -1,7 +1,7 @@
 import re
-from packaging.version import Version
 
 import sqlalchemy as sa
+from packaging.version import Version
 
 from nextgisweb.env import DBSession
 

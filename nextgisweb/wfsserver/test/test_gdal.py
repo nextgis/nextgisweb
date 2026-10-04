@@ -2,13 +2,13 @@ import re
 from datetime import date, datetime
 from functools import cache
 from itertools import product
-from packaging import version as pkg_version
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 import transaction
 from osgeo import gdal, ogr
+from packaging import version as pkg_version
 
 from nextgisweb.env import DBSession
 

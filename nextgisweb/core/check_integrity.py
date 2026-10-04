@@ -38,8 +38,7 @@ def schema_drift(comp: CoreComponent, /) -> CheckIntegrityResult:
     ihelper = InspectionHelper(conn)
 
     for table in tables:
-        for msg in check_table(table, conn, ihelper=ihelper):
-            yield msg
+        yield from check_table(table, conn, ihelper=ihelper)
 
 
 @schema_drift_tables_hook()

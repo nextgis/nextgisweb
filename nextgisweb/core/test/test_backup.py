@@ -1,6 +1,5 @@
-from packaging.version import Version
-
 import pytest
+from packaging.version import Version
 
 from ..backup import IndexFile, IndexRecord, backup, parse_pg_dump_version
 

@@ -1,6 +1,6 @@
 from os import environ
 from pathlib import Path
-from subprocess import PIPE, run
+from subprocess import run
 from typing import NamedTuple
 
 from nextgisweb.lib.logging import logger
@@ -24,9 +24,8 @@ def git_info(path: Path) -> GitInfo | None:
                 "--untracked-files=no",
             ],
             cwd=path,
-            stdout=PIPE,
-            stderr=PIPE,
             text=True,
+            capture_output=True,
             env={**environ, "LC_ALL": "C"},
         )
     except OSError:

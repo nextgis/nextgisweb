@@ -5,7 +5,7 @@ from warnings import warn
 from msgspec import NODEFAULT, Meta
 
 from .http import ContentType
-from .util import annotate, disannotate, unannotate
+from .util import annotate, disannotate, make_union, unannotate
 
 T = TypeVar("T")
 
@@ -18,7 +18,8 @@ DatetimeNaive = Annotated[datetime, Meta(tz=False)]
 
 class _AnyOfRuntime:
     def __class_getitem__(cls, args):
-        result = Annotated[Union[args], _AnyOfRuntime]
+        # ty: ignore[invalid-type-form]
+        result = Annotated[make_union(args), _AnyOfRuntime]
         return result
 
 

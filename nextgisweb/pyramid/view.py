@@ -1,11 +1,12 @@
 import os
 import os.path
 from base64 import b64decode
+from collections.abc import Iterable
 from datetime import timedelta
 from functools import cache
 from hashlib import md5
 from time import sleep
-from typing import Iterable, Protocol
+from typing import Protocol
 
 from babel import Locale
 from babel.core import UnknownLocaleError

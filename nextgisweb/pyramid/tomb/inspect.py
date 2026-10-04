@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Generator
 from dataclasses import dataclass, fields
-from typing import Generator
 
 from pyramid.config.actions import ActionInfo
 

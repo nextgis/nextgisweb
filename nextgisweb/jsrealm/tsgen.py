@@ -21,7 +21,7 @@ from typing import (
 from msgspec import UNSET, Struct, UnsetType, field
 
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.apitype import disannotate, unannotate
+from nextgisweb.lib.apitype import disannotate, make_union, unannotate
 from nextgisweb.lib.apitype.util import (
     NoneType,
     decompose_union,
@@ -257,7 +257,7 @@ class TSUnion(TSType, kw_only=True):
         args_defined = tuple(a for a in self.args if (unannotate(a) is not UnsetType))
         if len(self.args) != len(args_defined):
             if len(args_defined) > 1:
-                dtype = Union[args_defined]
+                dtype = make_union(args_defined)
                 self.undefided_excluded = TSUnion(
                     args=args_defined,
                     type=dtype,

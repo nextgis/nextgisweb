@@ -1,6 +1,7 @@
 import heapq
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass
-from typing import Any, Callable, Iterable, Iterator, Literal, Protocol
+from typing import Any, Literal, Protocol
 
 from nextgisweb.lib.logging import logger
 

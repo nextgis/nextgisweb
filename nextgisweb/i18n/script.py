@@ -6,7 +6,6 @@ from argparse import ArgumentParser, Namespace
 from collections import defaultdict
 from functools import partial
 from importlib import import_module
-from packaging import version as pkg_version
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from time import sleep
@@ -16,6 +15,7 @@ from babel.messages.mofile import write_mo
 from babel.messages.plurals import get_plural
 from babel.messages.pofile import read_po
 from msgspec import Struct, to_builtins
+from packaging import version as pkg_version
 from poeditor import POEditorAPI
 
 from nextgisweb.env import Env, env
