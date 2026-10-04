@@ -17,10 +17,11 @@ import type { OptionType } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { WebMapCSettingsUpdate } from "@nextgisweb/webmap/type/api";
 
+import { LegendSymbolsSelect, msgLegendSymbolsLabel } from "../component";
+
 import {
   AddressGeocoderOptions,
   DegreeFormatOptions,
-  LegendEnabledOptions,
   UnitsAreaOptions,
   UnitsLengthOptions,
 } from "./select-options";
@@ -63,9 +64,7 @@ export const SettingsForm: FC<SettingsFormProps> = ({
       onValuesChange={onValuesChange}
       layout="vertical"
     >
-      <Title level={4}>{gettext("General")}</Title>
-
-      <Row gutter={[16, 16]}>
+      <Row>
         <Col span={8}>
           <Form.Item>
             <Space orientation="horizontal">
@@ -74,6 +73,16 @@ export const SettingsForm: FC<SettingsFormProps> = ({
               </Form.Item>
               {gettext("Hide navigation menu for guest")}
             </Space>
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={8}>
+          <Form.Item name="legend_symbols" label={msgLegendSymbolsLabel}>
+            <LegendSymbolsSelect
+              style={INPUT_DEFAULT_WIDTH}
+              allowClear={true}
+            />
           </Form.Item>
         </Col>
       </Row>
@@ -228,27 +237,6 @@ export const SettingsForm: FC<SettingsFormProps> = ({
               <Input style={INPUT_DEFAULT_WIDTH} />
             </Form.Item>
           )}
-        </Col>
-      </Row>
-
-      <Title level={4}>{gettext("Legend")}</Title>
-
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
-          <Form.Item
-            name="legend_symbols"
-            normalize={(val: string) => (val === "default" ? null : val)}
-            getValueProps={(val: string) => {
-              val = !val ? "default" : val;
-              return { value: val };
-            }}
-            label={gettext("Visibility")}
-          >
-            <Select
-              options={LegendEnabledOptions}
-              style={INPUT_DEFAULT_WIDTH}
-            />
-          </Form.Item>
         </Col>
       </Row>
 

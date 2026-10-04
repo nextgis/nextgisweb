@@ -89,10 +89,3 @@ export const AddressGeocoderOptions: SelectProps["options"] = [
     value: "yandex",
   },
 ];
-
-export const LegendEnabledOptions: SelectProps["options"] = [
-  { value: "default", label: gettext("Default") },
-  { value: "expand", label: gettext("Expand") },
-  { value: "collapse", label: gettext("Collapse") },
-  { value: "disable", label: gettext("Disable") },
-];

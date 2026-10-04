@@ -1,1 +1,4 @@
-export { SelectLegendSymbols } from "./SelectLegendSymbols";
+export {
+  LegendSymbolsSelect,
+  msgLegendSymbolsLabel,
+} from "./LegendSymbolsSelect";

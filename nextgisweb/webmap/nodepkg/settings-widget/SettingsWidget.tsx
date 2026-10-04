@@ -4,14 +4,14 @@ import { useState } from "react";
 import { Badge, Button, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, pgettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
 import settings from "@nextgisweb/webmap/client-settings";
 import type { WebMapRead } from "@nextgisweb/webmap/type/api";
 
-import { SelectLegendSymbols } from "../component";
+import { LegendSymbolsSelect, msgLegendSymbolsLabel } from "../component";
 
 import { OptionsWidget } from "./OptionsWidget";
 import type { SettingStore } from "./SettingStore";
@@ -21,35 +21,31 @@ const { annotation } = settings;
 
 type AnnotationType = WebMapRead["annotation_default"];
 
-const msgInitExtent = gettext("Initial extent");
-const msgConstrExtent = gettext("Constraining extent");
-const msgTitle = gettext("Title");
-const msgLegend = gettext("Legend");
-const msgAnnotations = gettext("Annotations");
-const msgAnnotationsPlaceholder = gettext("Select mode");
-const msgBookmarks = gettext("Bookmarks");
-const msgBookmarksPlaceholder = gettext("Select resource");
-const msgMeasurementSrs = gettext("Measurement SRS");
-const msgLayersEditing = gettext("Layers editing");
-const msgAdditionalOptions = gettext("Additional options");
-const msgConfigure = gettext("Configure");
-
-const msgDefault = gettext("Default");
-
-const [msgInitExtentHelp, msgConstrExtentHelp] = [
-  gettext("Web map will start at this extent"),
-  gettext("Web map will not allow to move outside of this extent"),
-];
+/* prettier-ignore */ const
+msgDefault = gettext("Default"),
+msgInitExtent = gettext("Initial extent"),
+msgInitExtentHelp = gettext("Web map will start at this extent"),
+msgConstrExtent = gettext("Constraining extent"),
+msgConstrExtentHelp = gettext("Web map will not allow to move outside of this extent"),
+msgTitle = gettext("Title"),
+msgAnnotationsLabel = gettext("Annotations"),
+msgAnnotationsDisabled = pgettext("annotations", "Disabled"),
+msgBookmarks = gettext("Bookmarks"),
+msgBookmarksPlaceholder = gettext("Select resource"),
+msgMeasurementSrs = gettext("Measurement SRS"),
+msgLayersEditing = gettext("Editing on map"),
+msgAdditionalOptions = gettext("Additional options"),
+msgConfigure = gettext("Configure");
 
 const annotationOptions: { value: AnnotationType; label: string }[] = [
-  { value: "no", label: gettext("Hide by default") },
-  { value: "yes", label: gettext("Show without messages") },
-  { value: "messages", label: gettext("Show with messages") },
+  { value: "messages", label: pgettext("annotations", "Messages and markers") },
+  { value: "yes", label: pgettext("annotations", "Markers without messages") },
+  { value: "no", label: pgettext("annotations", "Hidden by default") },
 ];
 
 const editingOptions = [
-  { value: false, label: gettext("Disable") },
-  { value: true, label: gettext("Enable") },
+  { value: true, label: pgettext("editing", "Enabled") },
+  { value: false, label: pgettext("editing", "Disabled") },
 ];
 
 export const SettingsWidget: EditorWidget<SettingStore> = observer(
@@ -103,8 +99,8 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
               onChange={(v) => store.update({ title: v })}
             />
           </Lot>
-          <Lot label={msgLegend}>
-            <SelectLegendSymbols
+          <Lot label={msgLegendSymbolsLabel}>
+            <LegendSymbolsSelect
               value={store.legendSymbols}
               onChange={(v) => {
                 store.update({ legendSymbols: v });
@@ -113,7 +109,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
               allowClear
             />
           </Lot>
-          <Lot label={msgAnnotations}>
+          <Lot label={msgAnnotationsLabel}>
             <Select<AnnotationType>
               disabled={!annotation}
               value={store.annotationEnabled ? store.annotationDefault : null}
@@ -128,7 +124,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                 );
               }}
               options={annotationOptions}
-              placeholder={msgAnnotationsPlaceholder}
+              placeholder={msgAnnotationsDisabled}
               style={{ width: "100%" }}
               allowClear
             />

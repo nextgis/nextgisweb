@@ -23,7 +23,7 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 import { getEffectiveDisplayName } from "@nextgisweb/resource/util/getEffectiveDisplayName";
 import settings from "@nextgisweb/webmap/client-settings";
 
-import { SelectLegendSymbols } from "../component";
+import { LegendSymbolsSelect, msgLegendSymbolsLabel } from "../component";
 import { useOptionalDisplayContext } from "../display/context";
 
 import { DrawOrderTable } from "./DrawOrder";
@@ -45,7 +45,6 @@ const msgResource = gettext("Resource");
 const msgOpacity = gettext("Opacity");
 const msgMinScaleDenom = gettext("Min scale");
 const msgMaxScaleDenom = gettext("Max scale");
-const msgLegendSymbols = gettext("Legend");
 const msgAdapter = gettext("Adapter");
 const msgLayer = gettext("Layer");
 const msgGroup = gettext("Group");
@@ -205,9 +204,9 @@ export const LayerWidget = observer(({ item }: LayerWidgetProps) => {
       />
       <LotMV
         row
-        label={msgLegendSymbols}
+        label={msgLegendSymbolsLabel}
         value={item.layerLegendSymbols}
-        component={SelectLegendSymbols}
+        component={LegendSymbolsSelect}
         props={{ allowClear: true, style: { width: "100%" } }}
       />
       <LotMV
