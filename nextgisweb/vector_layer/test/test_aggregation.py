@@ -6,17 +6,21 @@ from nextgisweb.resource.test import ResourceAPI
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 # Dataset summary (from conftest.FILTER_DATASET):
-#   Alice:   age=25, score=8.5, city=NYC, birth_date=1998-05-15
-#   Bob:     age=30, score=7.0, city=LA,  birth_date=1993-08-22
-#   Charlie: age=35, score=9.0, city=NYC, birth_date=1988-12-01
-#   Diana:   age=28, score=6.5, city=SF,  birth_date=1995-03-10
-#   Eve:     age=32, score=8.0, city=NYC, birth_date=1991-07-18
+#   Alice:   age=25, score=8.5, city=NYC, birth_date=1998-05-15, geometry=POINT(0 0)
+#   Bob:     age=30, score=7.0, city=LA,  birth_date=1993-08-22, geometry=POINT(1 1)
+#   Charlie: age=35, score=9.0, city=NYC, birth_date=1988-12-01, geometry=POINT(2 2)
+#   Diana:   age=28, score=6.5, city=SF,  birth_date=1995-03-10, geometry=POINT(3 3)
+#   Eve:     age=32, score=8.0, city=NYC, birth_date=1991-07-18, geometry=POINT(4 4)
 
 
-def aggregate(app, vector_layer_filter_dataset, items, *, filter=None, status=200):
+def aggregate(
+    app, vector_layer_filter_dataset, items, *, filter=None, intersects=None, status=200
+):
     body = {"items": items}
     if filter is not None:
         body["filter"] = filter
+    if intersects is not None:
+        body["intersects"] = intersects
     return app.post(
         f"/api/resource/{vector_layer_filter_dataset}/feature/aggregate",
         json=body,
@@ -85,6 +89,17 @@ def test_min_max_with_filter(ngw_webtest_app, vector_layer_filter_dataset):
         filter=["==", ["get", "city"], "NYC"],
     )
     assert result["items"] == [{"type": "min_max", "min": 25, "max": 35}]
+
+
+def test_min_max_with_intersects(ngw_webtest_app, vector_layer_filter_dataset):
+    bbox = "POLYGON((1.5 1.5, 4.5 1.5, 4.5 4.5, 1.5 4.5, 1.5 1.5))"
+    result = aggregate(
+        ngw_webtest_app,
+        vector_layer_filter_dataset,
+        [{"type": "min_max", "field": "age"}],
+        intersects=bbox,
+    )
+    assert result["items"] == [{"type": "min_max", "min": 28, "max": 35}]
 
 
 def test_unique_values_basic(ngw_webtest_app, vector_layer_filter_dataset):
@@ -224,6 +239,29 @@ def test_sum_with_filter(ngw_webtest_app, vector_layer_filter_dataset):
         filter=["==", ["get", "city"], "NYC"],
     )
     assert result["items"] == [{"type": "sum", "sum": 92}]
+
+
+def test_sum_with_intersects(ngw_webtest_app, vector_layer_filter_dataset):
+    bbox = "POLYGON((-0.5 -0.5, 1.5 -0.5, 1.5 1.5, -0.5 1.5, -0.5 -0.5))"
+    result = aggregate(
+        ngw_webtest_app,
+        vector_layer_filter_dataset,
+        [{"type": "sum", "field": "age"}],
+        intersects=bbox,
+    )
+    assert result["items"] == [{"type": "sum", "sum": 55}]
+
+
+def test_sum_with_intersects_and_filter(ngw_webtest_app, vector_layer_filter_dataset):
+    bbox = "POLYGON((-0.5 -0.5, 2.5 -0.5, 2.5 2.5, -0.5 2.5, -0.5 -0.5))"
+    result = aggregate(
+        ngw_webtest_app,
+        vector_layer_filter_dataset,
+        [{"type": "sum", "field": "age"}],
+        filter=["==", ["get", "city"], "NYC"],
+        intersects=bbox,
+    )
+    assert result["items"] == [{"type": "sum", "sum": 60}]
 
 
 def test_sum_empty_result(ngw_webtest_app, vector_layer_filter_dataset):

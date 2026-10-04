@@ -1,5 +1,12 @@
 import { debounce } from "lodash-es";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ReactNode } from "react";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
@@ -7,14 +14,17 @@ import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { GridAggregation } from "../fields-widget/FieldsStore";
 import { JsonValuePreview } from "../json-value";
 
 import { FeatureTableRows } from "./FeatureTableRows";
+import { AggrCols } from "./component/AggrCols";
 import { HeaderCols } from "./component/HeaderCols";
 import { HeaderHandles } from "./component/HeaderHandles";
 import { $FID, KEY_FIELD_ID, LAST_CHANGED_FIELD_ID } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type { QueryParams } from "./hook/useFeatureTable";
+import { useGridAggregation } from "./hook/useGridAggregation";
 import type {
   ColOrder,
   EffectiveWidths,
@@ -31,6 +41,7 @@ interface FeatureTableProps {
   versioning: boolean;
   fields: FeatureLayerFieldRead[];
   total: number;
+  showGridAggregation: boolean;
   version?: number;
   selectedIds: number[];
   queryParams?: QueryParams;
@@ -48,6 +59,7 @@ function FeatureTable({
   versioning,
   fields,
   total,
+  showGridAggregation,
   version,
   selectedIds,
   queryParams,
@@ -81,6 +93,7 @@ function FeatureTable({
         id: KEY_FIELD_ID,
         display_name: "#",
         datatype: "INTEGER",
+        grid_aggregation: null,
       },
       ...fields,
     ];
@@ -90,6 +103,7 @@ function FeatureTable({
         id: LAST_CHANGED_FIELD_ID,
         display_name: gettext("Last changed"),
         datatype: "STRING",
+        grid_aggregation: null,
       });
     }
 
@@ -121,6 +135,24 @@ function FeatureTable({
     return cols;
   }, [versioning, fields, visibleFields]);
 
+  const [aggrModeOverrides, setAggrModeOverrides] = useState<
+    Map<number, GridAggregation>
+  >(() => new Map());
+
+  const handleAggrModeChange = useCallback(
+    (fieldId: number, mode: GridAggregation) => {
+      setAggrModeOverrides((prev) => {
+        const column = columns.find((c) => c.id === fieldId);
+        const current = prev.get(fieldId) ?? column?.grid_aggregation;
+        if (current === mode) return prev;
+        const next = new Map(prev);
+        next.set(fieldId, mode);
+        return next;
+      });
+    },
+    [columns]
+  );
+
   const {
     data,
     queryMode,
@@ -140,6 +172,26 @@ function FeatureTable({
     orderBy,
     version,
     total,
+  });
+
+  let isEmpty = total === 0;
+  if (queryMode && !isEmpty) {
+    isEmpty = !hasNextPage && queryTotal === 0;
+  }
+
+  const aggrExists = columns.some((c) => {
+    return c.grid_aggregation !== null;
+  });
+
+  const aggrVisible = showGridAggregation && !isEmpty && aggrExists;
+
+  const aggrValues = useGridAggregation({
+    resourceId,
+    columns,
+    showGridAggregation: aggrVisible,
+    modeOverrides: aggrModeOverrides,
+    queryParams,
+    version,
   });
 
   useEffect(() => {
@@ -205,11 +257,6 @@ function FeatureTable({
     "border-radius": "borderRadius",
   });
 
-  let isEmpty = total === 0;
-  if (queryMode && !isEmpty) {
-    isEmpty = !hasNextPage && queryTotal === 0;
-  }
-
   return (
     <div className="ngw-feature-layer-feature-table" style={themeVariables}>
       <div ref={theadRef} className="thead">
@@ -223,6 +270,25 @@ function FeatureTable({
             scrollBarSize={scrollBarSize}
           />
         </div>
+        {aggrExists && (
+          <div
+            className="tr"
+            style={
+              aggrVisible
+                ? undefined
+                : { height: 0, overflow: "hidden", border: "none" }
+            }
+          >
+            <AggrCols
+              columns={columns}
+              userDefinedWidths={userDefinedWidths}
+              aggrValues={aggrValues}
+              modeOverrides={aggrModeOverrides}
+              scrollBarSize={scrollBarSize}
+              onModeChange={handleAggrModeChange}
+            />
+          </div>
+        )}
         {effectiveWidths && (
           <HeaderHandles
             columns={columns}

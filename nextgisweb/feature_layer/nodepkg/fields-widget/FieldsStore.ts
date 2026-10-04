@@ -1,6 +1,7 @@
 import { difference } from "lodash-es";
 import { action, computed, observable, observableRef, observe } from "mobx";
 
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
@@ -12,12 +13,17 @@ import type {
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import type { Store } from "@nextgisweb/vector-layer/resource-widget/Store";
 
+export type GridAggregation = NonNullable<
+  FeatureLayerFieldRead["grid_aggregation"]
+>;
+
 interface FieldData {
   id: number | undefined;
   display_name: string;
   keyname: string;
   datatype: string | undefined;
   lookup_table: ResourceRef | null;
+  grid_aggregation: GridAggregation | null;
   label_field: boolean;
   grid_visibility: boolean;
   text_search: boolean;
@@ -30,6 +36,7 @@ const {
   keyname: fieldKeyname,
   datatype: fieldDatatype,
   lookup_table: fieldLookupTable,
+  grid_aggregation: fieldGridAggregation,
   label_field: fieldLabelField,
   grid_visibility: fieldGridVisibility,
   text_search: fieldTextSearch,
@@ -61,6 +68,7 @@ export class Field {
   readonly keyname = fieldKeyname.init("", this);
   readonly datatype = fieldDatatype.init("", this);
   readonly lookupTable = fieldLookupTable.init(null, this);
+  readonly gridAggregation = fieldGridAggregation.init(null, this);
   readonly labelField = fieldLabelField.init(false, this);
   readonly gridVisibility = fieldGridVisibility.init(true, this);
   readonly textSearch = fieldTextSearch.init(true, this);
@@ -69,6 +77,11 @@ export class Field {
   constructor(store: FieldsStore, data: FieldData) {
     this.store = store;
     fieldLoad(this, data);
+    observe(this.datatype, "value", () => {
+      if (!this.gridAggregationAvailable) {
+        this.gridAggregation.value = null;
+      }
+    });
     observe(this.labelField, "value", () => {
       if (this.labelField.value) {
         this.store.fields.forEach((i) => {
@@ -87,6 +100,7 @@ export class Field {
       ...(this.loookupTableAvailable
         ? this.lookupTable.jsonPart()
         : { lookup_table: null }),
+      ...this.gridAggregation.jsonPart(),
       ...this.labelField.jsonPart(),
       ...this.gridVisibility.jsonPart(),
       ...this.textSearch.jsonPart(),
@@ -99,9 +113,17 @@ export class Field {
     return fieldError(this);
   }
 
-  get loookupTableAvailable() {
+  private isDatatypeIn(datatypes: string[]) {
     const dt = this.datatype.value;
-    return dt ? ["INTEGER", "BIGINT", "STRING"].includes(dt) : false;
+    return dt ? datatypes.includes(dt) : false;
+  }
+
+  get loookupTableAvailable() {
+    return this.isDatatypeIn(["INTEGER", "BIGINT", "STRING"]);
+  }
+
+  get gridAggregationAvailable() {
+    return this.isDatatypeIn(["INTEGER", "BIGINT", "REAL"]);
   }
 }
 
