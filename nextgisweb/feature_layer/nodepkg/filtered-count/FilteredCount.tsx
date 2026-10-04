@@ -96,7 +96,10 @@ const FilteredCount = observer(({ store }: FilteredCountProps) => {
   const { size } = store;
   const [expanded, setExpanded] = useState(false);
 
-  const handleToggle = () => setExpanded(!expanded);
+  const handleToggle = () => {
+    store.setShowGridAggregation(!store.showGridAggregation);
+    setExpanded(!expanded);
+  };
 
   if (!expanded) {
     return (

@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo } from "react";
 
-import { CheckboxValue, InputValue, Modal } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue, Modal, Radio } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { FocusTable, Toggle, action } from "@nextgisweb/gui/focus-table";
 import type { FocusTableAction } from "@nextgisweb/gui/focus-table";
@@ -13,7 +13,7 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import { DatatypeSelect } from "./DatatypeSelect";
 import { Field } from "./FieldsStore";
-import type { FieldsStore } from "./FieldsStore";
+import type { FieldsStore, GridAggregation } from "./FieldsStore";
 
 import LabelFieldIcon from "@nextgisweb/icon/material/font_download/outline";
 import TextSearchIcon from "@nextgisweb/icon/material/manage_search";
@@ -27,12 +27,39 @@ msgDatatype = gettext("Type"),
 msgLookupTable = gettext("Lookup table"),
 msgGridVisibility = gettext("Feature table"),
 msgTextSearch = gettext("Text search"),
+msgGridAggregation = gettext("Display aggregation"),
+msgGridAggregationNone = gettext("None"),
+msgGridAggregationSum = gettext("Sum"),
+msgGridAggregationMin = gettext("Min"),
+msgGridAggregationMax = gettext("Max"),
 msgLabelField = gettext("Label attribute"),
 msgRequired = gettext("Required"),
 msgDeleteFieldTitle = gettext("Delete field?"),
 msgDeleteFieldContent = gettext("Deleting this field will permanently erase all its version history from this layer."),
 msgDatatypePlaceholder = gettext("Please select"),
 msgLookupTableNotUsed = gettext("Not used");
+
+function GridAggregationRadio({
+  value,
+  onChange,
+}: {
+  value?: GridAggregation | null;
+  onChange?: (value: GridAggregation | null) => void;
+}) {
+  return (
+    <Radio.Group
+      value={value ?? ""}
+      onChange={(e) =>
+        onChange?.(e.target.value === "" ? null : e.target.value)
+      }
+    >
+      <Radio value="">{msgGridAggregationNone}</Radio>
+      <Radio value="sum">{msgGridAggregationSum}</Radio>
+      <Radio value="min">{msgGridAggregationMin}</Radio>
+      <Radio value="max">{msgGridAggregationMax}</Radio>
+    </Radio.Group>
+  );
+}
 
 const FieldWidget = observer<{ item: Field }>(({ item }) => {
   return (
@@ -67,6 +94,12 @@ const FieldWidget = observer<{ item: Field }>(({ item }) => {
           style: { width: "100%" },
           allowClear: true,
         }}
+      />
+      <LotMV
+        label={msgGridAggregation}
+        visible={item.gridAggregationAvailable}
+        value={item.gridAggregation}
+        component={GridAggregationRadio}
       />
       <LotMV
         label={false}
@@ -123,9 +156,10 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
       display_name: gettext("Field") + " " + suffix,
       keyname: "field" + "_" + suffix,
       datatype: undefined,
-      grid_visibility: true,
-      label_field: false,
       lookup_table: null,
+      grid_aggregation: null,
+      label_field: false,
+      grid_visibility: true,
       text_search: true,
       required: false,
     });

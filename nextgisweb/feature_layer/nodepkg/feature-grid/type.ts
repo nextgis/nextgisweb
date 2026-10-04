@@ -25,7 +25,7 @@ export type OrderBy = [keynme: string, ordering: ColOrder];
 
 export interface FeatureLayerFieldCol extends Pick<
   FeatureLayerFieldRead,
-  "id" | "display_name" | "datatype"
+  "id" | "display_name" | "datatype" | "grid_aggregation"
 > {
   keyname?: string;
   flex?: string;

@@ -22,11 +22,11 @@ msgstr "Параметр 'text_search_context' требует наличия п�
 msgid "Aggregation is not supported for this layer."
 msgstr "Агрегация не поддерживается для этого слоя."
 
-#: api.py:805
+#: api.py:807
 msgid "Aggregation '{}' is not supported for this layer."
 msgstr "Агрегация '{}' не поддерживается для этого слоя."
 
-#: api.py:811 api.py:818
+#: api.py:813 api.py:820
 msgid "Field '{}' not found."
 msgstr "Поле '{}' не найдено."
 
@@ -104,15 +104,15 @@ msgstr "Таблица объектов"
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
-#: model.py:145
+#: model.py:157
 msgid "Spatial reference system"
 msgstr "Система координат"
 
-#: model.py:348
+#: model.py:371
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:418
+#: model.py:441
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
 
@@ -182,7 +182,7 @@ msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
 #: nodepkg/export-form/ExportForm.tsx:327
-#: nodepkg/fields-widget/FieldsWidget.tsx:218
+#: nodepkg/fields-widget/FieldsWidget.tsx:252
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
@@ -366,11 +366,11 @@ msgstr "Некорректное поле"
 msgid "Field not found"
 msgstr "Поле не найдено"
 
-#: nodepkg/feature-filter/testentry.tsx:127
+#: nodepkg/feature-filter/testentry.tsx:134
 msgid "Output JSON"
 msgstr "Вывод JSON"
 
-#: nodepkg/feature-filter/testentry.tsx:128
+#: nodepkg/feature-filter/testentry.tsx:135
 msgid "Current filter state"
 msgstr "Текущее состояние фильтра"
 
@@ -578,10 +578,25 @@ msgstr "Поиск..."
 msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
-#: nodepkg/feature-grid/FeatureTable.tsx:91
+#: nodepkg/feature-grid/FeatureTable.tsx:104
 #: nodepkg/feature-grid/component/TableConfigModal.tsx:98
 msgid "Last changed"
 msgstr "Последнее изменение"
+
+#: nodepkg/feature-grid/component/AggrCol.tsx:13
+#: nodepkg/fields-widget/FieldsWidget.tsx:32
+msgid "Sum"
+msgstr "Сумма"
+
+#: nodepkg/feature-grid/component/AggrCol.tsx:14
+#: nodepkg/fields-widget/FieldsWidget.tsx:33
+msgid "Min"
+msgstr "Мин"
+
+#: nodepkg/feature-grid/component/AggrCol.tsx:15
+#: nodepkg/fields-widget/FieldsWidget.tsx:34
+msgid "Max"
+msgstr "Макс"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:33
 msgid "Advanced export"
@@ -644,32 +659,40 @@ msgid "Text search"
 msgstr "Текстовый поиск"
 
 #: nodepkg/fields-widget/FieldsWidget.tsx:30
+msgid "Display aggregation"
+msgstr "Отображаемая агрегация"
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:31
+msgid "None"
+msgstr "Нет"
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:35
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:31
+#: nodepkg/fields-widget/FieldsWidget.tsx:36
 msgid "Required"
 msgstr "Обязательное"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:32
+#: nodepkg/fields-widget/FieldsWidget.tsx:37
 msgid "Delete field?"
 msgstr "Удалить поле?"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:33
+#: nodepkg/fields-widget/FieldsWidget.tsx:38
 msgid ""
 "Deleting this field will permanently erase all its version history from this "
 "layer."
 msgstr "Удаление этого поля навсегда сотрёт всю его историю версий в этом слое."
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:34
+#: nodepkg/fields-widget/FieldsWidget.tsx:39
 msgid "Please select"
 msgstr "Выберите тип"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:35
+#: nodepkg/fields-widget/FieldsWidget.tsx:40
 msgid "Not used"
 msgstr "Не используется"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:123
+#: nodepkg/fields-widget/FieldsWidget.tsx:156
 msgid "Field"
 msgstr "Поле"
 
@@ -678,7 +701,7 @@ msgid "{filtered_count} of {total_count}"
 msgstr "{filtered_count} из {total_count}"
 
 #: nodepkg/filtered-count/FilteredCount.tsx:72
-#: nodepkg/filtered-count/FilteredCount.tsx:103
+#: nodepkg/filtered-count/FilteredCount.tsx:106
 msgid "Feature count"
 msgstr "Количество объектов"
 

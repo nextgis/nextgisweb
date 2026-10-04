@@ -5,6 +5,7 @@ import { ExpandableText } from "@nextgisweb/gui/index";
 import SortIcon from "../component/SortIcon";
 import { $FID, KEY_FIELD_ID } from "../constant";
 import type { ColOrder, FeatureLayerFieldCol, OrderBy } from "../type";
+import { getColumnStyle } from "../util/getColumnStyle";
 
 interface HeaderColProps {
   ref: Ref<HTMLDivElement>;
@@ -21,13 +22,11 @@ export function HeaderCol({
   userDefinedWidths,
   toggleSorting,
 }: HeaderColProps) {
-  const { keyname, id, display_name: label, flex } = column;
+  const { keyname, id, display_name: label } = column;
 
   const colSort = orderBy && orderBy[0] === keyname && orderBy[1];
 
-  const style = userDefinedWidths[id]
-    ? { flex: `0 0 ${userDefinedWidths[id]}px` }
-    : { flex };
+  const style = getColumnStyle(column, userDefinedWidths);
 
   const onClick =
     id === KEY_FIELD_ID

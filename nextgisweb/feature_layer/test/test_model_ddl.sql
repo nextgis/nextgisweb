@@ -87,6 +87,7 @@ CREATE TABLE layer_field (
     keyname character varying NOT NULL,
     datatype character varying(50) NOT NULL,
     display_name character varying NOT NULL,
+    grid_aggregation character varying(50),
     grid_visibility boolean NOT NULL,
     text_search boolean NOT NULL,
     required boolean NOT NULL,

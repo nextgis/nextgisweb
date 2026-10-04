@@ -65,6 +65,28 @@
         background-color: rgba(127, 127, 127, 0.75);
       }
     }
+
+    .aggr {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 3em;
+      min-height: 27px;
+
+      .aggr-trigger {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .aggr-value {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-weight: bold;
+        user-select: text;
+      }
+    }
   }
 
   .tbody-scroller {
@@ -114,7 +136,8 @@
   }
 
   .td,
-  .th {
+  .th,
+  .aggr {
     border-inline-end: 1px solid var(--color-border);
     padding: 2px 4px;
   }

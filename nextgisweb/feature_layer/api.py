@@ -793,6 +793,8 @@ def aggregate(resource, request: Request, *, body: AggregateBody) -> AggregateRe
     if not IAggregatableFeatureQuery.providedBy(feature_query):
         raise ValidationError(message=gettext("Aggregation is not supported for this layer."))
 
+    apply_intersect_filter(feature_query, request, resource)
+
     if body.filter is not UNSET and IFilterableFeatureLayer.providedBy(resource):
         feature_query.set_filter_program(
             FilterParser.from_resource(resource, user=request.user).parse(body.filter)
