@@ -25,17 +25,17 @@ class RouteInspector(RouteMeta):
 def iter_routes(introspector) -> Generator[RouteInspector, None, None]:
     def views(related) -> Generator[ViewInspector, None, None]:
         for itm in filter(lambda i: i.category_name == "views", related):
-            if view_meta := itm.get("view_meta"):
-                assert isinstance(view_meta, ViewMeta)
+            view_meta = itm["view_meta"]
+            assert isinstance(view_meta, ViewMeta)
 
-                method = itm["request_methods"]
-                assert method is None or method in RequestMethodValues
+            method = itm["request_methods"]
+            assert method is None or method in RequestMethodValues
 
-                yield ViewInspector(
-                    **view_meta.__dict__,
-                    method=method,
-                    info=itm.action_info,
-                )
+            yield ViewInspector(
+                **view_meta.__dict__,
+                method=method,
+                info=itm.action_info,
+            )
 
     if routes := introspector.get_category("routes"):
         for itm in routes:

@@ -166,12 +166,15 @@ class Configurator(PyramidConfigurator):
         registry: Any
 
     def setup_registry(self, *args, **kwargs):
-        super().setup_registry(*args, **kwargs)
+        assert len(args) == 0
+
+        kwargs["request_factory"] = Request
+        kwargs["exceptionresponse_view"] = None
+
+        super().setup_registry(**kwargs)
 
         self.registry.registerUtility(RoutesMapper(), IRoutesMapper)
         self.add_view_deriver(ViewMetaDeriver(), name="view_meta")
-
-        self.set_request_factory(Request)
         self.set_execution_policy(self._execution_policy)
 
     def add_default_tweens(self):
@@ -222,7 +225,7 @@ class Configurator(PyramidConfigurator):
     def add_route(
         self,
         name: str,
-        pattern: str | None = None,
+        pattern: str,
         *,
         types: dict[str, object] | None = None,
         overloaded: bool = False,
@@ -242,75 +245,70 @@ class Configurator(PyramidConfigurator):
         patch: ViewFunc | None = None,
         **kw: Unpack[_AddRouteKW],
     ) -> ConfiguratorRouteHelper:
+        assert pattern and pattern.startswith("/"), "Route pattern must start with '/'"
+
         kwargs: dict[str, object] = {**kw}
 
         stacklevel = push_stacklevel(kwargs, False, True)
         component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
+        assert component is not None, "Component could not be determined"
 
-        if component is None:
-            # Legacy static view, probably from nextgisweb_threedim
-            logger.debug(f"No component found for {name=!r}, {pattern=!r}!")
+        opattern = pattern
+        rtypes: dict[str, object] = {}
 
-        elif pattern is not None:
-            if not pattern.startswith("/"):
-                raise ValueError(f"The route pattern must begin with '/', but got {pattern!r}.")
+        if factory is not None:
+            rtypes.update(getattr(factory, "annotations", {}))
 
-            opattern = pattern
-            rtypes: dict[str, object] = {}
+        if types is not None:
+            rtypes.update(types)
 
-            if factory is not None:
-                rtypes.update(getattr(factory, "annotations", {}))
+        # Rewrite route pattern in the following formats:
+        #   pattern:    /param/{name:regexp}  for Pyramid framework
+        #   itemplate:  /param/{0}            with numeric placeholders
+        #   ktemplate:  /param/{name}         with string placeholders
 
-            if types is not None:
-                rtypes.update(types)
+        lastpos, pattern, itemplate, ktemplate = 0, "", "", ""
+        for idx, m in enumerate(PATH_PARAM_RE.finditer(opattern)):
+            leader = opattern[lastpos : m.start()]
+            lastpos = m.end()
 
-            # Rewrite route pattern in the following formats:
-            #   pattern:    /param/{name:regexp}  for Pyramid framework
-            #   itemplate:  /param/{0}            with numeric placeholders
-            #   ktemplate:  /param/{name}         with string placeholders
+            key, type_or_regexp = m.groups()
 
-            lastpos, pattern, itemplate, ktemplate = 0, "", "", ""
-            for idx, m in enumerate(PATH_PARAM_RE.finditer(opattern)):
-                leader = opattern[lastpos : m.start()]
-                lastpos = m.end()
+            if (tdef := rtypes.get(key)) is None:
+                tdef = PATH_TYPES.get(type_or_regexp, PATH_TYPE_UNKNOWN)
+                rtypes[key] = tdef
 
-                key, type_or_regexp = m.groups()
-
-                if (tdef := rtypes.get(key)) is None:
-                    tdef = PATH_TYPES.get(type_or_regexp, PATH_TYPE_UNKNOWN)
-                    rtypes[key] = tdef
-
-                if type_or_regexp:
-                    if pdef := PATH_TYPES.get(type_or_regexp):
-                        # ty: ignore[unresolved-attribute]
-                        mpattern = type_info(pdef).extra["route_pattern"]
-                    else:
-                        mpattern = type_or_regexp
+            if type_or_regexp:
+                if pdef := PATH_TYPES.get(type_or_regexp):
+                    # ty: ignore[unresolved-attribute]
+                    mpattern = type_info(pdef).extra["route_pattern"]
                 else:
-                    mpattern = self._pattern_from_type(tdef)
+                    mpattern = type_or_regexp
+            else:
+                mpattern = self._pattern_from_type(tdef)
 
-                pattern += "%s{%s:%s}" % (leader, key, mpattern)
-                itemplate += "%s{%s}" % (leader, str(idx))
-                ktemplate += "%s{%s}" % (leader, key)
+            pattern += "%s{%s:%s}" % (leader, key, mpattern)
+            itemplate += "%s{%s}" % (leader, str(idx))
+            ktemplate += "%s{%s}" % (leader, key)
 
-            trailer = opattern[lastpos:]
-            itemplate += trailer
-            ktemplate += trailer
-            pattern += trailer
+        trailer = opattern[lastpos:]
+        itemplate += trailer
+        ktemplate += trailer
+        pattern += trailer
 
-            path_params = {k: PathParam(k, v) for k, v in rtypes.items()}
-            path_decoders = [(k, v.decoder) for k, v in path_params.items()]
+        path_params = {k: PathParam(k, v) for k, v in rtypes.items()}
+        path_decoders = [(k, v.decoder) for k, v in path_params.items()]
 
-            kwargs["route_meta"] = RouteMeta(
-                component=component,
-                overloaded=overloaded,
-                client=client,
-                cors_headers=cors_headers,
-                itemplate=itemplate,
-                ktemplate=ktemplate,
-                path_params=path_params,
-                path_decoders=path_decoders,
-            )
+        kwargs["route_meta"] = RouteMeta(
+            component=component,
+            overloaded=overloaded,
+            client=client,
+            cors_headers=cors_headers,
+            itemplate=itemplate,
+            ktemplate=ktemplate,
+            path_params=path_params,
+            path_decoders=path_decoders,
+        )
 
         helper = ConfiguratorRouteHelper(self, name, deprecated=deprecated, openapi=openapi)
         for m, h in (
@@ -341,9 +339,9 @@ class Configurator(PyramidConfigurator):
 
     def add_view(
         self,
-        view: ViewFunc | None = None,
+        view: ViewFunc,
         *,
-        route_name: str | None = None,
+        route_name: str,
         request_method: RequestMethodType | None = None,
         context: object | None = None,
         query_params: Iterable | None = None,
@@ -351,6 +349,9 @@ class Configurator(PyramidConfigurator):
         deprecated: bool = False,
         **kw: Unpack[_AddViewKW],
     ):
+        assert view is not None, "View function must be provided"
+        assert route_name is not None, "Route name must be provided"
+
         kwargs = {**kw}
 
         extra_query_params = query_params
@@ -358,111 +359,111 @@ class Configurator(PyramidConfigurator):
 
         stacklevel = push_stacklevel(kwargs, False, True)
         component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
+        assert component is not None, "Component could not be determined"
 
-        if view is not None and component is not None:
-            # Extract attrs missing in kwargs from view.__pyramid_{attr}__
-            attrs = {"renderer", "query_params", "react_renderer"}.difference(set(kwargs.keys()))
+        # Extract attrs missing in kwargs from view.__pyramid_{attr}__
+        attrs = {"renderer", "query_params", "react_renderer"}.difference(set(kwargs.keys()))
 
-            fn = view
-            while fn and len(attrs) > 0:
-                for attr in set(attrs):
-                    if (v := getattr(fn, f"__pyramid_{attr}__", None)) is not None:
-                        kwargs[attr] = v
-                        attrs.remove(attr)
-                fn = getattr(fn, "__wrapped__", None)
+        fn = view
+        while fn and len(attrs) > 0:
+            for attr in set(attrs):
+                if (v := getattr(fn, f"__pyramid_{attr}__", None)) is not None:
+                    kwargs[attr] = v
+                    attrs.remove(attr)
+            fn = getattr(fn, "__wrapped__", None)
 
-            sig = signature(view, eval_str=True)
+        sig = signature(view, eval_str=True)
 
-            body_type = None
-            has_request = has_context = False
-            path_params: dict[str, PathParam] = {}
-            query_params: dict[str, QueryParam] = {}
-            body: tuple[str, Any] | None = None
+        body_type = None
+        has_request = has_context = False
+        path_params: dict[str, PathParam] = {}
+        query_params: dict[str, QueryParam] = {}
+        body: tuple[str, Any] | None = None
 
-            for idx, (name, p) in enumerate(sig.parameters.items()):
-                if name == "request":
-                    has_request = True
-                    continue
-                elif idx == 0:
-                    has_context = True
-                    if p.annotation is not p.empty:
-                        kwargs["context"] = p.annotation
-                    continue
+        for idx, (name, p) in enumerate(sig.parameters.items()):
+            if name == "request":
+                has_request = True
+                continue
+            elif idx == 0:
+                has_context = True
+                if p.annotation is not p.empty:
+                    kwargs["context"] = p.annotation
+                continue
 
-                assert has_request or idx in (0, 1)
+            assert has_request or idx in (0, 1)
 
-                if name in ("body", "json_body"):
-                    assert body is None, "Got both of body and json_body arguments"
-                    assert p.annotation is not p.empty, f"Type hint required for {name}"
-                    body_type = p.annotation
-                    body_base, body_extras = disannotate(body_type)
-                    if is_struct_type(body_base) or (ContentType.JSON in body_extras):
-                        bextract = _json_msgspec_factory(body_type)
-                    else:
-                        err = f"Body type not supported: {body_base}"
-                        raise NotImplementedError(err)
-                    body = (name, bextract)
+            if name in ("body", "json_body"):
+                assert body is None, "Got both of body and json_body arguments"
+                assert p.annotation is not p.empty, f"Type hint required for {name}"
+                body_type = p.annotation
+                body_base, body_extras = disannotate(body_type)
+                if is_struct_type(body_base) or (ContentType.JSON in body_extras):
+                    bextract = _json_msgspec_factory(body_type)
+                else:
+                    err = f"Body type not supported: {body_base}"
+                    raise NotImplementedError(err)
+                body = (name, bextract)
 
-                elif p.kind == p.POSITIONAL_OR_KEYWORD:
-                    assert p.default is p.empty
-                    assert p.annotation is not p.empty
-                    path_params[name] = PathParam(name, p.annotation)
+            elif p.kind == p.POSITIONAL_OR_KEYWORD:
+                assert p.default is p.empty
+                assert p.annotation is not p.empty
+                path_params[name] = PathParam(name, p.annotation)
 
-                elif p.kind == p.KEYWORD_ONLY:
-                    pdefault = p.default if p.default is not p.empty else NODEFAULT
-                    query_params[name] = QueryParam(name, p.annotation, pdefault)
+            elif p.kind == p.KEYWORD_ONLY:
+                pdefault = p.default if p.default is not p.empty else NODEFAULT
+                query_params[name] = QueryParam(name, p.annotation, pdefault)
 
-            return_type = sig.return_annotation
-            return_renderer = None
-            if return_type is sig.empty:
-                return_type = None
-            elif return_type is JSONType:
-                return_renderer = "json"
-            else:
-                return_concrete, return_extras = disannotate(return_type, supertype=True)
-                if (
-                    return_concrete is EmptyObject
-                    or is_struct_type(return_concrete)
-                    or ContentType.JSON in return_extras
-                    or _AnyOfRuntime in return_extras
-                ):
-                    return_renderer = "msgspec"
+        return_type = sig.return_annotation
+        return_renderer = None
+        if return_type is sig.empty:
+            return_type = None
+        elif return_type is JSONType:
+            return_renderer = "json"
+        else:
+            return_concrete, return_extras = disannotate(return_type, supertype=True)
+            if (
+                return_concrete is EmptyObject
+                or is_struct_type(return_concrete)
+                or ContentType.JSON in return_extras
+                or _AnyOfRuntime in return_extras
+            ):
+                return_renderer = "msgspec"
 
-            if kwargs.get("renderer") is None and return_renderer is not None:
-                kwargs["renderer"] = return_renderer
+        if kwargs.get("renderer") is None and return_renderer is not None:
+            kwargs["renderer"] = return_renderer
 
-            kwargs["mapper"] = ContextRequestViewMapper
-            view = _view_driver_factory(
-                view,
-                has_context,
-                path_params=path_params,
-                query_params=query_params,
-                body=body,
-                result=return_type,
-            )
+        kwargs["mapper"] = ContextRequestViewMapper
+        view = _view_driver_factory(
+            view,
+            has_context,
+            path_params=path_params,
+            query_params=query_params,
+            body=body,
+            result=return_type,
+        )
 
-            if extra_query_params is not None:
-                query_params = query_params.copy()
-                for eqp in extra_query_params:
-                    if len(eqp) == 2:
-                        eqp = eqp + (NODEFAULT,)
-                    query_params[eqp[0]] = QueryParam(*eqp)
+        if extra_query_params is not None:
+            query_params = query_params.copy()
+            for eqp in extra_query_params:
+                if len(eqp) == 2:
+                    eqp = eqp + (NODEFAULT,)
+                query_params[eqp[0]] = QueryParam(*eqp)
 
-            react_renderer = kwargs.pop("react_renderer", None)
-            assert react_renderer is None or isinstance(react_renderer, str)
+        react_renderer = kwargs.pop("react_renderer", None)
+        assert react_renderer is None or isinstance(react_renderer, str)
 
-            kwargs["view_meta"] = ViewMeta(
-                func=view,
-                context=context,
-                deprecated=deprecated,
-                openapi=openapi,
-                path_params=path_params,
-                query_params=query_params,
-                component=component,
-                body_type=body_type,
-                return_type=return_type,
-                react_renderer=react_renderer,
-            )
+        kwargs["view_meta"] = ViewMeta(
+            func=view,
+            context=context,
+            deprecated=deprecated,
+            openapi=openapi,
+            path_params=path_params,
+            query_params=query_params,
+            component=component,
+            body_type=body_type,
+            return_type=return_type,
+            react_renderer=react_renderer,
+        )
 
         if route_name is not None:
             kwargs["route_name"] = route_name
