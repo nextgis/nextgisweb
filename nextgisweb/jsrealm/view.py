@@ -18,11 +18,7 @@ def testentry_browse(request: Request):
 
 
 @viewargs(renderer="mako")
-def testentry(request: Request):
-    subpath = request.matchdict["selected"]
-    assert isinstance(subpath, tuple)
-    selected = "/".join(subpath)
-
+def testentry(request: Request, selected: str):
     return dict(
         entrypoint=JSENTRY,
         selected=selected,
@@ -41,4 +37,4 @@ def setup_pyramid(comp: JSRealmComponent, config: Configurator):
             config.add_static_path(pn, p)
 
     config.add_route("jsrealm.testentry.browse", "/testentry/", get=testentry_browse)
-    config.add_route("jsrealm.testentry", "/testentry/*selected", get=testentry)
+    config.add_route("jsrealm.testentry", "/testentry/{selected:any}", get=testentry)

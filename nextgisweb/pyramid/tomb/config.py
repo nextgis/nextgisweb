@@ -159,6 +159,7 @@ PATH_TYPES = dict[str, Any](
 
 
 PATH_PARAM_RE = re.compile(r"\{(?P<k>\w+)(?:\:(?P<r>.+?))?\}")
+SUBPATH_RE = re.compile(r"^.*\*\w+$")
 
 
 class Configurator(PyramidConfigurator):
@@ -246,6 +247,7 @@ class Configurator(PyramidConfigurator):
         **kw: Unpack[_AddRouteKW],
     ) -> ConfiguratorRouteHelper:
         assert pattern and pattern.startswith("/"), "Route pattern must start with '/'"
+        assert SUBPATH_RE.match(pattern) is None, "Route pattern must not contain a subpath"
 
         kwargs: dict[str, object] = {**kw}
 

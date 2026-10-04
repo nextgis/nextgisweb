@@ -50,7 +50,7 @@ class StaticMap:
 
     def lookup(self, subpath) -> Path:
         n = self.data
-        u = list(subpath)
+        u = subpath.split("/")
         while True:
             try:
                 h = u.pop(0)

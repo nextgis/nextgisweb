@@ -91,7 +91,7 @@ def template_include(comp: PyramidComponent) -> Iterable[str]:
 @inject()
 def static_view(request: Request, skey: str, *, comp: PyramidComponent = inject.arg()):
     static_path = request.environ["static_path"]
-    cache = skey == comp.static_key[1:]
+    cache = skey == comp.static_key
     return StaticFileResponse(str(static_path), cache=cache, request=request)
 
 
@@ -793,8 +793,8 @@ def _setup_static(comp: PyramidComponent, config: Configurator):
     config.add_route_predicate("static_source", StaticSourcePredicate)
 
     if "static_key" in comp.options:
-        comp.static_key = "/" + comp.options["static_key"]
-        logger.debug("Using static key from options '%s'", comp.static_key[1:])
+        comp.static_key = comp.options["static_key"]
+        logger.debug("Using static key from options '%s'", comp.static_key)
     elif comp.env.component(CoreComponent).debug:
         # In debug build static_key from proccess startup time
         rproc = Process(os.getpid())
@@ -807,10 +807,9 @@ def _setup_static(comp: PyramidComponent, config: Configurator):
             logger.debug("Found uWSGI master process PID=%d", rproc.pid)
 
         # Use 4-byte hex representation of 1/5 second intervals
-        comp.static_key = "/" + hex(int(rproc.create_time() * 5) % (2**64)).replace(
-            "0x", ""
-        ).replace("L", "")
-        logger.debug("Using startup time static key [%s]", comp.static_key[1:])
+        static_key_int = int(rproc.create_time() * 5) % (2**64)
+        comp.static_key = hex(static_key_int).replace("0x", "").replace("L", "")
+        logger.debug("Using startup time static key [%s]", comp.static_key)
     else:
         # In production mode build static_key from nextgisweb_* package versions
         package_hash = md5(
@@ -819,18 +818,22 @@ def _setup_static(comp: PyramidComponent, config: Configurator):
                 for pobj in comp.env.packages.values()
             ).encode("utf-8")
         )
-        comp.static_key = "/" + package_hash.hexdigest()[:8]
-        logger.debug("Using package based static key '%s'", comp.static_key[1:])
+        comp.static_key = package_hash.hexdigest()[:8]
+        logger.debug("Using package based static key '%s'", comp.static_key)
 
     config.add_route(
         "pyramid.static",
-        "/static/{skey:str}/*subpath",
+        "/static/{skey:str}/{subpath:any}",
         static_source=True,
         get=static_view,
     )
 
     def static_url(request: Request, path=""):
-        return request.route_url("pyramid.static", subpath=path, skey=comp.static_key[1:])
+        return request.route_url(
+            "pyramid.static",
+            skey=comp.static_key,
+            subpath=path,
+        )
 
     config.add_request_method(static_url, property=False)
 

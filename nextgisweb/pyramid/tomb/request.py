@@ -34,11 +34,7 @@ class Request[C](BaseRequest):
         assert rmeta is not None
 
         mdict = self.matchdict
-        return {
-            name: decoder(mv)
-            for name, decoder in rmeta.path_decoders
-            if isinstance(mv := mdict[name], str)
-        }
+        return {name: decoder(mdict[name]) for name, decoder in rmeta.path_decoders}
 
     @cached_property
     def localizer(self) -> Localizer:
@@ -105,19 +101,19 @@ class Request[C](BaseRequest):
         def matched_route(self) -> Route: ...
 
         @property
-        def matchdict(self) -> dict[str, str | tuple[str, ...]]: ...
+        def matchdict(self) -> Mapping[str, str]: ...
 
         @property
         def query_string(self) -> str: ...
 
         @property
-        def params(self) -> dict[str, str]: ...
+        def params(self) -> Mapping[str, str]: ...
 
         @property
-        def GET(self) -> dict[str, str]: ...
+        def GET(self) -> Mapping[str, str]: ...
 
         @property
-        def POST(self) -> dict[str, str]: ...
+        def POST(self) -> Mapping[str, str]: ...
 
         def route_url(self, route_name: str, *elements, **kw) -> str: ...
 
