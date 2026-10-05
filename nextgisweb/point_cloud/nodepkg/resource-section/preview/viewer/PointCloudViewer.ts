@@ -3,18 +3,31 @@ import Instance from "@giro3d/giro3d/core/Instance.js";
 import { CoordinateSystem } from "@giro3d/giro3d/core/geographic/CoordinateSystem.js";
 import { Extent } from "@giro3d/giro3d/core/geographic/Extent.js";
 import { ColorLayer } from "@giro3d/giro3d/core/layer/ColorLayer.js";
+import { ElevationLayer } from "@giro3d/giro3d/core/layer/ElevationLayer.js";
 import Giro3DMap from "@giro3d/giro3d/entities/Map.js";
+import { MapLightingMode } from "@giro3d/giro3d/entities/MapLightingOptions.js";
 import PointCloud from "@giro3d/giro3d/entities/PointCloud.js";
 import COPCSource from "@giro3d/giro3d/sources/COPCSource.js";
 import TiledImageSource from "@giro3d/giro3d/sources/TiledImageSource.js";
+import type { TiledImageSourceOptions } from "@giro3d/giro3d/sources/TiledImageSource.js";
 import { setLazPerfPath } from "@giro3d/giro3d/sources/las/config.js";
 import lazPerfWasmUrl from "laz-perf/lib/web/laz-perf.wasm?url";
-import type UrlTile from "ol/source/UrlTile";
+import XYZ from "ol/source/XYZ";
 import { Color, MathUtils, SRGBColorSpace, Vector3 } from "three";
 import { MapControls } from "three/addons/controls/MapControls.js";
 
 import type { PointCloudLayerRead } from "@nextgisweb/point-cloud/type/api";
 import { routeURL } from "@nextgisweb/pyramid/api";
+
+import { TerrariumFormat } from "./TerrariumFormat";
+
+/**
+ * OpenLayers tile source as required by Giro3D
+ *
+ * Giro3D reads tile URLs from deprecated UrlTile sources, so the type is taken
+ * from its options instead of referencing UrlTile directly.
+ */
+export type TileSource = TiledImageSourceOptions["source"];
 
 export type ColoringMode =
   | "elevation"
@@ -52,6 +65,9 @@ const POINT_BUDGET = 2_000_000;
 // Point cloud surroundings shown on the basemap, relative to its size
 const MAP_MARGIN_RATIO = 1;
 const MAP_MARGIN_MIN = 500;
+
+// Maximum zoom level of terrain tiles (AWS Terrain Tiles provide up to 15)
+const TERRAIN_MAX_ZOOM = 15;
 
 let lazPerfConfigured = false;
 
@@ -144,10 +160,12 @@ export class PointCloudViewer {
   private readonly instance: Instance;
 
   private readonly data: PointCloudLayerRead;
+  private readonly crs: CoordinateSystem;
   private readonly controls: MapControls;
   private readonly map: Giro3DMap;
   private readonly pointCloud: PointCloud;
   private basemapLayer: ColorLayer | null = null;
+  private terrainLayer: ElevationLayer | null = null;
   private disposed = false;
 
   // Entities can't be configured until they are added to the instance, so the
@@ -155,13 +173,20 @@ export class PointCloudViewer {
   private loaded = false;
   private coloring: ColoringMode;
   private pointSize: number | null = null;
-  private basemapSource: UrlTile | null = null;
+  private basemapSource: TileSource | null = null;
+  private terrainUrl: string | null = null;
+  private verticalOffset = 0;
+
+  // Elevation of the point cloud lowest point in the scene: zero on the flat
+  // basemap or original Z with the vertical offset on terrain
+  private baseElevation = 0;
 
   constructor({ target, resourceId, data, coloring }: PointCloudViewerOptions) {
     configureLazPerf();
 
     this.data = data;
     const crs = registerCoordinateSystem(data);
+    this.crs = crs;
 
     this.instance = new Instance({
       target,
@@ -215,6 +240,7 @@ export class PointCloudViewer {
     this.applyColoring();
     this.applyPointSize();
     await this.applyBasemap();
+    await this.applyTerrain();
     this.instance.notifyChange();
   }
 
@@ -229,9 +255,21 @@ export class PointCloudViewer {
   }
 
   /** Replaces the basemap, `null` source removes it */
-  async setBasemap(source: UrlTile | null) {
+  async setBasemap(source: TileSource | null) {
     this.basemapSource = source;
     if (this.loaded) await this.applyBasemap();
+  }
+
+  /** Shows terrain from Terrarium tiles URL template, `null` hides it */
+  async setTerrain(url: string | null) {
+    this.terrainUrl = url;
+    if (this.loaded) await this.applyTerrain();
+  }
+
+  /** Sets the vertical offset of the point cloud on terrain, in meters */
+  setVerticalOffset(offset: number) {
+    this.verticalOffset = offset;
+    if (this.loaded) this.updatePlacement();
   }
 
   private applyColoring() {
@@ -264,6 +302,9 @@ export class PointCloudViewer {
 
     if (source) {
       const layer = new ColorLayer({
+        // Without a layer extent Giro3D uses the whole EPSG:3857 tile grid,
+        // which can't be reprojected to local coordinate systems (NaN values)
+        extent: this.map.extent,
         source: new TiledImageSource({ source }),
       });
       this.basemapLayer = layer;
@@ -272,6 +313,75 @@ export class PointCloudViewer {
     }
 
     this.instance.notifyChange(this.map);
+  }
+
+  private async applyTerrain() {
+    const url = this.terrainUrl;
+    if (this.terrainLayer) {
+      this.map.removeLayer(this.terrainLayer, { disposeLayer: true });
+      this.terrainLayer = null;
+    }
+
+    // Hillshading makes the terrain relief visible on the basemap
+    this.map.lighting = {
+      enabled: url !== null,
+      mode: MapLightingMode.Hillshade,
+    };
+
+    this.updatePlacement();
+
+    if (url === null) {
+      this.instance.notifyChange(this.map);
+      return;
+    }
+
+    const layer = new ElevationLayer({
+      // See the basemap layer above
+      extent: this.map.extent,
+      source: new TiledImageSource({
+        source: new XYZ({
+          url,
+          projection: "EPSG:3857",
+          maxZoom: TERRAIN_MAX_ZOOM,
+          crossOrigin: "anonymous",
+        }),
+        format: new TerrariumFormat(),
+      }),
+    });
+    this.terrainLayer = layer;
+    await this.map.addLayer(layer);
+    this.instance.notifyChange(this.map);
+  }
+
+  /**
+   * Puts the point cloud lowest point on the flat basemap, or keeps original
+   * Z with the vertical offset on terrain
+   */
+  private updatePlacement() {
+    if (this.terrainUrl === null) {
+      this.setBaseElevation(0);
+      return;
+    }
+    const original = this.data.zmin * this.data.z_scale;
+    const offset = this.verticalOffset / this.crs.metersPerVerticalUnit;
+    this.setBaseElevation(original + offset);
+  }
+
+  /** Moves the point cloud lowest point to the given elevation */
+  private setBaseElevation(elevation: number) {
+    const delta = elevation - this.baseElevation;
+    if (delta === 0) return;
+    this.baseElevation = elevation;
+
+    const object3d = this.pointCloud.object3d;
+    object3d.position.z += delta;
+    object3d.updateMatrixWorld(true);
+
+    // Keep the point cloud in view by moving the camera along
+    this.instance.view.camera.position.z += delta;
+    this.controls.target.z += delta;
+    this.controls.update();
+    this.instance.notifyChange(this.pointCloud);
   }
 
   dispose() {

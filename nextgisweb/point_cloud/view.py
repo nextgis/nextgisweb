@@ -102,5 +102,23 @@ def cs_point_budget(comp: PointCloudComponent, request: Request) -> PointBudgetC
     )
 
 
+class TerrainClientSetting(Struct, kw_only=True):
+    url: str
+    copyright_text: str | None
+    copyright_url: str | None
+
+
+@client_setting("terrain")
+def cs_terrain(comp: PointCloudComponent, request: Request) -> TerrainClientSetting | None:
+    opts = comp.options.with_prefix("terrain")
+    if not opts["enabled"]:
+        return None
+    return TerrainClientSetting(
+        url=opts["url"],
+        copyright_text=opts["copyright_text"],
+        copyright_url=opts["copyright_url"],
+    )
+
+
 def setup_pyramid(comp, config):
     pass

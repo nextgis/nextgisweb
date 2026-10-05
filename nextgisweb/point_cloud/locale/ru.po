@@ -128,44 +128,60 @@ msgstr ""
 "Слой создан. С помощью кнопки можно создать ресурс стиля облака точек по "
 "умолчанию."
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:21
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:34
 msgid "Coloring"
 msgstr "Окраска"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:22
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:35
 msgid "Basemap"
 msgstr "Подложка"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:23
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:36
 #: nodepkg/style-widget/EditorWidget.tsx:31
 msgid "Point size"
 msgstr "Размер точки"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:24
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:37
 msgid "No basemap"
 msgstr "Без подложки"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:25
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:38
+msgid "Terrain"
+msgstr "Рельеф"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:39
+msgid "Offset"
+msgstr "Смещение"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:40
+msgid "Reset offset"
+msgstr "Сбросить смещение"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:41
+msgid "m"
+msgstr "м"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:43
 msgid "Preview is not available for point clouds in geographic coordinate systems."
 msgstr "Предпросмотр недоступен для облаков точек в географических системах координат."
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:45
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:63
 msgid "RGB"
 msgstr "RGB"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:46
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:64
 msgid "Elevation"
 msgstr "Высота"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:48
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:66
 msgid "Classification"
 msgstr "Классификация"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:51
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:69
 msgid "Intensity"
 msgstr "Интенсивность"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:54
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:72
 msgid "Return number"
 msgstr "Номер отражения"
 

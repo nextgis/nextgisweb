@@ -1,5 +1,3 @@
-import type UrlTile from "ol/source/UrlTile";
-
 import basemapSettings from "@nextgisweb/basemap/client-settings";
 import type { BasemapConfig } from "@nextgisweb/basemap/layer-widget/type";
 import {
@@ -8,6 +6,8 @@ import {
 } from "@nextgisweb/basemap/util/baselayer";
 import { route } from "@nextgisweb/pyramid/api";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
+
+import type { TileSource } from "./PointCloudViewer";
 
 export interface BasemapOption {
   key: string;
@@ -71,9 +71,9 @@ export function defaultBasemapKey(options: BasemapOption[]) {
 /** Creates an OpenLayers tile source, the same way as for web maps */
 export async function createBasemapSource(
   config: BasemapConfig
-): Promise<UrlTile | null> {
+): Promise<TileSource | null> {
   const layer = await createTileLayer(prepareBaselayerConfig(config));
   return layer && "getTileUrlFunction" in layer.olSource
-    ? (layer.olSource as UrlTile)
+    ? (layer.olSource as TileSource)
     : null;
 }

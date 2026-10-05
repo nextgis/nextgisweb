@@ -1,9 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
-import { Alert, Select, Slider, Space } from "@nextgisweb/gui/antd";
+import {
+  Alert,
+  Button,
+  Flex,
+  InputNumber,
+  Select,
+  Slider,
+  Space,
+  Switch,
+  Tooltip,
+} from "@nextgisweb/gui/antd";
 import { CentralLoading } from "@nextgisweb/gui/component";
 import { extractError, isAbortError } from "@nextgisweb/gui/error";
+import settings from "@nextgisweb/point-cloud/client-settings";
 import type { PointCloudLayerRead } from "@nextgisweb/point-cloud/type/api";
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import {
@@ -18,16 +30,51 @@ import {
 } from "./viewer/basemap";
 import type { BasemapOption } from "./viewer/basemap";
 
+import RestartIcon from "@nextgisweb/icon/material/restart_alt";
+
 const msgColoring = gettext("Coloring");
 const msgBasemap = gettext("Basemap");
 const msgPointSize = gettext("Point size");
 const msgNoBasemap = gettext("No basemap");
+const msgTerrain = gettext("Terrain");
+const msgOffset = gettext("Offset");
+const msgResetOffset = gettext("Reset offset");
+const msgMeters = gettext("m");
+
 const msgUnsupportedCrs = gettext(
   "Preview is not available for point clouds in geographic coordinate systems."
 );
 
 const NO_BASEMAP = "";
 const DEFAULT_POINT_SIZE = 2;
+
+const SAFE_URL_RE = new RegExp(pyramidSettings.urlSafePattern);
+
+interface Attribution {
+  text: string;
+  url?: string | null;
+}
+
+/** Data source attributions in the map corner, as OSM requires */
+function Attributions({ items }: { items: Attribution[] }) {
+  if (!items.length) return null;
+  return (
+    <div className="attribution">
+      {items.map(({ text, url }, idx) => (
+        <Fragment key={idx}>
+          {idx > 0 && " | "}
+          {url && SAFE_URL_RE.test(url) ? (
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              {text}
+            </a>
+          ) : (
+            text
+          )}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
 
 interface PointCloudPreviewProps {
   resourceId: number;
@@ -71,6 +118,8 @@ export default function PointCloudPreview({
 
   const [basemaps, setBasemaps] = useState<BasemapOption[]>([]);
   const [basemapKey, setBasemapKey] = useState<string>(NO_BASEMAP);
+  const [terrain, setTerrain] = useState(false);
+  const [offset, setOffset] = useState(0);
 
   // The viewer is created once and doesn't depend on the controls state
   const initialColoring = useRef(coloring);
@@ -137,12 +186,33 @@ export default function PointCloudPreview({
   }, [viewer, basemap]);
 
   useEffect(() => {
+    if (!viewer) return;
+    viewer
+      .setTerrain(terrain && settings.terrain ? settings.terrain.url : null)
+      .catch((err) => console.error(err));
+  }, [viewer, terrain]);
+
+  useEffect(() => {
+    viewer?.setVerticalOffset(offset);
+  }, [viewer, offset]);
+
+  useEffect(() => {
     viewer?.setColoring(coloring);
   }, [viewer, coloring]);
 
   useEffect(() => {
     viewer?.setPointSize(pointSize);
   }, [viewer, pointSize]);
+
+  const attributions: Attribution[] = [];
+  if (basemap?.config.copyright_text) {
+    const { copyright_text: text, copyright_url: url } = basemap.config;
+    attributions.push({ text, url });
+  }
+  if (terrain && settings.terrain?.copyright_text) {
+    const { copyright_text: text, copyright_url: url } = settings.terrain;
+    attributions.push({ text, url });
+  }
 
   const basemapOptions = useMemo(
     () => [
@@ -154,37 +224,54 @@ export default function PointCloudPreview({
 
   return (
     <div className="ngw-point-cloud-preview">
-      <Space wrap className="toolbar">
-        <Space>
-          {msgColoring}
-          <Select
-            value={coloring}
-            onChange={setColoring}
-            options={colorings}
-            popupMatchSelectWidth={false}
-          />
+      <Flex className="toolbar" wrap justify="space-between" gap="small">
+        <Space wrap>
+          <Space>
+            {msgColoring}
+            <Select
+              value={coloring}
+              onChange={setColoring}
+              options={colorings}
+              popupMatchSelectWidth={false}
+            />
+          </Space>
+          <Space>
+            {msgBasemap}
+            <Select
+              value={basemapKey}
+              onChange={setBasemapKey}
+              options={basemapOptions}
+              popupMatchSelectWidth={false}
+            />
+          </Space>
         </Space>
-        <Space>
-          {msgBasemap}
-          <Select
-            value={basemapKey}
-            onChange={setBasemapKey}
-            options={basemapOptions}
-            popupMatchSelectWidth={false}
-          />
-        </Space>
-        <Space>
-          {msgPointSize}
-          <Slider
-            className="point-size"
-            min={1}
-            max={8}
-            step={0.5}
-            value={pointSize}
-            onChange={setPointSize}
-          />
-        </Space>
-      </Space>
+        {settings.terrain && (
+          <Space wrap>
+            <Space>
+              {msgTerrain}
+              <Switch checked={terrain} onChange={setTerrain} />
+            </Space>
+            <Space>
+              {msgOffset}
+              <InputNumber
+                className="offset-input"
+                step={0.5}
+                value={offset}
+                onChange={(value) => setOffset(value ?? 0)}
+                suffix={msgMeters}
+                disabled={!terrain}
+              />
+              <Tooltip title={msgResetOffset}>
+                <Button
+                  icon={<RestartIcon />}
+                  disabled={!terrain || offset === 0}
+                  onClick={() => setOffset(0)}
+                />
+              </Tooltip>
+            </Space>
+          </Space>
+        )}
+      </Flex>
       {error && <Alert type="error" title={error} showIcon />}
       <div className="ngw-point-cloud-preview-canvas">
         {/* Giro3D expects an empty target element */}
@@ -192,10 +279,18 @@ export default function PointCloudPreview({
         {loading && (
           <CentralLoading style={{ position: "absolute", inset: 0 }} />
         )}
+        <div className="point-size">
+          {msgPointSize}
+          <Slider
+            min={1}
+            max={8}
+            step={0.5}
+            value={pointSize}
+            onChange={setPointSize}
+          />
+        </div>
+        <Attributions items={attributions} />
       </div>
-      {basemap?.config.copyright_text && (
-        <div className="attribution">{basemap.config.copyright_text}</div>
-      )}
     </div>
   );
 }
