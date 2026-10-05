@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,10 +17,28 @@ from nextgisweb.spatial_ref_sys import SRS
 SUPPORTED_POINT_FORMATS = (6, 7, 8)
 
 
+_AXIS_RE = re.compile(r',AXIS\["[^"]*",\w+\]')
+
+
 def _authority(crs: CRS) -> str | None:
     if (authority := crs.to_authority()) is None:
         return None
     return ":".join(authority)
+
+
+def _without_axes(sr: osr.SpatialReference) -> osr.SpatialReference:
+    """Remove axis definitions to compare coordinate systems regardless of the
+    axis order: LAS always stores easting in X and northing in Y, while EPSG
+    defines many projected coordinate systems with northing first"""
+
+    try:
+        return sr_from_wkt(_AXIS_RE.sub("", sr.ExportToWkt()))
+    except (RuntimeError, SpatialReferenceError):
+        return sr
+
+
+def _is_same(sr: osr.SpatialReference, srs: SRS) -> bool:
+    return bool(sr.IsSame(_without_axes(srs.to_osr())))
 
 
 @dataclass(kw_only=True)
@@ -33,6 +52,9 @@ class FileCRS:
     vertical_display_name: str | None = None
     vertical_auth: str | None = None
 
+    # Meters per unit of Z coordinates if it's defined by the CRS
+    z_unit_factor: float | None = None
+
     @classmethod
     def from_crs(cls, crs: CRS) -> FileCRS:
         vertical = None
@@ -41,8 +63,15 @@ class FileCRS:
         if crs.is_compound:
             crs, vertical = crs.sub_crs_list[0], crs.sub_crs_list[1]
 
+        if vertical is not None and vertical.axis_info:
+            z_unit_factor = vertical.axis_info[0].unit_conversion_factor
+        elif len(crs.axis_info) == 3:
+            z_unit_factor = crs.axis_info[2].unit_conversion_factor
+        else:
+            z_unit_factor = None
+
         try:
-            crs_osr = sr_from_wkt(crs.to_wkt())
+            crs_osr = _without_axes(sr_from_wkt(crs.to_wkt()))
         except SpatialReferenceError as exc:
             raise ValidationError(
                 message=gettext("Unable to parse the point cloud coordinate system.")
@@ -54,12 +83,13 @@ class FileCRS:
             osr=crs_osr,
             vertical_display_name=vertical.name if vertical else None,
             vertical_auth=_authority(vertical) if vertical else None,
+            z_unit_factor=z_unit_factor,
         )
 
     def is_same(self, srs: SRS) -> bool:
         if self.auth is not None and self.auth == f"{srs.auth_name}:{srs.auth_srid}":
             return True
-        return bool(self.osr.IsSame(srs.to_osr()))
+        return _is_same(self.osr, srs)
 
 
 @dataclass(kw_only=True)
@@ -78,6 +108,10 @@ class PointCloudInfo:
     has_classification: bool
     has_returns: bool
 
+    # Upper bound of RGB channel values: 65535 per LAS specification, but some
+    # files store 8-bit values
+    rgb_max: int | None
+
 
 def find_srs_candidates(crs: FileCRS) -> list[SRS]:
     """Find registered coordinate systems equivalent to the file one"""
@@ -92,7 +126,7 @@ def find_srs_candidates(crs: FileCRS) -> list[SRS]:
     # Coordinate systems added from WKT have no authority fields set, so look
     # for equivalent ones among all registered
     for srs in SRS.query().order_by(SRS.id):
-        if srs not in result and crs.osr.IsSame(srs.to_osr()):
+        if srs not in result and _is_same(crs.osr, srs):
             result.append(srs)
 
     return result
@@ -161,8 +195,17 @@ def inspect_copc(path: Path) -> PointCloudInfo:
                 message=gettext("Only COPC point formats 6, 7, and 8 are supported.")
             )
 
-        if len(reader.query(level=0)) == 0:
+        root = reader.query(level=0)
+        if len(root) == 0:
             raise ValidationError(message=gettext("The COPC hierarchy is empty or corrupted."))
+
+        has_rgb = point_format_id in (7, 8)
+        rgb_max = None
+        if has_rgb:
+            # Root node points are spread across the whole cloud, so they are
+            # enough to tell 8-bit colors from 16-bit ones
+            peak = max(int(root.red.max()), int(root.green.max()), int(root.blue.max()))
+            rgb_max = 255 if peak <= 255 else 65535
 
         try:
             crs = header.parse_crs()
@@ -185,8 +228,9 @@ def inspect_copc(path: Path) -> PointCloudInfo:
             zmin=zmin,
             zmax=zmax,
             # PDRF 6-8 always contain intensity, classification and returns
-            has_rgb=point_format_id in (7, 8),
+            has_rgb=has_rgb,
             has_intensity=True,
             has_classification=True,
             has_returns=True,
+            rgb_max=rgb_max,
         )

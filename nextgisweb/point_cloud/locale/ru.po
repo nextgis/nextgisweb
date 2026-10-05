@@ -6,61 +6,61 @@ msgstr "Облака точек"
 msgid "Point cloud layer"
 msgstr "Слой облака точек"
 
-#: model.py:125
+#: model.py:141
 msgid "Point count"
 msgstr "Количество точек"
 
-#: model.py:126 nodepkg/layer-widget/EditorWidget.tsx:24
+#: model.py:142 nodepkg/layer-widget/EditorWidget.tsx:24
 msgid "Point format"
 msgstr "Формат точек"
 
-#: model.py:210 nodepkg/style-widget/EditorWidget.tsx:215
+#: model.py:243 nodepkg/style-widget/EditorWidget.tsx:215
 msgid "Point cloud style"
 msgstr "Стиль облака точек"
 
-#: model.py:226
+#: model.py:259
 msgid "Point size must be greater than zero."
 msgstr "Размер точки должен быть больше нуля."
 
-#: model.py:228
+#: model.py:261
 msgid "Opacity must be between 0 and 100."
 msgstr "Непрозрачность должна быть от 0 до 100."
 
-#: model.py:231
+#: model.py:264
 msgid "Point budget must be between {min} and {max}."
 msgstr "Бюджет точек должен быть от {min} до {max}."
 
-#: model.py:237
+#: model.py:270
 msgid "Minimum elevation percentile must be between 0 and 100."
 msgstr "Минимальный процентиль высоты должен быть от 0 до 100."
 
-#: model.py:241
+#: model.py:274
 msgid "Maximum elevation percentile must be between 0 and 100."
 msgstr "Максимальный процентиль высоты должен быть от 0 до 100."
 
-#: model.py:246
+#: model.py:279
 msgid "Minimum elevation percentile must be less than maximum percentile."
 msgstr "Минимальный процентиль высоты должен быть меньше максимального процентиля."
 
-#: model.py:253
+#: model.py:286
 msgid "RGB styling is available only for point clouds with RGB data."
 msgstr "Стиль RGB доступен только для облаков точек с данными RGB."
 
-#: model.py:258
+#: model.py:291
 msgid "Classification styling is available only when classification data is present."
 msgstr "Стиль по классификации доступен только при наличии данных классификации."
 
-#: model.py:264
+#: model.py:297
 msgid "Intensity styling is available only when intensity data is present."
 msgstr "Стиль по интенсивности доступен только при наличии данных интенсивности."
 
-#: model.py:270
+#: model.py:303
 msgid "Return number styling is available only when return information is present."
 msgstr ""
 "Стиль по номеру отражения доступен только при наличии информации об "
 "отражениях."
 
-#: model.py:277 nodepkg/style-widget/EditorWidget.tsx:30
+#: model.py:310 nodepkg/style-widget/EditorWidget.tsx:30
 msgid "Mode"
 msgstr "Режим"
 
@@ -128,9 +128,50 @@ msgstr ""
 "Слой создан. С помощью кнопки можно создать ресурс стиля облака точек по "
 "умолчанию."
 
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:21
+msgid "Coloring"
+msgstr "Окраска"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:22
+msgid "Basemap"
+msgstr "Подложка"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:23
 #: nodepkg/style-widget/EditorWidget.tsx:31
 msgid "Point size"
 msgstr "Размер точки"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:24
+msgid "No basemap"
+msgstr "Без подложки"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:25
+msgid "Preview is not available for point clouds in geographic coordinate systems."
+msgstr "Предпросмотр недоступен для облаков точек в географических системах координат."
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:45
+msgid "RGB"
+msgstr "RGB"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:46
+msgid "Elevation"
+msgstr "Высота"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:48
+msgid "Classification"
+msgstr "Классификация"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:51
+msgid "Intensity"
+msgstr "Интенсивность"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:54
+msgid "Return number"
+msgstr "Номер отражения"
+
+#: nodepkg/resource-section/preview/PointCloudResourceSectionPreview.tsx:35
+msgid "Preview"
+msgstr "Предпросмотр"
 
 #: nodepkg/style-widget/EditorWidget.tsx:32
 msgid "Opacity"
@@ -212,11 +253,11 @@ msgstr "Корректировать цвета с учётом значений
 msgid "Map classification codes to colors, one per line."
 msgstr "Задайте соответствие кодов классификации цветам, по одному на строку."
 
-#: validation.py:48 validation.py:171
+#: validation.py:77 validation.py:214
 msgid "Unable to parse the point cloud coordinate system."
 msgstr "Не удалось разобрать систему координат облака точек."
 
-#: validation.py:108
+#: validation.py:142
 msgid ""
 "The specified coordinate system does not match the coordinate system of the "
 "point cloud file."
@@ -224,11 +265,11 @@ msgstr ""
 "Указанная система координат не соответствует системе координат файла облака "
 "точек."
 
-#: validation.py:117
+#: validation.py:151
 msgid "The point cloud file has no coordinate system info. Specify it manually."
 msgstr "В файле облака точек нет информации о системе координат. Укажите её вручную."
 
-#: validation.py:128
+#: validation.py:162
 msgid ""
 "Several matching coordinate systems are registered in NextGIS Web. Specify "
 "one of them."
@@ -236,7 +277,7 @@ msgstr ""
 "В NextGIS Web зарегистрировано несколько подходящих систем координат. Укажите"
 " одну из них."
 
-#: validation.py:136
+#: validation.py:170
 msgid ""
 "The point cloud coordinate system could not be identified. Make sure the file"
 " has a recognized EPSG coordinate system."
@@ -244,7 +285,7 @@ msgstr ""
 "Система координат облака точек не может быть определена. Убедитесь, что файл "
 "имеет распознанную систему координат EPSG."
 
-#: validation.py:143
+#: validation.py:177
 msgid ""
 "The point cloud coordinate system ({auth}) is not registered in NextGIS Web. "
 "Add it to the list of supported coordinate systems first."
@@ -252,15 +293,15 @@ msgstr ""
 "Система координат облака точек ({auth}) не зарегистрирована в NextGIS Web. "
 "Сначала добавьте её в список поддерживаемых систем координат."
 
-#: validation.py:154
+#: validation.py:188
 msgid "Invalid COPC point cloud."
 msgstr "Некорректное облако точек COPC."
 
-#: validation.py:161
+#: validation.py:195
 msgid "Only COPC point formats 6, 7, and 8 are supported."
 msgstr "Поддерживаются только форматы точек COPC 6, 7 и 8."
 
-#: validation.py:165
+#: validation.py:200
 msgid "The COPC hierarchy is empty or corrupted."
 msgstr "Иерархия COPC пуста или повреждена."
 

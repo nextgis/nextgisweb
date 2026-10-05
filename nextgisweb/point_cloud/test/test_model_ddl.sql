@@ -15,6 +15,8 @@ CREATE TABLE point_cloud_layer (
     has_intensity boolean NOT NULL,
     has_classification boolean NOT NULL,
     has_returns boolean NOT NULL,
+    z_unit_factor double precision,
+    rgb_max integer,
     srs_id integer NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (id) REFERENCES resource (id),

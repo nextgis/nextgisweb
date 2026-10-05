@@ -1,0 +1,26 @@
+.ngw-point-cloud-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .toolbar .point-size {
+    width: 120px;
+  }
+
+  .attribution {
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+}
+
+.ngw-point-cloud-preview-canvas {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  overflow: hidden;
+
+  > .target {
+    position: absolute;
+    inset: 0;
+  }
+}

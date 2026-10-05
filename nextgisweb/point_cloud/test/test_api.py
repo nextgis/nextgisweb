@@ -1,7 +1,9 @@
 from pathlib import Path
 from unittest.mock import patch
 
+import numpy as np
 import pytest
+from osgeo import osr
 from pyproj import CRS
 
 from nextgisweb.env import DBSession
@@ -13,7 +15,13 @@ from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource.test import ResourceAPI
 from nextgisweb.spatial_ref_sys import SRS
 
-from ..validation import FileCRS, find_srs_candidates, inspect_copc, resolve_srs
+from ..validation import (
+    _AXIS_RE,
+    FileCRS,
+    find_srs_candidates,
+    inspect_copc,
+    resolve_srs,
+)
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -37,10 +45,21 @@ class _FakeHeader:
         return self._crs
 
 
+class _FakePoints:
+    def __init__(self, npoints, rgb_peak):
+        self._npoints = npoints
+        self.red = self.green = np.array([0] * npoints, dtype=np.uint16)
+        self.blue = np.array([rgb_peak] * npoints, dtype=np.uint16)
+
+    def __len__(self):
+        return self._npoints
+
+
 class _FakeReader:
-    def __init__(self, header, npoints):
+    def __init__(self, header, npoints, rgb_peak):
         self.header = header
         self._npoints = npoints
+        self._rgb_peak = rgb_peak
 
     def __enter__(self):
         return self
@@ -50,7 +69,7 @@ class _FakeReader:
 
     def query(self, *, level):
         assert level == 0
-        return [None] * self._npoints
+        return _FakePoints(self._npoints, self._rgb_peak)
 
 
 def fake_copc(
@@ -60,11 +79,12 @@ def fake_copc(
     maxs=(MERCATOR_MAX, MERCATOR_MAX, 6.0),
     crs=CRS.from_epsg(3857),
     npoints=1,
+    rgb_peak=65535,
 ):
     header = _FakeHeader(point_format_id=point_format_id, mins=mins, maxs=maxs, crs=crs)
     return patch(
         "nextgisweb.point_cloud.validation.CopcReader.open",
-        return_value=_FakeReader(header, npoints),
+        return_value=_FakeReader(header, npoints, rgb_peak),
     )
 
 
@@ -90,6 +110,34 @@ def test_inspect_compound_crs(ngw_txn):
     assert [srs.id for srs in find_srs_candidates(info.crs)] == [3857]
 
 
+@pytest.mark.parametrize(
+    "point_format_id, rgb_peak, rgb_max",
+    [
+        pytest.param(7, 65535, 65535, id="16-bit"),
+        pytest.param(7, 200, 255, id="8-bit"),
+        pytest.param(6, 0, None, id="no-rgb"),
+    ],
+)
+def test_inspect_rgb_max(point_format_id, rgb_peak, rgb_max, ngw_txn):
+    with fake_copc(point_format_id=point_format_id, rgb_peak=rgb_peak):
+        info = inspect_copc(Path("test.copc.laz"))
+    assert info.rgb_max == rgb_max
+
+
+@pytest.mark.parametrize(
+    "crs_input, z_unit_factor",
+    [
+        pytest.param("EPSG:3857", None, id="horizontal"),
+        pytest.param("EPSG:3857+5773", 1.0, id="compound-meters"),
+        pytest.param("EPSG:2263+6360", 0.3048006096, id="compound-feet"),
+        pytest.param("EPSG:4979", 1.0, id="geographic-3d"),
+    ],
+)
+def test_z_unit_factor(crs_input, z_unit_factor, ngw_txn):
+    crs = FileCRS.from_crs(CRS.from_user_input(crs_input))
+    assert crs.z_unit_factor == (pytest.approx(z_unit_factor) if z_unit_factor else None)
+
+
 @pytest.fixture
 def srs_without_authority(ngw_txn):
     # Coordinate system added from WKT has no authority fields set
@@ -106,6 +154,25 @@ def srs_without_authority(ngw_txn):
 def test_candidates_without_authority(crs_input, srs_without_authority):
     crs = FileCRS.from_crs(CRS.from_user_input(crs_input))
     assert find_srs_candidates(crs) == [srs_without_authority]
+
+
+@pytest.mark.parametrize("axes", [True, False], ids=["with-axes", "without-axes"])
+def test_candidates_northing_first(axes, ngw_txn):
+    # EPSG:3301 defines northing as the first axis, while coordinate systems
+    # added from WKT usually omit axes, implying easting first
+    sr = osr.SpatialReference()
+    sr.ImportFromEPSG(3301)
+    wkt = sr.ExportToWkt()
+    assert ',AXIS["Northing",NORTH]' in wkt
+    if not axes:
+        wkt = _AXIS_RE.sub("", wkt)
+    srs = SRS(wkt=wkt, display_name="Estonian Coordinate System of 1997").persist()
+    DBSession.flush()
+
+    crs = FileCRS.from_crs(CRS.from_epsg(3301))
+    # The same coordinate system may already be registered
+    assert srs in find_srs_candidates(crs)
+    assert crs.is_same(srs)
 
 
 def test_candidates_none(ngw_txn):
@@ -243,6 +310,18 @@ def test_create(layer_id, ngw_webtest_app: WebTestApp):
     assert data["point_format_id"] == 7
     assert data["has_rgb"] is True
     assert data["srs_proj4"]
+    assert data["z_unit_factor"] is None
+    assert data["z_scale"] == 1.0
+
+
+def test_z_scale(source_upload, ngw_resource_group, ngw_webtest_app: WebTestApp):
+    with fake_copc(crs=CRS.from_user_input("EPSG:3857+6360")):
+        layer_id = create_layer(source_upload, ngw_resource_group)
+
+    resp = ngw_webtest_app.get(f"/api/resource/{layer_id}", status=200)
+    data = resp.json["point_cloud_layer"]
+    assert data["z_unit_factor"] == pytest.approx(0.3048006096)
+    assert data["z_scale"] == pytest.approx(0.3048006096)
 
 
 def test_create_without_source(ngw_resource_group):

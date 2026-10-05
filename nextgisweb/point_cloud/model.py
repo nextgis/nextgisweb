@@ -78,6 +78,13 @@ class PointCloudLayer(SpatialLayerMixin, Resource):
     has_classification: Mapped[bool] = mapped_column(sa.Boolean, nullable=False)
     has_returns: Mapped[bool] = mapped_column(sa.Boolean, nullable=False)
 
+    # Meters per unit of Z coordinates as defined by the file CRS, NULL means
+    # Z coordinates are in units of the horizontal CRS
+    z_unit_factor: Mapped[float | None] = mapped_column(sa.Float)
+
+    # Upper bound of RGB channel values: 255 or 65535, NULL without RGB
+    rgb_max: Mapped[int | None] = mapped_column(sa.Integer)
+
     fileobj: Mapped[FileObj] = relationship(foreign_keys=[fileobj_id], cascade="all")
 
     @classmethod
@@ -106,6 +113,8 @@ class PointCloudLayer(SpatialLayerMixin, Resource):
         self.has_intensity = info.has_intensity
         self.has_classification = info.has_classification
         self.has_returns = info.has_returns
+        self.z_unit_factor = info.crs.z_unit_factor if info.crs is not None else None
+        self.rgb_max = info.rgb_max
 
         if diff := estimate_point_cloud_data(self) - old_size:
             core.reserve_storage(
@@ -164,6 +173,19 @@ class SrsProj4Attr(SAttribute):
         return srs.proj4 if srs is not None else None
 
 
+class ZScaleAttr(SAttribute):
+    """Multiplier converting Z coordinates to horizontal CRS units"""
+
+    def get(self, srlzr: Serializer) -> float:
+        sr = srlzr.obj.srs.to_osr()
+        if sr.IsGeographic():
+            # Horizontal units are angular, nothing to convert to
+            return 1.0
+        xy_factor = sr.GetLinearUnits()
+        z_factor = srlzr.obj.z_unit_factor
+        return (z_factor if z_factor is not None else xy_factor) / xy_factor
+
+
 class PointCloudLayerSerializer(Serializer, resource=PointCloudLayer):
     srs = SrsAttr(read=ResourceScope.read, write=DataScope.write, required=False)
     srs_proj4 = SrsProj4Attr(read=ResourceScope.read)
@@ -184,6 +206,10 @@ class PointCloudLayerSerializer(Serializer, resource=PointCloudLayer):
     has_intensity = SColumn(read=ResourceScope.read)
     has_classification = SColumn(read=ResourceScope.read)
     has_returns = SColumn(read=ResourceScope.read)
+    rgb_max = SColumn(read=ResourceScope.read)
+
+    z_unit_factor = SColumn(read=ResourceScope.read)
+    z_scale = ZScaleAttr(read=ResourceScope.read)
 
 
 POINT_BUDGET_DEFAULT = 120000

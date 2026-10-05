@@ -5,7 +5,7 @@ from nextgisweb.env import DBSession, gettext
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
 from nextgisweb.pyramid.tomb import Request
-from nextgisweb.resource import Widget
+from nextgisweb.resource import DataScope, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
@@ -79,6 +79,12 @@ def resource_section_default_style(obj, *, request, **kwargs):
             )
         )
     )
+
+
+@resource_sections("@nextgisweb/point-cloud/resource-section/preview")
+def resource_section_preview(obj, *, request, **kwargs):
+    # COPC data access requires data read permission
+    return isinstance(obj, PointCloudLayer) and obj.has_permission(DataScope.read, request.user)
 
 
 class PointBudgetClientSetting(Struct, kw_only=True):

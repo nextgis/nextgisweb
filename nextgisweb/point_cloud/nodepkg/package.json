@@ -3,8 +3,16 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
+    "@giro3d/giro3d": "2.0.4",
+    "@types/three": "~0.180.0",
     "copc": "^0.0.8",
     "laz-perf": "^0.0.7",
-    "proj4": "^2.20.9"
+    "proj4": "^2.20.9",
+    "three": "~0.180.0"
+  },
+  "nextgisweb": {
+    "rsbuildConfigs": {
+      "main": "rsbuild.main.ts"
+    }
   }
 }
