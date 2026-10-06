@@ -1,68 +1,18 @@
-#: model.py:50
+#: model.py:37
 msgid "Point clouds"
 msgstr "Облака точек"
 
-#: model.py:60 nodepkg/layer-widget/EditorWidget.tsx:220
+#: model.py:47 nodepkg/layer-widget/EditorWidget.tsx:220
 msgid "Point cloud layer"
 msgstr "Слой облака точек"
 
-#: model.py:141
+#: model.py:128
 msgid "Point count"
 msgstr "Количество точек"
 
-#: model.py:142 nodepkg/layer-widget/EditorWidget.tsx:24
+#: model.py:129 nodepkg/layer-widget/EditorWidget.tsx:24
 msgid "Point format"
 msgstr "Формат точек"
-
-#: model.py:243 nodepkg/style-widget/EditorWidget.tsx:215
-msgid "Point cloud style"
-msgstr "Стиль облака точек"
-
-#: model.py:259
-msgid "Point size must be greater than zero."
-msgstr "Размер точки должен быть больше нуля."
-
-#: model.py:261
-msgid "Opacity must be between 0 and 100."
-msgstr "Непрозрачность должна быть от 0 до 100."
-
-#: model.py:264
-msgid "Point budget must be between {min} and {max}."
-msgstr "Бюджет точек должен быть от {min} до {max}."
-
-#: model.py:270
-msgid "Minimum elevation percentile must be between 0 and 100."
-msgstr "Минимальный процентиль высоты должен быть от 0 до 100."
-
-#: model.py:274
-msgid "Maximum elevation percentile must be between 0 and 100."
-msgstr "Максимальный процентиль высоты должен быть от 0 до 100."
-
-#: model.py:279
-msgid "Minimum elevation percentile must be less than maximum percentile."
-msgstr "Минимальный процентиль высоты должен быть меньше максимального процентиля."
-
-#: model.py:286
-msgid "RGB styling is available only for point clouds with RGB data."
-msgstr "Стиль RGB доступен только для облаков точек с данными RGB."
-
-#: model.py:291
-msgid "Classification styling is available only when classification data is present."
-msgstr "Стиль по классификации доступен только при наличии данных классификации."
-
-#: model.py:297
-msgid "Intensity styling is available only when intensity data is present."
-msgstr "Стиль по интенсивности доступен только при наличии данных интенсивности."
-
-#: model.py:303
-msgid "Return number styling is available only when return information is present."
-msgstr ""
-"Стиль по номеру отражения доступен только при наличии информации об "
-"отражениях."
-
-#: model.py:310 nodepkg/style-widget/EditorWidget.tsx:30
-msgid "Mode"
-msgstr "Режим"
 
 #: nodepkg/layer-widget/EditorWidget.tsx:20
 msgid "Select a dataset"
@@ -116,158 +66,65 @@ msgstr "Добавить в Веб ГИС"
 msgid "Check again"
 msgstr "Проверить снова"
 
-#: nodepkg/resource-section/default-style/PointCloudResourceSectionDefaultStyle.tsx:14
-msgid "Create default point cloud style"
-msgstr "Создать стиль облака точек по умолчанию"
-
-#: nodepkg/resource-section/default-style/PointCloudResourceSectionDefaultStyle.tsx:15
-msgid ""
-"Layer created. You can generate a default point cloud style resource using "
-"the button."
-msgstr ""
-"Слой создан. С помощью кнопки можно создать ресурс стиля облака точек по "
-"умолчанию."
-
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:34
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:35
 msgid "Coloring"
 msgstr "Окраска"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:35
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:36
 msgid "Basemap"
 msgstr "Подложка"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:36
-#: nodepkg/style-widget/EditorWidget.tsx:31
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:37
 msgid "Point size"
 msgstr "Размер точки"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:37
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:38
 msgid "No basemap"
 msgstr "Без подложки"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:38
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:39
 msgid "Terrain"
 msgstr "Рельеф"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:39
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:40
 msgid "Offset"
 msgstr "Смещение"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:40
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:41
 msgid "Reset offset"
 msgstr "Сбросить смещение"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:41
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:42
 msgid "m"
 msgstr "м"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:43
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:44
 msgid "Preview is not available for point clouds in geographic coordinate systems."
 msgstr "Предпросмотр недоступен для облаков точек в географических системах координат."
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:63
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:92
 msgid "RGB"
 msgstr "RGB"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:64
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:93
 msgid "Elevation"
 msgstr "Высота"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:66
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:95
 msgid "Classification"
 msgstr "Классификация"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:69
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:98
 msgid "Intensity"
 msgstr "Интенсивность"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:72
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:101
 msgid "Return number"
 msgstr "Номер отражения"
 
 #: nodepkg/resource-section/preview/PointCloudResourceSectionPreview.tsx:35
 msgid "Preview"
 msgstr "Предпросмотр"
-
-#: nodepkg/style-widget/EditorWidget.tsx:32
-msgid "Opacity"
-msgstr "Непрозрачность"
-
-#: nodepkg/style-widget/EditorWidget.tsx:33
-msgid "Point budget"
-msgstr "Бюджет точек"
-
-#: nodepkg/style-widget/EditorWidget.tsx:34
-msgid "Use percentile clipping"
-msgstr "Использовать отсечение по процентилям"
-
-#: nodepkg/style-widget/EditorWidget.tsx:35
-msgid "Elevation min percentile"
-msgstr "Минимальный процентиль высоты"
-
-#: nodepkg/style-widget/EditorWidget.tsx:36
-msgid "Elevation max percentile"
-msgstr "Максимальный процентиль высоты"
-
-#: nodepkg/style-widget/EditorWidget.tsx:37
-msgid "Ramp start color"
-msgstr "Начальный цвет шкалы"
-
-#: nodepkg/style-widget/EditorWidget.tsx:38
-msgid "Ramp end color"
-msgstr "Конечный цвет шкалы"
-
-#: nodepkg/style-widget/EditorWidget.tsx:39
-msgid "Modulate by intensity"
-msgstr "Модулировать по интенсивности"
-
-#: nodepkg/style-widget/EditorWidget.tsx:40
-msgid "Classification colors"
-msgstr "Цвета классов"
-
-#: nodepkg/style-widget/EditorWidget.tsx:56
-msgid "Choose how point cloud colors are calculated."
-msgstr "Выберите способ вычисления цветов облака точек."
-
-#: nodepkg/style-widget/EditorWidget.tsx:57
-msgid "Sets the rendered size of each point."
-msgstr "Задаёт отображаемый размер каждой точки."
-
-#: nodepkg/style-widget/EditorWidget.tsx:58
-msgid "Controls overall transparency of the point cloud."
-msgstr "Управляет общей прозрачностью облака точек."
-
-#: nodepkg/style-widget/EditorWidget.tsx:59
-msgid "Maximum number of points rendered in the current view."
-msgstr "Максимальное количество точек, отображаемых в текущей области просмотра."
-
-#: nodepkg/style-widget/EditorWidget.tsx:60
-msgid "Ignore extreme elevation outliers when coloring points."
-msgstr "Игнорировать экстремальные выбросы высоты при окрашивании точек."
-
-#: nodepkg/style-widget/EditorWidget.tsx:61
-msgid "Lower elevation percentile used for color ramp scaling."
-msgstr "Нижний процентиль высоты для масштабирования цветовой шкалы."
-
-#: nodepkg/style-widget/EditorWidget.tsx:62
-msgid "Upper elevation percentile used for color ramp scaling."
-msgstr "Верхний процентиль высоты для масштабирования цветовой шкалы."
-
-#: nodepkg/style-widget/EditorWidget.tsx:63
-msgid "Color assigned to the lowest elevations in range."
-msgstr "Цвет, назначаемый минимальным высотам диапазона."
-
-#: nodepkg/style-widget/EditorWidget.tsx:64
-msgid "Color assigned to the highest elevations in range."
-msgstr "Цвет, назначаемый максимальным высотам диапазона."
-
-#: nodepkg/style-widget/EditorWidget.tsx:65
-msgid "Adjust colors using point intensity values."
-msgstr "Корректировать цвета с учётом значений интенсивности точек."
-
-#: nodepkg/style-widget/EditorWidget.tsx:66
-msgid "Map classification codes to colors, one per line."
-msgstr "Задайте соответствие кодов классификации цветам, по одному на строку."
 
 #: validation.py:77 validation.py:214
 msgid "Unable to parse the point cloud coordinate system."
@@ -321,11 +178,11 @@ msgstr "Поддерживаются только форматы точек COPC
 msgid "The COPC hierarchy is empty or corrupted."
 msgstr "Иерархия COPC пуста или повреждена."
 
-#: view.py:46
+#: view.py:25
 msgid "Cloud Optimized Point Cloud"
 msgstr "Cloud Optimized Point Cloud"
 
-#: view.py:48
+#: view.py:27
 msgid ""
 "A Cloud Optimized Point Cloud (COPC) is a LAZ file with an internal "
 "organization that allows clients to read only the parts they need using HTTP "

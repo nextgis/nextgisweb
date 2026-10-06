@@ -10,7 +10,6 @@ from nextgisweb.env import DBSession
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.point_cloud import PointCloudLayer
-from nextgisweb.point_cloud.model import POINT_BUDGET_DEFAULT, POINT_BUDGET_MAX
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource.test import ResourceAPI
 from nextgisweb.spatial_ref_sys import SRS
@@ -391,55 +390,3 @@ def test_copc_external_access(layer_id, ngw_webtest_app: WebTestApp):
     url = f"/api/resource/{layer_id}/point_cloud.copc.laz"
     page = ngw_webtest_app.get(f"/resource/{layer_id}", status=200)
     assert url in page.text
-
-
-def test_style_parent_and_value(layer_id, ngw_resource_group):
-    style_value = {
-        "mode": "classification",
-        "point_size": 3,
-        "opacity": 90,
-        "use_percentile_clip": True,
-        "elevation_min_percent": 2,
-        "elevation_max_percent": 98,
-        "ramp_start_color": "#2b83ba",
-        "ramp_end_color": "#fdae61",
-        "intensity_modulation": True,
-        "classification_colors": [{"code": 2, "color": "#8c510a"}],
-    }
-
-    style_id = ResourceAPI().create(
-        "point_cloud_style",
-        {
-            "resource": {"parent": {"id": layer_id}},
-            "point_cloud_style": {"value": style_value},
-        },
-    )
-
-    data = ResourceAPI().read(style_id)
-    assert data["point_cloud_style"]["value"]["mode"] == "classification"
-
-    ResourceAPI().create_request(
-        "point_cloud_style",
-        {
-            "resource": {"parent": {"id": ngw_resource_group}},
-            "point_cloud_style": {"value": style_value},
-        },
-        status=422,
-    )
-
-
-def test_point_budget(layer_id, ngw_webtest_app: WebTestApp):
-    settings = ngw_webtest_app.get(
-        "/api/component/pyramid/settings", query={"component": "point_cloud"}
-    ).json
-    assert settings["pointBudget"]["default"] == POINT_BUDGET_DEFAULT
-
-    def payload(**style):
-        return {"resource": {"parent": {"id": layer_id}}, "point_cloud_style": style}
-
-    style_id = ResourceAPI().create("point_cloud_style", payload())
-    value = ResourceAPI().read(style_id)["point_cloud_style"]["value"]
-    assert value["point_budget"] == POINT_BUDGET_DEFAULT
-
-    value["point_budget"] = POINT_BUDGET_MAX + 1
-    ResourceAPI().create_request("point_cloud_style", payload(value=value), status=422)

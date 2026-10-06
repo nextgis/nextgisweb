@@ -25,14 +25,3 @@ CREATE TABLE point_cloud_layer (
 );
 
 COMMENT ON TABLE point_cloud_layer IS 'point_cloud';
-
-/*** Table: point_cloud_style ***/
-
-CREATE TABLE point_cloud_style (
-    id integer NOT NULL,
-    point_cloud_style_value jsonb NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (id) REFERENCES resource (id)
-);
-
-COMMENT ON TABLE point_cloud_style IS 'point_cloud';
