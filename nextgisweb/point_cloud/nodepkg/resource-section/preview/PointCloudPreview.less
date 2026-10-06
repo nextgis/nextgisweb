@@ -20,7 +20,7 @@
   }
 
   // Controls and attribution over the map, like OpenLayers ones on web maps
-  > .point-size,
+  > .display-settings,
   > .attribution {
     position: absolute;
     right: 0;
@@ -28,11 +28,12 @@
     color: #333;
   }
 
-  > .point-size {
-    display: flex;
+  > .display-settings {
+    display: grid;
     top: 0;
+    grid-template-columns: auto auto;
     align-items: center;
-    gap: 8px;
+    gap: 4px 8px;
     border-bottom-left-radius: 4px;
     padding: 2px 8px;
 

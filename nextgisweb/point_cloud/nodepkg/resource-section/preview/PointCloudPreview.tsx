@@ -19,6 +19,8 @@ import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import {
+  DEFAULT_EDL_RADIUS,
+  DEFAULT_EDL_STRENGTH,
   PointCloudViewer,
   UnsupportedCoordinateSystemError,
 } from "./viewer/PointCloudViewer";
@@ -35,6 +37,9 @@ import RestartIcon from "@nextgisweb/icon/material/restart_alt";
 const msgColoring = gettext("Coloring");
 const msgBasemap = gettext("Basemap");
 const msgPointSize = gettext("Point size");
+const msgAuto = gettext("Auto");
+const msgShading = gettext("Shading");
+const msgEdgeWidth = gettext("Edge width");
 const msgNoBasemap = gettext("No basemap");
 const msgTerrain = gettext("Terrain");
 const msgOffset = gettext("Offset");
@@ -46,7 +51,14 @@ const msgUnsupportedCrs = gettext(
 );
 
 const NO_BASEMAP = "";
-const DEFAULT_POINT_SIZE = 2;
+// Zero lets Giro3D size points automatically, it also gives the densest level
+// of detail as the point size is a part of the screen space error
+const DEFAULT_POINT_SIZE = 0;
+
+/** Marks the default value on a slider, empty labels are ignored by antd */
+function defaultMark(value: number) {
+  return { [value]: " " };
+}
 
 const SAFE_URL_RE = new RegExp(pyramidSettings.urlSafePattern);
 
@@ -115,6 +127,8 @@ export default function PointCloudPreview({
   const colorings = useMemo(() => coloringOptions(data), [data]);
   const [coloring, setColoring] = useState<ColoringMode>(colorings[0].value);
   const [pointSize, setPointSize] = useState(DEFAULT_POINT_SIZE);
+  const [edlStrength, setEDLStrength] = useState(DEFAULT_EDL_STRENGTH);
+  const [edlRadius, setEDLRadius] = useState(DEFAULT_EDL_RADIUS);
 
   const [basemaps, setBasemaps] = useState<BasemapOption[]>([]);
   const [basemapKey, setBasemapKey] = useState<string>(NO_BASEMAP);
@@ -204,6 +218,14 @@ export default function PointCloudPreview({
     viewer?.setPointSize(pointSize);
   }, [viewer, pointSize]);
 
+  useEffect(() => {
+    viewer?.setEDLStrength(edlStrength);
+  }, [viewer, edlStrength]);
+
+  useEffect(() => {
+    viewer?.setEDLRadius(edlRadius);
+  }, [viewer, edlRadius]);
+
   const attributions: Attribution[] = [];
   if (basemap?.config.copyright_text) {
     const { copyright_text: text, copyright_url: url } = basemap.config;
@@ -279,14 +301,34 @@ export default function PointCloudPreview({
         {loading && (
           <CentralLoading style={{ position: "absolute", inset: 0 }} />
         )}
-        <div className="point-size">
+        <div className="display-settings">
           {msgPointSize}
           <Slider
-            min={1}
+            min={0}
             max={8}
             step={0.5}
             value={pointSize}
             onChange={setPointSize}
+            marks={defaultMark(DEFAULT_POINT_SIZE)}
+            tooltip={{ formatter: (v) => (v ? v : msgAuto) }}
+          />
+          {msgShading}
+          <Slider
+            min={0}
+            max={5}
+            step={0.1}
+            value={edlStrength}
+            onChange={setEDLStrength}
+            marks={defaultMark(DEFAULT_EDL_STRENGTH)}
+          />
+          {msgEdgeWidth}
+          <Slider
+            min={0.5}
+            max={4}
+            step={0.1}
+            value={edlRadius}
+            onChange={setEDLRadius}
+            marks={defaultMark(DEFAULT_EDL_RADIUS)}
           />
         </div>
         <Attributions items={attributions} />

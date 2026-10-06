@@ -7,6 +7,7 @@ import { ElevationLayer } from "@giro3d/giro3d/core/layer/ElevationLayer.js";
 import Giro3DMap from "@giro3d/giro3d/entities/Map.js";
 import { MapLightingMode } from "@giro3d/giro3d/entities/MapLightingOptions.js";
 import PointCloud from "@giro3d/giro3d/entities/PointCloud.js";
+import RenderingOptions from "@giro3d/giro3d/renderer/RenderingOptions.js";
 import COPCSource from "@giro3d/giro3d/sources/COPCSource.js";
 import TiledImageSource from "@giro3d/giro3d/sources/TiledImageSource.js";
 import type { TiledImageSourceOptions } from "@giro3d/giro3d/sources/TiledImageSource.js";
@@ -28,6 +29,12 @@ import { TerrariumFormat } from "./TerrariumFormat";
  * from its options instead of referencing UrlTile directly.
  */
 export type TileSource = TiledImageSourceOptions["source"];
+
+const defaultRenderingOptions = new RenderingOptions();
+
+/** Giro3D defaults of Eye-Dome Lighting parameters */
+export const DEFAULT_EDL_STRENGTH = defaultRenderingOptions.EDLStrength;
+export const DEFAULT_EDL_RADIUS = defaultRenderingOptions.EDLRadius;
 
 export type ColoringMode =
   | "elevation"
@@ -60,7 +67,6 @@ const RGB_CHANNELS = ["Red", "Green", "Blue"] as const;
 
 const BACKGROUND_COLOR = "#f0f0f0";
 const MAP_BACKGROUND_COLOR = "#d9d9d9";
-const POINT_BUDGET = 2_000_000;
 
 // Point cloud surroundings shown on the basemap, relative to its size
 const MAP_MARGIN_RATIO = 1;
@@ -209,7 +215,6 @@ export class PointCloudViewer {
         ).href,
       }),
     });
-    this.pointCloud.pointBudget = POINT_BUDGET;
 
     // Convert Z to horizontal units and put the lowest point on the basemap
     const object3d = this.pointCloud.object3d;
@@ -252,6 +257,18 @@ export class PointCloudViewer {
   setPointSize(size: number) {
     this.pointSize = size;
     if (this.loaded) this.applyPointSize();
+  }
+
+  /** Sets Eye-Dome Lighting strength, zero disables shading */
+  setEDLStrength(strength: number) {
+    this.instance.renderingOptions.EDLStrength = strength;
+    this.instance.notifyChange();
+  }
+
+  /** Sets Eye-Dome Lighting radius in pixels */
+  setEDLRadius(radius: number) {
+    this.instance.renderingOptions.EDLRadius = radius;
+    this.instance.notifyChange();
   }
 
   /** Replaces the basemap, `null` source removes it */

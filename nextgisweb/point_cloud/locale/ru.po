@@ -66,59 +66,71 @@ msgstr "Добавить в Веб ГИС"
 msgid "Check again"
 msgstr "Проверить снова"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:35
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:37
 msgid "Coloring"
 msgstr "Окраска"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:36
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:38
 msgid "Basemap"
 msgstr "Подложка"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:37
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:39
 msgid "Point size"
 msgstr "Размер точки"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:38
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:40
+msgid "Auto"
+msgstr "Авто"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:41
+msgid "Shading"
+msgstr "Затенение"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:42
+msgid "Edge width"
+msgstr "Ширина контура"
+
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:43
 msgid "No basemap"
 msgstr "Без подложки"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:39
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:44
 msgid "Terrain"
 msgstr "Рельеф"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:40
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:45
 msgid "Offset"
 msgstr "Смещение"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:41
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:46
 msgid "Reset offset"
 msgstr "Сбросить смещение"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:42
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:47
 msgid "m"
 msgstr "м"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:44
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:49
 msgid "Preview is not available for point clouds in geographic coordinate systems."
 msgstr "Предпросмотр недоступен для облаков точек в географических системах координат."
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:92
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:104
 msgid "RGB"
 msgstr "RGB"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:93
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:105
 msgid "Elevation"
 msgstr "Высота"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:95
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:107
 msgid "Classification"
 msgstr "Классификация"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:98
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:110
 msgid "Intensity"
 msgstr "Интенсивность"
 
-#: nodepkg/resource-section/preview/PointCloudPreview.tsx:101
+#: nodepkg/resource-section/preview/PointCloudPreview.tsx:113
 msgid "Return number"
 msgstr "Номер отражения"
 
