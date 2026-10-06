@@ -2,7 +2,7 @@ from datetime import date, datetime, time
 from unittest.mock import ANY
 
 import pytest
-from osgeo import ogr, osr
+from osgeo import gdal, ogr, osr
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE
@@ -154,7 +154,6 @@ def test_type_geojson(ngw_txn, ngw_data_path):
         fields = feat.fields
         assert fields["null"] == field_as(ref, "null", None)
         assert fields["int"] == field_as(ref, "int", "Integer")
-        assert fields["int64"] == field_as(ref, "int64", "Integer64")
         assert fields["real"] == field_as(ref, "real", "Double")
         assert fields["date"] == date(*field_as(ref, "date", "DateTime")[0:3])
         assert fields["time"] == time(*field_as(ref, "time", "DateTime")[3:6])
@@ -162,6 +161,10 @@ def test_type_geojson(ngw_txn, ngw_data_path):
         assert fields["string"] == field_as(ref, "string", "String")
         assert fields["unicode"] == field_as(ref, "unicode", "String")
         assert fields["boolean"] == bool(field_as(ref, "boolean", "Integer"))
+
+        # See https://lists.osgeo.org/pipermail/gdal-dev/2026-October/061755.html
+        if int(gdal.VersionInfo("VERSION_NUM")) < 3120000:
+            assert fields["int64"] == field_as(ref, "int64", "Integer64")
 
 
 @pytest.mark.parametrize(
