@@ -2,13 +2,15 @@ import pytest
 import sqlalchemy.sql as sql
 import transaction
 from sqlalchemy.exc import OperationalError
+from zope.event.classhandler import handler as zope_handler
+from zope.event.classhandler import registry as zope_registry
 
 from nextgisweb.env import DBSession
 
 from nextgisweb.auth import Group, User
 from nextgisweb.pyramid.test import WebTestApp
 
-from ..model import Resource, ResourceACLRule, ResourceGroup
+from ..model import OnResourcePermissions, Resource, ResourceACLRule, ResourceGroup
 from ..presolver import PermissionResolver
 from ..scope import ResourceScope
 from . import ResourceAPI
@@ -229,3 +231,47 @@ def test_create(
         {"resource": {"parent": {"id": ngw_resource_group_sub}}},
         status=403,
     )
+
+
+def test_permission_event(
+    user_id, ngw_resource_group, ngw_resource_group_sub, ngw_webtest_app: WebTestApp
+):
+    papi = ngw_webtest_app.with_url(f"/api/resource/{ngw_resource_group_sub}/permission")
+
+    with transaction.manager:
+        for rid in (ngw_resource_group, ngw_resource_group_sub):
+            ResourceACLRule(
+                resource_id=rid,
+                principal_id=user_id,
+                scope=ResourceScope.identity,
+                permission="read",
+                action="allow",
+            ).persist()
+
+    data = papi.get(query={"user": user_id}).json
+    assert data["resource"].pop("read")
+    assert not any(data["resource"].values())
+
+    call_user = 0
+    call_admin = 0
+
+    def on_resource_permissions(event):
+        nonlocal call_user, call_admin
+        user = event.user
+        if user.keyname == "administrator":
+            call_admin += 1
+        elif user.id == user_id:
+            call_user += 1
+            event.permissions.allow.clear()
+        else:
+            raise AssertionError
+
+    zope_handler(OnResourcePermissions, on_resource_permissions)
+    try:
+        data = papi.get(query={"user": user_id}).json
+    finally:
+        zope_registry[OnResourcePermissions].remove(on_resource_permissions)
+
+    assert not any(data["resource"].values())
+    assert call_user == 3  # Main / group / subgroup
+    assert call_admin >= 3
