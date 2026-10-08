@@ -10,7 +10,7 @@ from typing import Literal
 from warnings import warn
 
 import sqlalchemy as sa
-from sqlalchemy.schema import CreateTable
+from sqlalchemy.schema import CreateIndex, CreateTable
 
 
 class Constr:
@@ -55,7 +55,7 @@ def check_table(
         yield f"{tab_msg}: type mismatch ({exp} <> {table_type})."
         return
 
-    with _baseline_table(tab, conn=conn) as temp_tab_name_norm:
+    with _baseline_table(tab, conn=conn) as (temp_tab_name_norm, idx_rename):
         # Columns
 
         # fmt: off
@@ -158,12 +158,16 @@ def check_table(
                 ftab_relid if ftab_relid != tab_relid else None,
                 fcolnames,
             )
-
-            fk_data[key] = ConstraintInfo(
-                name=fk.name if isinstance(fk.name, str) else ihelper.fk_name(tab.name, colnames),
-                deferrable=fk.deferrable is True,
-                deferred=(fk.initially or "").upper() == "DEFERRED",
-            )
+            if (existing := fk_data.get(key)) is not None:
+                existing.duplicate = True
+            else:
+                fk_data[key] = ConstraintInfo(
+                    name=fk.name
+                    if isinstance(fk.name, str)
+                    else ihelper.fk_name(tab.name, colnames),
+                    deferrable=fk.deferrable is True,
+                    deferred=(fk.initially or "").upper() == "DEFERRED",
+                )
 
         # Compare constraints
 
@@ -191,7 +195,7 @@ def check_table(
                     yield f"{tab_msg}, {conlabel(key)} not found."
                     continue
 
-                if d_exp.duplicate:
+                if d_exp.duplicate or d_act.duplicate:
                     yield f"{tab_msg}, {conlabel(key)} has duplicates."
 
                 if d_exp.name is not None and d_exp.name != d_act.name:
@@ -206,22 +210,96 @@ def check_table(
             for key in cdata_act.keys():
                 yield f"{tab_msg}: extra constraint found ({conlabel(key)})."
 
+        # Indexes
+
+        # fmt: off
+        qindexes = sa.text(dedent("""
+            SELECT
+                c.relname,
+                am.amname,
+                i.indrelid,
+                i.indkey::int[],
+                pg_get_expr(i.indexprs, i.indrelid) AS expr,
+                i.indisprimary,
+                i.indisunique
+            FROM pg_index i
+            INNER JOIN pg_class c on c.oid = i.indexrelid
+            INNER JOIN pg_am am on am.oid = c.relam
+            WHERE i.indrelid = CAST(:name AS regclass)
+        """))
+        # fmt: on
+        result_exp = conn.execute(qindexes, dict(name=temp_tab_name_norm))
+        result_act = conn.execute(qindexes, dict(name=tab_name_norm))
+        data_exp = _group_indexes(result_exp, ihelper=ihelper)
+        data_act = _group_indexes(result_act, ihelper=ihelper)
+
+        def indlabel(key):
+            idx_type, rest = key
+            suffix = f"{idx_type} index" if idx_type is not None else "index"
+            if isinstance(rest, tuple):
+                rest = ", ".join(rest)
+            return f"{suffix} ({rest})"
+
+        for key, d_exp in data_exp.items():
+            if (d_act := data_act.pop(key, None)) is None:
+                yield f"{tab_msg}, {indlabel(key)} not found."
+                continue
+
+            if d_exp.duplicate or d_act.duplicate:
+                yield f"{tab_msg}, {indlabel(key)} has duplicates."
+
+            if (name_exp := idx_rename.pop(d_exp.name, d_exp.name)) != d_act.name:
+                yield f"{tab_msg}, {indlabel(key)} name mismatch ({name_exp} <> {d_act.name})."
+
+            if d_exp.access_method != d_act.access_method:
+                yield f"{tab_msg}, {indlabel(key)} access method mismatch ({d_exp.access_method} <> {d_act.access_method})."
+
+        for key in data_act.keys():
+            yield f"{tab_msg}: extra index found ({indlabel(key)})."
+
 
 @contextmanager
-def _baseline_table(table: sa.Table, *, conn: sa.Connection) -> Iterator[str]:
+def _baseline_table(
+    table: sa.Table, *, conn: sa.Connection
+) -> Iterator[tuple[str, dict[str, str]]]:
     # Setting schema to "pg_temp" is equivalent of creating a TEMPORARY table
     clone = table.to_metadata(sa.MetaData(), schema="pg_temp")
     conn.execute(CreateTable(clone, include_foreign_key_constraints=[]))
+
+    idx_rename: dict[str, str] = {}
+    idx_matched: list[sa.Index] = []
+    idx_columns_matched: list[tuple[str, ...]] = []
+    for idx_tmp in clone.indexes:
+        conn.execute(CreateIndex(idx_tmp))
+
+        if idx_tmp.name is not None:
+            columns_tmp = tuple(c.name for c in idx_tmp.columns)
+            if columns_tmp in idx_columns_matched:
+                # Ambiguous index info, can't match definitely. Name mismatch may occur.
+                matched = idx_matched[idx_columns_matched.index(columns_tmp)]
+                idx_rename.pop(matched.name, None)
+                continue
+            for idx in table.indexes:
+                if idx in idx_matched or len(idx.columns) != len(columns_tmp):
+                    continue
+                for i, c in enumerate(idx.columns):
+                    if c.name != columns_tmp[i]:
+                        break
+                else:
+                    if idx.name is not None and idx_tmp.name != idx.name:
+                        idx_rename[idx_tmp.name] = idx.name
+                    idx_matched.append(idx)
+                    idx_columns_matched.append(columns_tmp)
+                    break
 
     with conn.begin_nested() as savepoint:
         try:
             # This search path manipulation is required to handle `nextval`
             # defaults with sequences which aren't owned by the table.
             conn.execute(sa.text("SELECT set_config('search_path', '', true)"))
-
             # TODO: Handle quoting in table names, but for now we assume that
             # our table names don't require quoting.
-            yield f"pg_temp.{clone.name}"
+            yield f"pg_temp.{clone.name}", idx_rename
         finally:
             # Clean up the temporary table and restore the search path
             savepoint.rollback()
@@ -320,5 +398,39 @@ def _group_constraints(qresult: sa.Result, *, ihelper: InspectionHelper) -> Cons
                 name=row.conname,
                 deferrable=row.condeferrable,
                 deferred=row.condeferred,
+            )
+    return result
+
+
+@dataclass(kw_only=True)
+class IndexInfo:
+    name: str
+    access_method: str
+    duplicate: bool = False
+
+
+def _group_indexes(qresult: sa.Result, *, ihelper: InspectionHelper) -> dict[tuple, IndexInfo]:
+    result: dict[tuple, IndexInfo] = {}
+    for row in qresult.mappings():
+        if row.indisprimary:
+            idx_type = "primary unique"
+        elif row.indisunique:
+            idx_type = "unique"
+        else:
+            idx_type = None
+
+        if (expr := row.expr) is not None:
+            key = (idx_type, expr)
+        else:
+            assert 0 not in row.indkey, "Index expression expected"
+            columns = ihelper.colnames(row.indrelid, row.indkey)
+            key = (idx_type, columns)
+
+        if (existing := result.get(key)) is not None:
+            existing.duplicate = True
+        else:
+            result[key] = IndexInfo(
+                name=row.relname,
+                access_method=row.amname,
             )
     return result

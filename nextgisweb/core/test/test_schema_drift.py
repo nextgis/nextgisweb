@@ -43,6 +43,22 @@ def table_not_created(conn):
     yield meta
 
 
+@contextmanager
+def indexes(conn):
+    meta = sa.MetaData()
+    sa.Table(
+        "test_table",
+        meta,
+        sa.Column("value_primary", sa.Integer, primary_key=True),
+        sa.Column("value_unique", sa.Integer, unique=True),
+        sa.Column("value_index", sa.Integer),
+        sa.Index("test_ix_value_index", "value_index"),
+        sa.Column("value", sa.Integer),
+    )
+    meta.create_all(conn)
+    yield meta
+
+
 def _generate():
     yield pytest.param(table_not_created, None, "not exists", id="missing_table")
 
@@ -50,7 +66,7 @@ def _generate():
         (None, None, "success"),
         (
             "ALTER TABLE test_1.test_table_1 ADD COLUMN hellothere integer;",
-            "extra",
+            "extra columns",
             "extra_column",
         ),
         (
@@ -75,7 +91,7 @@ def _generate():
         ),
         (
             "ALTER TABLE test_1.test_table_1 RENAME CONSTRAINT test_table_1_pkey TO test_table_1_pkey1;",
-            "name mismatch",
+            2 * ["name mismatch"],
             "name_mismatch",
         ),
         (
@@ -97,6 +113,32 @@ def _generate():
         ),
     ):
         yield pytest.param(tables, sql, expected, id=id_)
+
+    for sql, expected, id_ in (
+        (None, None, "success"),
+        (
+            "CREATE INDEX ON test_table (value);",
+            "extra index",
+            "extra",
+        ),
+        (
+            "DROP INDEX test_ix_value_index",
+            "not found",
+            "missing",
+        ),
+        (
+            "ALTER INDEX test_ix_value_index RENAME TO test_ix_value_index1",
+            "name mismatch",
+            "name_mismatch",
+        ),
+        (
+            "DROP INDEX test_ix_value_index;\n"
+            "CREATE INDEX test_ix_value_index ON test_table USING brin (value_index);",
+            "access method mismatch",
+            "access_method_mismatch",
+        ),
+    ):
+        yield pytest.param(indexes, sql, expected, id=f"index_{id_}")
 
 
 @pytest.mark.parametrize("setup, sql, expected", _generate())
