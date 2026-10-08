@@ -1,0 +1,11 @@
+{
+  "name": "@nextgisweb/panorama",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@googlemaps/js-api-loader": "^2.1.1",
+    "@types/google.maps": "^3.66.3",
+    "@types/yandex-maps": "^2.1.36",
+    "penpal": "^8.0.1"
+  }
+}
