@@ -1,0 +1,19 @@
+#: nodepkg/PanoramaModal.tsx:10
+#, jsrealm
+msgid "Panorama"
+msgstr "Панорама"
+
+#: nodepkg/PanoramaModal.tsx:11
+#, jsrealm
+msgid "Close"
+msgstr "Закрыть"
+
+#: provider.py:27
+#, server
+msgid "Yandex Panorama"
+msgstr "Яндекс Панорама"
+
+#: provider.py:34
+#, server
+msgid "Google Panorama"
+msgstr "Google Панорама"
