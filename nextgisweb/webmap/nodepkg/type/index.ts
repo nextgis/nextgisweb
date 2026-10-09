@@ -34,6 +34,7 @@ export interface DisplayURLParams {
   lon?: number;
   lat?: number;
   base?: string;
+  mode?: string;
   zoom?: number;
   angle?: number;
   annot?: AnnotationVisibleMode;

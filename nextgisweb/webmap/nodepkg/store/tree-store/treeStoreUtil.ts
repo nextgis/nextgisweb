@@ -25,6 +25,17 @@ export interface SetItemVisibilityOptions {
   cascade?: "descendants" | "ancestors";
 }
 
+export function isLayerOutOfScaleRange(
+  layer: Pick<TreeLayerStore, "minResolution" | "maxResolution">,
+  resolution: number | null
+): boolean {
+  return (
+    resolution !== null &&
+    (resolution < (layer.minResolution ?? 0) ||
+      resolution >= (layer.maxResolution ?? Infinity))
+  );
+}
+
 export function filterItems<T extends TreeChildrenItemStore["type"]>(
   items: TreeItemStore[],
   query: { type: T } & Partial<ConfigByType<T>>

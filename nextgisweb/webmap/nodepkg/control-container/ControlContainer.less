@@ -1,3 +1,10 @@
+.mapadapter-control-container {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+
 .mapadapter-ctrl-top-left,
 .mapadapter-ctrl-top-right,
 .mapadapter-ctrl-bottom-left,
@@ -60,6 +67,8 @@
 .mapadapter-ctrl {
   display: inline-block;
   pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .mapadapter-ctrl-group {

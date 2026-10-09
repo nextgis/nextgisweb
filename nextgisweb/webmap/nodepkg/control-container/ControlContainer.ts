@@ -1,16 +1,6 @@
 import type { CSSProperties } from "react";
 
-import type { MapStore } from "../ol/MapStore";
 import "./ControlContainer.less";
-
-export interface MapControl {
-  id?: string;
-
-  onAdd(map?: MapStore): HTMLElement | undefined;
-  onRemove(map?: MapStore): unknown;
-  getContainer?(): HTMLElement;
-  remove?(): void;
-}
 
 type PositionsContainers = {
   [key in ControlPosition]: HTMLElement;
@@ -31,8 +21,6 @@ export type ControlPosition =
 export type TargetPosition = ControlPosition | { inside: string };
 
 export interface ControlContainerOptions {
-  target?: string;
-  mapStore?: MapStore;
   classPrefix?: string;
 }
 
@@ -40,7 +28,6 @@ type PendingItem = { element: HTMLElement; order: number };
 
 export class ControlContainer {
   private readonly classPrefix: string = "mapadapter";
-  private readonly mapStore?: MapStore;
   private readonly _container: HTMLElement;
   private readonly _positionsContainers: PositionsContainers;
 
@@ -49,35 +36,18 @@ export class ControlContainer {
 
   constructor(opt: ControlContainerOptions = {}) {
     this.classPrefix = opt.classPrefix || this.classPrefix;
-    this.mapStore = opt.mapStore;
     const { element, positionsContainers } = this._preparePositions();
     this._container = element;
     this._positionsContainers = positionsContainers;
-  }
-
-  addTo(el: HTMLElement | string): this {
-    const el_ = this.getElement(el);
-    if (!el_) {
-      console.warn("ControlContainer target element not found:", el);
-      return this;
-    }
-    el_.appendChild(this._container);
-    return this;
-  }
-
-  detach(): void {
-    const parent = this._container.parentElement;
-    if (parent) {
-      parent.removeChild(this._container);
-    }
   }
 
   getContainer(): HTMLElement {
     return this._container;
   }
 
-  getPositionContainer(position: ControlPosition): HTMLElement {
-    return this._positionsContainers[position];
+  remove(element: HTMLElement): void {
+    this._removePending(element);
+    element.remove();
   }
 
   changePlacement(
@@ -85,6 +55,7 @@ export class ControlContainer {
     position: TargetPosition,
     order: number = 0
   ): void {
+    this._removePending(wrapperEl);
     const nextContainer = this._resolveTargetContainer(position);
     if (nextContainer) {
       this._insertSorted(nextContainer, wrapperEl, order);
@@ -100,18 +71,7 @@ export class ControlContainer {
   }
 
   unregisterIDContainer(id: string): void {
-    const container = this._idContainers.get(id);
-    if (!container) return;
-
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
-
     this._idContainers.delete(id);
-
-    if (container.parentElement) {
-      container.parentElement.removeChild(container);
-    }
   }
 
   append(
@@ -227,6 +187,17 @@ export class ControlContainer {
     list.push({ element, order });
     list.sort((a, b) => a.order - b.order);
     this._pendingChildren.set(parentName, list);
+  }
+
+  private _removePending(element: HTMLElement): void {
+    for (const [id, children] of this._pendingChildren) {
+      const pending = children.filter((child) => child.element !== element);
+      if (pending.length) {
+        this._pendingChildren.set(id, pending);
+      } else {
+        this._pendingChildren.delete(id);
+      }
+    }
   }
 
   private _flushPending(parentName: string, targetContainer: HTMLElement) {

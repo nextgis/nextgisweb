@@ -2,10 +2,10 @@ import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import type { Options as VectorSourceOptions } from "ol/source/Vector";
 
-import { CoreLayer } from "./CoreLayer";
-import type { LayerOptions } from "./CoreLayer";
+import { OlLayerAdapter } from "./OlLayerAdapter";
+import type { LayerOptions } from "./OlLayerAdapter";
 
-export default class Vector extends CoreLayer<
+export default class Vector extends OlLayerAdapter<
   VectorSource,
   VectorLayer<VectorSource>,
   VectorSourceOptions

@@ -1,15 +1,11 @@
-import { actionBound, observableRef, reaction } from "mobx";
+import { actionBound, observableRef } from "mobx";
+import { getWorldsAway } from "ol/coordinate";
 import type { Coordinate } from "ol/coordinate";
-import {
-  boundingExtent,
-  containsCoordinate,
-  getCenter,
-  wrapX,
-} from "ol/extent";
+import { boundingExtent, getCenter, getWidth } from "ol/extent";
 import { GeoJSON, WKT } from "ol/format";
 import { MultiPolygon, Polygon } from "ol/geom";
 import { fromExtent } from "ol/geom/Polygon";
-import type Interaction from "ol/interaction/Interaction";
+import { get as getProjection } from "ol/proj";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { route } from "@nextgisweb/pyramid/api/route";
@@ -52,41 +48,11 @@ export class Identify {
   display: Display;
 
   @observableRef accessor active = true;
-  @observableRef accessor control: Interaction | null = null;
   @observableRef accessor identifyInfo: IdentifyInfo | null = null;
 
   constructor(options: IdentifyOptions) {
     this.display = options.display;
     this.map = this.display.map;
-
-    reaction(
-      () => this.control,
-      (ctrl, prev) => {
-        const olMap = this.display.map.olMap;
-        if (prev) {
-          olMap.removeInteraction(prev);
-        }
-        if (ctrl) {
-          olMap.addInteraction(ctrl);
-          ctrl.setActive(this.active);
-        }
-      },
-      { fireImmediately: false }
-    );
-
-    reaction(
-      () => this.active,
-      (isActive) => {
-        if (this.control) {
-          this.control.setActive(isActive);
-        }
-      }
-    );
-  }
-
-  @actionBound
-  setControl(control: Interaction | null) {
-    this.control = control;
   }
 
   @actionBound
@@ -237,9 +203,7 @@ export class Identify {
     });
 
     if (zoom) {
-      const view = this.map.olMap.getView();
-      view.setCenter(center);
-      view.setZoom(zoom);
+      this.map.setPosition({ center, zoom });
     } else {
       this.map.zoomToExtent(extent);
     }
@@ -247,17 +211,13 @@ export class Identify {
   }
 
   async execute(pixel: number[], radiusScale?: number): Promise<void> {
-    const { olMap, olView } = this.map;
-    const point = olMap.getCoordinateFromPixel(pixel);
-    const projection = olView.getProjection();
-
-    const projExtent = projection.getExtent();
-    // Workaround for identify outside the 180 meridian.
-    const outside = projExtent ? !containsCoordinate(projExtent, point) : false;
+    const point = this.map.adapter.getCoordinateFromPixel(pixel);
+    const geom = this._requestGeomString(pixel, radiusScale);
+    if (!point || !geom) return;
 
     const request: Request = {
-      srs: 3857,
-      geom: this._requestGeomString(pixel, radiusScale, outside),
+      srs: this.map.displaySrsId,
+      geom,
       layers: [],
     };
 
@@ -292,39 +252,78 @@ export class Identify {
 
     let raster: RasterLayerIdentifyResponse | undefined;
     if (rasterLayers.length) {
-      const [x, y] = olMap.getCoordinateFromPixel([pixel[0], pixel[1]]);
+      const [x, y] = point;
       raster = await route("raster_layer.identify").get({
         query: { resources: rasterLayers, x, y },
       });
     }
 
-    this.openIdentifyPanel({ features, point, layerLabels, raster });
+    await this.openIdentifyPanel({ features, point, layerLabels, raster });
   }
 
   private _requestGeomString(
     pixel: number[],
-    radiusScale = 1,
-    outside = false
-  ): string {
-    const olMap = this.map.olMap;
+    radiusScale = 1
+  ): string | undefined {
+    const adapter = this.map.adapter;
     const radius = this.pixelRadius * radiusScale;
-    const bounds = boundingExtent([
-      olMap.getCoordinateFromPixel([pixel[0] - radius, pixel[1] - radius]),
-      olMap.getCoordinateFromPixel([pixel[0] + radius, pixel[1] + radius]),
-    ]);
-    const rangeGeom = fromExtent(bounds);
+    const center = adapter.getCoordinateFromPixel(pixel);
+    if (!center) return;
+    const [x, y] = pixel;
+    const pixels = [
+      [x - radius, y - radius],
+      [x + radius, y - radius],
+      [x + radius, y + radius],
+      [x - radius, y + radius],
+    ];
+    const projection = getProjection(this.map.displayProjection);
+    const world = projection?.canWrapX() ? projection.getExtent() : undefined;
+    const width = world ? getWidth(world) : 0;
+    const coordinates = pixels.map((pixel) => {
+      const coordinate = adapter.getCoordinateFromPixel(pixel);
+      if (coordinate && width) {
+        coordinate[0] +=
+          Math.round((center[0] - coordinate[0]) / width) * width;
+      }
+      return coordinate;
+    });
 
-    if (outside) {
-      const projection = olMap.getView().getProjection();
-      const wrapped = wrapX(bounds, projection);
-      const wrappedPoly = fromExtent(wrapped);
+    let rangeGeom: Polygon;
+    if (coordinates.every((coordinate) => coordinate !== undefined)) {
+      const ring = coordinates as number[][];
+      rangeGeom = new Polygon([[...ring, ring[0]]]);
+    } else {
+      // At the horizon some corners miss the ground; retain a nonzero tolerance.
+      const resolution =
+        adapter.getViewState()?.resolution ?? this.map.resolution ?? 0;
+      const distance = radius * resolution;
+      const points = coordinates.filter(
+        (coordinate) => coordinate !== undefined
+      );
+      rangeGeom = fromExtent(
+        boundingExtent([
+          ...points,
+          [center[0] - distance, center[1] - distance],
+          [center[0] + distance, center[1] + distance],
+        ])
+      );
+    }
 
-      const multi = new MultiPolygon([
-        rangeGeom.getCoordinates(),
-        wrappedPoly.getCoordinates(),
-      ]);
-
-      return wkt.writeGeometry(multi);
+    // Workaround for identify outside the 180 meridian.
+    if (projection && width) {
+      const bounds = rangeGeom.getExtent();
+      const worldsAway =
+        getWorldsAway(center, projection) ||
+        Math.sign(
+          getWorldsAway([bounds[0], center[1]], projection) ||
+            getWorldsAway([bounds[2], center[1]], projection)
+        );
+      if (worldsAway) {
+        const wrapped = rangeGeom.clone();
+        wrapped.translate(-worldsAway * width, 0);
+        const multi = new MultiPolygon([rangeGeom, wrapped]);
+        return wkt.writeGeometry(multi);
+      }
     }
 
     return wkt.writeGeometry(rangeGeom);

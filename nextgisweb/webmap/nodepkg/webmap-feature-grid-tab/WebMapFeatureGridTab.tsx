@@ -15,6 +15,7 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
+import { hasOlMap } from "@nextgisweb/webmap/ol/util/hasOlMap";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
 import type topic from "../compat/topic";
@@ -34,6 +35,33 @@ interface WebMapFeatureGridTabProps {
   item: TreeLayerStore;
   topic: typeof topic;
 }
+
+type FilterExtentActionProps = ActionProps & {
+  display: ReturnType<typeof useDisplayContext>["display"];
+  store: FeatureGridStore;
+};
+
+const FilterExtentAction = observer(
+  ({ display, store, ...props }: FilterExtentActionProps) => {
+    const { adapter } = display.map;
+
+    if (!hasOlMap(adapter)) return null;
+
+    return (
+      <FilterExtentBtn
+        {...props}
+        display={display}
+        olMap={adapter.map}
+        onGeomChange={(_, geomWKT) => {
+          store.setQueryParams((prev) => ({
+            ...prev,
+            intersects: geomWKT,
+          }));
+        }}
+      />
+    );
+  }
+);
 
 export const WebMapFeatureGridTab = observer(
   ({ topic, plugin, item }: WebMapFeatureGridTabProps) => {
@@ -173,20 +201,9 @@ export const WebMapFeatureGridTab = observer(
               />
             </>
           ),
-          (props: ActionProps) => {
-            return (
-              <FilterExtentBtn
-                {...props}
-                display={display}
-                onGeomChange={(_, geomWKT) => {
-                  store.setQueryParams((prev) => ({
-                    ...prev,
-                    intersects: geomWKT,
-                  }));
-                }}
-              />
-            );
-          },
+          (props: ActionProps) => (
+            <FilterExtentAction {...props} display={display} store={store} />
+          ),
         ],
       });
 

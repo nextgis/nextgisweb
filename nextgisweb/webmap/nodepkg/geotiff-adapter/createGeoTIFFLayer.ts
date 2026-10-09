@@ -7,7 +7,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { geoTIFFLoadFunction } from "@nextgisweb/pyramid/util";
 import type { RasterBand } from "@nextgisweb/raster-layer/type/api";
 
-import type { CreateDisplayAdapterLayerOptions } from "../DisplayLayerAdapter";
+import type { WebmapLayerOptions } from "../layer-adapter";
 import type { CreateLayerOptions } from "../type/CreateLayerOptions";
 
 interface CreateGeoTIFFLayerOptions extends CreateLayerOptions {
@@ -49,7 +49,7 @@ function createAlphaExpression(
 
 function createSource(
   sourceOptions: GeoTIFFSourceOptions,
-  options?: CreateDisplayAdapterLayerOptions
+  options?: WebmapLayerOptions
 ) {
   return new GeoTIFFSource({
     ...sourceOptions,
@@ -234,7 +234,7 @@ export function setGeoTIFFRGBIntensityStyle(
 
 export function createGeoTIFFLayer(
   item: CreateGeoTIFFLayerOptions,
-  options?: CreateDisplayAdapterLayerOptions
+  options?: WebmapLayerOptions
 ) {
   const url = routeURL("raster_layer.cog", item.styleId);
 

@@ -90,6 +90,7 @@ export function GeometryInfoPreview({
         srs: { id: srid },
         maxZoom: 18,
       }}
+      allowMapModeChange={false}
     >
       <NGWLayer
         resourceId={resourceId}

@@ -1,23 +1,22 @@
+import type OlMap from "ol/Map";
 import { always } from "ol/events/condition";
 import { DragZoom } from "ol/interaction";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { useMapContext } from "../context/useMapContext";
 import { ToggleControl } from "../control";
 import type { ToggleControlProps } from "../control";
 
 import ZoomInIcon from "@nextgisweb/icon/material/zoom_in";
 import ZoomOutIcon from "@nextgisweb/icon/material/zoom_out";
 
-type ToolZoomProps = { out?: boolean } & ToggleControlProps;
+type ToolZoomProps = { out?: boolean; olMap: OlMap } & ToggleControlProps;
 
-export default function ToolZoom({ out = false, ...rest }: ToolZoomProps) {
-  const { mapStore } = useMapContext();
+function ToolZoom({ olMap, out = false, ...rest }: ToolZoomProps) {
   const interactionRef = useRef<DragZoom | null>(null);
+  const activeRef = useRef(false);
 
-  const { targetElement, olMap } = mapStore;
   const title = useMemo(
     () => (out ? gettext("Zoom out") : gettext("Zoom in")),
     [out]
@@ -25,7 +24,7 @@ export default function ToolZoom({ out = false, ...rest }: ToolZoomProps) {
 
   useEffect(() => {
     const dz = new DragZoom({ condition: always, out });
-    dz.setActive(false);
+    dz.setActive(activeRef.current);
     olMap.addInteraction(dz);
     interactionRef.current = dz;
 
@@ -35,24 +34,25 @@ export default function ToolZoom({ out = false, ...rest }: ToolZoomProps) {
         olMap.removeInteraction(dz);
       } finally {
         interactionRef.current = null;
-        const el = targetElement;
+        const el = olMap.getTargetElement();
         if (el) {
           el.style.cursor = "auto";
         }
       }
     };
-  }, [olMap, targetElement, out]);
+  }, [olMap, out]);
 
   const setActive = useCallback(
     (active: boolean) => {
+      activeRef.current = active;
       const dz = interactionRef.current;
       if (!dz) return;
       dz.setActive(active);
-      const el = targetElement;
+      const el = olMap.getTargetElement();
       if (el)
         el.style.cursor = active ? (out ? "zoom-out" : "zoom-in") : "auto";
     },
-    [targetElement, out]
+    [olMap, out]
   );
 
   return (
@@ -61,3 +61,5 @@ export default function ToolZoom({ out = false, ...rest }: ToolZoomProps) {
     </ToggleControl>
   );
 }
+
+export default ToolZoom;

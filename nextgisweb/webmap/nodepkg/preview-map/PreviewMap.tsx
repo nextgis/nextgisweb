@@ -1,14 +1,45 @@
+import { observer } from "mobx-react-lite";
 import { Suspense, useMemo, useRef, useState } from "react";
 
-import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
 
 import { registry } from "../display/component/map-panel/registry";
+import { DEFAULT_MAP_MAX_ZOOM } from "../map-adapter/constant";
 import { ToggleControl, ZoomControl } from "../map-component";
 import { MapComponent } from "../map-component/MapComponent";
 import type { MapComponentProps } from "../map-component/MapComponent";
+import { useMapContext } from "../map-component/context/useMapContext";
 
 import MapIcon from "@nextgisweb/icon/material/map/outline";
+
+const PreviewMapControls = observer(() => {
+  const { mapStore } = useMapContext();
+  const reg = registry
+    .queryAll()
+    .filter(
+      (c) => c.showOnPreview && (c.isEnabled?.({ map: mapStore }) ?? true)
+    );
+
+  const lazyControls = reg
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map(({ component, key, getProps, order, position, previewPosition }) => ({
+      key,
+      LazyControl: component,
+      props: {
+        order,
+        position: previewPosition ?? position,
+        ...getProps?.({ map: mapStore }),
+      },
+    }));
+
+  return lazyControls.map(({ key, LazyControl, props }) => (
+    <Suspense key={key}>
+      <LazyControl {...props} />
+    </Suspense>
+  ));
+});
+
+PreviewMapControls.displayName = "PreviewMapControls";
 
 export function PreviewMap({
   children,
@@ -30,18 +61,6 @@ export function PreviewMap({
     effectiveExtent && effectiveExtent.maxZoom !== undefined
       ? effectiveExtent.maxZoom
       : DEFAULT_MAP_MAX_ZOOM;
-
-  const lazyControls = useMemo(() => {
-    const reg = registry.queryAll().filter((c) => c.showOnPreview);
-
-    return reg
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-      .map(({ component, key, props, order, position }) => ({
-        key,
-        LazyControl: component,
-        props: { order, position, ...props },
-      }));
-  }, []);
 
   return (
     <MapComponent
@@ -73,11 +92,7 @@ export function PreviewMap({
         <MapIcon />
       </ToggleControl>
 
-      {lazyControls.map(({ key, LazyControl, props }) => (
-        <Suspense key={key}>
-          <LazyControl {...props} />
-        </Suspense>
-      ))}
+      <PreviewMapControls />
       {children}
     </MapComponent>
   );

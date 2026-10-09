@@ -1,17 +1,12 @@
 import { observer } from "mobx-react-lite";
 import type { ViewOptions } from "ol/View";
-import { useEffect, useRef } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
-import { assert } from "@nextgisweb/jsrealm/error";
-import type { MapExtent, MapStore } from "@nextgisweb/webmap/ol/MapStore";
+import type { MapExtent } from "@nextgisweb/webmap/map-adapter";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
-import { MapContext } from "./context/useMapContext";
-import { ToggleGroup } from "./control/toggle-group/ToggleGroup";
+import { MapContainer } from "./MapContainer";
 import { useMapAdapter } from "./hook/useMapAdapter";
-
-import "ol/ol.css";
-import "./MapComponent.less";
 
 export interface MapComponentProps extends ViewOptions {
   style?: CSSProperties;
@@ -24,6 +19,7 @@ export interface MapComponentProps extends ViewOptions {
   initialMapExtent?: MapExtent;
   resetView?: boolean;
   showZoomLevel?: boolean;
+  allowMapModeChange?: boolean;
   whenCreated?: (mapStore: MapStore | null) => void;
 }
 
@@ -38,6 +34,7 @@ export const MapComponent = observer(
     children,
     className,
     mapExtent,
+    allowMapModeChange,
     whenCreated,
     ...restViewOptions
   }: MapComponentProps) => {
@@ -48,58 +45,19 @@ export const MapComponent = observer(
       maxZoom,
       mapStore: mapStoreProp,
       mapExtent,
+      allowMapModeChange,
       ...restViewOptions,
     });
 
-    const mapContainerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-      let observer: ResizeObserver | undefined = undefined;
-      if (mapStore) {
-        assert(mapContainerRef.current);
-
-        const target = mapContainerRef.current;
-
-        mapStore.startup(target).then(() => {
-          if (whenCreated) {
-            whenCreated(mapStore);
-          }
-
-          observer = new ResizeObserver(() => {
-            mapStore.updateSize();
-          });
-          observer.observe(target);
-        });
-      }
-
-      return () => {
-        if (observer) {
-          observer.disconnect();
-        }
-        mapStore?.detach();
-      };
-    }, [mapStore, whenCreated]);
-
-    if (!mapStore) {
-      return null;
-    }
-
-    const { mapState, defaultMapState, setMapState, setDefaultMapState } =
-      mapStore;
-
     return (
-      <ToggleGroup
-        value={mapState}
-        defaultValue={defaultMapState}
-        onDefaultChange={setDefaultMapState}
-        onChange={setMapState}
+      <MapContainer
+        style={style}
+        mapStore={mapStore}
+        className={className}
+        whenCreated={whenCreated}
       >
-        <MapContext value={{ mapStore }}>
-          <div ref={mapContainerRef} style={style} className={className}>
-            {children}
-          </div>
-        </MapContext>
-      </ToggleGroup>
+        {children}
+      </MapContainer>
     );
   }
 );

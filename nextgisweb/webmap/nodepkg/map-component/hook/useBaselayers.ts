@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
-import { createBaselayer } from "@nextgisweb/basemap/util/baselayer";
-import type { BaselayerOptions } from "@nextgisweb/basemap/util/baselayer";
-import { useAbortController } from "@nextgisweb/pyramid/hook";
+import type {
+  TileLayerDefinition,
+  TileLayerOptions,
+} from "@nextgisweb/webmap/layer-adapter";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
-import type { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
+
+import { useMapLayer } from "./useMapLayer";
 
 export function useBaselayers({
   mapStore,
@@ -12,54 +14,35 @@ export function useBaselayers({
   baseKey,
 }: {
   mapStore: MapStore;
-  basemaps: BaselayerOptions[];
+  basemaps: TileLayerOptions[];
   baseKey?: string;
 }) {
-  const { makeSignal, abort } = useAbortController();
+  const configs = useMemo(
+    () =>
+      basemaps.map((config) => ({
+        ...config,
+        name: config.name,
+        isBaseLayer: true,
+      })),
+    [basemaps]
+  );
+  const { activeBasemapKey, zoom } = mapStore;
+  const config = configs.find((item) => item.name === activeBasemapKey);
 
   useEffect(() => {
-    if (!basemaps.length) return;
+    mapStore.setBasemapConfigs(configs, baseKey);
+  }, [mapStore, configs, baseKey]);
 
-    const preferredBasemapKey =
-      baseKey ?? (mapStore.baseLayer ? mapStore.activeBasemapKey : undefined);
-    const signal = makeSignal();
-    const layers: CoreLayer[] = [];
+  const layerDefinition = useMemo<TileLayerDefinition | undefined>(
+    () => (config ? { type: "tile", options: config } : undefined),
+    [config]
+  );
+  const layer = useMapLayer(mapStore, layerDefinition);
 
-    const setup = async () => {
-      for (const config of basemaps) {
-        if (signal.aborted) return;
-
-        try {
-          const layer = await createBaselayer(config);
-          if (!layer) continue;
-          if (signal.aborted) {
-            layer.dispose();
-            return;
-          }
-
-          if (layer.olLayer.getVisible()) {
-            mapStore.setBaseLayer(layer);
-          }
-          mapStore.addLayer(layer);
-          layers.push(layer);
-        } catch {
-          //
-        }
-      }
-
-      if (preferredBasemapKey && !signal.aborted) {
-        mapStore.switchBasemap(preferredBasemapKey);
-      }
-    };
-
-    setup();
-
-    return () => {
-      abort();
-      for (const layer of layers) {
-        mapStore.removeLayer(layer);
-        layer.dispose();
-      }
-    };
-  }, [abort, basemaps, baseKey, makeSignal, mapStore]);
+  useEffect(() => {
+    const minZoom = config?.layer?.minZoom;
+    layer?.setVisibility(
+      minZoom === undefined || (zoom !== null && zoom > minZoom)
+    );
+  }, [layer, config, zoom]);
 }

@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import type OlMap from "ol/Map";
 import { Control } from "ol/control";
 import type { Layer } from "ol/layer";
 import type RenderEvent from "ol/render/Event";
@@ -6,8 +7,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import { useMapContext } from "../../context/useMapContext";
 
 import { postcompose, precompose } from "./swipeControlUtils";
 
@@ -17,6 +16,7 @@ import "./SwipeControl.less";
 export type Orientation = "vertical" | "horizontal";
 
 export interface SwipeControlProps {
+  olMap: OlMap;
   className?: string;
 
   layers?: Layer[];
@@ -26,15 +26,13 @@ export interface SwipeControlProps {
 }
 
 export default function SwipeControl({
+  olMap,
   className = "ol-swipe",
   layers = [],
   position: positionProp = 0.5,
   orientation: orientationProp = "vertical",
   onRotateRequest,
 }: SwipeControlProps) {
-  const { mapStore } = useMapContext();
-  const { olMap, targetElement } = mapStore;
-
   const [position, setPosition] = useState(positionProp);
   const [orientation, setOrientation] = useState<Orientation>(orientationProp);
   const [isReversed, setIsReversed] = useState(false);
@@ -118,6 +116,7 @@ export default function SwipeControl({
 
     const onMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
+      const targetElement = olMap.getTargetElement();
       if (!targetElement) return;
 
       const rect = targetElement.getBoundingClientRect();
@@ -145,7 +144,7 @@ export default function SwipeControl({
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [element, isDragging, targetElement, orientation]);
+  }, [element, isDragging, olMap, orientation]);
 
   const onToggleRotate = useCallback(() => {
     const states: Array<{ orientation: Orientation; isReversed: boolean }> = [

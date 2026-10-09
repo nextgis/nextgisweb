@@ -1,55 +1,30 @@
-import type { Options as XYZSourceOptions } from "ol/source/XYZ";
-import { useEffect, useRef, useState } from "react";
+import { observer } from "mobx-react-lite";
+import { useEffect, useMemo } from "react";
 
-import type { BasemapType } from "@nextgisweb/basemap/type/api";
-import { createTileLayer } from "@nextgisweb/basemap/util/baselayer";
 import { isValidURL } from "@nextgisweb/gui/arm/validate";
 import { useObjectState } from "@nextgisweb/gui/hook";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import { tileLoadFunction } from "@nextgisweb/pyramid/util";
 import type {
-  CoreLayer,
-  LayerOptions,
-} from "@nextgisweb/webmap/ol/layer/CoreLayer";
+  TileLayerDefinition,
+  TileLayerOptions,
+} from "@nextgisweb/webmap/layer-adapter";
 
 import { useMapContext } from "./context/useMapContext";
-
-const exptyTileText = gettext("Unable to load tile");
-function createEmptyTile(
-  text = exptyTileText,
-  width = 256,
-  height = 256,
-  textColor = "#808080"
-) {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    ctx.fillStyle = textColor;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.save();
-    ctx.translate(width / 2, height / 2);
-    ctx.fillText(text, 0, 0);
-    ctx.restore();
-  }
-  return canvas.toDataURL("image/png");
-}
-
-const emptyTile = createEmptyTile();
+import { useMapLayer } from "./hook/useMapLayer";
 
 export interface URLLayerProps {
   url: string;
-  type?: BasemapType;
+  type?: TileLayerOptions["type"];
   opacity?: number;
   copyrightText?: string | null;
   copyrightUrl?: string | null;
-  layerOptions?: LayerOptions;
-  sourceOptions?: Pick<XYZSourceOptions, "minZoom" | "maxZoom" | "projection">;
+  layerOptions?: TileLayerOptions["layer"];
+  sourceOptions?: Pick<
+    TileLayerOptions["source"],
+    "minZoom" | "maxZoom" | "projection"
+  >;
 }
 
-export function URLLayer({
+export const URLLayer = observer(function URLLayer({
   url,
   type = "tms",
   opacity,
@@ -59,79 +34,30 @@ export function URLLayer({
   sourceOptions: sourceOptionsProp,
 }: URLLayerProps) {
   const { mapStore } = useMapContext();
-
+  const { zoom } = mapStore;
   const [sourceOptions] = useObjectState(sourceOptionsProp);
   const [layerOptions] = useObjectState(layerOptionsProp || {});
-  const layerOptionsRef = useRef(layerOptionsProp);
 
-  const [layer, setLayer] = useState<CoreLayer | undefined>(undefined);
-  const layerRef = useRef<CoreLayer | undefined>(undefined);
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    if (mapStore && url && isValidURL(url)) {
-      createTileLayer({
+  const layerDefinition = useMemo<TileLayerDefinition | undefined>(() => {
+    if (!url || !isValidURL(url)) return;
+    return {
+      type: "tile",
+      options: {
         type,
-        layer: layerOptionsRef.current,
+        layer: layerOptions,
         copyrightText,
         copyrightUrl,
-        source: {
-          url,
-          wrapX: true,
-          crossOrigin: "anonymous",
-          tileLoadFunction: (image, src) => {
-            // @ts-expect-error Property 'getImage' does not exist on type 'Tile'.
-            const img = image.getImage() as HTMLImageElement;
-
-            tileLoadFunction({
-              src,
-              cache: "force-cache",
-              noDataStatuses: [404, 204],
-
-              signal: abortController.signal,
-            })
-              .then((imageUrl) => {
-                img.src = imageUrl;
-              })
-              .catch(() => {
-                img.src = emptyTile;
-              });
-          },
-          ...sourceOptions,
-        },
-      }).then((tileLayer) => {
-        if (abortController.signal.aborted) {
-          tileLayer?.dispose();
-        } else if (tileLayer) {
-          layerRef.current = tileLayer;
-
-          tileLayer.setZIndex(1);
-          setLayer(tileLayer);
-          mapStore.addLayer(tileLayer);
-        }
-      });
-    }
-    return () => {
-      abortController.abort();
-      if (layerRef.current) {
-        mapStore.removeLayer(layerRef.current);
-        layerRef.current.dispose();
-        layerRef.current = undefined;
-      }
+        source: { url, wrapX: true, ...sourceOptions },
+        request: { cache: "force-cache", noDataStatuses: [404, 204] },
+      },
     };
-  }, [mapStore, copyrightText, copyrightUrl, sourceOptions, type, url]);
+  }, [url, type, layerOptions, sourceOptions, copyrightText, copyrightUrl]);
+
+  const layer = useMapLayer(mapStore, layerDefinition);
 
   useEffect(() => {
-    if (layer) {
-      layerOptionsRef.current = layerOptions;
-    }
-  }, [layer, layerOptions]);
-
-  useEffect(() => {
-    if (layer && layerOptions.minZoom !== undefined) {
-      layer.getLayer().setMinZoom(layerOptions.minZoom);
-    }
-  }, [layer, layerOptions.minZoom]);
+    layer?.setZIndex(1);
+  }, [layer]);
 
   useEffect(() => {
     if (layer && opacity !== undefined) {
@@ -139,5 +65,16 @@ export function URLLayer({
     }
   }, [opacity, layer]);
 
+  useEffect(() => {
+    if (!layer) return;
+
+    const isVisible = layerOptions.visible !== false;
+    const isZoomAllowed =
+      layerOptions.minZoom === undefined ||
+      (zoom !== null && zoom > layerOptions.minZoom);
+
+    layer.setVisibility(isVisible && isZoomAllowed);
+  }, [layer, layerOptions.visible, layerOptions.minZoom, zoom]);
+
   return null;
-}
+});

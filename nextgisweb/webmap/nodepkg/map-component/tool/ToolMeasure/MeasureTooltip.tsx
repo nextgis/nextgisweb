@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import type OlMap from "ol/Map";
 import Overlay from "ol/Overlay";
 import type { Options as OverlayOptions } from "ol/Overlay";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -8,14 +9,13 @@ import { createPortal } from "react-dom";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 
-import { useMapContext } from "../../context/useMapContext";
-
 import "./MeasureTooltip.less";
 
 export interface MeasureTooltipProps extends Pick<
   OverlayOptions,
   "position" | "offset"
 > {
+  olMap: OlMap;
   children?: ReactNode;
   isEditing?: boolean;
   isCurrent?: boolean;
@@ -23,6 +23,7 @@ export interface MeasureTooltipProps extends Pick<
 }
 
 export function MeasureTooltip({
+  olMap,
   offset = [0, -12],
   children,
   position,
@@ -30,7 +31,6 @@ export function MeasureTooltip({
   isCurrent = false,
   onClose,
 }: MeasureTooltipProps) {
-  const { mapStore } = useMapContext();
   const [overlay, setOverlay] = useState<Overlay | null>(null);
 
   const positionRef = useRef(position);
@@ -52,12 +52,12 @@ export function MeasureTooltip({
       insertFirst: false,
     });
     setOverlay(overlay);
-    mapStore.olMap.addOverlay(overlay);
+    olMap.addOverlay(overlay);
 
     return () => {
-      mapStore.olMap.removeOverlay(overlay);
+      olMap.removeOverlay(overlay);
     };
-  }, [mapStore.olMap]);
+  }, [olMap]);
 
   const element = useMemo(() => overlay?.getElement(), [overlay]);
 

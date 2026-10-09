@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite";
 import type { Options as OlRotateOptions } from "ol/control/Rotate";
-import { easeOut } from "ol/easing";
 import { useCallback, useMemo } from "react";
 import type { CSSProperties } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { DEFAULT_VIEW_ANIMATION_DURATION } from "@nextgisweb/webmap/map-adapter/constant";
 
 import { useMapContext } from "../context/useMapContext";
 
@@ -31,7 +31,7 @@ const RotateControl = observer(
     style,
     position,
     tipLabel = gettext("Reset rotation"),
-    duration = 250,
+    duration = DEFAULT_VIEW_ANIMATION_DURATION,
     autoHide = true,
     className,
   }: RotateControlProps) => {
@@ -44,26 +44,7 @@ const RotateControl = observer(
     );
 
     const onReset = useCallback(() => {
-      const map = mapStore.olMap;
-      const view = map.getView();
-      if (!view) {
-        // the map does not have a view, so we can't act
-        // upon it
-        return;
-      }
-      const rotation = view.getRotation();
-
-      if (rotation !== undefined) {
-        if (duration > 0 && rotation % (2 * Math.PI) !== 0) {
-          view.animate({
-            rotation: 0,
-            duration,
-            easing: easeOut,
-          });
-        } else {
-          view.setRotation(0);
-        }
-      }
+      mapStore.setRotation(0, duration);
     }, [mapStore, duration]);
 
     if (hidden) {

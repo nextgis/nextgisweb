@@ -11,13 +11,13 @@ interface BasemapSelectorProps {
 }
 
 export const BasemapSelector = observer(({ map }: BasemapSelectorProps) => {
-  const { baseLayers, activeBasemapKey, switchBasemap } = map;
+  const { basemapConfigs, activeBasemapKey, switchBasemap } = map;
 
   const options: OptionType[] = [];
-  for (const [key, layer] of Object.entries(baseLayers)) {
+  for (const config of basemapConfigs) {
     options.push({
-      label: layer.title,
-      value: key,
+      label: config.title,
+      value: config.name,
     });
   }
 

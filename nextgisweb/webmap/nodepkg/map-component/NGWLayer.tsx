@@ -1,10 +1,11 @@
+import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 
 import { useMapContext } from "./context/useMapContext";
 import { useNGWLayer } from "./hook/useNGWLayer";
 import type { LayerOptions, LayerType } from "./hook/useNGWLayer";
 
-export function NGWLayer({
+export const NGWLayer = observer(function NGWLayer({
   zIndex = 0,
   layerType,
   resourceId,
@@ -20,20 +21,11 @@ export function NGWLayer({
   const { mapStore: adapter } = useMapContext();
 
   const [layer, control] = useNGWLayer({
+    mapStore: adapter,
     layerType: layerType,
     resourceId: resourceId,
     layerOptions,
   });
-
-  useEffect(() => {
-    if (!adapter?.olMap || !layer) return;
-
-    adapter.olMap.addLayer(layer);
-
-    return () => {
-      adapter.olMap.removeLayer(layer);
-    };
-  }, [layerType, resourceId, adapter, zIndex, layer]);
 
   useEffect(() => {
     if (!layer) return;
@@ -47,4 +39,4 @@ export function NGWLayer({
   }, [opacity, layer]);
 
   return <>{control}</>;
-}
+});

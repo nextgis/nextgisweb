@@ -1,7 +1,5 @@
 import { observer } from "mobx-react-lite";
-import type { MapBrowserEvent } from "ol";
-import Interaction from "ol/interaction/Interaction";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -32,7 +30,9 @@ const IdentifyControl = observer(
     const { display } = useDisplayContext();
     const { isActive, makeDefault } = useToggleGroupItem(groupId);
 
-    const identifyInfo = display.identify.identifyInfo;
+    const { identify, map } = display;
+    const { adapter, started } = map;
+    const { identifyInfo, active } = identify;
 
     useEffect(() => {
       if (isDefaultGroupId) {
@@ -40,34 +40,14 @@ const IdentifyControl = observer(
       }
     }, [isDefaultGroupId, makeDefault]);
 
-    const interaction = useMemo(() => {
-      const handleEvent = (evt: MapBrowserEvent<any>) => {
-        if (evt.type === "singleclick") {
-          display.identify
-            .execute(
-              evt.pixel,
-              evt.originalEvent.pointerType === "touch" ? 2 : undefined
-            )
-            .catch(errorModal);
-          evt.preventDefault?.();
-        }
-        return true;
-      };
-      return new Interaction({ handleEvent });
-    }, [display.identify]);
-
     useEffect(() => {
-      if (!isActive) {
-        display.identify.setControl(null);
-        return;
-      }
-
-      display.identify.setControl(interaction);
-
-      return () => {
-        display.identify.setControl(null);
-      };
-    }, [isActive, interaction, display.identify]);
+      if (!isActive || !active || !started) return;
+      return adapter.subscribeClick((event) => {
+        identify
+          .execute(event.pixel, event.pointerType === "touch" ? 2 : undefined)
+          .catch(errorModal);
+      });
+    }, [adapter, started, isActive, active, identify]);
 
     if (!identifyInfo || !identifyInfo.response.featureCount) {
       return (

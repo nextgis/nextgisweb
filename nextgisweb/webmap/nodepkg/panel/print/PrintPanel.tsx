@@ -42,10 +42,8 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
   const show = useCallback(() => {
     if (!mapInit.current) {
-      const mainMapView = display.map.olView;
-
       printMapStore.update({
-        center: mainMapView.getCenter(),
+        center: display.map.getViewState()?.center,
         scale: display.map.scale,
       });
 
@@ -54,20 +52,16 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
       setReady(true);
       mapInit.current = true;
     }
-  }, [display.map.olView, display.map.scale, printMapStore]);
+  }, [display, printMapStore]);
 
   const hide = useCallback(() => {
     if (mapInit.current) {
       // Sync the main map's view with last print preview position before closing
-      const mainMapView = display.map.olView;
-      if (mapPositionRef.current.center) {
-        mainMapView.setCenter(mapPositionRef.current.center);
-      }
-      if (mapPositionRef.current.scale) {
-        mainMapView.setResolution(
-          display.map.resolutionForScale(mapPositionRef.current.scale)
-        );
-      }
+      const { center, scale } = mapPositionRef.current;
+      display.map.setViewOptions({
+        center,
+        resolution: scale ? display.map.resolutionForScale(scale) : undefined,
+      });
 
       mapInit.current = false;
     }

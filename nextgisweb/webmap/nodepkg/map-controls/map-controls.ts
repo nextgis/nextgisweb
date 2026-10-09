@@ -4,6 +4,10 @@ import { lazy } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { mapControlRegistry } from "@nextgisweb/webmap/display/component/map-panel/registry";
+import { hasOlMap } from "@nextgisweb/webmap/ol/util/hasOlMap";
+
+import type { MapToolbarControlProps } from "../map-component/control/MapToolbarControl";
+import { getOlMapProps } from "../ol/util/getOlMapProps";
 
 const ZoomControlLazy = lazy(
   () => import("../map-component/control/ZoomControl")
@@ -36,26 +40,26 @@ const MapLoadingIndicatorControlLazy = lazy(
   () => import("../map-component/control/MapLoadingIndicatorControl")
 );
 
-mapControlRegistry(COMP_ID, {
+mapControlRegistry<MapToolbarControlProps>(COMP_ID, {
   key: "at",
   order: 1000,
   label: gettext("Attribution toolbar"),
-  props: {
+  getProps: () => ({
     id: "attribution-toolbar",
     direction: "horizontal",
     align: "center",
     gap: 8,
-  },
+  }),
   position: "bottom-right",
   showOnPreview: true,
   embeddedShowMode: "always",
   component: MapToolbarControlLazy,
 });
 
-mapControlRegistry(COMP_ID, {
+mapControlRegistry<MapToolbarControlProps>(COMP_ID, {
   key: "mt",
   label: gettext("Map toolbar"),
-  props: { id: "map-toolbar", direction: "horizontal" },
+  getProps: () => ({ id: "map-toolbar", direction: "horizontal" }),
   position: "bottom-left",
   showOnPreview: true,
   embeddedShowMode: "always",
@@ -80,6 +84,8 @@ mapControlRegistry(COMP_ID, {
 
 mapControlRegistry(COMP_ID, {
   key: "attr",
+  isEnabled: ({ map }) => hasOlMap(map.adapter),
+  getProps: getOlMapProps,
   order: 30,
   position: { inside: "attribution-toolbar" },
   showOnPreview: true,
@@ -99,9 +105,13 @@ mapControlRegistry(COMP_ID, {
 
 mapControlRegistry(COMP_ID, {
   key: "sl",
+  isEnabled: ({ map }) => hasOlMap(map.adapter),
+  getProps: (context) => ({
+    ...getOlMapProps(context),
+    scaleOptions: { minWidth: 48 },
+  }),
   order: 20,
   label: gettext("Scale line"),
-  props: { scaleOptions: { minWidth: 48 } },
   position: { inside: "attribution-toolbar" },
   showOnPreview: true,
   embeddedShowMode: "customize",
@@ -112,7 +122,6 @@ mapControlRegistry(COMP_ID, {
   key: "li",
   order: 30,
   label: gettext("Loading indicator"),
-  props: {},
   position: { inside: "attribution-toolbar" },
   showOnPreview: true,
   embeddedShowMode: "customize",
@@ -130,6 +139,8 @@ mapControlRegistry(COMP_ID, {
 
 mapControlRegistry(COMP_ID, {
   key: "ml",
+  getProps: getOlMapProps,
+  isEnabled: ({ map }) => hasOlMap(map.adapter),
   order: 70,
   label: gettext("Locate me"),
   position: "top-left",
@@ -142,11 +153,11 @@ mapControlRegistry(COMP_ID, {
   key: "id",
   label: gettext("Identification"),
   order: -10,
-  props: {
+  getProps: () => ({
     isDefaultGroupId: true,
     groupId: "identifying",
     label: gettext("Identification"),
-  },
+  }),
   position: { inside: "map-toolbar" },
   embeddedShowMode: "customize",
   component: IdentifyControlLazy,

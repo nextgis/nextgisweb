@@ -8,7 +8,7 @@ export const PluginMapComponents = observer(
     return (
       <>
         {display.config.pluginKeys.map((key) => {
-          const plugin = display.plugins[key];
+          const plugin = display.availablePlugins[key];
 
           const RenderMap = plugin?.renderMap;
           if (!RenderMap) {

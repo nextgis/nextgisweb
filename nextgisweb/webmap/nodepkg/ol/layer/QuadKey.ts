@@ -3,8 +3,8 @@ import { XYZ as XYZSource } from "ol/source";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 import type { TileCoord } from "ol/tilecoord";
 
-import { CoreLayer } from "./CoreLayer";
-import type { LayerOptions } from "./CoreLayer";
+import { OlLayerAdapter } from "./OlLayerAdapter";
+import type { LayerOptions } from "./OlLayerAdapter";
 
 function quadKey(tileCoord: TileCoord): string {
   const z = tileCoord[0];
@@ -26,7 +26,7 @@ function quadKey(tileCoord: TileCoord): string {
   return digits.join("");
 }
 
-export default class QuadKey extends CoreLayer<
+export default class QuadKey extends OlLayerAdapter<
   XYZSource,
   TileLayer<XYZSource>,
   XYZSourceOptions

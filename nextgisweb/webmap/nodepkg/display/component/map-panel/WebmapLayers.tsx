@@ -1,160 +1,104 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { useMemoDebounce } from "@nextgisweb/pyramid/hook";
-import type { LayerDisplayAdapterCtor } from "@nextgisweb/webmap/DisplayLayerAdapter";
-import { entrypointsLoader } from "@nextgisweb/webmap/compat/util/entrypointLoader";
+import type { WebmapLayerDefinition } from "@nextgisweb/webmap/layer-adapter";
 import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
-import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
-import type { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
+import { useMapLayer } from "@nextgisweb/webmap/map-component/hook/useMapLayer";
 import type { TreeStore } from "@nextgisweb/webmap/store";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
-import { filterItems } from "@nextgisweb/webmap/store/tree-store/treeStoreUtil";
-
-function updateLayerResolutionRange({
-  item,
-  layer,
-  mapStore,
-}: {
-  item: TreeLayerStore;
-  layer?: CoreLayer | null;
-  mapStore: MapStore;
-}) {
-  const minResolution =
-    item.maxScaleDenom !== null
-      ? (mapStore.resolutionForScale(item.maxScaleDenom) ?? null)
-      : null;
-  const maxResolution =
-    item.minScaleDenom !== null
-      ? (mapStore.resolutionForScale(item.minScaleDenom) ?? null)
-      : null;
-
-  item.update({ minResolution, maxResolution });
-
-  if (layer) {
-    layer.olLayer.setMinResolution(minResolution ?? 0);
-    layer.olLayer.setMaxResolution(maxResolution ?? Infinity);
-  }
-}
+import {
+  filterItems,
+  isLayerOutOfScaleRange,
+} from "@nextgisweb/webmap/store/tree-store/treeStoreUtil";
 
 const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
-  const layerItemRef = useRef(layerItem);
-  const [layer, setLayer] = useState<CoreLayer | null>(null);
-  const layerRef = useRef(layer);
-
+  const { mapStore } = useMapContext();
+  const { hmux, resolution } = mapStore;
   const {
     filter,
-    opacity,
     adapter,
-    symbols,
     visible,
-    legendInfo,
+    opacity,
+    symbols,
+    minResolution,
+    maxResolution,
     minScaleDenom,
     maxScaleDenom,
     drawOrderPosition,
   } = layerItem;
-  const { mapStore } = useMapContext();
-  const { hmux } = mapStore;
+  const changeStamp = layerItem.legendInfo.changeStamp;
+  const previousChangeStamp = useRef(changeStamp);
 
-  const resolutionDebounced = useMemoDebounce(mapStore.resolution, 100);
+  const resolutionDebounced = useMemoDebounce(resolution, 100);
+  const effectiveVisible =
+    visible && !isLayerOutOfScaleRange(layerItem, resolution);
 
-  useEffect(() => {
-    layerItemRef.current = layerItem;
-  }, [layerItem]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const item = layerItemRef.current;
-    let existLayer: CoreLayer | undefined = mapStore.getLayer(item.id);
-    const setup = async () => {
-      if (!existLayer) {
-        const Adapter = (await entrypointsLoader([adapter]))[
-          adapter
-        ] as LayerDisplayAdapterCtor;
-        if (cancelled) return;
-        updateLayerResolutionRange({ item, mapStore });
-
-        existLayer = new Adapter().createLayer(item, {
-          hmux: hmux ?? undefined,
-        });
-
-        mapStore.addLayer(
-          existLayer,
-          layerItemRef.current.drawOrderPosition ?? undefined
-        );
-      }
-      setLayer(existLayer);
-    };
-    setup();
-
-    return () => {
-      cancelled = true;
-      if (existLayer) {
-        mapStore.removeLayer(existLayer);
-      }
-    };
-  }, [mapStore, adapter, hmux]);
+  const layerDefinition = useMemo<WebmapLayerDefinition>(
+    () => ({
+      type: "webmap",
+      item: { ...layerItem.dump(), adapter },
+      options: { hmux: hmux ?? undefined },
+    }),
+    [layerItem, adapter, hmux]
+  );
+  const layer = useMapLayer(mapStore, layerDefinition);
 
   useEffect(() => {
-    layerRef.current = layer;
-  }, [layer]);
-
-  useEffect(() => {
-    updateLayerResolutionRange({
-      item: layerItemRef.current,
-      layer,
-      mapStore,
+    layerItem.update({
+      minResolution:
+        maxScaleDenom !== null
+          ? (mapStore.resolutionForScale(maxScaleDenom) ?? null)
+          : null,
+      maxResolution:
+        minScaleDenom !== null
+          ? (mapStore.resolutionForScale(minScaleDenom) ?? null)
+          : null,
     });
-  }, [layer, mapStore, minScaleDenom, maxScaleDenom]);
+  }, [layerItem, mapStore, minScaleDenom, maxScaleDenom]);
 
   useEffect(() => {
-    if (layer) {
-      layer.setVisibility(visible);
-    }
-  }, [visible, layer, mapStore]);
+    layer?.setResolutionRange(minResolution, maxResolution);
+  }, [layer, minResolution, maxResolution]);
+
+  useEffect(() => {
+    layer?.setVisibility(effectiveVisible);
+  }, [layer, effectiveVisible]);
 
   useEffect(() => {
     if (layer && opacity !== null && opacity !== undefined) {
       layer.setOpacity(opacity);
     }
-  }, [opacity, layer, mapStore]);
-
-  useEffect(() => {}, []);
+  }, [layer, opacity]);
 
   useEffect(() => {
-    if (layer) {
-      layer.setSymbols(symbols);
-    }
+    layer?.setSymbols(symbols);
   }, [layer, symbols]);
 
   useEffect(() => {
-    if (layer) {
-      layer.setFilter(filter);
-    }
+    layer?.setFilter(filter);
   }, [layer, filter]);
 
   useEffect(() => {
-    if (layerRef.current) {
-      layerRef.current.reload();
+    if (layer && drawOrderPosition !== null) {
+      layer.setZIndex(drawOrderPosition);
     }
-  }, [legendInfo.changeStamp]);
+  }, [layer, drawOrderPosition]);
 
   useEffect(() => {
-    if (layerRef.current && drawOrderPosition !== null) {
-      layerRef.current.setZIndex(drawOrderPosition);
+    if (changeStamp !== previousChangeStamp.current) {
+      layer?.reload();
     }
-  }, [drawOrderPosition]);
+    previousChangeStamp.current = changeStamp;
+  }, [layer, changeStamp]);
 
   useEffect(() => {
     const r = resolutionDebounced;
-    if (!layer || r === null) return;
-    const ol = layer.olLayer;
-
-    const isOutOfScaleRange =
-      r < ol.getMinResolution() || r >= ol.getMaxResolution();
-
-    layerItemRef.current.update({ isOutOfScaleRange });
-  }, [layer, resolutionDebounced, minScaleDenom, maxScaleDenom]);
+    if (r === null) return;
+    layerItem.update({
+      isOutOfScaleRange: isLayerOutOfScaleRange(layerItem, resolutionDebounced),
+    });
+  }, [layerItem, resolutionDebounced, minScaleDenom, maxScaleDenom]);
 
   return null;
 });

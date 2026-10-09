@@ -12,7 +12,7 @@ import { useBaselayers } from "@nextgisweb/webmap/map-component/hook/useBaselaye
 const BasemapLayers = observer(
   ({ display, identity }: { display: Display; identity: string }) => {
     const { mapStore } = useMapContext();
-    const { targetElement } = mapStore;
+    const { targetElement, adapter } = mapStore;
 
     const wmplugin = display.config.webmapPlugin[
       identity
@@ -43,9 +43,9 @@ const BasemapLayers = observer(
       });
 
       configs.push({
-        keyname: "blank",
+        name: "blank",
+        title: gettext("No basemap"),
         layer: {
-          title: gettext("No basemap"),
           visible: !hasDefault,
         },
         source: {},
@@ -56,16 +56,16 @@ const BasemapLayers = observer(
     useBaselayers({ mapStore, basemaps, baseKey: display.urlParams.base });
 
     useEffect(() => {
+      const color = backgroundColor ? `#${backgroundColor}` : "";
+      adapter.setBackgroundColor?.(color);
       if (!targetElement) {
         return;
       }
-      targetElement.style.backgroundColor = backgroundColor
-        ? `#${backgroundColor}`
-        : "";
+      targetElement.style.backgroundColor = color;
       return () => {
         targetElement.style.backgroundColor = "";
       };
-    }, [targetElement, backgroundColor]);
+    }, [targetElement, adapter, backgroundColor]);
 
     return null;
   }

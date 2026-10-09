@@ -7,6 +7,10 @@ import { isAbortError } from "@nextgisweb/gui/error";
 import type { SizeType } from "@nextgisweb/gui/fields-form";
 import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
+import {
+  DEFAULT_EXTENT_SRS,
+  DEFAULT_FIT_PADDING,
+} from "@nextgisweb/webmap/map-adapter/constant";
 import { NGWLayer } from "@nextgisweb/webmap/map-component";
 import type { LayerOptions } from "@nextgisweb/webmap/map-component/hook/useNGWLayer";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
@@ -16,7 +20,6 @@ import { getFeatureStyle } from "../geometry-info/component/GeometryInfoPreview"
 import { GeometryEditorControlPanel } from "./GeometryEditorControlPanel";
 import GeometryEditorStore from "./GeometryEditorStore";
 import type { FeatureGeometry } from "./GeometryEditorStore";
-import { DEFAULT_PADDING, DEFAULT_SRS } from "./constant";
 import { ZoomToResourceBtn } from "./util/component/ZoomToResourceBtn";
 import { fetchResourceExtent } from "./util/fetchResourceExtent";
 
@@ -100,8 +103,8 @@ const GeometryEditor = observer(
       return initialExtent
         ? {
             extent: initialExtent,
-            padding: DEFAULT_PADDING,
-            srs: DEFAULT_SRS,
+            padding: DEFAULT_FIT_PADDING,
+            srs: DEFAULT_EXTENT_SRS,
           }
         : undefined;
     }, [initialExtent]);
@@ -115,6 +118,7 @@ const GeometryEditor = observer(
         style={{ width: "100%", height: "100%" }}
         basemap
         initialMapExtent={initialMapExtent}
+        allowMapModeChange={false}
       >
         {store._parentStore?.resourceId && (
           <>

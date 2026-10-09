@@ -1,4 +1,5 @@
 import type Feature from "ol/Feature";
+import type OlMap from "ol/Map";
 import { WKT } from "ol/format";
 import type VectorSource from "ol/source/Vector";
 import { lazy, useCallback, useEffect, useRef, useState } from "react";
@@ -15,7 +16,7 @@ import VectorLayerClass from "../../ol/layer/Vector";
 
 import { AnnotationFeature } from "./AnnotationFeature";
 import type { AnnotationInfo } from "./AnnotationFeature";
-import { AnnotationsEditableLayer } from "./AnnotationsEditableLayer";
+import { AnnotationsEditableLayerInner } from "./AnnotationsEditableLayer";
 import type { AnnotationGeometryType } from "./AnnotationsEditableLayer";
 import { AnnotationsPopup } from "./AnnotationsPopup";
 
@@ -49,19 +50,23 @@ function annotationVisible(annot: AnnotationVisibleMode) {
 }
 
 interface AnnotationsLayerComponentProps {
+  olMap: OlMap;
   filter: AccessFilter;
   webmapId: number;
   editable: boolean;
   visibleMode: AnnotationVisibleMode;
   activeGeometryType: AnnotationGeometryType | null;
+  onEditChange?: (editing: boolean) => void;
 }
 
 export function AnnotationsLayer({
+  olMap,
   filter,
   editable,
   webmapId,
   visibleMode,
   activeGeometryType,
+  onEditChange,
 }: AnnotationsLayerComponentProps) {
   const layerRef = useRef<VectorLayerClass | null>(null);
   const sourceRef = useRef<VectorSource | null>(null);
@@ -75,6 +80,7 @@ export function AnnotationsLayer({
 
   const { showModal, modalHolder } = useShowModal();
   const { mapStore } = useMapContext();
+  const { adapter } = mapStore;
   const { makeSignal } = useAbortController();
 
   const isStale = useCallback(
@@ -378,10 +384,15 @@ export function AnnotationsLayer({
 
   const onChangeAnnotation = useCallback(
     (annFeature: AnnotationFeature) => {
-      showForEdit(annFeature).then(dialogResultHandle);
+      onEditChange?.(true);
+      showForEdit(annFeature)
+        .then(dialogResultHandle)
+        .finally(() => onEditChange?.(false));
     },
-    [dialogResultHandle, showForEdit]
+    [dialogResultHandle, showForEdit, onEditChange]
   );
+
+  useEffect(() => () => onEditChange?.(false), [onEditChange]);
 
   const onCreateOlFeature = useCallback(
     (olFeature: Feature) => {
@@ -389,9 +400,9 @@ export function AnnotationsLayer({
         feature: olFeature,
       });
 
-      showForEdit(annFeature).then(dialogResultHandle);
+      onChangeAnnotation(annFeature);
     },
-    [dialogResultHandle, showForEdit]
+    [onChangeAnnotation]
   );
 
   const fillAnnotations = useCallback(
@@ -438,7 +449,7 @@ export function AnnotationsLayer({
     });
     const source = layer.getSource();
 
-    mapStore.addLayer(layer);
+    mapStore.addLayer(layer, undefined, adapter);
 
     sourceRef.current = source;
     layerRef.current = layer;
@@ -481,6 +492,8 @@ export function AnnotationsLayer({
   }, [
     webmapId,
     mapStore,
+    adapter,
+    olMap,
     isStale,
     makeSignal,
     applyFilter,
@@ -494,19 +507,20 @@ export function AnnotationsLayer({
 
   return (
     <>
-      <AnnotationsEditableLayer
+      <AnnotationsEditableLayerInner
         activeGeometryType={activeGeometryType}
         onCreateOlFeature={onCreateOlFeature}
         editable={editable}
         mapStore={mapStore}
         source={source}
+        olMap={olMap}
       />
       {popupFeatures.map((annFeature, index) => (
         <AnnotationsPopup
           key={annFeature.getId() ?? index}
           annFeature={annFeature}
           editable={editable}
-          map={mapStore}
+          map={olMap}
           onChange={onChangeAnnotation}
         />
       ))}

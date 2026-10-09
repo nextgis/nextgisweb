@@ -11,7 +11,6 @@ export function updateControlAppearance(
   el.className = "";
 
   el.classList.add("mapadapter-ctrl");
-  el.classList.add("ol-unselectable");
   if (bar) {
     el.classList.add("mapadapter-ctrl-group");
   }

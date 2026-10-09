@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import type OlMap from "ol/Map";
 import { unByKey } from "ol/Observable";
 import type { EventsKey } from "ol/events";
 import type { Geometry } from "ol/geom";
@@ -34,25 +35,28 @@ import MeasureDistance from "@nextgisweb/webmap/icon/measure_distance";
 type MeasureKind = "LineString" | "Polygon";
 
 export interface ToolMeasureProps extends ToggleControlProps {
+  olMap: OlMap;
   type: MeasureKind;
   groupId?: string;
   isDefaultGroupId?: boolean;
 }
 
-type TooltipState = MeasureTooltipProps & {
+type TooltipState = Omit<MeasureTooltipProps, "olMap"> & {
   id: string;
 };
 
-const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
+const ToolMeasure = observer((props: ToolMeasureProps) => {
+  const { olMap, type, groupId, ...rest } = props;
   const { mapStore } = useMapContext();
 
-  const { olMap } = mapStore;
+  const adapter = mapStore.adapter;
   const measureSrsId = mapStore.measureSrsId || settings.measurement_srid;
 
   const [currentTooltipId, setCurrentTooltipId] = useState<string | null>(null);
 
   const vectorRef = useRef<Vector | null>(null);
   const interactionRef = useRef<Draw | null>(null);
+  const activeRef = useRef(false);
   const changeListenerRef = useRef<EventsKey | null>(null);
   const measureSrsIdRef = useRef(measureSrsId);
   const measureRevisionRef = useRef(0);
@@ -144,10 +148,10 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
     const source = vector.getSource();
     vectorRef.current = vector;
 
-    mapStore.addLayer(vector);
+    mapStore.addLayer(vector, undefined, adapter);
 
     const interaction = new Draw({ source, type, style });
-    interaction.setActive(false);
+    interaction.setActive(activeRef.current);
     interactionRef.current = interaction;
     olMap.addInteraction(interaction);
 
@@ -223,10 +227,18 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
       measureRevisionRef.current = measureRevisionRef.current + 1;
 
       setCurrentTooltipId(null);
+      setTooltips(new Map());
 
       unbindChangeListener();
     };
-  }, [closeTooltip, debouncedUpdateMeasuredValue, mapStore, olMap, type]);
+  }, [
+    closeTooltip,
+    debouncedUpdateMeasuredValue,
+    mapStore,
+    adapter,
+    olMap,
+    type,
+  ]);
 
   useEffect(() => {
     measureSrsIdRef.current = measureSrsId;
@@ -249,6 +261,7 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
 
   const setActive = useCallback(
     (active: boolean) => {
+      activeRef.current = active;
       const interaction = interactionRef.current;
       if (!interaction) return;
 
@@ -281,6 +294,7 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
       {Array.from(tooltips).map(([id, tooltip]) => (
         <MeasureTooltip
           key={id}
+          olMap={olMap}
           isEditing={!!currentTooltipId}
           isCurrent={currentTooltipId === id}
           {...tooltip}

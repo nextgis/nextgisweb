@@ -2,8 +2,8 @@
 import { lazy } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { hasOlMap } from "@nextgisweb/webmap/ol/util/hasOlMap";
 import { registry } from "@nextgisweb/webmap/panel/registry";
-import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import AnnotationIcon from "@nextgisweb/icon/material/chat";
 
@@ -21,8 +21,10 @@ registry.register(COMP_ID, {
 
   tab: { forceRender: true },
 
-  isEnabled: ({ config }: { config: DisplayConfig }) => {
+  isEnabled: ({ config, map }) => {
     return (
+      map.ready &&
+      hasOlMap(map.adapter) &&
       config.annotations &&
       config.annotations.enabled &&
       config.annotations.scope.read

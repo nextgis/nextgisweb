@@ -40,19 +40,20 @@ export const getPermalink = ({
   });
 
   const params: Partial<Record<keyof DisplayURLParams, string>> = {
-    angle: String(display.map.olMap.getView().getRotation() || 0),
-    zoom: String(display.map.olMap.getView().getZoom() || 0),
+    angle: display.map.rotation.toFixed(3),
+    zoom: (display.map.zoom ?? 0).toFixed(3),
     styles: visibleStyles.join(","),
+    ...(display.mapMode === "2d" ? {} : { mode: display.mapMode }),
     ...additionalParams,
   };
-  if (display.map.baseLayer) {
-    params.base = display.map.baseLayer.name;
+  if (display.map.activeBasemapKey) {
+    params.base = display.map.activeBasemapKey;
   }
 
   if (center === undefined) {
-    const coord = display.map.olMap.getView().getCenter();
+    const coord = display.map.center;
     if (coord) {
-      center = toLonLat(coord);
+      center = toLonLat(coord, display.map.displayProjection);
     }
   }
   if (center) {

@@ -5,10 +5,10 @@ import { unByKey } from "ol/Observable";
 import { useCallback, useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import CompanyLogoControl from "@nextgisweb/pyramid/company-logo/CompanyLogoControl";
 import { useDebounce } from "@nextgisweb/pyramid/hook";
 import { imageQueue } from "@nextgisweb/pyramid/util";
-import { mapStartup } from "@nextgisweb/webmap/ol/util/mapStartup";
 
 import type { Display } from "../display";
 import { PanelMapComponents } from "../display/component/map-panel/PanelMapComponents";
@@ -18,6 +18,7 @@ import { MapComponent } from "../map-component";
 import RotateControl from "../map-component/control/RotateControl";
 import { GraticuleLayer } from "../map-component/layer/GraticuleLayer";
 import { MapStore } from "../ol/MapStore";
+import { hasOlMap } from "../ol/util/hasOlMap";
 
 import { PrintScaleToolbar } from "./PrintScaleToolar";
 import type { PrintMapStore } from "./store";
@@ -33,25 +34,33 @@ export const PrintMapPreview = observer(
   ({ display, printMapStore }: PrintMapPreviewProps) => {
     const measureSrsId = display.map.measureSrsId;
     const [mapStore] = useState(() => {
-      const viewMainMap = display.map.olView;
-      const projection = display.map.olView.getProjection();
       const view = new View({
         maxZoom: display.map.maxZoom,
         extent: display.map.constrainingExtent,
-        projection,
+        projection: display.map.displayProjection,
         constrainResolution: false,
-        center: printMapStore.center ?? viewMainMap.getCenter(),
+        center: printMapStore.center ?? display.map.getViewState()?.center,
       });
       const mStore = new MapStore({
         view,
         controls: [],
         measureSrsId,
       });
-      if (display.map.baseLayer) {
-        mStore.setBaseLayer(display.map.baseLayer);
-      }
+      mStore.setBasemapConfigs(
+        display.map.basemapConfigs,
+        display.map.activeBasemapKey
+      );
       return mStore;
     });
+
+    const [mainMapLoaded, setMainMapLoaded] = useState(false);
+    const mainMap = hasOlMap(display.map.adapter)
+      ? display.map.adapter.map
+      : undefined;
+
+    const { adapter } = mapStore;
+    const olMap = hasOlMap(adapter) ? adapter.map : undefined;
+    const viewPrintMap = olMap?.getView();
 
     const {
       arrow,
@@ -66,31 +75,41 @@ export const PrintMapPreview = observer(
 
     useEffect(() => {
       let cancelled = false;
+      setMainMapLoaded(false);
+
+      const startPrintMap = () => {
+        imageQueue.waitAll().then(() => {
+          if (!cancelled) {
+            setMainMapLoaded(true);
+          }
+        });
+      };
 
       // This is an important aspect not just for optimization
       // but also for handling the print map logic,
       // where after each position change, the map scale is rounded and the map view is redrawn.
-      const renderCompleteKey = display.map.olMap.once("rendercomplete", () => {
+      const renderCompleteKey = mainMap?.once("rendercomplete", () => {
         // If the display page opens in the print panel, the main map starts loading invisibly underneath.
         // Aborting the shared image queue too early prevents the main map from loading its layers.
         // So we have to wait until it's fully loaded before using the queue for the print map.
-        imageQueue.waitAll().then(() => {
-          if (!cancelled) {
-            mapStartup({ olMap: mapStore.olMap, queue: imageQueue });
-          }
-        });
+        startPrintMap();
       });
+      if (mainMap) {
+        mainMap.render();
+      } else {
+        startPrintMap();
+      }
 
       return () => {
         cancelled = true;
-        unByKey(renderCompleteKey);
+        if (renderCompleteKey) {
+          unByKey(renderCompleteKey);
+        }
       };
-    }, [display.map.olMap, mapStore.olMap]);
+    }, [mainMap]);
 
     useEffect(() => {
-      if (!mapStore.ready) return;
-
-      const viewPrintMap = mapStore.olView;
+      if (!mapStore.ready || !viewPrintMap) return;
 
       const center = printMapStore.center;
       if (center) {
@@ -117,13 +136,13 @@ export const PrintMapPreview = observer(
         unByKey(unCenterKey);
         viewCenterChange.cancel();
       };
-    }, [mapStore, mapStore.ready, mapStore.olView, printMapStore]);
+    }, [mapStore, mapStore.ready, viewPrintMap, printMapStore]);
 
     useEffect(() => {
       if (scale) {
-        mapStore.olView.setResolution(mapStore.resolutionForScale(scale));
+        viewPrintMap?.setResolution(mapStore.resolutionForScale(scale));
       }
-    }, [mapStore, mapStore.olView, scale]);
+    }, [mapStore, viewPrintMap, scale]);
 
     const onChangeScale = useCallback(
       (scale: number) => {
@@ -139,11 +158,10 @@ export const PrintMapPreview = observer(
     }, [mapStore.ready, mapStore.scale, debouncedOnScaleChange]);
 
     useEffect(() => {
-      const printMap = mapStore.olMap;
-      if (!printMap) return;
-
-      printMap.updateSize();
+      mapStore.updateSize();
     }, [width, height, margin, mapStore]);
+
+    if (!mainMapLoaded) return null;
 
     return (
       <MapComponent
@@ -151,7 +169,9 @@ export const PrintMapPreview = observer(
         mapStore={mapStore}
       >
         <WebmapLayers treeStore={display.treeStore} />
-        <CompanyLogoControl position="bottom-right" />
+        {pyramidSettings.company_logo.enabled && (
+          <CompanyLogoControl position="bottom-right" />
+        )}
         <PanelMapComponents display={display} />
         <PluginMapComponents display={display} />
         {arrow && (
@@ -161,8 +181,14 @@ export const PrintMapPreview = observer(
             style={{ borderRadius: "50px" }}
           />
         )}
-        {graticule && <GraticuleLayer showLabels />}
-        <PrintScaleToolbar scaleLine={scaleLine} scaleValue={scaleValue} />
+        {graticule && olMap && <GraticuleLayer olMap={olMap} showLabels />}
+        {olMap && (
+          <PrintScaleToolbar
+            olMap={olMap}
+            scaleLine={scaleLine}
+            scaleValue={scaleValue}
+          />
+        )}
       </MapComponent>
     );
   }

@@ -1,4 +1,6 @@
+import { observer } from "mobx-react-lite";
 import type { Feature } from "ol";
+import type OlMap from "ol/Map";
 import { never } from "ol/events/condition";
 import { Draw } from "ol/interaction";
 import type { Vector as VectorSource } from "ol/source";
@@ -21,17 +23,20 @@ interface AnnotationsEditableLayerComponentProps {
   source: VectorSource;
   editable: boolean;
   mapStore: MapStore;
+  olMap: OlMap;
   activeGeometryType: AnnotationGeometryType | null;
   onCreateOlFeature: (olFeature: Feature) => void;
 }
 
-export function AnnotationsEditableLayer({
+export function AnnotationsEditableLayerInner({
   source,
   editable,
   mapStore,
+  olMap,
   activeGeometryType,
   onCreateOlFeature,
 }: AnnotationsEditableLayerComponentProps) {
+  const { adapter } = mapStore;
   const drawRef = useRef<Draw | null>(null);
   const editActiveRef = useRef(false);
   const overlayLayerRef = useRef<VectorLayerClass | null>(null);
@@ -39,10 +44,10 @@ export function AnnotationsEditableLayer({
 
   const removeInteraction = useCallback((): void => {
     if (drawRef.current) {
-      mapStore.olMap.removeInteraction(drawRef.current);
+      olMap.removeInteraction(drawRef.current);
       drawRef.current = null;
     }
-  }, [mapStore]);
+  }, [olMap]);
 
   const deactivate = useCallback((): void => {
     removeInteraction();
@@ -65,11 +70,11 @@ export function AnnotationsEditableLayer({
         onCreateOlFeature(e.feature);
       });
 
-      mapStore.olMap.addInteraction(draw);
+      olMap.addInteraction(draw);
       draw.setActive(true);
       drawRef.current = draw;
     },
-    [mapStore, onCreateOlFeature]
+    [olMap, onCreateOlFeature]
   );
 
   const activate = useCallback(
@@ -80,12 +85,12 @@ export function AnnotationsEditableLayer({
       });
 
       overlayLayer.getLayer().setSource(source);
-      mapStore.addLayer(overlayLayer);
+      mapStore.addLayer(overlayLayer, undefined, adapter);
       overlayLayerRef.current = overlayLayer;
       activeSourceRef.current = source;
       addInteraction(source, geometryType);
     },
-    [addInteraction, mapStore]
+    [addInteraction, mapStore, adapter]
   );
 
   const changeGeometryType = useCallback(
@@ -136,4 +141,4 @@ export function AnnotationsEditableLayer({
   return null;
 }
 
-AnnotationsEditableLayer.displayName = "AnnotationsEditableLayer";
+export const AnnotationsEditableLayer = observer(AnnotationsEditableLayerInner);

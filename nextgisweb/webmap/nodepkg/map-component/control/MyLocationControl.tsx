@@ -1,12 +1,13 @@
 import { observer } from "mobx-react-lite";
 import Feature from "ol/Feature";
 import Geolocation from "ol/Geolocation";
+import type OlMap from "ol/Map";
 import { unByKey } from "ol/Observable";
 import { Point } from "ol/geom";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -32,10 +33,13 @@ export interface MyLocationControlOptions {
   zIndex?: number;
 }
 
-export type MyLocationControlProps = ControlProps<MyLocationControlOptions>;
+export type MyLocationControlProps = ControlProps<
+  MyLocationControlOptions & { olMap: OlMap }
+>;
 
 export const MyLocationControl = observer(
   ({
+    olMap,
     order,
     position,
     tipLabel = gettext("Show my location"),
@@ -52,14 +56,10 @@ export const MyLocationControl = observer(
     const shouldZoomRef = useRef<boolean>(false);
     const listenersRef = useRef<any[]>([]);
 
-    const supported = useMemo(() => {
-      return (
-        typeof navigator !== "undefined" &&
-        "geolocation" in navigator &&
-        typeof location !== "undefined" &&
-        location.protocol === "https:"
-      );
-    }, []);
+    const supported =
+      typeof navigator !== "undefined" &&
+      "geolocation" in navigator &&
+      window.isSecureContext;
 
     const teardown = useCallback(() => {
       if (geolocationRef.current) {
@@ -88,10 +88,10 @@ export const MyLocationControl = observer(
       });
 
       const layer = new VectorLayer({ source });
-      layer.setMap(mapStore.olMap);
+      layer.setMap(olMap);
       layer.setZIndex(zIndex);
       layerRef.current = layer;
-    }, [mapStore, zIndex]);
+    }, [olMap, zIndex]);
 
     const onAccuracyChange = useCallback(() => {
       const geo = geolocationRef.current;
@@ -126,7 +126,7 @@ export const MyLocationControl = observer(
       shouldZoomRef.current = true;
       buildLayer();
 
-      const view = mapStore.olMap.getView();
+      const view = olMap.getView();
       const geoloc = new Geolocation({
         trackingOptions: { enableHighAccuracy: true },
         projection: view.getProjection(),
@@ -141,7 +141,7 @@ export const MyLocationControl = observer(
       ];
 
       setEnabled(true);
-    }, [buildLayer, mapStore, onAccuracyChange, onPositionChange, onError]);
+    }, [buildLayer, olMap, onAccuracyChange, onPositionChange, onError]);
 
     const disable = useCallback(() => {
       teardown();
@@ -155,7 +155,8 @@ export const MyLocationControl = observer(
       } else {
         disable();
       }
-    }, [supported, enabled, enable, disable]);
+      return teardown;
+    }, [supported, enabled, enable, disable, teardown]);
 
     if (!supported) return null;
 

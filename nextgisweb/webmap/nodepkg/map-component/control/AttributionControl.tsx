@@ -1,5 +1,7 @@
 import classNames from "classnames";
+import { observer } from "mobx-react-lite";
 import type { MapEvent } from "ol";
+import type OlMap from "ol/Map";
 import type { ViewStateLayerStateExtent } from "ol/View";
 import { equals } from "ol/array";
 import { toPromise } from "ol/functions";
@@ -16,6 +18,7 @@ import type { MapControlProps } from "./MapControl";
 import InfoIcon from "@nextgisweb/icon/material/info";
 
 export interface AttributionControlProps extends MapControlProps {
+  olMap: OlMap;
   className?: string;
   tipLabel?: string;
   label?: ReactNode;
@@ -35,7 +38,8 @@ function AttributionList({ items }: { items: string[] }) {
   );
 }
 
-export default function AttributionControl({
+function AttributionControl({
+  olMap,
   className = "ol-attribution",
   tipLabel = "Attributions",
   label = <InfoIcon />,
@@ -54,8 +58,7 @@ export default function AttributionControl({
   const expandCls = expandClassName ?? `${className}-expand`;
 
   useEffect(() => {
-    const map = mapStore.olMap;
-    if (!map || !mapStore.targetElement) return;
+    if (!mapStore.targetElement) return;
 
     const container = mapStore.targetElement;
 
@@ -74,7 +77,7 @@ export default function AttributionControl({
 
   const collectSourceAttributions = useCallback(
     (frameState: ViewStateLayerStateExtent) => {
-      const layers = mapStore.olMap.getAllLayers();
+      const layers = olMap.getAllLayers();
 
       const visibleAttributions = new Set(
         layers.flatMap((layer) => layer.getAttributions(frameState))
@@ -89,7 +92,7 @@ export default function AttributionControl({
       }
       return Array.from(visibleAttributions);
     },
-    [attributions, mapStore.olMap]
+    [attributions, olMap]
   );
 
   const update = useCallback(
@@ -118,15 +121,14 @@ export default function AttributionControl({
   );
 
   useEffect(() => {
-    const map = mapStore.olMap;
-    if (!map) return;
+    if (!olMap) return;
     const handler = (e: MapEvent) =>
       update(e?.frameState as ViewStateLayerStateExtent | null);
-    map.on("postrender", handler);
+    olMap.on("postrender", handler);
     return () => {
-      map.un("postrender", handler);
+      olMap.un("postrender", handler);
     };
-  }, [mapStore, update]);
+  }, [olMap, update]);
 
   const onClickInfo = useCallback(() => {
     if (!isSmall) return;
@@ -167,3 +169,5 @@ export default function AttributionControl({
     )
   );
 }
+
+export default observer(AttributionControl);

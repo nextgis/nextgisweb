@@ -1,4 +1,3 @@
-import Control from "ol/control/Control";
 import type { CSSProperties } from "react";
 
 import { ControlContainer } from "../../control-container/ControlContainer";
@@ -6,100 +5,71 @@ import type { TargetPosition } from "../../control-container/ControlContainer";
 
 import "./PanelControl.less";
 
-interface PanelControlOptions {
-  collapsible?: boolean;
-}
-
-const OPTIONS: PanelControlOptions = {
-  collapsible: false,
-};
-
 export interface ControlOptions {
   id?: string;
   order?: number;
-  control: Control;
+  element: HTMLElement;
   position: TargetPosition;
   targetStyle?: CSSProperties;
 }
 
-export class PanelControl extends Control {
+export class PanelControl {
   private panelContainer: ControlContainer;
-  private targets = new WeakMap<Control, HTMLElement>();
-  private ids = new WeakMap<Control, string>();
+  private targets = new WeakMap<HTMLElement, HTMLElement>();
+  private ids = new WeakMap<HTMLElement, string>();
 
-  constructor(options?: PanelControlOptions) {
-    const panelContainer = new ControlContainer();
-    const element = panelContainer.getContainer();
-    super({ ...OPTIONS, ...options, element });
-    this.panelContainer = panelContainer;
+  constructor() {
+    this.panelContainer = new ControlContainer();
   }
 
   addControl({
     id,
     order = 0,
-    control,
+    element,
     position,
     targetStyle,
   }: ControlOptions): void {
-    const map = this.getMap();
-    if (!map) return;
-
     const target = document.createElement("div");
 
     if (targetStyle) {
       Object.assign(target.style, targetStyle);
     }
-    // @ts-expect-error Property 'element' is protected in OL types
-    const element = control.element as HTMLElement | undefined;
+    target.append(element);
 
     if (id) {
-      this.panelContainer.registerIDContainer(id, element || target);
-      this.ids.set(control, id);
+      this.panelContainer.registerIDContainer(id, element);
+      this.ids.set(element, id);
     }
     this.panelContainer.append(target, position, order);
-
-    control.setTarget(target);
-
-    map.addControl(control);
-    this.targets.set(control, target);
+    this.targets.set(element, target);
   }
 
   updateControlPlacement(
-    control: Control,
+    element: HTMLElement,
     position: TargetPosition,
     order: number = 0
   ): void {
-    //  @ts-expect-error private property
-    const target = control.target_ as HTMLElement | string | undefined;
-    const wrapperEl = (
-      typeof target === "string" ? document.querySelector(target) : target
-    ) as HTMLElement | null;
-
+    const wrapperEl = this.targets.get(element);
     if (!wrapperEl) return;
 
     this.panelContainer.changePlacement(wrapperEl, position, order);
   }
 
-  getTarget(control: Control): HTMLElement | undefined {
-    return this.targets.get(control);
+  getTarget(element: HTMLElement): HTMLElement | undefined {
+    return this.targets.get(element);
   }
 
-  removeControl(control: Control): void {
-    const map = this.getMap();
-    if (map) {
-      map.removeControl(control);
-    }
-
-    const id = this.ids.get(control);
+  removeControl(element: HTMLElement): void {
+    const id = this.ids.get(element);
     if (id) {
       this.panelContainer.unregisterIDContainer(id);
-      this.ids.delete(control);
+      this.ids.delete(element);
     }
 
-    const target = this.targets.get(control);
+    const target = this.targets.get(element);
     if (target) {
-      target.remove();
-      this.targets.delete(control);
+      this.panelContainer.remove(target);
+      this.targets.delete(element);
     }
   }
 

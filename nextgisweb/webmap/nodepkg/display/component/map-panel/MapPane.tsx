@@ -1,10 +1,11 @@
+import { reaction } from "mobx";
 import { observer } from "mobx-react-lite";
-import { fromLonLat } from "ol/proj";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
-import { MapComponent } from "@nextgisweb/webmap/map-component";
+import { MapContainer } from "@nextgisweb/webmap/map-component/MapContainer";
+import { setURLParam } from "@nextgisweb/webmap/utils/URL";
 
 import type { Display } from "../../Display";
 
@@ -21,42 +22,27 @@ export const MapPane = observer(
     const themeVariables = useThemeVariables({
       "theme-color-primary": "colorPrimary",
     });
-
-    const whenCreated = useCallback(() => {
-      const ready = display.mapReady;
-      display.setMapReady(true);
-
-      const urlParams = display.urlParams;
-
-      if (!ready) {
-        if (
-          !("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)
-        ) {
-          display.map.zoomToInitialExtent();
-        } else {
-          const view = display.map.olView;
-          if (urlParams.lon && urlParams.lat) {
-            view.setCenter(fromLonLat([urlParams.lon, urlParams.lat]));
-          }
-          if (urlParams.zoom !== undefined) {
-            view.setZoom(urlParams.zoom);
-          }
-
-          if ("angle" in urlParams && urlParams.angle !== undefined) {
-            view.setRotation(urlParams.angle);
-          }
+    useEffect(() => {
+      const dispose = reaction(
+        () => display.map.mapMode,
+        (mode) => {
+          setURLParam("mode", mode === "2d" ? "" : mode);
         }
-      }
+      );
+      return dispose;
     }, [display]);
 
     return (
-      <MapComponent
+      <MapContainer
         className="ngw-webmap-display-map-pane"
         mapStore={display.map}
         style={themeVariables}
-        whenCreated={whenCreated}
       >
-        <MapControls mapStore={display.map} isTinyMode={display.isTinyMode} />
+        <MapControls
+          display={display}
+          mapStore={display.map}
+          isTinyMode={display.isTinyMode}
+        />
         <MapHighlight
           mapStore={display.map}
           highlightStore={display.highlighter}
@@ -66,7 +52,7 @@ export const MapPane = observer(
         <PluginMapComponents display={display} />
 
         {children}
-      </MapComponent>
+      </MapContainer>
     );
   }
 );

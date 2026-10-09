@@ -1,3 +1,5 @@
+import type OlMap from "ol/Map";
+
 import {
   InfoScaleControl,
   MapToolbarControl,
@@ -5,9 +7,11 @@ import {
 } from "../map-component/control";
 
 export function PrintScaleToolbar({
+  olMap,
   scaleValue,
   scaleLine,
 }: {
+  olMap: OlMap;
   scaleValue: boolean;
   scaleLine: boolean;
 }) {
@@ -25,7 +29,7 @@ export function PrintScaleToolbar({
       bar
     >
       {scaleValue && <InfoScaleControl order={1} />}
-      {scaleLine && <ScaleLineControl order={2} />}
+      {scaleLine && <ScaleLineControl olMap={olMap} order={2} />}
     </MapToolbarControl>
   );
 }

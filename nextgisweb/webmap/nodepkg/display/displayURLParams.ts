@@ -5,15 +5,14 @@ import { UrlParams } from "../utils/UrlParams";
 
 const toFloat = (val: URLParams[0]) =>
   typeof val === "string" ? parseFloat(val) : undefined;
-const toInt = (val: URLParams[0]) =>
-  typeof val === "string" ? parseInt(val) : undefined;
 
 export const displayURLParams = new UrlParams<DisplayURLParams>({
   lon: { parse: toFloat },
   lat: { parse: toFloat },
   base: {},
-  zoom: { parse: toInt },
-  angle: { parse: toInt },
+  mode: {},
+  zoom: { parse: toFloat },
+  angle: { parse: toFloat },
   annot: {},
   events: {},
   panel: {},

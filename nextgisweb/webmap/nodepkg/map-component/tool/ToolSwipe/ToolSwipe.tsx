@@ -1,9 +1,11 @@
 import { observer } from "mobx-react-lite";
+import type OlMap from "ol/Map";
 import { useCallback, useMemo, useState } from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context";
+import { OlLayerAdapter } from "@nextgisweb/webmap/ol/layer/OlLayerAdapter";
 
 import { ToggleControl } from "../../control";
 import type { ToggleControlProps } from "../../control";
@@ -23,12 +25,14 @@ msgLayerHiddenTitle = gettext("Layer is not visible");
 type Orientation = "vertical" | "horizontal";
 
 export interface ToolSwipeProps extends ToggleControlProps {
+  olMap: OlMap;
   orientation?: Orientation;
   groupId?: string;
 }
 
 const ToolSwipe = observer(
   ({
+    olMap,
     orientation: orientationProp = "horizontal",
     groupId,
     ...rest
@@ -84,11 +88,18 @@ const ToolSwipe = observer(
     const layers = useMemo(() => {
       if (item) {
         if (item.type === "layer") {
-          const l = map.layers[item.id]?.olLayer;
-          return l ? [l] : [];
+          const l = map.layers[item.id];
+          return l instanceof OlLayerAdapter ? [l.olLayer] : [];
         } else if (item.type === "group") {
           const desc = display.treeStore.getDescendants(item.id);
-          return desc.map((d) => map.layers[d.id]?.olLayer).filter(Boolean);
+          return desc
+            .map((d) => {
+              const layer = map.layers[d.id];
+              return layer instanceof OlLayerAdapter
+                ? layer.olLayer
+                : undefined;
+            })
+            .filter((layer) => layer !== undefined);
         }
       }
       return [];
@@ -128,6 +139,7 @@ const ToolSwipe = observer(
 
         {active && (
           <SwipeControl
+            olMap={olMap}
             layers={layers}
             orientation={orientation}
             onRotateRequest={handleRotate}
