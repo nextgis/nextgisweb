@@ -1,4 +1,5 @@
 import { unByKey } from "ol/Observable";
+import type { Type as OlGeometryType } from "ol/geom/Geometry";
 import type { Draw } from "ol/interaction";
 import { useCallback, useEffect, useState } from "react";
 
@@ -6,26 +7,42 @@ import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
 
+import { CoordInput } from "./CoordInput";
+
 import FinishIcon from "@nextgisweb/icon/material/check";
 import CancelIcon from "@nextgisweb/icon/material/close";
 import UndoIcon from "@nextgisweb/icon/material/undo";
 
-export function DrawControl({ draw }: { draw: Draw }) {
+export function DrawControl({
+  draw,
+  geomType,
+  enableCoordinateInput = false,
+}: {
+  draw: Draw;
+  geomType?: OlGeometryType;
+  enableCoordinateInput?: boolean;
+}) {
   const [isDrawing, setIsDrawing] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
+  const [coordOpen, setCoordOpen] = useState(false);
+  const [coordFilled, setCoordFilled] = useState(false);
 
   useEffect(() => {
     const onStart = () => {
       setIsDrawing(true);
       setCanUndo(true);
     };
-    const onEnd = () => {
+    const onAbort = () => {
       setIsDrawing(false);
       setCanUndo(false);
     };
+    const onEnd = () => {
+      onAbort();
+      setCoordOpen(false);
+    };
 
     const keyStart = draw.on("drawstart", onStart);
-    const keyAbort = draw.on("drawabort", onEnd);
+    const keyAbort = draw.on("drawabort", onAbort);
     const keyEnd = draw.on("drawend", onEnd);
 
     return () => {
@@ -53,49 +70,70 @@ export function DrawControl({ draw }: { draw: Draw }) {
 
   useKeydownListener(
     "Enter",
-    (e) => isDrawing && (e.preventDefault(), onFinish())
+    (e) => isDrawing && !coordFilled && (e.preventDefault(), onFinish())
   );
-  useKeydownListener(
-    "Escape",
-    (e) => isDrawing && (e.preventDefault(), onCancel())
-  );
+  useKeydownListener("Escape", (e) => {
+    if (coordOpen) {
+      e.preventDefault();
+      setCoordOpen(false);
+    } else if (isDrawing) {
+      e.preventDefault();
+      onCancel();
+    }
+  });
   useKeydownListener(
     "Backspace",
-    (e) => isDrawing && (e.preventDefault(), onUndo())
+    (e) => isDrawing && !coordFilled && (e.preventDefault(), onUndo())
   );
   useKeydownListener("z", (e) => {
-    if (!isDrawing) return;
+    if (!isDrawing || coordFilled) return;
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
       onUndo();
     }
   });
 
-  if (!isDrawing) return null;
+  if (!isDrawing && !enableCoordinateInput) return null;
 
   return (
     <>
-      <ButtonControl
-        onClick={onFinish}
-        title={`${gettext("Finish drawing")} (Enter)`}
-      >
-        <FinishIcon />
-      </ButtonControl>
+      {enableCoordinateInput && geomType && (
+        <CoordInput
+          draw={draw}
+          geomType={geomType}
+          open={coordOpen}
+          setOpen={setCoordOpen}
+          onFilledChange={setCoordFilled}
+        />
+      )}
+      {isDrawing && (
+        <>
+          <ButtonControl
+            order={2}
+            onClick={onFinish}
+            title={`${gettext("Finish drawing")} (Enter)`}
+          >
+            <FinishIcon />
+          </ButtonControl>
 
-      <ButtonControl
-        onClick={onUndo}
-        title={`${gettext("Undo last point")} (Backspace / Ctrl+Z)`}
-        disabled={!canUndo}
-      >
-        <UndoIcon />
-      </ButtonControl>
+          <ButtonControl
+            order={3}
+            onClick={onUndo}
+            title={`${gettext("Undo last point")} (Backspace / Ctrl+Z)`}
+            disabled={!canUndo}
+          >
+            <UndoIcon />
+          </ButtonControl>
 
-      <ButtonControl
-        onClick={onCancel}
-        title={`${gettext("Cancel drawing")} (Esc)`}
-      >
-        <CancelIcon />
-      </ButtonControl>
+          <ButtonControl
+            order={4}
+            onClick={onCancel}
+            title={`${gettext("Cancel drawing")} (Esc)`}
+          >
+            <CancelIcon />
+          </ButtonControl>
+        </>
+      )}
     </>
   );
 }

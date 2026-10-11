@@ -144,6 +144,12 @@ export class ControlContainer {
     el: HTMLElement,
     order: number
   ) {
+    if (
+      el.parentElement === positionContainer &&
+      el.dataset.order === String(order)
+    ) {
+      return;
+    }
     el.dataset.order = String(order);
     el.style.order = String(order);
     const children = Array.from(positionContainer.children) as HTMLElement[];

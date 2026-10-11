@@ -573,6 +573,7 @@ msgid "Add"
 msgstr "Добавить"
 
 #: nodepkg/panel/layers/useAddItem.tsx:116
+#: nodepkg/plugin/layer-editor/modes/component/CoordInput.tsx:187
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:185
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:192
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
@@ -954,6 +955,15 @@ msgstr "Удалить: Shift + клик на вершину"
 #: nodepkg/plugin/layer-editor/modes/MoveMode.tsx:87
 msgid "Move"
 msgstr "Переместить"
+
+#: nodepkg/plugin/layer-editor/modes/component/CoordInput.tsx:190
+msgid "OK"
+msgstr "ОК"
+
+#: nodepkg/plugin/layer-editor/modes/component/CoordInput.tsx:197
+#: nodepkg/plugin/layer-editor/modes/component/CoordInput.tsx:199
+msgid "Enter coordinates"
+msgstr "Введите координаты"
 
 #: nodepkg/plugin/layer-export/LayerExportPlugin.tsx:45
 msgid "Export"

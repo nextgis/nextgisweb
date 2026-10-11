@@ -126,7 +126,9 @@ export const DrawMode: LayerEditorMode<DrawModeProps> = ({
       >
         <AddCircleIcon />
       </ToggleControl>
-      {active && <DrawControl draw={draw} />}
+      {active && (
+        <DrawControl draw={draw} geomType={geomType} enableCoordinateInput />
+      )}
     </MapToolbarControl>
   );
 };

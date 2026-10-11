@@ -5,7 +5,7 @@ import {
 } from "./regex";
 import type { GroupName } from "./regex";
 
-interface Coordinate {
+export interface Coordinate {
   lon: number;
   lat: number;
 }
