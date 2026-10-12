@@ -6,9 +6,14 @@ from setuptools import find_packages, setup
 with open("VERSION") as fd:
     VERSION = fd.read().rstrip()
 
+numpy_spec = "numpy<2"
+
 try:
     gv = check_output(["gdal-config", "--version"], universal_newlines=True).strip()
     gdal_spec = f"gdal=={gv}.*"
+    gmaj, gmin, *_ = (int(p) for p in gv.split("."))
+    if (gmaj, gmin) >= (3, 9):
+        numpy_spec = "numpy"
 except CalledProcessError:
     gdal_spec = "pygdal>=3.8"
 
@@ -17,7 +22,6 @@ except CalledProcessError:
 # of truth, ensuring compatibility with GDAL installation, where Numpy must be
 # pre-installed.
 
-numpy_spec = "numpy<2"
 if __name__ == "__main__" and len(sys.argv) >= 2 and sys.argv[1] == "gdal_numpy_spec":
     print(f"{gdal_spec} {numpy_spec}")
     sys.exit(0)
