@@ -10,7 +10,7 @@ from typing import Literal
 from warnings import warn
 
 import sqlalchemy as sa
-from sqlalchemy.schema import CreateTable
+from sqlalchemy.schema import CreateIndex, CreateTable
 
 
 class Constr:
@@ -158,12 +158,16 @@ def check_table(
                 ftab_relid if ftab_relid != tab_relid else None,
                 fcolnames,
             )
-
-            fk_data[key] = ConstraintInfo(
-                name=fk.name if isinstance(fk.name, str) else ihelper.fk_name(tab.name, colnames),
-                deferrable=fk.deferrable is True,
-                deferred=(fk.initially or "").upper() == "DEFERRED",
-            )
+            if (existing := fk_data.get(key)) is not None:
+                existing.duplicate = True
+            else:
+                fk_data[key] = ConstraintInfo(
+                    name=fk.name
+                    if isinstance(fk.name, str)
+                    else ihelper.fk_name(tab.name, colnames),
+                    deferrable=fk.deferrable is True,
+                    deferred=(fk.initially or "").upper() == "DEFERRED",
+                )
 
         # Compare constraints
 
@@ -191,7 +195,7 @@ def check_table(
                     yield f"{tab_msg}, {conlabel(key)} not found."
                     continue
 
-                if d_exp.duplicate:
+                if d_exp.duplicate or d_act.duplicate:
                     yield f"{tab_msg}, {conlabel(key)} has duplicates."
 
                 if d_exp.name is not None and d_exp.name != d_act.name:
@@ -206,12 +210,76 @@ def check_table(
             for key in cdata_act.keys():
                 yield f"{tab_msg}: extra constraint found ({conlabel(key)})."
 
+        # Indexes
+
+        # fmt: off
+        qindexes = sa.text(dedent("""
+            SELECT
+                c.relname,
+                am.amname,
+                i.indrelid,
+                i.indkey::int[],
+                pg_get_expr(i.indexprs, i.indrelid) AS expr,
+                i.indisprimary,
+                i.indisunique
+            FROM pg_index i
+            INNER JOIN pg_class c on c.oid = i.indexrelid
+            INNER JOIN pg_am am on am.oid = c.relam
+            WHERE i.indrelid = CAST(:name AS regclass)
+        """))
+        # fmt: on
+        result_exp = conn.execute(qindexes, dict(name=temp_tab_name_norm))
+        result_act = conn.execute(qindexes, dict(name=tab_name_norm))
+        data_exp = _group_indexes(result_exp, ihelper=ihelper)
+        data_act = _group_indexes(result_act, ihelper=ihelper)
+
+        def indlabel(key):
+            idx_type, rest = key
+            suffix = f"{idx_type} index" if idx_type is not None else "index"
+            if isinstance(rest, tuple):
+                rest = ", ".join(rest)
+            return f"{suffix} ({rest})"
+
+        for key, d_exp in data_exp.items():
+            if (d_act := data_act.pop(key, None)) is None:
+                yield f"{tab_msg}, {indlabel(key)} not found."
+                continue
+
+            if d_exp.duplicate or d_act.duplicate:
+                yield f"{tab_msg}, {indlabel(key)} has duplicates."
+
+            if d_exp.name != d_act.name:
+                yield f"{tab_msg}, {indlabel(key)} name mismatch ({d_exp.name} <> {d_act.name})."
+
+            if d_exp.access_method != d_act.access_method:
+                yield f"{tab_msg}, {indlabel(key)} access method mismatch ({d_exp.access_method} <> {d_act.access_method})."
+
+        for key in data_act.keys():
+            yield f"{tab_msg}: extra index found ({indlabel(key)})."
+
 
 @contextmanager
 def _baseline_table(table: sa.Table, *, conn: sa.Connection) -> Iterator[str]:
     # Setting schema to "pg_temp" is equivalent of creating a TEMPORARY table
     clone = table.to_metadata(sa.MetaData(), schema="pg_temp")
     conn.execute(CreateTable(clone, include_foreign_key_constraints=[]))
+
+    idx_rename: dict[str, sa.quoted_name] = {}
+    for idx in table.indexes:
+        if idx._column_flag:
+            assert idx.name is not None
+            assert len(idx.columns) == 1
+            colname = idx.columns[0].name
+            assert colname not in idx_rename
+            idx_rename[colname] = idx.name
+
+    for idx_tmp in clone.indexes:
+        if idx_tmp._column_flag:
+            assert len(idx_tmp.columns) == 1
+            idx_tmp.name = idx_rename.pop(idx_tmp.columns[0].name)
+        conn.execute(CreateIndex(idx_tmp))
+
+    assert len(idx_rename) == 0, "Unmatched column-defined indexes present"
 
     with conn.begin_nested() as savepoint:
         try:
@@ -320,5 +388,39 @@ def _group_constraints(qresult: sa.Result, *, ihelper: InspectionHelper) -> Cons
                 name=row.conname,
                 deferrable=row.condeferrable,
                 deferred=row.condeferred,
+            )
+    return result
+
+
+@dataclass(kw_only=True)
+class IndexInfo:
+    name: str
+    access_method: str
+    duplicate: bool = False
+
+
+def _group_indexes(qresult: sa.Result, *, ihelper: InspectionHelper) -> dict[tuple, IndexInfo]:
+    result: dict[tuple, IndexInfo] = {}
+    for row in qresult.mappings():
+        if row.indisprimary:
+            idx_type = "primary unique"
+        elif row.indisunique:
+            idx_type = "unique"
+        else:
+            idx_type = None
+
+        if (expr := row.expr) is not None:
+            key = (idx_type, expr)
+        else:
+            assert 0 not in row.indkey, "Index expression expected"
+            columns = ihelper.colnames(row.indrelid, row.indkey)
+            key = (idx_type, columns)
+
+        if (existing := result.get(key)) is not None:
+            existing.duplicate = True
+        else:
+            result[key] = IndexInfo(
+                name=row.relname,
+                access_method=row.amname,
             )
     return result
