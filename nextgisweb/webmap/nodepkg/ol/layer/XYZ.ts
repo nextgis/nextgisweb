@@ -5,15 +5,15 @@ import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
 import type { LayerSymbols } from "@nextgisweb/webmap/compat/type";
 
-import { CoreLayer } from "./CoreLayer";
-import type { LayerOptions } from "./CoreLayer";
+import { OlLayerAdapter } from "./OlLayerAdapter";
+import type { LayerOptions } from "./OlLayerAdapter";
 
 interface URLParams {
   [key: string]: string;
   resource: string;
 }
 
-export default class XYZ extends CoreLayer<
+export default class XYZ extends OlLayerAdapter<
   XYZSource,
   TileLayer<XYZSource>,
   XYZSourceOptions
@@ -93,6 +93,7 @@ export default class XYZ extends CoreLayer<
         (acc, curr) => {
           if (!curr) return acc;
 
+          curr = curr.replace(/\+/g, " ");
           const i = curr.indexOf("=");
 
           if (i !== -1) {
@@ -110,7 +111,9 @@ export default class XYZ extends CoreLayer<
   private buildQueryString(params: URLParams): string {
     return Object.entries(params)
       .map(([key, val]) => {
-        return `${key}=${val}`;
+        const template =
+          ["x", "y", "z"].includes(key) && val === "{" + key + "}";
+        return `${encodeURIComponent(key)}=${template ? val : encodeURIComponent(val)}`;
       })
       .join("&");
   }

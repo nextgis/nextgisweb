@@ -56,24 +56,34 @@ export const DisplayWidget = observer(
     );
     const [mounted, setMounted] = useState(false);
     const { isMobile, screenReady, isPortrait } = useLayout();
+    const {
+      map,
+      urlParams,
+      isTinyMode,
+      tabsManager,
+      panelManager,
+      setIsMobile,
+    } = display;
+    const { ready } = map;
+    const { panel: requestedPanel, panels: allowedPanels } = urlParams;
 
     useEffect(() => {
       display.startup();
     }, [display]);
 
     useEffect(() => {
-      display.setIsMobile(isMobile);
-    }, [display, isMobile]);
+      setIsMobile(isMobile);
+    }, [setIsMobile, isMobile]);
 
-    const { activePanel, activePanelName, items } = display.panelManager;
-    const { tabs } = display.tabsManager;
+    const { activePanel, activePanelName, items } = panelManager;
+    const { tabs } = tabsManager;
 
     useEffect(() => {
-      const panel = display.panelManager;
-      const requestedPanel = display.urlParams.panel;
+      if (mounted || !screenReady || !ready) return;
+
       let canceled = false;
-      if (display.isTinyMode) {
-        panel.setAllowPanels(display.urlParams.panels || []);
+      if (isTinyMode) {
+        panelManager.setAllowPanels(allowedPanels || []);
       }
 
       async function buildPluginsAndActivate() {
@@ -81,22 +91,22 @@ export const DisplayWidget = observer(
 
         plugins.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
         for (const plugin of plugins) {
-          await panel.registerPlugin(plugin);
+          await panelManager.registerPlugin(plugin);
         }
         if (canceled) return;
 
         const requestedItem = requestedPanel
-          ? panel.getItem(requestedPanel)
+          ? panelManager.getItem(requestedPanel)
           : undefined;
         const hasRequestedWidget = requestedItem?.type === "widget";
         const isEmptyMode = requestedPanel === emptyModeURLValue;
 
         if (hasRequestedWidget) {
-          panel.setActive(requestedPanel, "init");
+          panelManager.setActive(requestedPanel, "init");
         } else if (!isEmptyMode) {
-          const firstPanelKey = panel.panels.keys().next().value;
+          const firstPanelKey = panelManager.panels.keys().next().value;
           if (firstPanelKey) {
-            panel.setActive(firstPanelKey, "init");
+            panelManager.setActive(firstPanelKey, "init");
           }
         }
         setMounted(true);
@@ -107,7 +117,15 @@ export const DisplayWidget = observer(
       return () => {
         canceled = true;
       };
-    }, [display, display.isTinyMode]);
+    }, [
+      ready,
+      mounted,
+      isTinyMode,
+      screenReady,
+      panelManager,
+      allowedPanels,
+      requestedPanel,
+    ]);
 
     useEffect(() => {
       if (!mounted) return;
@@ -142,12 +160,12 @@ export const DisplayWidget = observer(
         const newPanelSize = sizes[1];
         if (activePanel) {
           if (newPanelSize < PANEL_MIN_HEIGHT) {
-            display.panelManager.closePanel();
+            panelManager.closePanel();
             setPanelSize(getDefultPanelSize(isPortrait));
           }
         }
       },
-      [activePanel, display.panelManager, isPortrait]
+      [activePanel, panelManager, isPortrait]
     );
 
     const panelsToShow = useMemo(() => {
@@ -166,7 +184,7 @@ export const DisplayWidget = observer(
           >
             <NavigationMenu
               orientation={isPortrait ? "horizontal" : "vertical"}
-              store={display.panelManager}
+              store={panelManager}
             />
           </Panel>,
           <Panel
@@ -186,7 +204,7 @@ export const DisplayWidget = observer(
             </Panel>
             {tabs.length && (
               <Panel key="tabs">
-                <WebMapTabs store={display.tabsManager} />
+                <WebMapTabs store={tabsManager} />
               </Panel>
             )}
           </Splitter>
@@ -196,6 +214,8 @@ export const DisplayWidget = observer(
       if (isPortrait) showPanels.reverse();
       return showPanels;
     }, [
+      panelManager,
+      tabsManager,
       mapChildren,
       screenReady,
       activePanel,

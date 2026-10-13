@@ -1,10 +1,13 @@
+import { observer } from "mobx-react-lite";
 import { unByKey } from "ol/Observable";
 import type VectorSource from "ol/source/Vector";
 import { useEffect, useState } from "react";
 
 import { DeleteIcon } from "@nextgisweb/gui/icon";
 import { MapToolbarControl } from "@nextgisweb/webmap/map-component";
+import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
 import { useToggleGroupItem } from "@nextgisweb/webmap/map-component/control/toggle-group";
+import { hasOlMap } from "@nextgisweb/webmap/ol/util/hasOlMap";
 import { EditableItem } from "@nextgisweb/webmap/plugin/layer-editor/EditableItem";
 import { ClearAllBtn } from "@nextgisweb/webmap/plugin/layer-editor/modes/ClearAllBtn";
 import { MoveMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/MoveMode";
@@ -15,10 +18,13 @@ interface ExtentEditorControlPanelProps {
   order?: number;
 }
 
-export function ExtentEditorControlPanel({
+function ExtentEditorControlPanelInner({
   source,
   order = 10,
 }: ExtentEditorControlPanelProps) {
+  const { mapStore } = useMapContext();
+  const { adapter } = mapStore;
+  const olMap = hasOlMap(adapter) ? adapter.map : undefined;
   const [featuresLength, setFeaturesLength] = useState<number | null>(null);
   const { activate, isActive } = useToggleGroupItem("extent-editor");
 
@@ -42,6 +48,8 @@ export function ExtentEditorControlPanel({
     }
   }, [editingMode, activate]);
 
+  if (!olMap) return null;
+
   return (
     <MapToolbarControl
       order={order}
@@ -53,6 +61,7 @@ export function ExtentEditorControlPanel({
       gap={4}
     >
       <EditableItem
+        olMap={olMap}
         enabled
         source={source}
         editingMode={isActive ? editingMode : null}
@@ -70,3 +79,5 @@ export function ExtentEditorControlPanel({
     </MapToolbarControl>
   );
 }
+
+export const ExtentEditorControlPanel = observer(ExtentEditorControlPanelInner);

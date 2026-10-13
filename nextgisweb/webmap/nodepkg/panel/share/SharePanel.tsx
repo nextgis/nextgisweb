@@ -78,16 +78,6 @@ const CodeArea = (props: TextAreaProps) => {
   );
 };
 
-const toolsOptions = registry
-  .queryAll()
-  .filter((c) => c.embeddedShowMode === "customize")
-  .map((c) => {
-    return {
-      label: c.label,
-      value: c.key,
-    };
-  });
-
 const ToolsSelect = (props: SelectProps) => {
   return (
     <Select
@@ -97,7 +87,6 @@ const ToolsSelect = (props: SelectProps) => {
         width: "100%",
       }}
       placeholder={gettext("Select tools")}
-      options={toolsOptions}
       {...props}
     />
   );
@@ -224,20 +213,20 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
       updateEmbedCode();
     });
 
-    const mapView = display.map.olMap.getView();
-    mapView.on("change", updateTexts);
+    const unsubscribe = display.map.adapter.subscribe(updateTexts);
 
     updateTexts();
 
     return () => {
       isMounted = false;
-      mapView.un("change", updateTexts);
+      unsubscribe();
     };
   }, [
     display.map.started,
     display.treeStore.deepTreeStamp,
-    display.map.baseLayer,
-    display.map.olMap,
+    display.map.activeBasemapKey,
+    display.map.adapter,
+    display.map.mapMode,
     updateEmbedCode,
     updatePermalinkUrl,
   ]);
@@ -254,7 +243,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     controls,
     panels,
     activePanel,
-    display.map.baseLayer,
+    display.map.activeBasemapKey,
     display.map.started,
     updateEmbedCode,
   ]);
@@ -272,6 +261,20 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }
   }, [panels, activePanel]);
 
+  const toolsOptions = registry
+    .queryAll()
+    .filter(
+      (c) =>
+        c.embeddedShowMode === "customize" &&
+        (c.isEnabled?.({ map: display.map, display }) ?? true)
+    )
+    .map((c) => {
+      return {
+        label: c.label,
+        value: c.key,
+      };
+    });
+
   useEffect(() => {
     const panelsForTinyMap = panelManager.sorted
       .filter((p) => p.applyToTinyMap === true)
@@ -284,7 +287,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
       })
       .sort((a, b) => a.title.localeCompare(b.title));
     setPanelsOptions(panelsForTinyMap);
-  }, [panelManager]);
+  }, [panelManager, panelManager.sorted]);
 
   const previewUrl = routeURL("webmap.preview_embedded");
 
@@ -394,7 +397,11 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         </div>
         <div className="input-group column">
           <label>{gettext("Map tools")}</label>
-          <ToolsSelect value={controls} onChange={setControls} />
+          <ToolsSelect
+            value={controls}
+            onChange={setControls}
+            options={toolsOptions}
+          />
         </div>
         <div className="input-group column">
           <label>{gettext("Panels")}</label>

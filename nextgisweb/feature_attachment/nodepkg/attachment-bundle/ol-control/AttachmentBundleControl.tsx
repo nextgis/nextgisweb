@@ -1,6 +1,5 @@
 import { lazy, useCallback } from "react";
 
-import settings from "@nextgisweb/feature-attachment/client-settings";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context/useDisplayContext";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
 import type { ButtonControlProps } from "@nextgisweb/webmap/map-component";
@@ -28,10 +27,6 @@ export default function AttachmentBundleControl(props: ButtonControlProps) {
       },
     });
   }, [display, props.title]);
-
-  if (!settings["webmap"]["bundle"]) {
-    return null;
-  }
 
   return (
     <ButtonControl {...props} onClick={onClick}>

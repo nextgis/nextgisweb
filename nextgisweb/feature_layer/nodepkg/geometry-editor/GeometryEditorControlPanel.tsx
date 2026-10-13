@@ -7,7 +7,9 @@ import {
 } from "@nextgisweb/feature-layer/util/geometry-types";
 import type { ControlPosition } from "@nextgisweb/webmap/control-container/ControlContainer";
 import { MapToolbarControl } from "@nextgisweb/webmap/map-component";
+import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
 import { useToggleGroupItem } from "@nextgisweb/webmap/map-component/control/toggle-group";
+import { hasOlMap } from "@nextgisweb/webmap/ol/util/hasOlMap";
 import { EditableItem } from "@nextgisweb/webmap/plugin/layer-editor/EditableItem";
 import { ClearAllBtn } from "@nextgisweb/webmap/plugin/layer-editor/modes/ClearAllBtn";
 import { DeleteMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/DeleteMode";
@@ -26,6 +28,9 @@ interface GeometryEditorControlPanelProps {
 
 export const GeometryEditorControlPanel = observer(
   ({ store, order, position }: GeometryEditorControlPanelProps) => {
+    const { mapStore } = useMapContext();
+    const { adapter } = mapStore;
+    const olMap = hasOlMap(adapter) ? adapter.map : undefined;
     const { geometryType, source, value, multiGeometry } = store;
     const [editingMode, setEditingMode] = useState<string | null>(() =>
       value ? ModifyMode.displayName : DrawMode.displayName
@@ -38,7 +43,7 @@ export const GeometryEditorControlPanel = observer(
       }
     }, [editingMode, activate]);
 
-    if (!geometryType || !source) {
+    if (!olMap || !geometryType || !source) {
       return null;
     }
 
@@ -52,6 +57,7 @@ export const GeometryEditorControlPanel = observer(
         id="editor-toolbar"
       >
         <EditableItem
+          olMap={olMap}
           source={source}
           enabled
           editingMode={isActive ? editingMode : null}

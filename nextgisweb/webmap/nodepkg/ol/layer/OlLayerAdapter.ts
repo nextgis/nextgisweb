@@ -5,6 +5,7 @@ import type { Style } from "ol/style";
 
 import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
 import type { LayerSymbols } from "@nextgisweb/webmap/compat/type";
+import type { CoreLayer } from "@nextgisweb/webmap/layer-adapter/CoreLayer";
 
 export interface LayerOptions {
   title?: string;
@@ -22,12 +23,11 @@ export type ExtendedOlLayer<
   TLayer extends Layer<TSource> = Layer<TSource>,
 > = TLayer;
 
-/** We are using CoreLayer instead of BaseLayer here to avoid mismatch with cartographic baselayer on the bottom of map */
-export abstract class CoreLayer<
+export abstract class OlLayerAdapter<
   TSource extends Source = Source,
   TLayer extends ExtendedOlLayer<TSource> = ExtendedOlLayer<TSource>,
   TSourceOptions = unknown,
-> {
+> implements CoreLayer {
   id = uniqueId();
   name: string;
   title: string;
@@ -81,18 +81,6 @@ export abstract class CoreLayer<
 
     this.setOpacity(this.olLayer.getOpacity() ?? 1);
     this.setVisibility(this.olLayer.getVisible() ?? true);
-
-    this.bindLayerEvents();
-  }
-
-  bindLayerEvents(): void {
-    this.olLayer.on("change:visible", () => {
-      this.setVisibility(this.olLayer.getVisible() ?? true);
-    });
-
-    this.olLayer.on("change:opacity", () => {
-      this.setOpacity(this.olLayer.getOpacity() ?? 1);
-    });
   }
 
   setVisibility(visibility: boolean): void {
@@ -113,6 +101,14 @@ export abstract class CoreLayer<
 
   setZIndex(zIndex: number) {
     this.getLayer()?.setZIndex(zIndex);
+  }
+
+  setResolutionRange(
+    minResolution: number | null,
+    maxResolution: number | null
+  ): void {
+    this.olLayer.setMinResolution(minResolution ?? 0);
+    this.olLayer.setMaxResolution(maxResolution ?? Infinity);
   }
 
   reload(): void {

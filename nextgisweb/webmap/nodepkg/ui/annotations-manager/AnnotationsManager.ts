@@ -21,6 +21,7 @@ export class AnnotationsManager {
   private _display: Display;
 
   @observableRef accessor visibleMode: AnnotationVisibleMode | null = null;
+  @observableRef accessor editing = false;
   @observableRef accessor filter: AccessFilter = {
     public: true,
     own: true,
@@ -48,6 +49,7 @@ export class AnnotationsManager {
       return;
     }
 
+    if (this.visibleMode !== null) return;
     this.activeGeometryType = null;
     this.visibleMode = this._getInitialVisibleMode();
   }
@@ -56,6 +58,11 @@ export class AnnotationsManager {
   stop(): void {
     this.activeGeometryType = null;
     this.visibleMode = null;
+  }
+
+  @actionBound
+  setEditing(editing: boolean): void {
+    this.editing = editing;
   }
 
   @actionBound

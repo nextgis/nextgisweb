@@ -1,8 +1,8 @@
 import Source from "ol/source/Source";
 import type { Options as SourceOptions } from "ol/source/Source";
 
-import { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
-import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
+import { OlLayerAdapter } from "@nextgisweb/webmap/ol/layer/OlLayerAdapter";
+import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/OlLayerAdapter";
 
 import { MapLibreStyleLayer } from "./MapLibreStyleLayer";
 
@@ -10,7 +10,7 @@ interface MapLibreSourceOptions extends SourceOptions {
   url: string;
 }
 
-export default class MapLibreAdapter extends CoreLayer<
+export default class MapLibreAdapter extends OlLayerAdapter<
   Source,
   MapLibreStyleLayer,
   MapLibreSourceOptions

@@ -1,6 +1,6 @@
 import { action, actionBound, computed, observableRef, reaction } from "mobx";
 import type { Extent } from "ol/extent";
-import { transformExtent } from "ol/proj";
+import { fromLonLat, transformExtent } from "ol/proj";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -11,6 +11,7 @@ import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
 import settings from "../client-settings";
 import { HighlightStore } from "../highlight-store";
+import { DEFAULT_MAP_PROJECTION } from "../map-adapter/constant";
 import { MapStore } from "../ol/MapStore";
 import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
@@ -24,7 +25,7 @@ import { ConfigStore } from "./ConfigStore";
 import { displayURLParams } from "./displayURLParams";
 
 export class Display {
-  displayProjection = "EPSG:3857";
+  displayProjection = DEFAULT_MAP_PROJECTION;
   lonlatProjection = "EPSG:4326";
 
   readonly config: ConfigStore;
@@ -45,7 +46,7 @@ export class Display {
 
   urlParams: DisplayURLParams;
 
-  @observableRef accessor mapReady = false;
+  @observableRef accessor editingInProgress = false;
   @observableRef accessor item: TreeItemStore | null = null;
   @observableRef accessor isMobile = false;
 
@@ -87,15 +88,31 @@ export class Display {
       imageQueue.setLimit(100);
     }
 
+    const { lon, lat, zoom = 10, angle = 0 } = this.urlParams;
+
     this.map = new MapStore({
+      hmux,
       logo: false,
+      mapMode: this.urlParams.mode,
       controls: [],
-      initialExtent,
-      constrainingExtent,
+      initialView:
+        lon !== undefined && lat !== undefined
+          ? {
+              center: fromLonLat([lon, lat], this.displayProjection),
+              zoom,
+              rotation: angle,
+            }
+          : undefined,
       measureSrsId: this.config.measureSrsId,
+      initialExtent,
       displayProjection: this.displayProjection,
       lonlatProjection: this.lonlatProjection,
-      hmux,
+      constrainingExtent,
+      canChangeMapMode: () =>
+        !this.editingInProgress &&
+        !this.treeStore.editableLayers.length &&
+        !this.annotationsManager.activeGeometryType &&
+        !this.annotationsManager.editing,
     });
     this.identify = new Identify({ display: this });
     this.annotationsManager = new AnnotationsManager({ display: this });
@@ -122,9 +139,23 @@ export class Display {
     this.isMobile = val;
   }
 
+  @computed
+  get availablePlugins(): Record<string, PluginBase<TreeItemStore>> {
+    return Object.fromEntries(
+      Object.entries(this.plugins).filter(
+        ([, plugin]) => plugin.isEnabled?.(this) ?? true
+      )
+    );
+  }
+
+  @computed
+  get mapMode(): string {
+    return this.map.mapMode;
+  }
+
   @actionBound
-  setMapReady(status: boolean) {
-    this.mapReady = status;
+  setEditingInProgress(value: boolean): void {
+    this.editingInProgress = value;
   }
 
   getVisibleItems() {

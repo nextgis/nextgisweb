@@ -2,17 +2,16 @@ import {
   action,
   actionBound,
   computed,
+  observable,
   observableRef,
   observableStruct,
+  runInAction,
 } from "mobx";
 import type { Feature } from "ol";
-import OlMap from "ol/Map";
+import type OlMap from "ol/Map";
 import type { MapOptions as OlMapOptions } from "ol/Map";
-import { unByKey } from "ol/Observable";
-import View from "ol/View";
+import type View from "ol/View";
 import type { FitOptions } from "ol/View";
-import type Control from "ol/control/Control";
-import type { EventsKey } from "ol/events";
 import * as olExtent from "ol/extent";
 import type { Extent } from "ol/extent";
 import { GeoJSON, WKT } from "ol/format";
@@ -20,40 +19,46 @@ import type { Geometry } from "ol/geom";
 import * as olProj from "ol/proj";
 import type { ProjectionLike } from "ol/proj";
 
-import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
-import { imageQueue } from "@nextgisweb/pyramid/util";
-import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
 
+import type { TargetPosition } from "../control-container/ControlContainer";
+import type { LayerDefinition, TileLayerOptions } from "../layer-adapter";
+import type { CoreLayer } from "../layer-adapter/CoreLayer";
+import {
+  DEFAULT_MAP_MAX_ZOOM,
+  DEFAULT_MAP_PROJECTION,
+} from "../map-adapter/constant";
+import { registry as adapterRegistry } from "../map-adapter/registry";
+import type { MapAdapterPlugin } from "../map-adapter/registry";
 import type {
-  CreateControlOptions,
-  MapControl,
-  TargetPosition,
-} from "../control-container/ControlContainer";
+  MapAdapter,
+  MapExtent,
+  MapViewOptions,
+  MapViewState,
+} from "../map-adapter/type";
 
-import { createControl } from "./control/createControl";
-import type { CoreLayer, ExtendedOlLayer } from "./layer/CoreLayer";
+import { OpenLayersMapAdapter } from "./OlMapAdapter";
 import { PanelControl } from "./panel-control/PanelControl";
 import type { ControlOptions } from "./panel-control/PanelControl";
-import { mapStartup } from "./util/mapStartup";
 import { scaleForResolution } from "./util/resolutionUtil";
 
-import "ol/ol.css";
-
-export interface MapExtent extends FitOptions {
-  extent: NgwExtent;
-  srs: SRSRef;
-}
-
 interface MapOptions extends Omit<OlMapOptions, "target"> {
+  hmux?: boolean;
   logo?: boolean;
-  constrainingExtent?: Extent;
+  target?: HTMLElement;
+  mapMode?: string;
+  initialView?: MapViewOptions;
   measureSrsId?: number | null;
   initialExtent?: Extent;
   lonlatProjection?: string;
   displayProjection?: string;
-  target?: string | HTMLElement;
-  hmux?: boolean;
+  constrainingExtent?: Extent;
+  canChangeMapMode?: () => boolean;
+}
+
+interface MapStartupOptions {
+  onCreated?: () => void;
+  onError?: (error: unknown) => void;
 }
 
 export interface Position {
@@ -74,33 +79,50 @@ interface Layers {
 export const TOP_LAYER_ZINDEX = 10000;
 
 export class MapStore {
-  readonly panelControl: PanelControl;
+  readonly panelControl = new PanelControl();
 
   private readonly DPI = 1000 / 39.37 / 0.28;
   private readonly IPM = 39.37;
-  private readonly SMART_ZOOM_EXTENT = 100;
-  private readonly SMART_ZOOM = 12;
 
   readonly initialExtent?: Extent;
   readonly constrainingExtent?: Extent;
 
   readonly maxZoom = DEFAULT_MAP_MAX_ZOOM;
 
-  readonly displaySrsId = 3857;
-  readonly displayProjection = `EPSG:${this.displaySrsId}`;
+  @observableRef accessor displayProjection = DEFAULT_MAP_PROJECTION;
+
+  @computed
+  get displaySrsId(): number {
+    return Number(this.displayProjection.replace("EPSG:", ""));
+  }
   readonly lonlatProjection = "EPSG:4326";
 
   @observableRef accessor hmux: boolean | null;
 
+  /**
+   * @deprecated TODO remove from MapStore after migrating the remaining consumers.
+   */
   @observableRef accessor olMap: OlMap;
+  /**
+   * @deprecated TODO remove from MapStore after migrating the remaining consumers.
+   */
   @observableRef accessor olView: View;
 
+  /** The adapter is mounted and the map view has been initialized. */
   @observableRef accessor ready = false;
   @observableRef accessor started = false;
 
   @observableRef accessor layers: Layers = {};
 
   @observableRef accessor baseLayer: CoreLayer | null = null;
+  @observableRef accessor basemapConfigs: TileLayerOptions[] = [];
+  @observableRef accessor activeBasemapKey = "blank";
+  private basemapSelectionInitialized = false;
+  private readonly layerDefinitions = observable.set<LayerDefinition>([], {
+    deep: false,
+  });
+  private readonly adapterPlugins = new WeakMap<MapAdapter, MapAdapterPlugin>();
+  private readonly layerOwners = new WeakMap<CoreLayer, MapAdapter>();
   @observableRef accessor resolution: number | null = null;
   @observableStruct accessor center: number[] | null = null;
   @observableRef accessor zoom: number | null = null;
@@ -112,46 +134,221 @@ export class MapStore {
   @observableRef accessor isLoading: boolean = false;
   @observableRef accessor defaultMapState: string | null = null;
 
-  private _viewUnbindKeys: EventsKey[] = [];
-  private _mapUnbindKeys: EventsKey[] = [];
+  /**
+   * @deprecated TODO remove from MapStore after migrating the remaining consumers.
+   */
+  readonly defaultAdapter: OpenLayersMapAdapter;
+
+  @observableRef accessor mapMode = "2d";
+  @observableRef accessor adapter: MapAdapter;
+  private adapterUnsubscribe?: () => void;
+  private target?: HTMLElement;
+  private startupOptions?: MapStartupOptions;
+  private transitionId = 0;
+  private viewInitialized = false;
+  @observableRef private accessor mapModeChangeAllowed = true;
+  private loadingStartTime?: number;
+  @observableRef private accessor targetElementValue: HTMLElement | null = null;
 
   constructor(private options: MapOptions) {
     const {
       hmux,
       target,
+      mapMode = "2d",
+      initialView,
       measureSrsId,
       initialExtent,
       constrainingExtent,
+      canChangeMapMode,
       ...viewOptions
     } = this.options;
     this.hmux = hmux ?? null;
     this.measureSrsId = measureSrsId ?? null;
     this.initialExtent = initialExtent;
     this.constrainingExtent = constrainingExtent;
-    if (!viewOptions.view) {
-      viewOptions.view = new View({
-        maxZoom: this.maxZoom,
-        projection: this.displayProjection,
-        // Must always be true for correct tile caching with image adapters
-        constrainResolution: true,
-        extent: constrainingExtent,
-      });
-    }
-    this.olMap = new OlMap(viewOptions);
+    this.defaultAdapter = new OpenLayersMapAdapter({
+      ...viewOptions,
+      constrainingExtent,
+    });
+    this.adapter = this.defaultAdapter;
+    this.olMap = this.defaultAdapter.map;
     this.olView = this.olMap.getView();
-    this.panelControl = new PanelControl();
-    this.olMap.addControl(this.panelControl);
+    this.displayProjection =
+      options.displayProjection ?? this.olView.getProjection().getCode();
+    if (
+      mapMode === "2d" ||
+      adapterRegistry.queryAll().some(({ key }) => key === mapMode)
+    ) {
+      this.mapMode = mapMode;
+    }
+    this.subscribeToAdapter();
     if (target) {
       this.startup(target);
     }
   }
 
   @computed
-  get activeBasemapKey(): "blank" | string {
-    if (!this.baseLayer || !this.baseLayer.name) {
-      return "blank";
+  private get adapterPlugin(): MapAdapterPlugin | undefined {
+    return adapterRegistry.queryAll().find(({ key }) => key === this.mapMode);
+  }
+
+  @computed
+  get canChangeMapMode(): boolean {
+    return (
+      this.mapModeChangeAllowed && (this.options.canChangeMapMode?.() ?? true)
+    );
+  }
+
+  @actionBound
+  setMapModeOptions({
+    allowMapModeChange = true,
+  }: {
+    allowMapModeChange?: boolean;
+  }): void {
+    this.mapModeChangeAllowed = allowMapModeChange;
+  }
+
+  @actionBound
+  setMapMode(mode: string): boolean {
+    if (mode === this.mapMode || !this.canChangeMapMode) return false;
+    if (
+      mode !== "2d" &&
+      !adapterRegistry.queryAll().some(({ key }) => key === mode)
+    ) {
+      return false;
     }
-    return this.baseLayer.name;
+    this.mapMode = mode;
+    if (this.target) void this.mountAdapter();
+    return true;
+  }
+
+  @actionBound
+  private setAdapter(adapter: MapAdapter, plugin?: MapAdapterPlugin): void {
+    if (adapter === this.adapter) return;
+    if (plugin) this.adapterPlugins.set(adapter, plugin);
+    this.adapterUnsubscribe?.();
+    this.adapterUnsubscribe = undefined;
+    this.loadingStartTime = undefined;
+    this.adapter = adapter;
+  }
+
+  getViewState(): MapViewState | null {
+    const state = this.adapter.getViewState();
+    if (state) return state;
+    const { center, zoom, resolution, rotation } = this;
+    if (!center || zoom === null || resolution === null) return null;
+    return { center: [...center], zoom, resolution, rotation };
+  }
+
+  private subscribeToAdapter(): void {
+    this.adapterUnsubscribe?.();
+    const adapter = this.adapter;
+    const unsubscribe = adapter.subscribe(() => {
+      if (adapter === this.adapter) {
+        this.syncAdapterState();
+      }
+    });
+    const unsubscribeMoveEnd = adapter.subscribeMoveEnd(() => {
+      if (adapter === this.adapter) {
+        this.syncPosition();
+      }
+    });
+    this.adapterUnsubscribe = () => {
+      unsubscribe();
+      unsubscribeMoveEnd();
+    };
+    this.syncAdapterState();
+  }
+
+  @action
+  private syncAdapterState(): void {
+    const state = this.adapter.getViewState();
+    if (state) {
+      this.center = state.center;
+      this.zoom = state.zoom;
+      this.resolution = state.resolution;
+      this.rotation = state.rotation;
+    }
+    const status = this.adapter.getStatus();
+    if (state && status.started && this.position === null) {
+      this.position = { center: state.center, zoom: state.zoom };
+    }
+    if (!status.started) {
+      this.loadingStartTime = undefined;
+    } else if (status.isLoading) {
+      this.loadingStartTime ??= performance.now();
+    } else if (this.loadingStartTime !== undefined) {
+      const durationMs = (performance.now() - this.loadingStartTime).toFixed(0);
+      console.log(`Map layers loaded in ${durationMs} ms`);
+      this.loadingStartTime = undefined;
+    }
+    this.started = status.started;
+    this.isLoading = status.isLoading;
+    this.targetElementValue = status.target;
+  }
+
+  @action
+  private syncPosition(): void {
+    const state = this.adapter.getViewState();
+    if (state) this.position = { center: state.center, zoom: state.zoom };
+  }
+
+  @action
+  setViewState(state: MapViewState): void {
+    this.adapter.setViewState(state);
+    this.syncPosition();
+  }
+
+  @action
+  setViewOptions(options: MapViewOptions): void {
+    const { extent, ...view } = options;
+    this.adapter.setViewOptions(view);
+    if (extent) {
+      this.fitNGWExtent(extent);
+    }
+    this.syncPosition();
+  }
+
+  setPosition({ center, zoom }: Position): void {
+    const state = this.getViewState();
+    if (!state) return;
+    this.setViewState({
+      ...state,
+      center,
+      zoom,
+      resolution: state.resolution * 2 ** (state.zoom - zoom),
+    });
+  }
+
+  canZoomBy(delta: number): boolean {
+    if (this.zoom === null) return false;
+    return this.adapter.canZoomBy(delta);
+  }
+
+  zoomBy(delta: number, duration?: number): void {
+    this.adapter.zoomBy(delta, duration);
+  }
+
+  setRotation(rotation: number, duration?: number): void {
+    this.adapter.setRotation(rotation, duration);
+  }
+
+  @actionBound
+  setBasemapConfigs(configs: TileLayerOptions[], preferredKey?: string): void {
+    this.basemapConfigs = configs.map((config, index) => ({
+      ...config,
+      name: config.name ?? `basemap_${index}`,
+    }));
+    if (!configs.length) return;
+    const hasKey = (key?: string) =>
+      key !== undefined && this.basemapConfigs.some((c) => c.name === key);
+    if (this.basemapSelectionInitialized && hasKey(this.activeBasemapKey))
+      return;
+    this.activeBasemapKey =
+      (hasKey(preferredKey) ? preferredKey : undefined) ??
+      this.basemapConfigs.find((c) => c.layer?.visible)?.name ??
+      (hasKey("blank") ? "blank" : this.basemapConfigs[0].name!);
+    this.basemapSelectionInitialized = true;
   }
 
   @actionBound
@@ -173,6 +370,8 @@ export class MapStore {
   @action
   setBaseLayer(layer: CoreLayer) {
     this.baseLayer = layer;
+    this.activeBasemapKey = layer.name;
+    this.basemapSelectionInitialized = true;
   }
 
   @actionBound
@@ -187,151 +386,196 @@ export class MapStore {
 
   @actionBound
   switchBasemap(basemapLayerKey: string) {
-    if (!(basemapLayerKey in this.layers)) {
+    if (!this.basemapConfigs.some((c) => c.name === basemapLayerKey))
       return false;
-    }
-
-    if (this.baseLayer && this.baseLayer.name) {
-      const { name } = this.baseLayer;
-      this.layers[name].olLayer.setVisible(false);
-    }
-
-    const newLayer = this.layers[basemapLayerKey];
-    newLayer.olLayer.setVisible(true);
-    this.baseLayer = newLayer;
-
+    this.activeBasemapKey = basemapLayerKey;
+    this.basemapSelectionInitialized = true;
     return true;
   }
 
-  async startup(target: string | HTMLElement): Promise<void> {
-    return new Promise((resolve) => {
-      if (this._mapUnbindKeys.length) {
-        this.detach();
-      }
-
-      const olMap = this.olMap;
-
-      const olView = olMap.getView();
-
-      const s = this.getSetters(olView);
-
-      const applyInitialState = () => {
-        s.setResolution();
-        s.setCenter();
-        s.setPosition();
-        s.setRotation();
-      };
-      this.bindView(olView);
-
-      let loadedStartTime: number | undefined = undefined;
-
-      this._mapUnbindKeys.push(
-        olMap.on("loadstart", () => {
-          loadedStartTime = performance.now();
-
-          this.setIsLoading(true);
-        }),
-
-        olMap.on("loadend", () => {
-          if (loadedStartTime !== undefined) {
-            const startedAt = loadedStartTime;
-            const finishedAt = performance.now();
-            const durationMs = (finishedAt - startedAt).toFixed(0);
-            console.log(`Map layers loaded in ${durationMs} ms`);
-            loadedStartTime = undefined;
-          }
-
-          this.setIsLoading(false);
-        }),
-
-        olMap.on("moveend", s.setPosition),
-        olMap.once("rendercomplete", applyInitialState),
-
-        // Workaround to skip first map move event on start
-        olMap.once("movestart", () => {
-          // Map ready only then first move happend
-          resolve();
-          this.setReady(true);
-          mapStartup({ olMap, queue: imageQueue });
-        })
-      );
-
-      olMap.setTarget(target);
-
-      this.setStarted(true);
-    });
+  async startup(
+    target: HTMLElement,
+    options?: MapStartupOptions
+  ): Promise<void> {
+    this.target = target;
+    this.startupOptions = options;
+    await this.mountAdapter();
   }
 
-  setView(view: View): void {
-    this.unView();
-    this.bindView(view);
+  private async mountAdapter(state = this.getViewState()): Promise<void> {
+    const target = this.target;
+    if (!target) return;
+    const transitionId = ++this.transitionId;
+    const mode = this.mapMode;
+    const plugin = this.adapterPlugin;
+    this.unmountAdapter();
+    let created: MapAdapter | undefined;
 
-    this.olMap.setView(view);
-    this._setView(view);
+    try {
+      created = plugin
+        ? await plugin.createAdapter({ mapStore: this })
+        : this.defaultAdapter;
+      if (transitionId !== this.transitionId) {
+        if (created !== this.defaultAdapter && created !== this.adapter) {
+          created.unmount();
+        }
+        return;
+      }
+      this.setAdapter(created, plugin);
+      this.subscribeToAdapter();
+      await created.mount(target);
+      if (transitionId !== this.transitionId) {
+        if (created !== this.adapter || !this.target) {
+          created.unmount();
+        }
+        return;
+      }
+      if (state) {
+        this.setViewState(state);
+      } else if (!this.viewInitialized) {
+        if (this.options.initialView) {
+          this.setViewOptions(this.options.initialView);
+        } else {
+          this.zoomToInitialExtent();
+          this.syncPosition();
+        }
+      }
+      this.viewInitialized = true;
+      runInAction(() => {
+        this.ready = true;
+      });
+      this.startupOptions?.onCreated?.();
+    } catch (error) {
+      if (transitionId !== this.transitionId) return;
+      runInAction(() => {
+        this.ready = false;
+      });
+      if (this.startupOptions?.onError) {
+        this.startupOptions.onError(error);
+      } else console.error(error);
+      if (mode !== "2d") {
+        this.restoreDefaultAdapter(state);
+      }
+    }
   }
 
   @action
-  private _setView(view: View) {
-    this.olView = view;
-  }
-  private bindView(view: View) {
-    const s = this.getSetters(view);
-    this._viewUnbindKeys.push(
-      view.on("change:resolution", s.setResolution),
-      view.on("change:center", s.setCenter),
-      view.on("change:rotation", s.setRotation)
-    );
-  }
-  private unView() {
-    if (this._viewUnbindKeys) {
-      this._viewUnbindKeys.forEach(unByKey);
-    }
-    this._viewUnbindKeys = [];
+  private restoreDefaultAdapter(state?: MapViewState | null): void {
+    this.mapMode = "2d";
+    if (this.target) void this.mountAdapter(state);
   }
 
   detach(): void {
-    this.unView();
-    if (this._mapUnbindKeys) {
-      this._mapUnbindKeys.forEach(unByKey);
+    ++this.transitionId;
+    this.target = undefined;
+    this.startupOptions = undefined;
+    this.unmountAdapter();
+  }
+
+  @action
+  private unmountAdapter(): void {
+    this.ready = false;
+    this.syncAdapterState();
+    this.adapterUnsubscribe?.();
+    this.adapterUnsubscribe = undefined;
+    this.adapter.unmount();
+    this.syncAdapterState();
+  }
+
+  @actionBound
+  registerLayerDefinition(layerDefinition: LayerDefinition): () => void {
+    this.layerDefinitions.add(layerDefinition);
+    return action(() => {
+      this.layerDefinitions.delete(layerDefinition);
+    });
+  }
+
+  private isLayerSupported(
+    layerDefinition: LayerDefinition,
+    plugin?: MapAdapterPlugin
+  ): boolean {
+    if (!plugin) return true;
+    const { layerSupport } = plugin;
+    switch (layerDefinition.type) {
+      case "tile":
+        return layerSupport.tile?.(layerDefinition.options) ?? false;
+      case "webmap":
+        return (
+          layerSupport.webmap?.(
+            layerDefinition.item,
+            layerDefinition.options
+          ) ?? false
+        );
+      case "geojson":
+        return layerSupport.geojson?.(layerDefinition.options) ?? false;
+      case "resource":
+        return (
+          layerSupport.resource?.[layerDefinition.resourceType]?.(
+            layerDefinition.options
+          ) ?? false
+        );
     }
-    this._mapUnbindKeys = [];
-    this.setReady(false);
-    this.olMap.setTarget(undefined);
-    this.setStarted(false);
+  }
+
+  canUseMapAdapter(mode: string): boolean {
+    const plugin = adapterRegistry.queryAll().find(({ key }) => key === mode);
+    if (mode !== "2d" && !plugin) return false;
+    for (const layerDefinition of this.layerDefinitions) {
+      if (!this.isLayerSupported(layerDefinition, plugin)) return false;
+    }
+    return true;
+  }
+
+  createLayer(
+    layerDefinition: LayerDefinition,
+    adapter: MapAdapter = this.adapter
+  ): CoreLayer | undefined | Promise<CoreLayer | undefined> {
+    if (
+      !this.isLayerSupported(layerDefinition, this.adapterPlugins.get(adapter))
+    )
+      return;
+    const factories = adapter.layerAdapters;
+    switch (layerDefinition.type) {
+      case "tile":
+        return factories.tile(layerDefinition.options);
+      case "webmap":
+        return factories.webmap(layerDefinition.item, layerDefinition.options);
+      case "geojson":
+        return factories.geojson(layerDefinition.options);
+      case "resource":
+        return factories.resource?.[layerDefinition.resourceType]?.(
+          layerDefinition.options
+        );
+    }
   }
 
   getLayer(id: number): CoreLayer | undefined {
     return this.layers[id];
   }
 
-  getLayersArray() {
-    return this.olMap.getLayers().getArray() as ExtendedOlLayer[];
-  }
-
   @action
-  addLayer(layer: CoreLayer, order?: number): void {
-    const layers = { ...this.layers, [layer.name]: layer };
-    this.layers = layers;
-    const olLayer = layer.getLayer();
+  addLayer(layer: CoreLayer, order?: number, adapter?: MapAdapter): void {
+    const owner = this.layerOwners.get(layer) ?? adapter ?? this.adapter;
+    this.layerOwners.set(layer, owner);
     if (layer.isBaseLayer) {
-      olLayer.setZIndex(-1);
+      layer.setZIndex(-1);
     } else if (layer.isTopLayer) {
-      olLayer.setZIndex(TOP_LAYER_ZINDEX);
+      layer.setZIndex(TOP_LAYER_ZINDEX);
     } else if (order !== undefined) {
-      olLayer.setZIndex(order);
+      layer.setZIndex(order);
     }
-    this.olMap.addLayer(olLayer);
+    owner.addLayer(layer);
+    if (layer.isBaseLayer && layer.name === this.activeBasemapKey) {
+      this.baseLayer = layer;
+    }
+    this.layers = { ...this.layers, [layer.name]: layer };
   }
 
   @actionBound
   setLayerZIndex(layerDef: CoreLayer | number, zIndex: number) {
     const layer =
       typeof layerDef === "number" ? this.layers[layerDef] : layerDef;
-    if (layer && layer.olLayer && layer.olLayer.setZIndex) {
-      if (layer.olLayer.getZIndex() !== zIndex) {
-        layer.olLayer.setZIndex(zIndex);
-      }
-    }
+    layer?.setZIndex(zIndex);
   }
 
   @computed
@@ -345,11 +589,15 @@ export class MapStore {
   }
 
   @actionBound
-  removeLayer(layer: CoreLayer): void {
-    this.olMap.removeLayer(layer.getLayer());
-    const layers = { ...this.layers };
-    delete layers[layer.name];
-    this.layers = layers;
+  removeLayer(layer: CoreLayer, adapter?: MapAdapter): void {
+    const owner = this.layerOwners.get(layer) ?? adapter ?? this.adapter;
+    owner.removeLayer(layer);
+    this.layerOwners.delete(layer);
+    if (this.layers[layer.name] === layer) {
+      const layers = { ...this.layers };
+      delete layers[layer.name];
+      this.layers = layers;
+    }
     if (this.baseLayer === layer) {
       this.baseLayer = null;
     }
@@ -364,7 +612,7 @@ export class MapStore {
     return scaleForResolution({
       dpi: this.DPI,
       ipm: this.IPM,
-      projection: this.olView.getProjection(),
+      projection: olProj.get(this.displayProjection)!,
       resolution,
     });
   }
@@ -373,38 +621,32 @@ export class MapStore {
     if (scale === null || scale === undefined) {
       return;
     }
-    const mpu = this.olView.getProjection().getMetersPerUnit() ?? 1;
+    const mpu = olProj.get(this.displayProjection)?.getMetersPerUnit() ?? 1;
     scale = typeof scale === "string" ? parseFloat(scale) : scale;
     return scale / (mpu * this.DPI * this.IPM);
   }
 
   getPosition(crs?: string): Position {
-    const view = this.olMap.getView();
-    let center = view.getCenter();
-    if (!center) {
+    const state = this.adapter.getViewState();
+    if (!state) {
       throw new Error("Map center is not set");
     }
 
-    const mapCrs = view.getProjection().getCode();
+    let center = state.center;
+    const mapCrs = this.displayProjection;
     if (crs && crs !== mapCrs) {
       center = olProj.transform(center, mapCrs, crs);
     }
 
-    const zoom = view.getZoom();
-    if (zoom === undefined) {
-      throw new Error("Map zoom is not set");
-    }
-
     return {
-      zoom,
+      zoom: state.zoom,
       center,
     };
   }
 
   getExtent(crs?: string): number[] {
-    const view = this.olMap.getView();
-    let extent = view.calculateExtent();
-    const mapCrs = view.getProjection().getCode();
+    let extent = this.adapter.getExtent() ?? olExtent.createEmpty();
+    const mapCrs = this.displayProjection;
 
     if (crs && crs !== mapCrs) {
       extent = olProj.transformExtent(extent, mapCrs, crs);
@@ -444,7 +686,7 @@ export class MapStore {
     opts: GeomOptions = { srs: "EPSG:3857", format: "wkt" }
   ): Extent {
     const dataProjection = opts.srs ?? "EPSG:3857";
-    const viewProj = this.olView.getProjection();
+    const viewProj = this.displayProjection;
     const isWkt = opts.format === "wkt";
 
     const geometry =
@@ -467,22 +709,23 @@ export class MapStore {
   }
 
   panToExtent(extent: Extent, fitOpts?: FitOptions): void {
-    const view = this.olMap.getView();
+    const viewExtent = this.adapter.getExtent();
 
-    const viewExtent = view.calculateExtent();
-
-    if (olExtent.containsExtent(viewExtent, extent)) {
+    if (viewExtent && olExtent.containsExtent(viewExtent, extent)) {
       return;
     }
 
+    const state = this.adapter.getViewState();
     const [width, height] = olExtent.getSize(extent);
-    const [viewWidth, viewHeight] = olExtent.getSize(viewExtent);
+    const [viewWidth, viewHeight] = viewExtent
+      ? olExtent.getSize(viewExtent)
+      : [0, 0];
     const fitsInView = width <= viewWidth && height <= viewHeight;
 
-    if (fitsInView) {
-      view.setCenter(olExtent.getCenter(extent));
+    if (state && fitsInView) {
+      this.setViewState({ ...state, center: olExtent.getCenter(extent) });
     } else {
-      view.fit(extent, fitOpts);
+      this.adapter.zoomToExtent(extent, { ...fitOpts, smartZoom: false });
     }
   }
 
@@ -493,34 +736,19 @@ export class MapStore {
       ...fitOpts
     }: FitOptions & { projection?: ProjectionLike } = {}
   ): void {
-    const view = this.olMap.getView();
-
     if (projection) {
-      extent = olProj.transformExtent(extent, projection, view.getProjection());
+      extent = olProj.transformExtent(
+        extent,
+        projection,
+        this.displayProjection
+      );
     }
-
-    const widthExtent = olExtent.getWidth(extent);
-    const heightExtent = olExtent.getHeight(extent);
-
-    if (
-      widthExtent < this.SMART_ZOOM_EXTENT &&
-      heightExtent < this.SMART_ZOOM_EXTENT
-    ) {
-      const center = olExtent.getCenter(extent);
-      view.setCenter(center);
-
-      const zoom = view.getZoom();
-      if (zoom === undefined || zoom < this.SMART_ZOOM) {
-        view.setZoom(this.SMART_ZOOM);
-      }
-    } else {
-      view.fit(extent, fitOpts);
-    }
+    this.adapter.zoomToExtent(extent, fitOpts);
   }
 
   zoomToInitialExtent() {
     if (this.initialExtent) {
-      this.olMap.getView().fit(this.initialExtent);
+      this.adapter.zoomToExtent(this.initialExtent, { smartZoom: false });
     }
   }
 
@@ -554,86 +782,33 @@ export class MapStore {
     return this.panelControl.getContainer();
   }
 
-  createControl(control: MapControl, options: CreateControlOptions): Control {
-    return createControl(control, options, this);
+  getControlTarget(element: HTMLElement): HTMLElement | undefined {
+    return this.panelControl.getTarget(element);
   }
 
-  addControl(options: ControlOptions): Control | undefined {
+  addControl(options: ControlOptions): void {
     this.panelControl.addControl(options);
-    return options.control;
   }
+
   updateControlPlacement(
-    control: Control,
+    element: HTMLElement,
     position: TargetPosition,
     order?: number
-  ): Control | undefined {
-    this.panelControl.updateControlPlacement(control, position, order);
-    return control;
+  ): void {
+    this.panelControl.updateControlPlacement(element, position, order);
   }
 
-  removeControl(control: Control): void {
-    this.panelControl.removeControl(control);
+  removeControl(element: HTMLElement): void {
+    this.panelControl.removeControl(element);
   }
 
   @computed
-  get targetElement() {
-    if (this.started) {
-      return this.olMap.getTargetElement();
-    }
-    return null;
+  get targetElement(): HTMLElement | null {
+    return this.targetElementValue;
   }
 
+  @action
   updateSize() {
-    this.olMap.updateSize();
-  }
-
-  @action
-  private setReady(val: boolean) {
-    this.ready = val;
-  }
-  @action
-  private setStarted(val: boolean) {
-    this.started = val;
-  }
-
-  @action
-  private setResolution(resolution: number | null) {
-    this.resolution = resolution;
-  }
-  @action
-  private setPosition(position: Position | null) {
-    this.position = position;
-    if (position) {
-      const { zoom, center } = position;
-      this.setZoom(zoom);
-      this.setCenter(center);
-    }
-  }
-  @action
-  private setCenter(center: number[] | null) {
-    this.center = center;
-  }
-  @action
-  private setZoom(zoom: number) {
-    this.zoom = zoom;
-  }
-  @action
-  private setRotation(rad: number) {
-    this.rotation = typeof rad === "number" ? rad : 0;
-  }
-
-  private getSetters(olView: View) {
-    return {
-      setResolution: () => this.setResolution(olView.getResolution() ?? null),
-      setCenter: () => {
-        this.setCenter(olView.getCenter() ?? null);
-      },
-      setPosition: () => {
-        this.setPosition(this.getPosition());
-      },
-      setRotation: () => {
-        this.setRotation(olView.getRotation());
-      },
-    };
+    this.adapter.resize();
   }
 }
