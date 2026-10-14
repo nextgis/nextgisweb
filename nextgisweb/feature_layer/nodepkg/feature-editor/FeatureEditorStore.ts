@@ -201,14 +201,14 @@ export class FeatureEditorStore {
         }).patch({
           // @ts-expect-error TODO: define patch payload for feature_layer.feature.collection
           json: [json],
-          query: { dt_format: "iso" },
+          query: { dt_format: "iso", geom_null: true },
         });
       } else {
         await route("feature_layer.feature.item", {
           id: this.resourceId,
           fid: this.featureId,
         }).put({
-          query: { dt_format: "iso" },
+          query: { dt_format: "iso", geom_null: true },
           json,
         });
       }
