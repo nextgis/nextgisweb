@@ -1,0 +1,16 @@
+{
+  "name": "@nextgisweb/point-cloud",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@giro3d/giro3d": "2.0.4",
+    "@types/three": "~0.180.0",
+    "laz-perf": "^0.0.7",
+    "three": "~0.180.0"
+  },
+  "nextgisweb": {
+    "rsbuildConfigs": {
+      "main": "rsbuild.main.ts"
+    }
+  }
+}

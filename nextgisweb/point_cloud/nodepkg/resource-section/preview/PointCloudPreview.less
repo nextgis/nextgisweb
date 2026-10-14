@@ -1,0 +1,52 @@
+.ngw-point-cloud-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .toolbar .offset-input {
+    width: 100px;
+  }
+}
+
+.ngw-point-cloud-preview-canvas {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  overflow: hidden;
+
+  > .target {
+    position: absolute;
+    inset: 0;
+  }
+
+  // Controls and attribution over the map, like OpenLayers ones on web maps
+  > .display-settings,
+  > .attribution {
+    position: absolute;
+    right: 0;
+    background: rgba(255, 255, 255, 0.75);
+    color: #333;
+  }
+
+  > .display-settings {
+    display: grid;
+    top: 0;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 4px 8px;
+    border-bottom-left-radius: 4px;
+    padding: 2px 8px;
+
+    .ant-slider {
+      margin: 0 6px;
+      width: 100px;
+    }
+  }
+
+  > .attribution {
+    bottom: 0;
+    padding: 2px 6px;
+    max-width: 100%;
+    font-size: 12px;
+  }
+}
