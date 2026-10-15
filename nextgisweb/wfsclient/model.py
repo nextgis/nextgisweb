@@ -261,12 +261,17 @@ class WFSConnection(Resource):
             if not isinstance(srid, int):
                 continue
 
-            el_bbox = find_tags(el, "WGS84BoundingBox")[0]
-            min_lon, min_lat = map(float, find_tags(el_bbox, "LowerCorner")[0].text.split(" "))
-            max_lon, max_lat = map(float, find_tags(el_bbox, "UpperCorner")[0].text.split(" "))
+            name = find_tags(el, "Name")[0].text
+
+            if len(_bbox := find_tags(el, "WGS84BoundingBox")) > 0:
+                el_bbox = _bbox[0]
+                min_lon, min_lat = map(float, find_tags(el_bbox, "LowerCorner")[0].text.split(" "))
+                max_lon, max_lat = map(float, find_tags(el_bbox, "UpperCorner")[0].text.split(" "))
+            else:
+                min_lon, min_lat, max_lon, max_lat = -180.0, -90.0, 180.0, 90.0
             layers.append(
                 dict(
-                    name=find_tags(el, "Name")[0].text,
+                    name=name,
                     srid=srid,
                     bbox=(min_lon, min_lat, max_lon, max_lat),
                 )
