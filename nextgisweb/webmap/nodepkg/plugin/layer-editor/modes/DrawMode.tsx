@@ -114,7 +114,14 @@ export const DrawMode: LayerEditorMode<DrawModeProps> = ({
       <ToggleControl
         groupId={DrawMode.displayName}
         order={-1}
-        title={gettext("Create")}
+        title={
+          geomType.includes("LineString") || geomType.includes("Polygon")
+            ? [
+                gettext("Create"),
+                gettext("Freehand drawing: hold Shift and drag"),
+              ].join("\n")
+            : gettext("Create")
+        }
         onChange={setActive}
       >
         <AddCircleIcon />

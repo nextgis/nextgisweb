@@ -42,6 +42,8 @@ export const GeometryEditorControlPanel = observer(
       return null;
     }
 
+    const geomType = getOlGeometryType(geometryType);
+
     return (
       <MapToolbarControl
         position={position}
@@ -59,14 +61,14 @@ export const GeometryEditorControlPanel = observer(
         >
           <DrawMode
             order={1}
-            geomType={getOlGeometryType(geometryType)}
+            geomType={geomType}
             geomLayout={getOlLayout(geometryType)}
             clearPrevious={!multiGeometry}
           />
 
           {value && (
             <>
-              <ModifyMode order={2} />
+              <ModifyMode order={2} geomType={geomType} />
               <MoveMode order={3} />
               {geometryType.includes("POLYGON") && <HoleMode order={4} />}
               {store.multiGeometry && <DeleteMode order={6} />}

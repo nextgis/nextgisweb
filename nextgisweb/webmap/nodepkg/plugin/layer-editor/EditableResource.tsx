@@ -163,7 +163,7 @@ export const EditableResource = observer(
               geomType={geomConfig.type}
               geomLayout={geomConfig.layout}
             />
-            <ModifyMode order={2} />
+            <ModifyMode order={2} geomType={geomConfig.type} />
             <MoveMode order={3} />
             {geomConfig.type.includes("Polygon") && <HoleMode order={4} />}
             <AttributeMode order={5} resourceId={resourceId} />

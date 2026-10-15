@@ -920,10 +920,15 @@ msgstr "Удалить все"
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/plugin/layer-editor/modes/DrawMode.tsx:117
+#: nodepkg/plugin/layer-editor/modes/DrawMode.tsx:120
+#: nodepkg/plugin/layer-editor/modes/DrawMode.tsx:123
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:194
 msgid "Create"
 msgstr "Создать"
+
+#: nodepkg/plugin/layer-editor/modes/DrawMode.tsx:121
+msgid "Freehand drawing: hold Shift and drag"
+msgstr "Рисование от руки: зажмите Shift и ведите мышью"
 
 #: nodepkg/plugin/layer-editor/modes/HoleMode.tsx:26
 msgid "Click inside a polygon to start cutting a hole"
@@ -933,9 +938,18 @@ msgstr "Щёлкните внутри полигона, чтобы начать 
 msgid "Cut hole"
 msgstr "Вырезать отверстие"
 
-#: nodepkg/plugin/layer-editor/modes/ModifyMode.tsx:53
+#: nodepkg/plugin/layer-editor/modes/ModifyMode.tsx:64
+#: nodepkg/plugin/layer-editor/modes/ModifyMode.tsx:68
 msgid "Modify"
 msgstr "Изменить"
+
+#: nodepkg/plugin/layer-editor/modes/ModifyMode.tsx:65
+msgid "Add: click an edge and drag"
+msgstr "Добавить: клик на ребро и потянуть"
+
+#: nodepkg/plugin/layer-editor/modes/ModifyMode.tsx:66
+msgid "Delete: Shift + click a vertex"
+msgstr "Удалить: Shift + клик на вершину"
 
 #: nodepkg/plugin/layer-editor/modes/MoveMode.tsx:87
 msgid "Move"
