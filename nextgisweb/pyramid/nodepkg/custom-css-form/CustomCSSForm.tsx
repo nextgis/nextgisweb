@@ -54,14 +54,20 @@ export function CustomCSSForm() {
   return (
     <Space orientation="vertical" style={{ width: "100%" }}>
       {contextHolder}
-      <Row gutter={[16, 16]}>
-        <Col span={14} style={{ height: "300px" }}>
+
+      <Typography.Paragraph type="secondary">{msgDesc}</Typography.Paragraph>
+
+      <Row>
+        <Col
+          span={24}
+          style={{
+            height: "clamp(480px, 70vh, 900px)",
+          }}
+        >
           <Code value={initial} onChange={setData} lang="css" lineNumbers />
         </Col>
-        <Col span={10}>
-          <Typography.Paragraph>{msgDesc}</Typography.Paragraph>
-        </Col>
       </Row>
+
       <Row>
         <SaveButton onClick={save} loading={saving} />
       </Row>
