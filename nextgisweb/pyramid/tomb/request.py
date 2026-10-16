@@ -26,7 +26,7 @@ class Request[C](BaseRequest):
 
     @cached_property
     def qs_parser(self) -> QueryString:
-        return QueryString(self.environ["QUERY_STRING"])
+        return QueryString(self.environ.get("QUERY_STRING", ""))
 
     @cached_property
     def path_param(self) -> Mapping[str, Any]:
