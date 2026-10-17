@@ -3,6 +3,7 @@
 import { lazy } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import cs from "@nextgisweb/webmap/client-settings";
 import { mapControlRegistry } from "@nextgisweb/webmap/display/component/map-panel/registry";
 
 const ToolZoomLazy = lazy(() => import("../map-component/tool/ToolZoom"));
@@ -10,6 +11,9 @@ const ToolSwipeLazy = lazy(() => import("../map-component/tool/ToolSwipe"));
 const ToolMeasureLazy = lazy(() => import("../map-component/tool/ToolMeasure"));
 const ToolViewerInfoLazy = lazy(
   () => import("../map-component/tool/ToolViewerInfo")
+);
+const ToolPanoramaLazy = lazy(
+  () => import("../map-component/tool/ToolPanorama")
 );
 
 mapControlRegistry(COMP_ID, {
@@ -62,9 +66,22 @@ mapControlRegistry(COMP_ID, {
   showOnPreview: true,
   props: { type: "Polygon", groupId: "measuringArea" },
 });
+if (cs.panorama.enabled && cs.panorama.provider) {
+  mapControlRegistry(COMP_ID, {
+    key: "pa",
+    order: 60,
+    component: ToolPanoramaLazy,
+    label: gettext("Search panorama"),
+    position: { inside: "map-toolbar" },
+    embeddedShowMode: "customize",
+    hideOnMobile: true,
+    showOnPreview: false,
+    props: { groupId: "searchPanorama" },
+  });
+}
 mapControlRegistry(COMP_ID, {
   key: "tv",
-  order: 60,
+  order: 70,
   component: ToolViewerInfoLazy,
   label: gettext("Cursor coordinates / extent"),
   position: { inside: "map-toolbar" },

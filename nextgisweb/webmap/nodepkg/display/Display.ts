@@ -19,6 +19,7 @@ import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 import type { DisplayURLParams, MapPlugin, TinyConfig } from "../type";
 import { AnnotationsManager } from "../ui/annotations-manager";
 import { normalizeExtent } from "../utils/normalizeExtent";
+import { WebMapPanoramaStore } from "../webmap-panorama-tab/WebMapPanoramaStore";
 
 import { ConfigStore } from "./ConfigStore";
 import { displayURLParams } from "./displayURLParams";
@@ -37,6 +38,7 @@ export class Display {
   treeStore: TreeStore;
   tabsManager: WebMapTabsStore;
   highlighter = new HighlightStore();
+  panorama: WebMapPanoramaStore;
   panelManager: PanelManager;
   annotationsManager: AnnotationsManager;
 
@@ -99,6 +101,7 @@ export class Display {
     });
     this.identify = new Identify({ display: this });
     this.annotationsManager = new AnnotationsManager({ display: this });
+    this.panorama = new WebMapPanoramaStore({ display: this });
 
     this.panelManager = new PanelManager({
       display: this,

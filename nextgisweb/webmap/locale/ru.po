@@ -6,6 +6,14 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
+#: api.py:490
+msgid "Unknown panorama provider '{}'."
+msgstr "Неизвестный провайдер панорам '{}'."
+
+#: api.py:492
+msgid "API key for panorama provider '{}' is required."
+msgstr "Для провайдера панорам '{}' API ключ обязателен."
+
 #: component.py:26
 msgid "Main web map"
 msgstr "Основная веб-карта"
@@ -86,11 +94,11 @@ msgstr "Отключена"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:286
+#: nodepkg/display/Display.ts:289
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:287
+#: nodepkg/display/Display.ts:290
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -291,12 +299,12 @@ msgid "Current zoom level"
 msgstr "Текущий зум"
 
 #: nodepkg/map-component/control/ZoomControl.tsx:81
-#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:19
+#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:23
 msgid "Zoom in"
 msgstr "Приблизить"
 
 #: nodepkg/map-component/control/ZoomControl.tsx:82
-#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:29
+#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:33
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
@@ -305,14 +313,33 @@ msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:67
-#: nodepkg/map-controls/map-tools.ts:49
+#: nodepkg/map-controls/map-tools.ts:53
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:68
-#: nodepkg/map-controls/map-tools.ts:59
+#: nodepkg/map-controls/map-tools.ts:63
 msgid "Measure area"
 msgstr "Измерение площади"
+
+#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:24
+#: nodepkg/map-controls/map-tools.ts:74
+msgid "Search panorama"
+msgstr "Поиск панорам"
+
+#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:25
+#: nodepkg/panorama/PanoramaViewer.tsx:28
+msgid "No panorama available at this location"
+msgstr "В указанной точке панорамы не найдены"
+
+#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:26
+#: nodepkg/panorama/PanoramaViewer.tsx:32
+msgid ""
+"The panorama service is currently unavailable. Please try again at a later "
+"time or contact Web GIS administrator."
+msgstr ""
+"Сервис панорам сейчас недоступен. Попробуйте позже или свяжитесь с "
+"администратором Веб ГИС."
 
 #: nodepkg/map-component/tool/ToolSwipe/SwipeControl.tsx:175
 msgid "Rotate swipe"
@@ -343,7 +370,7 @@ msgid "Layer is not visible"
 msgstr "Слой не включен"
 
 #: nodepkg/map-component/tool/ToolSwipe/ToolSwipe.tsx:46
-#: nodepkg/map-controls/map-tools.ts:39
+#: nodepkg/map-controls/map-tools.ts:43
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
@@ -381,12 +408,12 @@ msgid "Locate me"
 msgstr "Определить мое местоположение"
 
 #: nodepkg/map-controls/map-controls.ts:143
-#: nodepkg/map-controls/map-controls.ts:148 nodepkg/settings/SettingsForm.tsx:90
+#: nodepkg/map-controls/map-controls.ts:148 nodepkg/settings/SettingsForm.tsx:119
 #: option/base.py:39
 msgid "Identification"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/map-tools.ts:69
+#: nodepkg/map-controls/map-tools.ts:86
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
 
@@ -568,7 +595,7 @@ msgstr "Добавить группу"
 msgid "New group"
 msgstr "Новая группа"
 
-#: nodepkg/panel/layers/useAddItem.tsx:115
+#: nodepkg/panel/layers/useAddItem.tsx:115 nodepkg/settings/PanoramaSettings.tsx:31
 msgid "Add"
 msgstr "Добавить"
 
@@ -861,6 +888,14 @@ msgstr "Предпросмотр"
 msgid "Share"
 msgstr "Поделиться"
 
+#: nodepkg/panorama/provider/plugin.ts:9
+msgid "Google Street View"
+msgstr "Google Street View"
+
+#: nodepkg/panorama/provider/plugin.ts:20
+msgid "Yandex Panorama"
+msgstr "Яндекс Панорама"
+
 #: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:20
 msgid "Feature table"
 msgstr "Таблица объектов"
@@ -1047,7 +1082,7 @@ msgid "Select resource"
 msgstr "Выберите ресурс"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:35
-#: nodepkg/settings/SettingsForm.tsx:161
+#: nodepkg/settings/SettingsForm.tsx:190
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
@@ -1092,75 +1127,92 @@ msgstr "Отключено"
 msgid "Settings"
 msgstr "Настройки"
 
+#: nodepkg/settings/PanoramaSettings.tsx:32 nodepkg/settings/SettingsForm.tsx:209
+msgid "Enable"
+msgstr "Включить"
+
+#: nodepkg/settings/PanoramaSettings.tsx:33
+msgid "API key"
+msgstr "API ключ"
+
+#: nodepkg/settings/PanoramaSettings.tsx:34 nodepkg/settings/SettingsForm.tsx:263
+msgid "API key is required"
+msgstr "API ключ является обязательным"
+
+#: nodepkg/settings/PanoramaSettings.tsx:35
+msgid "Default provider"
+msgstr "Провайдер по умолчанию"
+
+#: nodepkg/settings/PanoramaSettings.tsx:36
+msgid "Add one or more panorama providers to your Web GIS."
+msgstr "Добавьте одного или более провайдеров панорам в вашу Веб ГИС."
+
 #: nodepkg/settings/Settings.tsx:63
 msgid "Settings saved"
 msgstr "Настройки сохранены"
 
-#: nodepkg/settings/SettingsForm.tsx:74
+#: nodepkg/settings/SettingsForm.tsx:103
 msgid "Hide navigation menu for guest"
 msgstr "Скрывать меню навигации для гостя"
 
-#: nodepkg/settings/SettingsForm.tsx:103
+#: nodepkg/settings/SettingsForm.tsx:132
 msgid "Show feature attributes"
 msgstr "Показывать атрибуты объектов"
 
-#: nodepkg/settings/SettingsForm.tsx:117
+#: nodepkg/settings/SettingsForm.tsx:146
 msgid "Show geometry info"
 msgstr "Показывать информацию о геометрии"
 
-#: nodepkg/settings/SettingsForm.tsx:127
+#: nodepkg/settings/SettingsForm.tsx:156
 msgid "Radius, px"
 msgstr "Радиус, пикс."
 
-#: nodepkg/settings/SettingsForm.tsx:139
+#: nodepkg/settings/SettingsForm.tsx:168
 msgid "Measurement"
 msgstr "Измерения"
 
-#: nodepkg/settings/SettingsForm.tsx:143
+#: nodepkg/settings/SettingsForm.tsx:172
 msgid "Length units"
 msgstr "Единицы длины"
 
-#: nodepkg/settings/SettingsForm.tsx:148
+#: nodepkg/settings/SettingsForm.tsx:177
 msgid "Area units"
 msgstr "Единицы площади"
 
-#: nodepkg/settings/SettingsForm.tsx:153
+#: nodepkg/settings/SettingsForm.tsx:182
 msgid "Degree format"
 msgstr "Формат градусов"
 
-#: nodepkg/settings/SettingsForm.tsx:167
+#: nodepkg/settings/SettingsForm.tsx:196
 msgid "Address search"
 msgstr "Адресный поиск"
 
-#: nodepkg/settings/SettingsForm.tsx:180
-msgid "Enable"
-msgstr "Включить"
-
-#: nodepkg/settings/SettingsForm.tsx:194
+#: nodepkg/settings/SettingsForm.tsx:223
 msgid "Limit by web map initial extent"
 msgstr "Ограничить начальным охватом карты"
 
-#: nodepkg/settings/SettingsForm.tsx:202
+#: nodepkg/settings/SettingsForm.tsx:231
 msgid "Provider"
 msgstr "Провайдер"
 
-#: nodepkg/settings/SettingsForm.tsx:213
+#: nodepkg/settings/SettingsForm.tsx:242
 msgid "Limit search results to countries"
 msgstr "Ограничить поиск странами"
 
-#: nodepkg/settings/SettingsForm.tsx:221
+#: nodepkg/settings/SettingsForm.tsx:250
 msgid "Invalid countries. For example ru or gb,de"
 msgstr "Неверные значения. Например, ru или gb,de"
 
-#: nodepkg/settings/SettingsForm.tsx:232
+#: nodepkg/settings/SettingsForm.tsx:261
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
-#: nodepkg/settings/SettingsForm.tsx:234
-msgid "API key is required"
-msgstr "API ключ является обязательным"
+#: nodepkg/settings/SettingsForm.tsx:272
+#: nodepkg/webmap-panorama-tab/WebMapPanoramaStore.ts:67 view.py:163
+msgid "Panorama"
+msgstr "Панорама"
 
-#: nodepkg/settings/SettingsForm.tsx:254
+#: nodepkg/settings/SettingsForm.tsx:287
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:187
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:62
 msgid "Save"

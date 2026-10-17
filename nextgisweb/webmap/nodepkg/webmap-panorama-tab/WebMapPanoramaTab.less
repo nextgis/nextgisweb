@@ -1,0 +1,27 @@
+.ant-tabs .ant-tabs-tabpane-hidden:has(> .ngw-webmap-panorama-tab) {
+  display: block;
+  position: absolute;
+  visibility: hidden;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ant-tabs-tab-btn > .ant-select.ngw-webmap-panorama-tab-select {
+  gap: 4px;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+
+  > .ant-select-content {
+    padding: 0;
+    color: inherit;
+    line-height: inherit;
+  }
+
+  > .ant-select-suffix {
+    margin: 0;
+  }
+}

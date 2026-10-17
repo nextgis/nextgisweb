@@ -6,11 +6,11 @@ from msgspec import Struct
 
 from nextgisweb.env import COMP_ID, gettext
 
-from nextgisweb.gui import react_renderer
+from nextgisweb.gui import REACT_RENDERER, react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
 from nextgisweb.pyramid.api import csetting
-from nextgisweb.pyramid.tomb import Configurator, Request, render_to_response
+from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request, render_to_response
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
 
@@ -146,6 +146,26 @@ class WebMapTMSLink(TMSLink):
         )
 
 
+PANORAMA_HOST_ENTRY = jsentry("@nextgisweb/webmap/panorama/provider/PanoramaProviderHost")
+
+
+def panorama(request: Request):
+    settings = csetting.registry[COMP_ID]["panorama"].getter()
+    if not settings.enabled or settings.provider is None:
+        raise HTTPNotFound()
+
+    return render_to_response(
+        REACT_RENDERER,
+        dict(
+            entrypoint=PANORAMA_HOST_ENTRY,
+            props=dict(),
+            layout_mode="nullSpace",
+            title=gettext("Panorama"),
+        ),
+        request=request,
+    )
+
+
 class WebMapAdapterCS(Struct, kw_only=True):
     display_name: str
 
@@ -214,6 +234,12 @@ def setup_pyramid(comp: WebMapComponent, config: Configurator):
         "webmap.control_panel.settings",
         "/control-panel/webmap-settings",
         get=settings,
+    )
+
+    config.add_route(
+        "webmap.panorama",
+        "/webmap/panorama",
+        get=panorama,
     )
 
     for k, v in csetting.registry[COMP_ID].items():

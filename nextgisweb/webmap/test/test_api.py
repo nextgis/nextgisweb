@@ -75,3 +75,31 @@ def test_options(options, ok, webmap, ngw_webtest_app: WebTestApp):
 
     data = rapi.read(webmap)
     assert data["webmap"]["options"] == options
+
+
+def test_panorama(ngw_webtest_app: WebTestApp):
+    url = "/api/component/pyramid/csettings"
+    orig = ngw_webtest_app.get(url, query={"webmap": ["panorama"]}).json
+
+    def put(provider=None, **keys):
+        body = dict(enabled=True, provider=provider, keys=keys)
+        ngw_webtest_app.put(url, json={"webmap": {"panorama": body}})
+        return ngw_webtest_app.get(url, query={"webmap": ["panorama"]}).json["webmap"]["panorama"][
+            "provider"
+        ]
+
+    try:
+        assert put() is None
+        assert put("google") is None
+        assert put(google="") == "google"
+        assert put("yandex", google="") == "google"
+        assert put(google="", yandex="key") == "google"
+        assert put("yandex", google="", yandex="key") == "yandex"
+        assert put("yandex", yandex="key") == "yandex"
+        assert put("google", yandex="key") == "yandex"
+
+        for keys in (dict(yandex=""), dict(unknown="key")):
+            body = dict(enabled=True, keys=keys)
+            ngw_webtest_app.put(url, json={"webmap": {"panorama": body}}, status=422)
+    finally:
+        ngw_webtest_app.put(url, json=orig)

@@ -1,0 +1,48 @@
+.ngw-webmap-panorama-viewer {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  > .frame {
+    display: flex;
+    position: relative;
+    flex-grow: 1;
+    min-height: 0;
+    overflow: hidden;
+
+    > iframe {
+      flex-grow: 1;
+      border: none;
+      width: 100%;
+
+      &.hidden {
+        visibility: hidden;
+      }
+    }
+
+    > .loading {
+      position: absolute;
+      inset: 0;
+      background-color: var(--divider-color);
+    }
+
+    > .placeholder {
+      display: flex;
+      position: absolute;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      inset: 0;
+      background-color: var(--divider-color);
+      padding: 16px;
+      color: var(--text-secondary);
+      text-align: center;
+
+      > svg.icon {
+        color: var(--icon-color);
+        font-size: 48px;
+      }
+    }
+  }
+}
