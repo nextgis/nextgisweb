@@ -6,14 +6,14 @@ from ..diagnostics import ERROR, SUCCESS, Checker, PostgresCheck
 @pytest.fixture(scope="module")
 def con_args(ngw_env):
     src = ngw_env.core._db_connection_args()
-    return dict(
-        hostname=src["host"],
-        port=src["port"],
-        database=src["database"],
-        username=src["username"],
-        password=src["password"],
-        sslmode=None,
-    )
+    return {
+        "hostname": src["host"],
+        "port": src["port"],
+        "database": src["database"],
+        "username": src["username"],
+        "password": src["password"],
+        "sslmode": None,
+    }
 
 
 def test_postgres_check(con_args):

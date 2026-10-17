@@ -84,7 +84,7 @@ def test_format(c, m, uc_tr):
 
 class DictTranslator(Translator):
     def __init__(self):
-        self._dict = dict()
+        self._dict = {}
 
     def add(self, msg, translation):
         self._dict[msg] = translation

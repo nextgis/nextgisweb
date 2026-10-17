@@ -40,13 +40,13 @@ class StructB(Struct, kw_only=True):
 
 
 class tc:
-    registry = list()
+    registry = []
 
     def __init__(self, value, *types):
         self._value = value
         self._types = types
-        self._valid = list()
-        self._invalid = list()
+        self._valid = []
+        self._invalid = []
         self.registry.append(self)
 
     def ok(self, *valid):
@@ -92,7 +92,7 @@ tc(StructA(i=1, b=False, s="foo", t=(0, 0)), StructA).ok("i=1&s=foo&t=0,0")
 tc(StructA(i=1, b=False, s=None, t=(0, 0)), StructA).ok("i=1&t=0,0")
 tc(StructB(i=42), StructB).ok("j=42")
 tc(StructB(i=0, t=(1, 2)), StructB).ok("j=0&t=1,2")
-tc(dict(a=42), dict[str, int], dict[str, FortyTwo]).ok("par[a]=42", "par%5Ba%5D=42")
+tc({"a": 42}, dict[str, int], dict[str, FortyTwo]).ok("par[a]=42", "par%5Ba%5D=42")
 tc({42: "qux"}, dict[int, str], dict[FortyTwo, str]).ok("par[42]=qux", "par[4%32]=qu%78")
 
 tc({0: [1]}, dict[int, list[int]]).ok("par[0]=1").err("par[0]=foo")

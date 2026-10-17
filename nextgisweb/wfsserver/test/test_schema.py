@@ -67,17 +67,17 @@ for version in TEST_WFS_VERSIONS:
         (
             pytest.param(
                 version,
-                dict(request="GetCapabilities"),
+                {"request": "GetCapabilities"},
                 id="{}-GetCapabilities".format(version),
             ),
             pytest.param(
                 version,
-                dict(request="DescribeFeatureType"),
+                {"request": "DescribeFeatureType"},
                 id="{}-DescribeFeatureType".format(version),
             ),
             pytest.param(
                 version,
-                dict(request="GetFeature", typenames="test"),
+                {"request": "GetFeature", "typenames": "test"},
                 id="{}-GetFeature".format(version),
             ),
         )

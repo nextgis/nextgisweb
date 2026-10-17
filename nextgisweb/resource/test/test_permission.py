@@ -25,7 +25,7 @@ def user_id(ngw_resource_group):
 
     DBSession.query(Resource).filter_by(
         id=ngw_resource_group,
-    ).update(dict(owner_user_id=user.id))
+    ).update({"owner_user_id": user.id})
 
     yield user.id
 
@@ -164,14 +164,14 @@ def test_admin_permissions(admin, ngw_resource_group, ngw_cleanup):
     permissions = rapi.read(0)["resource"]["permissions"]
 
     def check(data, status, *, resource_id=0):
-        perm_data = dict(
-            action="deny",
-            identity="",
-            permission="",
-            principal=dict(id=admin),
-            propagate=False,
-            scope="",
-        )
+        perm_data = {
+            "action": "deny",
+            "identity": "",
+            "permission": "",
+            "principal": {"id": admin},
+            "propagate": False,
+            "scope": "",
+        }
         perm_data.update(data)
 
         with ngw_cleanup.disable():

@@ -15,7 +15,7 @@ def test_example():
     def bar(comp):
         pass
 
-    assert list(func for _, func in test_hook) == [bar, foo]
+    assert [func for _, func in test_hook] == [bar, foo]
 
 
 @pytest.mark.usefixtures("ngw_env")
@@ -34,4 +34,4 @@ def test_stages():
     def default(comp):
         pass
 
-    assert list(func for _, func in test_hook) == [initial, default, final]
+    assert [func for _, func in test_hook] == [initial, default, final]

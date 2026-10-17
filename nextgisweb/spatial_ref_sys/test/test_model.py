@@ -20,7 +20,7 @@ WKT_EPSG_3395 = 'PROJCS["WGS 84 / World Mercator",GEOGCS["WGS 84",DATUM["WGS_198
 
 def get_postgis_wkt(srid):
     qpg = sa.text("SELECT srtext FROM spatial_ref_sys WHERE srid = :id")
-    return DBSession.connection().execute(qpg, dict(id=srid)).scalar()
+    return DBSession.connection().execute(qpg, {"id": srid}).scalar()
 
 
 def test_postgis_sync(ngw_txn):
@@ -83,7 +83,7 @@ def test_postgis_transform(ngw_txn, x, y, src, dst):
         ) AS pt
     """
 
-    params = dict(x=x, y=y, src=src, dst=dst)
+    params = {"x": x, "y": y, "src": src, "dst": dst}
     px, py = DBSession.connection().execute(sa.text(sql), params).one()
 
     assert abs(px - x) < 1e-6

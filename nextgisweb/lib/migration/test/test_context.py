@@ -134,8 +134,8 @@ def test_install_unistall(graph):
     with compare_ctx(ctx):
         solution = resolve(
             operations,
-            {k: False for k in graph._nodes},
-            {k: True for k in graph._nodes},
+            dict.fromkeys(graph._nodes, False),
+            dict.fromkeys(graph._nodes, True),
         )
 
         for op in solution:
@@ -143,8 +143,8 @@ def test_install_unistall(graph):
 
         solution = resolve(
             operations,
-            {k: True for k in graph._nodes},
-            {k: False for k in graph._nodes},
+            dict.fromkeys(graph._nodes, True),
+            dict.fromkeys(graph._nodes, False),
         )
 
         print("\n".join(map(str, solution)))
@@ -162,7 +162,7 @@ def test_forward(graph):
     solution = resolve(
         operations,
         {k: k in graph._tails for k in graph._nodes},
-        {k: True for k in graph._nodes},
+        dict.fromkeys(graph._nodes, True),
     )
 
     print("\n".join(map(str, solution)))
@@ -181,7 +181,7 @@ def test_rewind(graph):
     operations = graph.operations(install=False, forward=False, uninstall=False, rewind=True)
     solution = resolve(
         operations,
-        {k: True for k in graph._nodes},
+        dict.fromkeys(graph._nodes, True),
         {k: k in graph._tails for k in graph._nodes},
     )
 

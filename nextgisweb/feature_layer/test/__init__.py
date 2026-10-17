@@ -74,7 +74,7 @@ class FeatureLayerAPI:
         status: WebTestApp.Status = None,
     ) -> list | dict:
         epoch = epoch if epoch is not None else self.versioning()["epoch"]
-        query = dict(extensions=self.extensions, epoch=epoch, initial=initial)
+        query = {"extensions": self.extensions, "epoch": epoch, "initial": initial}
         if target:
             query["target"] = target
 
@@ -109,7 +109,7 @@ class TransactionAPI:
         self.epoch = epoch
 
     def __enter__(self) -> TransactionAPI:
-        resp = self.client.post("/", json=dict(epoch=self.epoch) if self.epoch else {}).json
+        resp = self.client.post("/", json={"epoch": self.epoch} if self.epoch else {}).json
         self.id = resp.get("id")
         return self
 

@@ -237,7 +237,7 @@ def _user_data():
 
 @pytest.mark.usefixtures("disable_users", "ngw_auth_administrator")
 def test_user_limit(ngw_env, uapi: WebTestApp):
-    with ngw_env.auth.options.override(dict(user_limit=2)):
+    with ngw_env.auth.options.override({"user_limit": 2}):
         u1_id = uapi.post(json=_user_data(), status=201).json["id"]
         uapi.post(json=_user_data(), status=422)
         uapi.put(u1_id, json={"disabled": True})
@@ -250,12 +250,12 @@ def test_user_over_limit(ngw_env, uapi: WebTestApp):
     u1_id = uapi.post(json=_user_data(), status=201).json["id"]
     uapi.post(json=_user_data())
 
-    with ngw_env.auth.options.override(dict(user_limit=2)):
+    with ngw_env.auth.options.override({"user_limit": 2}):
         uapi.put(u1_id, json={"display_name": "Test user1 name"}, status=200)
         uapi.put(u1_id, json={"disabled": True}, status=200)
         uapi.put(u1_id, json={"disabled": False}, status=422)
 
-    with ngw_env.auth.options.override(dict(user_limit=3)):
+    with ngw_env.auth.options.override({"user_limit": 3}):
         uapi.put(u1_id, json={"disabled": False}, status=200)
 
 
@@ -263,7 +263,7 @@ def test_user_over_limit(ngw_env, uapi: WebTestApp):
 def test_user_limit_local(uapi: WebTestApp, ngw_env):
     admin = User.filter_by(keyname="administrator").one()
     limit = 2 if admin.password_hash is not None else 1
-    with ngw_env.auth.options.override(dict(user_limit_local=limit)):
+    with ngw_env.auth.options.override({"user_limit_local": limit}):
         u1_id = uapi.post(json=_user_data(), status=201).json["id"]
         uapi.post(json=_user_data(), status=422)
         uapi.put(u1_id, json={"disabled": True})
@@ -290,10 +290,10 @@ def test_unique(uapi: WebTestApp, gapi: WebTestApp):
     u2["id"] = uapi.post(json=u2, status=201).json["id"]
 
     g1_obj = Group.test_instance()
-    g1 = dict(keyname=g1_obj.keyname, display_name=g1_obj.display_name)
+    g1 = {"keyname": g1_obj.keyname, "display_name": g1_obj.display_name}
     g1["id"] = gapi.post(json=g1, status=201).json["id"]
 
-    g2 = dict(keyname=g1_obj.keyname.swapcase(), display_name=g1_obj.display_name.swapcase())
+    g2 = {"keyname": g1_obj.keyname.swapcase(), "display_name": g1_obj.display_name.swapcase()}
     gapi.post(json=g2, status=422)
 
     g2["keyname"] = Group.test_instance().keyname
@@ -318,7 +318,7 @@ def test_unique(uapi: WebTestApp, gapi: WebTestApp):
 )
 @pytest.mark.usefixtures("ngw_auth_administrator")
 def test_keyname(keyname, ok, user, group, uapi: WebTestApp, gapi: WebTestApp):
-    data = dict(keyname=keyname)
+    data = {"keyname": keyname}
     uapi.put(user.id, json=data, status=200 if ok else 422)
     gapi.put(group.id, json=data, status=200 if ok else 422)
 
@@ -334,7 +334,7 @@ def group_members():
 
     with transaction.manager:
         admins = Group.filter_by(keyname="administrators").one()
-        admins.members = [u for u in User.filter(User.id.in_(remember))]
+        admins.members = list(User.filter(User.id.in_(remember)))
 
 
 class TestSystemPrincipal:
@@ -342,10 +342,10 @@ class TestSystemPrincipal:
     def system_user_params():
         for k in ("guest", "authenticated", "everyone", "owner"):
             for t, data, ok in (
-                ("empty", dict(), True),
-                ("equal", dict(keyname=k), True),
-                ("edit", dict(display_name=k.upper()), False),
-                ("member_of", dict(member_of=["administrators"]), k == "guest"),
+                ("empty", {}, True),
+                ("equal", {"keyname": k}, True),
+                ("edit", {"display_name": k.upper()}, False),
+                ("member_of", {"member_of": ["administrators"]}, k == "guest"),
             ):
                 yield pytest.param(k, data, ok, id=f"{k}-{t}")
 
@@ -366,11 +366,11 @@ class TestSystemPrincipal:
     @staticmethod
     def system_group_params():
         p = pytest.param
-        yield p(dict(), None, True, id="empty")
-        yield p(dict(keyname="administrators"), None, True, id="equal")
-        yield p(dict(display_name="ADMINS!"), None, False, id="edit")
+        yield p({}, None, True, id="empty")
+        yield p({"keyname": "administrators"}, None, True, id="equal")
+        yield p({"display_name": "ADMINS!"}, None, False, id="edit")
         for k in ("guest", "authenticated", "everyone", "owner"):
-            yield p(dict(), k, k == "guest", id=f"members-{k}")
+            yield p({}, k, k == "guest", id=f"members-{k}")
 
     @pytest.mark.parametrize("data, member_add, ok", system_group_params())
     @pytest.mark.usefixtures("ngw_auth_administrator")

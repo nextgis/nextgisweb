@@ -18,7 +18,7 @@ from .. import WFSConnection, WFSLayer
 def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
     with create_vector_layer(ogrlayer, parent_id) as vlayer:
         with transaction.manager:
-            res_common = dict(parent_id=parent_id, owner_user=User.by_keyname("administrator"))
+            res_common = {"parent_id": parent_id, "owner_user": User.by_keyname("administrator")}
             service = WFSService(
                 display_name=token_hex(),
                 **res_common,

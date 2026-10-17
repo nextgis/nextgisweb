@@ -18,9 +18,9 @@ def reset(ngw_env):
         False,
         "abc",
         123,
-        dict(key="value"),
-        [1, "a", dict(k=0)],
-        dict(we=dict(need=dict(to=dict(go="deeper")))),
+        {"key": "value"},
+        [1, "a", {"k": 0}],
+        {"we": {"need": {"to": {"go": "deeper"}}}},
     ),
 )
 def test_setting(value, ngw_env):

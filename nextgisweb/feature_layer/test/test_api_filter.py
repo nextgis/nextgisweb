@@ -46,7 +46,7 @@ def test_filter_empty_expression(ngw_webtest_app: WebTestApp, test_layer_id):
 
     resp = ngw_webtest_app.get(
         f"/api/resource/{test_layer_id}/feature/",
-        query=dict(filter=filter),
+        query={"filter": filter},
         status=200,
     )
 

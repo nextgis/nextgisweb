@@ -39,9 +39,9 @@ m_nested = Nested(m_struct)
         ),
         pytest.param(v_uuid, f'"{v_uuid}"', str(v_uuid), id="uuid"),
         pytest.param(
-            [OrderedDict(a=0), dict(b=1)],
+            [OrderedDict(a=0), {"b": 1}],
             '[{"a":0},{"b":1}]',
-            [dict(a=0), dict(b=1)],
+            [{"a": 0}, {"b": 1}],
             id="complex",
         ),
         pytest.param(m_struct, '{"e":"2.71"}', {"e": "2.71"}, id="struct"),
@@ -60,5 +60,5 @@ def test_json(data, serialized, deserialized):
 
 
 def test_json_pretty():
-    assert dumps(dict(a=1, b=2)) == '{"a":1,"b":2}'
-    assert dumps(dict(a=1, b=2), pretty=True) == '{\n  "a": 1,\n  "b": 2\n}'
+    assert dumps({"a": 1, "b": 2}) == '{"a":1,"b":2}'
+    assert dumps({"a": 1, "b": 2}, pretty=True) == '{\n  "a": 1,\n  "b": 2\n}'

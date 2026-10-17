@@ -91,7 +91,7 @@ def test_ref_dml(versioning, geom_type, operation):
             sql = vls.dml_update(id=bpid, with_geom=wg)
             sql_cmp(sql, f"ref_dml/update.{vs}.wg={wg}.{gs}")
     elif operation == "delete":
-        sql_cmp(vls.dml_delete(filter_by=dict(fid=bpid)), f"ref_dml/delete.{vs}.{gs}")
+        sql_cmp(vls.dml_delete(filter_by={"fid": bpid}), f"ref_dml/delete.{vs}.{gs}")
     elif operation == "reset_seq":
         sql_cmp(vls.dml_reset_seq(), f"ref_dml/reset_seq.{vs}.{gs}")
     elif not versioning:

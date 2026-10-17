@@ -12,7 +12,7 @@ pytestmark = pytest.mark.usefixtures(
 def test_items():
     rapi = ResourceAPI()
     res_id = rapi.create("resource_group", {})
-    assert rapi.read(res_id)["resmeta"]["items"] == dict()
+    assert rapi.read(res_id)["resmeta"]["items"] == {}
 
     items = {"key1": "foo", "key2": "bar"}
     rapi.update(res_id, {"resmeta": {"items": items}})
@@ -29,7 +29,7 @@ def test_items():
 )
 def test_item_type(value):
     rapi = ResourceAPI()
-    items = dict(key=value)
+    items = {"key": value}
 
     res_id = rapi.create("resource_group", {"resmeta": {"items": items}})
     value_saved = rapi.read(res_id)["resmeta"]["items"]["key"]

@@ -55,18 +55,18 @@ def test_wkt_wkb(wkt, ngw_txn):
 @pytest.mark.parametrize(
     "src, is_valid",
     (
-        (dict(wkt="DICH"), False),
-        (dict(wkt="POINT (0)"), False),
-        (dict(wkt="POINT (0 0.0)"), True),
-        (dict(wkt="POINT Z (1 2 3)"), True),
-        (dict(wkt="GEOMETRYCOLLECTION EMPTY"), True),
-        (dict(wkt="POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"), True),
+        ({"wkt": "DICH"}, False),
+        ({"wkt": "POINT (0)"}, False),
+        ({"wkt": "POINT (0 0.0)"}, True),
+        ({"wkt": "POINT Z (1 2 3)"}, True),
+        ({"wkt": "GEOMETRYCOLLECTION EMPTY"}, True),
+        ({"wkt": "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"}, True),
         # Missing comma between coordinates - OGR silently misparsed, PostGIS/GEOS rejects
-        (dict(wkt="POLYGON ((0 0, 4 0, 4 4 0 4, 0 0))"), False),
+        ({"wkt": "POLYGON ((0 0, 4 0, 4 4 0 4, 0 0))"}, False),
         # POINT(0 0) WKB and EWKT
-        (dict(wkb="010100000000000000000000000000000000000000"), True),
-        (dict(wkb="010100002000000000000000000000000000000000"), False),
-        (dict(wkb="0101000020e610000000000000000000000000000000000000"), False),
+        ({"wkb": "010100000000000000000000000000000000000000"}, True),
+        ({"wkb": "010100002000000000000000000000000000000000"}, False),
+        ({"wkb": "0101000020e610000000000000000000000000000000000000"}, False),
     ),
 )
 def test_valid(src, is_valid):
@@ -97,12 +97,12 @@ def test_convert(fmt_src, fmt_dst):
     geom_wkt = "POINT Z (1 2 3)"
     geom_ogr = ogr.CreateGeometryFromWkt(geom_wkt)
 
-    sample = dict(
-        wkb=cohere_bytes(geom_ogr.ExportToWkb(ogr.wkbNDR)),
-        wkt=geom_ogr.ExportToIsoWkt(),
-        ogr=geom_ogr.Clone(),
-        shape=wkt_loads(geom_wkt),
-    )
+    sample = {
+        "wkb": cohere_bytes(geom_ogr.ExportToWkb(ogr.wkbNDR)),
+        "wkt": geom_ogr.ExportToIsoWkt(),
+        "ogr": geom_ogr.Clone(),
+        "shape": wkt_loads(geom_wkt),
+    }
 
     val_src = getattr(Geometry, "from_" + fmt_src)(sample[fmt_src])
     val_dst = getattr(val_src, fmt_dst)

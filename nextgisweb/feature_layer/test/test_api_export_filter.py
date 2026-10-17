@@ -89,7 +89,7 @@ def test_export_filter_with_intersects(export_runner):
 
 def test_export_gpkg_with_filter(test_layer_id, ngw_webtest_app: WebTestApp):
     filter = json.dumps(["all", ["==", ["get", "city"], "NYC"]])
-    qs = dict(format="GPKG", srs="3857", filter=filter)
+    qs = {"format": "GPKG", "srs": "3857", "filter": filter}
 
     response = ngw_webtest_app.get(
         f"/api/resource/{test_layer_id}/export",
@@ -112,7 +112,7 @@ def test_export_gpkg_with_filter(test_layer_id, ngw_webtest_app: WebTestApp):
 
 def test_export_shapefile_with_filter(test_layer_id, ngw_webtest_app: WebTestApp):
     filter = json.dumps(["all", [">", ["get", "age"], 30]])
-    qs = dict(format="ESRI Shapefile", srs="3857", filter=filter)
+    qs = {"format": "ESRI Shapefile", "srs": "3857", "filter": filter}
 
     response = ngw_webtest_app.get(
         f"/api/resource/{test_layer_id}/export",

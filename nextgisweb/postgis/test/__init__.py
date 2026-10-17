@@ -74,7 +74,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
     with engine.connect() as conn:
         with conn.begin():
             for i, feature in enumerate(ogrlayer, start=1):
-                values = dict(id=i)
+                values = {"id": i}
                 geom = feature.GetGeometryRef()
                 values[column_geom] = geom_wkb(geom.ExportToWkb(ogr.wkbNDR))
 
@@ -89,7 +89,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
                 conn.execute(table.insert().values(**values))
 
     with transaction.manager:
-        res_common = dict(parent_id=parent_id, owner_user=User.by_keyname("administrator"))
+        res_common = {"parent_id": parent_id, "owner_user": User.by_keyname("administrator")}
 
         connection = PostgisConnection(
             **res_common,

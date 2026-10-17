@@ -37,10 +37,10 @@ def quota(ngw_env):
 
     @contextmanager
     def _quota(**kw):
-        options = dict(limit=None, resource_cls=None, resource_by_cls=dict())
+        options = {"limit": None, "resource_cls": None, "resource_by_cls": {}}
         options.update(kw)
 
-        mem = dict()
+        mem = {}
         for k, v in options.items():
             attr = f"quota_{k}"
             mem[attr] = getattr(comp, attr)
@@ -84,13 +84,13 @@ def resource():
 def test_resource_search(resource, ngw_webtest_app: WebTestApp):
     api = ngw_webtest_app.with_url("/api/resource/search/")
 
-    resp_json = api.get(query=dict(display_name="狗子有佛性也無")).json
+    resp_json = api.get(query={"display_name": "狗子有佛性也無"}).json
     assert len(resp_json) == 1
 
-    resp_json = api.get(query=dict(display_name="狗子有佛性也無", keyname="foo")).json
+    resp_json = api.get(query={"display_name": "狗子有佛性也無", "keyname": "foo"}).json
     assert resp_json == []
 
-    resp_json = api.get(query=dict(display_name__ilike="%佛%")).json
+    resp_json = api.get(query={"display_name__ilike": "%佛%"}).json
     assert len(resp_json) == 1
     assert resp_json[0]["resource"]["display_name"] == resource.display_name
 
@@ -191,8 +191,7 @@ def test_resource_search_parent_id_recursive(
 def resource_stat():
     with DBSession.no_autoflush:
         cls_count = dict(
-            (cls, count)
-            for cls, count in DBSession.query(
+            DBSession.query(
                 Resource.cls,
                 func.count(Resource.id),
             ).group_by(Resource.cls)
@@ -249,13 +248,13 @@ def test_quota(quota, disable, resource_stat, ngw_webtest_app: WebTestApp):
         create_resource_group(201)
 
     # Quota set to exact current count should block any new creations
-    with quota(resource_by_cls=dict(resource_group=rg_count)):
+    with quota(resource_by_cls={"resource_group": rg_count}):
         check({"resource_group": 0}, 200)
         check({"resource_group": 1}, 402, {"cls": "resource_group", "required": 1, "available": 0})
         create_resource_group(402)
 
     # Quota set for another resource classes shouldn't affect resource_group
-    with quota(resource_by_cls=dict(another_resource_cls=rg_count)):
+    with quota(resource_by_cls={"another_resource_cls": rg_count}):
         check({"resource_group": 999}, 200)
         create_resource_group(201)
 

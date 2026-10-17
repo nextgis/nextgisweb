@@ -19,7 +19,7 @@ from . import FeatureLayerAPI
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
-ZXY0 = dict(z=0, x=0, y=0)
+ZXY0 = {"z": 0, "x": 0, "y": 0}
 
 
 def test_identify(ngw_webtest_app: WebTestApp):
@@ -67,15 +67,15 @@ def test_fields_edit(vector_layer_id, ngw_webtest_app: WebTestApp):
     assert len(feature_fields) == 2
 
     fields.append(
-        dict(
-            keyname="new_field",
-            datatype="DATETIME",
-            typemod=None,
-            display_name="new_field",
-            label_field=False,
-            grid_visibility=True,
-            text_search=True,
-        )
+        {
+            "keyname": "new_field",
+            "datatype": "DATETIME",
+            "typemod": None,
+            "display_name": "new_field",
+            "label_field": False,
+            "grid_visibility": True,
+            "text_search": True,
+        }
     )
     lapi.put(json={"feature_layer": {"fields": fields}}, status=200)
 
@@ -159,21 +159,21 @@ def test_geom_edit(ngw_webtest_app: WebTestApp, vector_layer_id):
     assert wkt_compare(feature["geom"], "POINT (0.0 0.0)")
 
     feature = ngw_webtest_app.get(feature_url + "?geom_format=geojson").json
-    assert feature["geom"] == dict(type="Point", coordinates=[0.0, 0.0])
+    assert feature["geom"] == {"type": "Point", "coordinates": [0.0, 0.0]}
 
     feature["geom"] = "POINT (1 0)"
     ngw_webtest_app.put(feature_url, json=feature)
     feature = ngw_webtest_app.get(feature_url).json
     assert wkt_compare(feature["geom"], "POINT (1.0 0.0)")
 
-    feature["geom"] = dict(type="Point", coordinates=[1, 2])
+    feature["geom"] = {"type": "Point", "coordinates": [1, 2]}
     ngw_webtest_app.put(feature_url + "?geom_format=geojson", json=feature)
     assert feature == ngw_webtest_app.get(feature_url + "?geom_format=geojson").json
 
     feature = ngw_webtest_app.get(feature_url).json
     assert wkt_compare(feature["geom"], "POINT (1.0 2.0)")
 
-    feature["geom"] = dict(type="Point", coordinates=[90, 45])
+    feature["geom"] = {"type": "Point", "coordinates": [90, 45]}
     ngw_webtest_app.put(feature_url + "?geom_format=geojson&srs=4326", json=feature)
     feature = ngw_webtest_app.get(feature_url + "?geom_format=geojson&srs=3857").json
     coords = feature["geom"]["coordinates"]
@@ -189,7 +189,7 @@ def test_cpatch(ngw_webtest_app: WebTestApp, vector_layer_id):
             {"id": 2, "delete": True},
             {"geom": "POINT (1 1)", "fields": {"price": 0}},
         ],
-        query=dict(geom_null=True),
+        query={"geom_null": True},
     )
 
     assert result == [{"id": 1}, {"id": 2}, {"id": 3}]
@@ -250,7 +250,7 @@ def test_fields_unique():
 def test_export(fmt, zipped, srs, ngw_webtest_app: WebTestApp, vector_layer_id):
     ngw_webtest_app.get(
         "/api/resource/%d/export" % vector_layer_id,
-        query=dict(format=fmt, zipped=zipped, srs=srs),
+        query={"format": fmt, "zipped": zipped, "srs": srs},
         status=200,
     )
 
@@ -332,14 +332,14 @@ def test_mvt_should_return_not_found_if_mvt_driver_not_available(
 def test_filter(ngw_webtest_app: WebTestApp, vector_layer_id):
     url_feature = f"/api/resource/{vector_layer_id}/feature/"
 
-    resp = ngw_webtest_app.get(url_feature, query=dict(fld_price__ge=-1), status=200)
+    resp = ngw_webtest_app.get(url_feature, query={"fld_price__ge": -1}, status=200)
     assert len(resp.json) == 1
     assert resp.json[0]["fields"]["price"] == -1
 
-    ngw_webtest_app.get(url_feature, query=dict(fld_not_exists="no matter"), status=422)
+    ngw_webtest_app.get(url_feature, query={"fld_not_exists": "no matter"}, status=422)
 
     # The 'startswith' operator is not supported in the new filter format
-    ngw_webtest_app.get(url_feature, query=dict(fld_price__startswith=1), status=422)
+    ngw_webtest_app.get(url_feature, query={"fld_price__startswith": 1}, status=422)
 
 
 def test_feature_delete(ngw_webtest_app: WebTestApp, vector_layer_id):
@@ -348,7 +348,7 @@ def test_feature_delete(ngw_webtest_app: WebTestApp, vector_layer_id):
     resp = ngw_webtest_app.delete(url_feature, json=[])
     assert resp.json == []
 
-    resp = ngw_webtest_app.delete(url_feature, json=[dict(id=1)])
+    resp = ngw_webtest_app.delete(url_feature, json=[{"id": 1}])
     assert resp.json == [1]
 
     resp = ngw_webtest_app.delete(url_feature)
@@ -363,9 +363,9 @@ def _fields_order_layer():
         layer = VectorLayer(geometry_type="NONE").persist()
         layer.setup_from_fields(
             [
-                dict(keyname="field0", datatype="STRING"),
-                dict(keyname="field1", datatype="STRING"),
-                dict(keyname="field2", datatype="STRING"),
+                {"keyname": "field0", "datatype": "STRING"},
+                {"keyname": "field1", "datatype": "STRING"},
+                {"keyname": "field2", "datatype": "STRING"},
             ]
         )
         layer.feature_label_field = layer.fields[0]
@@ -383,9 +383,9 @@ def test_fields_order(indexes_change, ngw_webtest_app: WebTestApp, _fields_order
     fields = resp.json["feature_layer"]["fields"]
 
     fields_new = [
-        dict(id=fields[idx]["id"], display_name=f"change {idx}") for idx in indexes_change
+        {"id": fields[idx]["id"], "display_name": f"change {idx}"} for idx in indexes_change
     ]
-    data = dict(feature_layer=dict(fields=fields_new))
+    data = {"feature_layer": {"fields": fields_new}}
     api.put(json=data, status=200)
 
     resp = api.get(status=200)

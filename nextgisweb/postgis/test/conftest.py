@@ -152,13 +152,13 @@ def creds(ngw_env):
         if o not in opts_db:
             pytest.skip(f"Option test.database.{o} isn't set")
 
-    return dict(
-        hostname=opts_db["host"],
-        port=opts_db["port"],
-        database=opts_db["name"],
-        username=opts_db["user"],
-        password=opts_db["password"],
-    )
+    return {
+        "hostname": opts_db["host"],
+        "port": opts_db["port"],
+        "database": opts_db["name"],
+        "username": opts_db["user"],
+        "password": opts_db["password"],
+    }
 
 
 @pytest.fixture

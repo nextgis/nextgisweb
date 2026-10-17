@@ -56,7 +56,7 @@ def test_api(vector_layer_id, ngw_webtest_app: WebTestApp):
 
     resp = ngw_webtest_app.get(
         rapi.item_url(res_id, "wfs"),
-        query=dict(service="wfs", request="GetCapabilities"),
+        query={"service": "wfs", "request": "GetCapabilities"},
         status=200,
     )
 

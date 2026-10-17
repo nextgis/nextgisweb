@@ -25,9 +25,9 @@ def off_keep_interfal(ngw_env):
 @pytest.mark.parametrize(
     "kwargs, unref, orphan",
     [
-        pytest.param(dict(), False, False, id="default"),
-        pytest.param(dict(unreferenced=True, orphaned=True), False, False, id="force"),
-        pytest.param(dict(unreferenced=False, orphaned=False), True, True, id="disable"),
+        pytest.param({}, False, False, id="default"),
+        pytest.param({"unreferenced": True, "orphaned": True}, False, False, id="force"),
+        pytest.param({"unreferenced": False, "orphaned": False}, True, True, id="disable"),
     ],
 )
 def test_cleanup(wet, kwargs, unref, orphan, ngw_env, ngw_txn):

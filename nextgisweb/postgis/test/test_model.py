@@ -88,7 +88,7 @@ def test_types(creds, types_ctx, ngw_webtest_app: WebTestApp):
 
     resp = ngw_webtest_app.post(
         "/api/component/postgis/check",
-        json=dict(layer=dict(id=layer.id)),
+        json={"layer": {"id": layer.id}},
     )
     assert StatusEnum(resp.json["status"]) is StatusEnum.SUCCESS
 
@@ -129,17 +129,17 @@ def postgis_layer(creds, db_tx_ctx):
 def test_postgis_tx(postgis_layer, ngw_webtest_app: WebTestApp):
     resp = ngw_webtest_app.post(
         "/api/component/postgis/check",
-        json=dict(layer=dict(id=postgis_layer)),
+        json={"layer": {"id": postgis_layer}},
     )
     assert StatusEnum(resp.json["status"]) is StatusEnum.SUCCESS
 
     fapi = ngw_webtest_app.with_url(f"/api/resource/{postgis_layer}/feature/")
 
-    data = [dict(fields=dict(fld_sometime_fail=n)) for n in (4, 8, 15)]
+    data = [{"fields": {"fld_sometime_fail": n}} for n in (4, 8, 15)]
     resp = fapi.patch(json=data, status=200)
     assert len(resp.json) == 3
 
-    data = [dict(fields=dict(fld_sometime_fail=n)) for n in (16, 23, 42)]
+    data = [{"fields": {"fld_sometime_fail": n}} for n in (16, 23, 42)]
     resp = fapi.patch(json=data, status="*")
     assert resp.status_code >= 500
 
@@ -151,7 +151,7 @@ def test_postgis_tx(postgis_layer, ngw_webtest_app: WebTestApp):
 def test_postgis_tx_fail(ok, postgis_layer, ngw_webtest_app: WebTestApp, ngw_env):
     fapi = ngw_webtest_app.with_url(f"/api/resource/{postgis_layer}/feature/")
 
-    data = dict(extensions=dict(description="description"))
+    data = {"extensions": {"description": "description"}}
     with (
         patch.object(
             PostgisLayer,

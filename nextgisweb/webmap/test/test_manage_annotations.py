@@ -11,12 +11,12 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
 
 def make_annotation_json(public: bool):
-    return dict(
-        description="description",
-        geom="POINT (0 0)",
-        public=public,
-        style=dict(string="string", int=0, bool=True, none=None),
-    )
+    return {
+        "description": "description",
+        "geom": "POINT (0 0)",
+        "public": public,
+        "style": {"string": "string", "int": 0, "bool": True, "none": None},
+    }
 
 
 def make_annotation(webmap, public, user_id):

@@ -165,7 +165,7 @@ def test_ogrloader(ngw_webtest_app: WebTestApp, ngw_resource_group_sub, ngw_file
 
     flv = rapi.read(res_id)["feature_layer"]["versioning"]
     assert flv.pop("epoch", None)
-    assert flv == dict(enabled=True, latest=1)
+    assert flv == {"enabled": True, "latest": 1}
 
 
 F1, F2 = range(1, 3)
@@ -255,7 +255,7 @@ def test_changes(initial, target, expected, vres):
         assert vid == evid, f"#{fid} vid: got {vid} instead of {evid}"
         assert action == eaction, f"#{fid} action: got {action} instead of {eaction}"
 
-    assert expected == dict()
+    assert expected == {}
 
 
 def test_revert():

@@ -146,7 +146,7 @@ def test_attributes(
             assert sorted(ids) == ids_expected
 
         for filter_, ids_expected in filter_cases:
-            filter_by = dict()
+            filter_by = {}
             skip = False
             for k, o, v in filter_:
                 if o != "eq":

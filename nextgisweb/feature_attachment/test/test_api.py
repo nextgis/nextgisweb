@@ -61,105 +61,105 @@ def clear(layer_id):
     (
         (
             [
-                dict(name="00001/test_A", size=1),
-                dict(name="00003/test_B", size=2),
+                {"name": "00001/test_A", "size": 1},
+                {"name": "00003/test_B", "size": 2},
             ],
-            dict(features=[1, 3]),
+            {"features": [1, 3]},
         ),
         (
             [
-                dict(name="00001/test_A", size=1),
-                dict(name="AAAA2/test_B", size=2),
+                {"name": "00001/test_A", "size": 1},
+                {"name": "AAAA2/test_B", "size": 2},
             ],
-            dict(error=True),
+            {"error": True},
         ),
         (
             [
-                dict(name="00001/test_A", size=1),
-                dict(name="00002/test_B", size=2),
-                dict(name="00002/test_C", size=3),
-                dict(
-                    name="metadata.json",
-                    content=dumpb(
-                        dict(
-                            items={
-                                "00001/test_A": dict(
-                                    name="test_A",
-                                    feature_id=3,
-                                    mime_type="text/plain",
-                                    description=None,
-                                ),
-                                "00002/test_B": dict(
-                                    name="test_B",
-                                    feature_id=1,
-                                    mime_type="text/plain",
-                                    description=None,
-                                ),
-                                "00002/test_C": dict(
-                                    name=None,
-                                    feature_id=2,
-                                    mime_type="text/plain",
-                                    description="No name",
-                                ),
+                {"name": "00001/test_A", "size": 1},
+                {"name": "00002/test_B", "size": 2},
+                {"name": "00002/test_C", "size": 3},
+                {
+                    "name": "metadata.json",
+                    "content": dumpb(
+                        {
+                            "items": {
+                                "00001/test_A": {
+                                    "name": "test_A",
+                                    "feature_id": 3,
+                                    "mime_type": "text/plain",
+                                    "description": None,
+                                },
+                                "00002/test_B": {
+                                    "name": "test_B",
+                                    "feature_id": 1,
+                                    "mime_type": "text/plain",
+                                    "description": None,
+                                },
+                                "00002/test_C": {
+                                    "name": None,
+                                    "feature_id": 2,
+                                    "mime_type": "text/plain",
+                                    "description": "No name",
+                                },
                             }
-                        )
+                        }
                     ),
-                ),
+                },
             ],
-            dict(features=[3, 1, 2]),
+            {"features": [3, 1, 2]},
         ),
         (
             [
-                dict(name="00001/test_A", size=1),
-                dict(name="whoiam", size=2),
-                dict(
-                    name="metadata.json",
-                    content=dumpb(
-                        dict(
-                            items={
-                                "00001/test_A": dict(
-                                    name="test_A",
-                                    feature_id=3,
-                                    mime_type="text/plain",
-                                    description=None,
-                                ),
+                {"name": "00001/test_A", "size": 1},
+                {"name": "whoiam", "size": 2},
+                {
+                    "name": "metadata.json",
+                    "content": dumpb(
+                        {
+                            "items": {
+                                "00001/test_A": {
+                                    "name": "test_A",
+                                    "feature_id": 3,
+                                    "mime_type": "text/plain",
+                                    "description": None,
+                                },
                             }
-                        )
+                        }
                     ),
-                ),
+                },
             ],
-            dict(error=True),
+            {"error": True},
         ),
         (
             [
-                dict(name="test_A", size=1),
-                dict(name="test_B", size=2),
-                dict(name="test_C", size=1),
-                dict(
-                    name="metadata.json",
-                    content=dumpb(
-                        dict(
-                            items={
-                                "test_A": dict(
-                                    name="test_A",
-                                    keyname="A",
-                                    feature_id=1,
-                                ),
-                                "test_B": dict(
-                                    name="test_B",
-                                    keyname="B",
-                                    feature_id=1,
-                                ),
-                                "test_C": dict(
-                                    name="test_C",
-                                    feature_id=2,
-                                ),
+                {"name": "test_A", "size": 1},
+                {"name": "test_B", "size": 2},
+                {"name": "test_C", "size": 1},
+                {
+                    "name": "metadata.json",
+                    "content": dumpb(
+                        {
+                            "items": {
+                                "test_A": {
+                                    "name": "test_A",
+                                    "keyname": "A",
+                                    "feature_id": 1,
+                                },
+                                "test_B": {
+                                    "name": "test_B",
+                                    "keyname": "B",
+                                    "feature_id": 1,
+                                },
+                                "test_C": {
+                                    "name": "test_C",
+                                    "feature_id": 2,
+                                },
                             }
-                        )
+                        }
                     ),
-                ),
+                },
             ],
-            dict(features=[1, 1, 2]),
+            {"features": [1, 1, 2]},
         ),
     ),
 )
@@ -178,7 +178,7 @@ def test_import_export(
     if status != 200:
         return
 
-    assert resp_import.json == dict(imported=len(result["features"]), skipped=0)
+    assert resp_import.json == {"imported": len(result["features"]), "skipped": 0}
 
     fid_last = att_idx = attachments = None
     for file_idx, fid in enumerate(result["features"]):
@@ -212,9 +212,9 @@ def test_import_export(
 
 def test_import_multiple(layer_id, ngw_file_upload, ngw_webtest_app: WebTestApp):
     files = (
-        dict(name="00001/test_A", content="AAA"),
-        dict(name="00001/test_B", content="BBB"),
-        dict(name="00002/test_C", content="AAA"),
+        {"name": "00001/test_A", "content": "AAA"},
+        {"name": "00001/test_B", "content": "BBB"},
+        {"name": "00002/test_C", "content": "AAA"},
     )
     upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put(
@@ -222,46 +222,46 @@ def test_import_multiple(layer_id, ngw_file_upload, ngw_webtest_app: WebTestApp)
         json={"source": upload_meta},
         status=200,
     )
-    assert resp.json == dict(imported=3, skipped=0)
+    assert resp.json == {"imported": 3, "skipped": 0}
 
     resp = ngw_webtest_app.put(
         f"/api/resource/{layer_id}/feature_attachment/import",
         json={"source": upload_meta},
         status=200,
     )
-    assert resp.json == dict(imported=0, skipped=3)
+    assert resp.json == {"imported": 0, "skipped": 3}
 
     resp = ngw_webtest_app.put(
         f"/api/resource/{layer_id}/feature_attachment/import",
         json={"source": upload_meta, "replace": True},
         status=200,
     )
-    assert resp.json == dict(imported=3, skipped=0)
+    assert resp.json == {"imported": 3, "skipped": 0}
 
     files = (
-        dict(name="somefile.txt", content="BBB"),
-        dict(name="00002/test_D", content="CCC"),
-        dict(
-            name="metadata.json",
-            content=dumpb(
-                dict(
-                    items={
-                        "somefile.txt": dict(
-                            name="somefile",
-                            feature_id=1,
-                            mime_type="text/plain",
-                            description=None,
-                        ),
-                        "00002/test_D": dict(
-                            name="test_B",
-                            feature_id=2,
-                            mime_type="text/plain",
-                            description=None,
-                        ),
+        {"name": "somefile.txt", "content": "BBB"},
+        {"name": "00002/test_D", "content": "CCC"},
+        {
+            "name": "metadata.json",
+            "content": dumpb(
+                {
+                    "items": {
+                        "somefile.txt": {
+                            "name": "somefile",
+                            "feature_id": 1,
+                            "mime_type": "text/plain",
+                            "description": None,
+                        },
+                        "00002/test_D": {
+                            "name": "test_B",
+                            "feature_id": 2,
+                            "mime_type": "text/plain",
+                            "description": None,
+                        },
                     }
-                )
+                }
             ),
-        ),
+        },
     )
     upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put(
@@ -269,7 +269,7 @@ def test_import_multiple(layer_id, ngw_file_upload, ngw_webtest_app: WebTestApp)
         json={"source": upload_meta},
         status=200,
     )
-    assert resp.json == dict(imported=1, skipped=1)
+    assert resp.json == {"imported": 1, "skipped": 1}
 
 
 # name = '{feature_id}/{file_name}'
@@ -278,14 +278,14 @@ def test_import_image(
     layer_id, clear, ngw_file_upload, ngw_webtest_app: WebTestApp, ngw_data_path
 ):
     img_data = (ngw_data_path / "panorama.jpg").read_bytes()
-    files = (dict(name="00003/image", content=img_data),)
+    files = ({"name": "00003/image", "content": img_data},)
     upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put(
         f"/api/resource/{layer_id}/feature_attachment/import",
         json={"source": upload_meta},
         status=200,
     )
-    assert resp.json == dict(imported=1, skipped=0)
+    assert resp.json == {"imported": 1, "skipped": 0}
 
     with transaction.manager:
         obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
@@ -362,14 +362,14 @@ def test_import_image_panorama_marker_single(
     )
     img_data = _jpeg_with_xmp(xmp_data)
 
-    files = (dict(name="00003/image", content=img_data),)
+    files = ({"name": "00003/image", "content": img_data},)
     upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put(
         f"/api/resource/{layer_id}/feature_attachment/import",
         json={"source": upload_meta},
         status=200,
     )
-    assert resp.json == dict(imported=1, skipped=0)
+    assert resp.json == {"imported": 1, "skipped": 0}
 
     with transaction.manager:
         obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
@@ -408,14 +408,14 @@ def test_import_image_panorama_marker_multi(
     )
     img_data = _jpeg_with_xmp(xmp_data)
 
-    files = (dict(name="00003/image", content=img_data),)
+    files = ({"name": "00003/image", "content": img_data},)
     upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put(
         f"/api/resource/{layer_id}/feature_attachment/import",
         json={"source": upload_meta},
         status=200,
     )
-    assert resp.json == dict(imported=1, skipped=0)
+    assert resp.json == {"imported": 1, "skipped": 0}
 
     with transaction.manager:
         obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
@@ -607,17 +607,19 @@ def test_feature_layer_and_feature_attachment_api(
 def test_id_copy(layer_id, ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_resource_group):
     with NamedTemporaryFile() as f:
         upload_meta = ngw_file_upload(f.name)
-    data = dict(extensions=dict(attachment=[dict(file_upload=upload_meta)]))
+    data = {"extensions": {"attachment": [{"file_upload": upload_meta}]}}
     ngw_webtest_app.put(f"/api/resource/{layer_id}/feature/1", json=data, status=200)
     resp = ngw_webtest_app.get(f"/api/resource/{layer_id}/feature/1", status=200)
     aid = resp.json["extensions"]["attachment"][0]["id"]
 
-    data = dict(
-        resource=dict(
-            cls="vector_layer", display_name=token_hex(), parent=dict(id=ngw_resource_group)
-        ),
-        vector_layer=dict(feature_layer=dict(resource=dict(id=layer_id)), srs=dict(id=3857)),
-    )
+    data = {
+        "resource": {
+            "cls": "vector_layer",
+            "display_name": token_hex(),
+            "parent": {"id": ngw_resource_group},
+        },
+        "vector_layer": {"feature_layer": {"resource": {"id": layer_id}}, "srs": {"id": 3857}},
+    }
     resp = ngw_webtest_app.post("/api/resource/", json=data, status=201)
     copy_layer_id = resp.json["id"]
 

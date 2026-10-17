@@ -211,29 +211,33 @@ for version in TEST_WFS_VERSIONS:
                     pytest.param(
                         version,
                         layer,
-                        dict(
-                            null="not null", int=42, real=-0.0, string=None, unicode="¯\\_(ツ)_/¯"
-                        ),
+                        {
+                            "null": "not null",
+                            "int": 42,
+                            "real": -0.0,
+                            "string": None,
+                            "unicode": "¯\\_(ツ)_/¯",
+                        },
                         "POINT (1 1)",
                         id="{}-type-f1".format(version),
                     ),
                     pytest.param(
                         version,
                         layer,
-                        dict(
-                            null=None,
-                            int=2**16,
-                            real=3.1415926535897,
-                            string="str",
-                            unicode="مرحبا بالعالم",
-                        ),
+                        {
+                            "null": None,
+                            "int": 2**16,
+                            "real": 3.1415926535897,
+                            "string": "str",
+                            "unicode": "مرحبا بالعالم",
+                        },
                         "POINT (0.1 -3.1)",
                         id="{}-type-f2".format(version),
                     ),
                     pytest.param(
                         version,
                         layer,
-                        dict(),
+                        {},
                         None,
                         id="{}-type-f3".format(version),
                     ),
@@ -244,7 +248,7 @@ for version in TEST_WFS_VERSIONS:
                 pytest.param(
                     version,
                     layer,
-                    dict(int=42),
+                    {"int": 42},
                     "POINT Z (0 0 -1)",
                     id="{}-points-f1".format(version),
                 )

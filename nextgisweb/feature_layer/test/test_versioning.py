@@ -13,7 +13,7 @@ from nextgisweb.resource.test import ResourceAPI
 from ..versioning.extension import ExtensionQueries, FVersioningExtensionMixin
 
 Base = orm.declarative_base()
-registry = dict()
+registry = {}
 
 
 class Simple(FVersioningExtensionMixin, Base):
@@ -53,7 +53,7 @@ def configure_mappers():
 
 @pytest.mark.parametrize("cls", [Simple, Complex])
 def test_ref_create_table(cls):
-    sql = list()
+    sql = []
     for t in (mapper_table(cls), cls.fversioning_etab, cls.fversioning_htab):
         sql.append(sa.schema.CreateTable(t))
         for idx in t.indexes:

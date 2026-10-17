@@ -98,7 +98,7 @@ def test_default_order_tms_ids_should_match_the_reversed_order_webmap_items(webm
         webmap = WebMap.filter_by(id=webmap.id).one()
         ids = webmap_items_to_tms_ids_list(webmap)
 
-    assert ids == sorted(map(lambda ls: ls[1], fixt_layers_styles), reverse=True)
+    assert ids == sorted((ls[1] for ls in fixt_layers_styles), reverse=True)
 
 
 def test_order_tms_ids_should_consider_the_draw_order_enabled(webmap_with_items):
@@ -111,7 +111,7 @@ def test_order_tms_ids_should_consider_the_draw_order_enabled(webmap_with_items)
     # sort expected styles by draw_order_position
     fixt_layers_styles = sorted(fixt_layers_styles, key=lambda ls: ls[2], reverse=True)
 
-    assert ids == list(map(lambda ls: ls[1], fixt_layers_styles))
+    assert ids == [ls[1] for ls in fixt_layers_styles]
 
     with transaction.manager:
         webmap = WebMap.filter_by(id=webmap.id).one()

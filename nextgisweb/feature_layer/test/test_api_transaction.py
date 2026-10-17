@@ -31,7 +31,7 @@ def mkres():
             epoch = obj.fversioning.epoch if versioning else None
 
         fld_id = obj.fields[0].id
-        return (obj.id, epoch, (lambda v: dict(foo=v)) if fdict else (lambda v: [(fld_id, v)]))
+        return (obj.id, epoch, (lambda v: {"foo": v}) if fdict else (lambda v: [(fld_id, v)]))
 
     yield _mkres
 

@@ -20,7 +20,7 @@ def test_last_activity(ngw_env, ngw_webtest_app: WebTestApp):
             ("administrator", None),
         ):
             DBSession.query(User).filter_by(keyname=keyname).update(
-                dict(last_activity=last_activity)
+                {"last_activity": last_activity}
             )
 
     with ngw_env.auth.options.override(activity_delta=timedelta(seconds=0)):

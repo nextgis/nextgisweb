@@ -21,15 +21,15 @@ def test_from_fields(ngw_txn):
     res = VectorLayer(geometry_type="POINT")
     res.setup_from_fields(
         [
-            dict(keyname="integer", datatype=FIELD_TYPE.INTEGER),
-            dict(keyname="bigint", datatype=FIELD_TYPE.BIGINT),
-            dict(keyname="real", datatype=FIELD_TYPE.REAL),
-            dict(keyname="string", datatype=FIELD_TYPE.STRING, label_field=True),
-            dict(keyname="date", datatype=FIELD_TYPE.DATE),
-            dict(keyname="time", datatype=FIELD_TYPE.TIME),
-            dict(keyname="datetime", datatype=FIELD_TYPE.DATETIME),
-            dict(keyname="boolean", datatype=FIELD_TYPE.BOOLEAN),
-            dict(keyname="json", datatype=FIELD_TYPE.JSON),
+            {"keyname": "integer", "datatype": FIELD_TYPE.INTEGER},
+            {"keyname": "bigint", "datatype": FIELD_TYPE.BIGINT},
+            {"keyname": "real", "datatype": FIELD_TYPE.REAL},
+            {"keyname": "string", "datatype": FIELD_TYPE.STRING, "label_field": True},
+            {"keyname": "date", "datatype": FIELD_TYPE.DATE},
+            {"keyname": "time", "datatype": FIELD_TYPE.TIME},
+            {"keyname": "datetime", "datatype": FIELD_TYPE.DATETIME},
+            {"keyname": "boolean", "datatype": FIELD_TYPE.BOOLEAN},
+            {"keyname": "json", "datatype": FIELD_TYPE.JSON},
         ]
     )
 
@@ -219,7 +219,7 @@ def test_source_layer(ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data_pat
     )
 
     fapi = FeatureLayerAPI(res_id)
-    assert fapi.feature_get(2)["fields"] == dict(name_point="Point two")
+    assert fapi.feature_get(2)["fields"] == {"name_point": "Point two"}
 
     rapi.update(res_id, {"vector_layer": {"delete_all_features": True}})
     fapi.feature_get(2, status=404)
@@ -256,12 +256,12 @@ def test_copy(versioning, ngw_file_upload, ngw_data_path):
 
     src_fapi.feature_update(
         1,
-        dict(
-            extensions=dict(
-                attachment=[dict(file_upload=upload_meta)],
-                description="Example description",
-            )
-        ),
+        {
+            "extensions": {
+                "attachment": [{"file_upload": upload_meta}],
+                "description": "Example description",
+            }
+        },
     )
 
     feature = src_fapi.feature_get(1)
@@ -285,7 +285,7 @@ def test_copy(versioning, ngw_file_upload, ngw_data_path):
     dst_fapi = FeatureLayerAPI(dst_id, extensions=extensions)
     assert dst_fapi.feature_list() == expected_v2
 
-    resp = dst_fapi.feature_create(dict())
+    resp = dst_fapi.feature_create({})
     assert resp["id"] == 2
 
     if not versioning:
@@ -397,7 +397,7 @@ def test_error_limit():
         feature.SetGeometry(ogr.CreateGeometryFromWkt(wkt))
         layer.CreateFeature(feature)
 
-    opts = dict(fix_errors=FIX_ERRORS.NONE)
+    opts = {"fix_errors": FIX_ERRORS.NONE}
     with pytest.raises(ValidationError) as excinfo:
         res.from_source(layer, **opts, skip_errors=False)
     assert excinfo.value.detail is not None
@@ -423,7 +423,7 @@ def test_id_field(data, ngw_data_path):
     res = VectorLayer().persist()
     src = ngw_data_path / f"{data}.geojson"
 
-    fid_params = dict(fid_source=FID_SOURCE.FIELD, fid_field=["id"])
+    fid_params = {"fid_source": FID_SOURCE.FIELD, "fid_field": ["id"]}
     with pytest.raises(ValidationError):
         res.from_source(src, **fid_params)
 

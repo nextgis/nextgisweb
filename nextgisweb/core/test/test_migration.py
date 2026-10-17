@@ -29,5 +29,5 @@ def test_tail_to_head(graph):
     resolve(
         operations,
         {m: m in graph._tails for m in graph.select("all")},
-        {m: True for m in graph.select("head")},
+        dict.fromkeys(graph.select("head"), True),
     )

@@ -4,24 +4,24 @@ from ..api import add_extent
 
 check_extents = [
     [
-        dict(minLon=100, maxLon=150, minLat=50, maxLat=90),
-        dict(minLon=90, maxLon=160, minLat=40, maxLat=95),
-        dict(minLon=90, maxLon=160, minLat=40, maxLat=95),
+        {"minLon": 100, "maxLon": 150, "minLat": 50, "maxLat": 90},
+        {"minLon": 90, "maxLon": 160, "minLat": 40, "maxLat": 95},
+        {"minLon": 90, "maxLon": 160, "minLat": 40, "maxLat": 95},
     ],
     [
-        dict(minLon=100, maxLon=150, minLat=50, maxLat=90),
-        dict(minLon=None, maxLon=160, minLat=40, maxLat=95),
-        dict(minLon=100, maxLon=150, minLat=50, maxLat=90),
+        {"minLon": 100, "maxLon": 150, "minLat": 50, "maxLat": 90},
+        {"minLon": None, "maxLon": 160, "minLat": 40, "maxLat": 95},
+        {"minLon": 100, "maxLon": 150, "minLat": 50, "maxLat": 90},
     ],
     [
-        dict(minLon=None, maxLon=150, minLat=50, maxLat=90),
-        dict(minLon=None, maxLon=160, minLat=40, maxLat=95),
+        {"minLon": None, "maxLon": 150, "minLat": 50, "maxLat": 90},
+        {"minLon": None, "maxLon": 160, "minLat": 40, "maxLat": 95},
         None,
     ],
     [
-        dict(minLon=100, maxLon=150, minLat=50, maxLat=90),
+        {"minLon": 100, "maxLon": 150, "minLat": 50, "maxLat": 90},
         None,
-        dict(minLon=100, maxLon=150, minLat=50, maxLat=90),
+        {"minLon": 100, "maxLon": 150, "minLat": 50, "maxLat": 90},
     ],
     [
         None,
@@ -29,9 +29,9 @@ check_extents = [
         None,
     ],
     [
-        dict(minLon=100, maxLon=150, minLat=50, maxLat=90),
-        dict(minLon=-90, maxLon=120, minLat=-40, maxLat=70),
-        dict(minLon=-90, maxLon=150, minLat=-40, maxLat=90),
+        {"minLon": 100, "maxLon": 150, "minLat": 50, "maxLat": 90},
+        {"minLon": -90, "maxLon": 120, "minLat": -40, "maxLat": 70},
+        {"minLon": -90, "maxLon": 150, "minLat": -40, "maxLat": 90},
     ],
 ]
 

@@ -60,7 +60,7 @@ def test_feature_layer_api(versioning, ngw_webtest_app: WebTestApp):
         # Request the current version and compare
         resp_fa = ngw_webtest_app.get(f"{burl}/1?version={vup}&extensions=description")
         resp_fa = resp_fa.json["extensions"]["description"]
-        assert resp_fa == dict(version=vup, value="foo")
+        assert resp_fa == {"version": vup, "value": "foo"}
 
     # Update the description
     payload = {"extensions": {"description": "bar"}}
@@ -145,29 +145,29 @@ def clear(layer_id):
     "files, result",
     (
         (
-            [dict(name="qwerty.html", content="wrong-fid")],
-            dict(error=True),
+            [{"name": "qwerty.html", "content": "wrong-fid"}],
+            {"error": True},
         ),
         (
-            [dict(name="00001", content="wrong-ext")],
-            dict(error=True),
-        ),
-        (
-            [
-                dict(name="00001.html", content="plain text"),
-                dict(name="00003.hTmL", content="<p>paragraph</p>"),
-            ],
-            dict(features=[1, 3]),
+            [{"name": "00001", "content": "wrong-ext"}],
+            {"error": True},
         ),
         (
             [
-                dict(
-                    name="1.html",
-                    content="plain<p>pa<i>r</i>a<b>g</b>raph</p><script>alert('hacked')</script>",
-                    expected="plain<p>pa<i>r</i>a<b>g</b>raph</p>",
-                ),
+                {"name": "00001.html", "content": "plain text"},
+                {"name": "00003.hTmL", "content": "<p>paragraph</p>"},
             ],
-            dict(features=[1]),
+            {"features": [1, 3]},
+        ),
+        (
+            [
+                {
+                    "name": "1.html",
+                    "content": "plain<p>pa<i>r</i>a<b>g</b>raph</p><script>alert('hacked')</script>",
+                    "expected": "plain<p>pa<i>r</i>a<b>g</b>raph</p>",
+                },
+            ],
+            {"features": [1]},
         ),
     ),
 )
@@ -189,7 +189,7 @@ def test_import_export(
     for file_idx, fid in enumerate(result["features"]):
         resp = ngw_webtest_app.get(
             f"/api/resource/{layer_id}/feature/{fid}",
-            query=dict(extensions="description"),
+            query={"extensions": "description"},
             status=200,
         )
         description = resp.json["extensions"]["description"]

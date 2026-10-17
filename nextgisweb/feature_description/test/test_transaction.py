@@ -34,13 +34,13 @@ def test_workflow(versioning, mkres):
     with fapi.transaction() as txn:  # Version 2
         for _ in range(2):
             # Repeats of the same data should also report 200 OK
-            txn.put(1, dict(action="description.put", fid=1, value="Foo"))
+            txn.put(1, {"action": "description.put", "fid": 1, "value": "Foo"})
 
-        txn.put(2, dict(action="description.put", fid=2, value="Bar"))
-        txn.put(3, dict(action="description.put", fid=3, value="Zoo"))
+        txn.put(2, {"action": "description.put", "fid": 2, "value": "Bar"})
+        txn.put(3, {"action": "description.put", "fid": 3, "value": "Zoo"})
 
         # But another operation should report 409 Conflict
-        txn.put(1, dict(action="description.put", fid=1, value="Qux"), status=409)
+        txn.put(1, {"action": "description.put", "fid": 1, "value": "Qux"}, status=409)
 
         # Results aren't available until commit happens
         txn.results(status=422)
@@ -51,9 +51,9 @@ def test_workflow(versioning, mkres):
         assert commit_1 == commit_2
 
         assert txn.results() == [
-            [1, dict(action="description.put")],
-            [2, dict(action="description.put")],
-            [3, dict(action="description.put")],
+            [1, {"action": "description.put"}],
+            [2, {"action": "description.put"}],
+            [3, {"action": "description.put"}],
         ]
 
     # Transaction is already disposed
@@ -73,20 +73,20 @@ def test_workflow(versioning, mkres):
         return
 
     with fapi.transaction() as txn:  # Version 3
-        txn.put(1, dict(action="description.put", fid=1, vid=2, value=None))
-        txn.put(2, dict(action="description.put", fid=2, vid=2, value="Qux"))
-        txn.put(3, dict(action="description.put", fid=3, vid=0, value="Ham"))
+        txn.put(1, {"action": "description.put", "fid": 1, "vid": 2, "value": None})
+        txn.put(2, {"action": "description.put", "fid": 2, "vid": 2, "value": "Qux"})
+        txn.put(3, {"action": "description.put", "fid": 3, "vid": 0, "value": "Ham"})
 
         error = txn.commit_errors()[0][1]["error"]
         assert error == "description.conflict"
-        txn.put(3, dict(action="description.put", fid=3, vid=2, value="Ham"))
+        txn.put(3, {"action": "description.put", "fid": 3, "vid": 2, "value": "Ham"})
 
         txn.commit()
 
         assert txn.results() == [
-            [1, dict(action="description.put")],
-            [2, dict(action="description.put")],
-            [3, dict(action="description.put")],
+            [1, {"action": "description.put"}],
+            [2, {"action": "description.put"}],
+            [3, {"action": "description.put"}],
         ]
 
     assert fapi.feature_get(1, version=3) == {
@@ -114,11 +114,11 @@ def test_workflow(versioning, mkres):
     }
 
     with fapi.transaction() as txn:  # Version 4
-        txn.put(2, dict(action="description.restore", fid=1))
+        txn.put(2, {"action": "description.restore", "fid": 1})
         txn.commit()
 
         assert txn.results() == [
-            [2, dict(action="description.restore")],
+            [2, {"action": "description.restore"}],
         ]
 
     changes = fapi.changes(initial=1, filter=["description."])
@@ -135,13 +135,13 @@ def test_workflow(versioning, mkres):
     ]
 
     with fapi.transaction() as txn:  # Version 5
-        txn.put(1, dict(action="feature.create"))
-        txn.put(2, dict(action="description.put", fid=dict(sn=1), value="New"))
+        txn.put(1, {"action": "feature.create"})
+        txn.put(2, {"action": "description.put", "fid": {"sn": 1}, "value": "New"})
         txn.commit()
 
         assert txn.results() == [
-            [1, dict(action="feature.create", fid=4)],
-            [2, dict(action="description.put")],
+            [1, {"action": "feature.create", "fid": 4}],
+            [2, {"action": "description.put"}],
         ]
 
     changes = fapi.changes(initial=4)
@@ -166,7 +166,7 @@ def test_workflow(versioning, mkres):
 
     for v in reversed(range(0, latest)):
         with fapi.transaction() as txn:
-            txn.put(1, dict(action="revert", tid=v))
+            txn.put(1, {"action": "revert", "tid": v})
             txn.commit()
 
         expected_version += 1

@@ -19,7 +19,7 @@ def path(
     pass
 
 
-config.add_route("path", "/path/{foo}/{bar}", types=dict(foo=int, bar=int), get=path)
+config.add_route("path", "/path/{foo}/{bar}", types={"foo": int, "bar": int}, get=path)
 
 
 def query_primitive(

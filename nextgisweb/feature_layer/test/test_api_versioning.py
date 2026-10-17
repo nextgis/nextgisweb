@@ -29,7 +29,7 @@ def test_crud(res, ngw_webtest_app: WebTestApp, ngw_env):
     ngw_webtest_app.put(rurl, json=payload)
     resp_flv = ngw_webtest_app.get(rurl).json["feature_layer"]["versioning"]
     assert resp_flv.pop("epoch")
-    assert resp_flv == dict(enabled=True, latest=vnext)
+    assert resp_flv == {"enabled": True, "latest": vnext}
 
     resp_v1 = ngw_webtest_app.get(f"{burl}/version/{vnext}").json
     assert resp_v1["id"] == vnext
@@ -38,7 +38,7 @@ def test_crud(res, ngw_webtest_app: WebTestApp, ngw_env):
     vnext = next(vcur)
     payload = {"geom": "POINT Z (0 0 2)", "fields": {"foo": "2"}}
     resp = ngw_webtest_app.post(curl, json=payload).json
-    assert resp == dict(id=1, version=vnext)
+    assert resp == {"id": 1, "version": vnext}
 
     resp_v2 = ngw_webtest_app.get(f"{burl}/version/{vnext}").json
     assert resp_v2["id"] == vnext
@@ -47,11 +47,11 @@ def test_crud(res, ngw_webtest_app: WebTestApp, ngw_env):
     ngw_webtest_app.get(f"{burl}/1?version=1", status=404)
     resp_f1_v2 = ngw_webtest_app.get(f"{burl}/1?version=2").json
     assert resp_f1_v2["geom"] == "POINT Z (0 0 2)"
-    assert resp_f1_v2["fields"] == dict(foo="2")
+    assert resp_f1_v2["fields"] == {"foo": "2"}
 
     payload = {"geom": "POINT Z (0 0 3)", "fields": {"foo": "3"}}
     resp = ngw_webtest_app.put(f"{burl}/1", json=payload, status=200).json
-    assert resp == dict(id=1, version=next(vcur))
+    assert resp == {"id": 1, "version": next(vcur)}
 
     ngw_webtest_app.get(f"{burl}/1" + "?version=1", status=404)
     resp = ngw_webtest_app.get(f"{burl}/1" + "?version=2").json
@@ -59,15 +59,15 @@ def test_crud(res, ngw_webtest_app: WebTestApp, ngw_env):
 
     vnext = next(vcur)
     payload = [{"id": 1, "geom": "POINT(0 0 4)"}]
-    expected = [dict(id=1, version=vnext)]
+    expected = [{"id": 1, "version": vnext}]
     for i in range(2, 3 + 1):
         payload += [{"geom": "POINT(0 0 5)"}]
-        expected += [dict(id=i, version=vnext)]
+        expected += [{"id": i, "version": vnext}]
     resp = ngw_webtest_app.patch(curl, json=payload).json
     assert resp == expected
 
     resp = ngw_webtest_app.delete(f"{burl}/1").json
-    assert resp == dict(id=1, version=next(vcur))
+    assert resp == {"id": 1, "version": next(vcur)}
     ngw_webtest_app.put(f"{burl}/1", json={}, status=404)
     ngw_webtest_app.delete(f"{burl}/1", status=404)
 
@@ -84,11 +84,11 @@ def test_crud(res, ngw_webtest_app: WebTestApp, ngw_env):
 
     resp_flv = ngw_webtest_app.get(rurl).json["feature_layer"]["versioning"]
     assert resp_flv.pop("epoch")
-    assert resp_flv == dict(enabled=True, latest=next(vcur))
+    assert resp_flv == {"enabled": True, "latest": next(vcur)}
 
     for val in (False, True, False):
         payload = {"feature_layer": {"versioning": {"enabled": val}}}
         ngw_webtest_app.put(rurl, json=payload)
 
     resp_flv = ngw_webtest_app.get(rurl).json["feature_layer"]["versioning"]
-    assert resp_flv == dict(enabled=False)
+    assert resp_flv == {"enabled": False}

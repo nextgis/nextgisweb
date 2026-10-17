@@ -8,10 +8,10 @@ from nextgisweb.pyramid.test import WebTestApp
 @pytest.mark.parametrize(
     "filename, checks",
     (
-        pytest.param("tileset.mbtiles", dict(expected=dict(zmin=0, zmax=11)), id="mbtiles"),
-        pytest.param("tileset.zip", dict(expected=dict(zmin=0, zmax=11)), id="zip"),
-        pytest.param("subdir.zip", dict(expected=dict(zmin=0, zmax=2)), id="zip-subdir"),
-        pytest.param("two-subdir.zip", dict(ok=False), id="zip-differend-subdir"),
+        pytest.param("tileset.mbtiles", {"expected": {"zmin": 0, "zmax": 11}}, id="mbtiles"),
+        pytest.param("tileset.zip", {"expected": {"zmin": 0, "zmax": 11}}, id="zip"),
+        pytest.param("subdir.zip", {"expected": {"zmin": 0, "zmax": 2}}, id="zip-subdir"),
+        pytest.param("two-subdir.zip", {"ok": False}, id="zip-differend-subdir"),
     ),
 )
 def test_create(
@@ -25,10 +25,14 @@ def test_create(
 ):
     upload_meta = ngw_file_upload(ngw_data_path / filename)
 
-    data = dict(
-        resource=dict(cls="tileset", display_name=token_hex(), parent=dict(id=ngw_resource_group)),
-        tileset=dict(srs=dict(id=3857), source=upload_meta),
-    )
+    data = {
+        "resource": {
+            "cls": "tileset",
+            "display_name": token_hex(),
+            "parent": {"id": ngw_resource_group},
+        },
+        "tileset": {"srs": {"id": 3857}, "source": upload_meta},
+    }
     ok = checks.get("ok", True)
     resp = ngw_webtest_app.post("/api/resource/", json=data, status=201 if ok else 422)
     if not ok:

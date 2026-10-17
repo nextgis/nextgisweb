@@ -37,7 +37,7 @@ def override(ngw_core_settings_override):
 )
 def test_validation(origin, ok, ngw_webtest_app: WebTestApp):
     url = "/api/component/pyramid/csettings"
-    body = dict(pyramid=dict(allow_origin=[origin]))
+    body = {"pyramid": {"allow_origin": [origin]}}
     ngw_webtest_app.put(url, json=body, status=200 if ok else 422)
 
 

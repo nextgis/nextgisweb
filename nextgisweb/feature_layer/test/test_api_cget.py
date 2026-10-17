@@ -71,7 +71,7 @@ def test_cget_extensions(ngw_webtest_app: WebTestApp, vector_layer_id):
     assert "extensions" not in resp.json
 
     resp = ngw_webtest_app.get(f"{url_feature}?extensions=description,attachment")
-    assert resp.json[0]["extensions"] == dict(description=None, attachment=None)
+    assert resp.json[0]["extensions"] == {"description": None, "attachment": None}
 
 
 def test_there_is_no_label_by_default(ngw_webtest_app: WebTestApp, vector_layer_id):

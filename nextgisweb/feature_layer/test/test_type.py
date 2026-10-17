@@ -73,7 +73,7 @@ def test_datetime_valid(type, format, value, type_layer, ngw_webtest_app: WebTes
 def int_layer():
     with transaction.manager:
         layer = VectorLayer(geometry_type="POINT").persist()
-        layer.setup_from_fields([dict(keyname="f", datatype="INTEGER")])
+        layer.setup_from_fields([{"keyname": "f", "datatype": "INTEGER"}])
     yield layer.id
 
 
@@ -109,7 +109,7 @@ def test_int_valid(value, expected, bigint_layer, ngw_webtest_app: WebTestApp):
 )
 def test_int_invalid(value, int_layer, ngw_webtest_app: WebTestApp):
     url = f"/api/resource/{int_layer}/feature/"
-    feature = dict(geom="POINT (0 0)", fields=dict(f=value))
+    feature = {"geom": "POINT (0 0)", "fields": {"f": value}}
     ngw_webtest_app.post(url, json=feature, status=422)
 
 
@@ -117,7 +117,7 @@ def test_int_invalid(value, int_layer, ngw_webtest_app: WebTestApp):
 def bigint_layer():
     with transaction.manager:
         layer = VectorLayer(geometry_type="POINT").persist()
-        layer.setup_from_fields([dict(keyname="f", datatype="BIGINT")])
+        layer.setup_from_fields([{"keyname": "f", "datatype": "BIGINT"}])
     yield layer.id
 
 
@@ -181,7 +181,7 @@ def test_bigint_valid(value, cases, bigint_layer, ngw_webtest_app: WebTestApp):
     fid = resp.json["id"]
 
     for bi_fmt, expected in cases.items():
-        q = dict()
+        q = {}
         if bi_fmt is not None:
             q["bigint_format"] = bi_fmt
         resp = ngw_webtest_app.get(url + str(fid), query=q, status=200)
@@ -208,7 +208,7 @@ def test_bigint_invalid(value, bigint_layer, ngw_webtest_app: WebTestApp):
 def bool_layer():
     with transaction.manager:
         layer = VectorLayer(geometry_type="POINT").persist()
-        layer.setup_from_fields([dict(keyname="f", datatype="BOOLEAN")])
+        layer.setup_from_fields([{"keyname": "f", "datatype": "BOOLEAN"}])
     yield layer.id
 
 
@@ -253,7 +253,7 @@ def test_bool_invalid(value, bool_layer, ngw_webtest_app: WebTestApp):
 def json_layer():
     with transaction.manager:
         layer = VectorLayer(geometry_type="POINT").persist()
-        layer.setup_from_fields([dict(keyname="f", datatype="JSON")])
+        layer.setup_from_fields([{"keyname": "f", "datatype": "JSON"}])
     yield layer.id
 
 

@@ -61,8 +61,8 @@ def test_storage(ngw_env, ngw_webtest_app: WebTestApp):
     assert "storage.res" not in DBSession().info
 
     cur = ngw_env.core.query_storage()
-    assert cur[""] == dict(estimated=None, updated=dt(), data_volume=600)
-    assert cur[TestKOD1.identity] == dict(estimated=None, updated=dt(), data_volume=500)
+    assert cur[""] == {"estimated": None, "updated": dt(), "data_volume": 600}
+    assert cur[TestKOD1.identity] == {"estimated": None, "updated": dt(), "data_volume": 500}
 
     res = ngw_webtest_app.get("/api/component/pyramid/storage", status=200)
     assert res.json[""]["updated"] == dt().isoformat()
@@ -121,7 +121,7 @@ def test_estimate_all(ngw_env, ngw_webtest_app: WebTestApp):
     with transaction.manager:
         res = vector_layer()
 
-    feature = dict(geom="POINT (0 0)")
+    feature = {"geom": "POINT (0 0)"}
     resp = ngw_webtest_app.post("/api/resource/%d/feature/" % res.id, json=feature)
     fid = resp.json["id"]
 
@@ -135,7 +135,7 @@ def test_estimate_all(ngw_env, ngw_webtest_app: WebTestApp):
 
     estimate(ngw_webtest_app)
 
-    cur = ngw_env.core.query_storage(dict(resource_id=lambda col: col == res.id))
+    cur = ngw_env.core.query_storage({"resource_id": lambda col: col == res.id})
     assert FeatureAttachmentData.identity in cur
     assert cur[FeatureAttachmentData.identity]["data_volume"] == len(content)
 
@@ -164,7 +164,7 @@ def test_check_limit_after_estimate(ngw_env, ngw_webtest_app: WebTestApp):
         res = vector_layer()
         DBSession.flush()
 
-    feature = dict(geom="POINT (0 0)")
+    feature = {"geom": "POINT (0 0)"}
     resp = ngw_webtest_app.post("/api/resource/%d/feature/" % res.id, json=feature)
     fid = resp.json["id"]
 

@@ -21,7 +21,7 @@ def cwebapp(ngw_env):
         try:
             body = request.json_body
         except ValueError:
-            body = dict()
+            body = {}
 
         for k, v in body.items():
             if k.startswith(prefix):
@@ -64,20 +64,20 @@ def get_session_id(ngw_env):
 @pytest.fixture()
 def session_headers(ngw_env):
     def _wrap(session_id):
-        return dict(cookie="%s=%s" % (ngw_env.pyramid.options["session.cookie.name"], session_id))
+        return {"cookie": "%s=%s" % (ngw_env.pyramid.options["session.cookie.name"], session_id)}
 
     yield _wrap
 
 
 def read_store(session_id):
-    result = dict()
+    result = {}
     for kv in SessionStore.filter_by(session_id=session_id).all():
         result[kv.key] = kv.value
     return result
 
 
 def test_session_store(cwebapp: WebTestApp, get_session_id, session_headers):
-    kv = dict(_test_A="A", _test_B="B1")
+    kv = {"_test_A": "A", "_test_B": "B1"}
     res = cwebapp.post("/test/session_kv", json=kv)
     session_id = get_session_id(res)
     assert session_id is not None
@@ -89,12 +89,12 @@ def test_session_store(cwebapp: WebTestApp, get_session_id, session_headers):
     assert get_session_id(res) == session_id
     assert read_store(session_id) == kv
 
-    part = dict(_test_B="B2")
+    part = {"_test_B": "B2"}
     cwebapp.post("/test/session_kv", json=part, headers=headers)
     kv.update(part)
     assert read_store(session_id) == kv
 
-    cwebapp.post("/test/session_kv", json=dict(_test_B=None), headers=headers)
+    cwebapp.post("/test/session_kv", json={"_test_B": None}, headers=headers)
     del kv["_test_B"]
     assert read_store(session_id) == kv
 
@@ -123,20 +123,20 @@ def test_session_lifetime(
     ngw_env.pyramid.options["session.activity_delta"] = timedelta(seconds=0)
 
     with freeze_time(datetime(year=2011, month=1, day=1)) as frozen_dt:
-        res = cwebapp.post("/test/session_kv", json=dict(_test_var=1))
+        res = cwebapp.post("/test/session_kv", json={"_test_var": 1})
         session_id = get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=90))
         headers = session_headers(session_id)
-        res = cwebapp.post("/test/session_kv", json=dict(_test_var=2), headers=headers)
+        res = cwebapp.post("/test/session_kv", json={"_test_var": 2}, headers=headers)
         assert session_id == get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=90))
-        res = cwebapp.post("/test/session_kv", json=dict(_test_var=3), headers=headers)
+        res = cwebapp.post("/test/session_kv", json={"_test_var": 3}, headers=headers)
         assert session_id == get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=101))
-        res = cwebapp.post("/test/session_kv", json=dict(_test_var=4), headers=headers)
+        res = cwebapp.post("/test/session_kv", json={"_test_var": 4}, headers=headers)
         new_session_id = get_session_id(res)
         assert new_session_id is not None
         assert session_id != new_session_id
@@ -144,16 +144,16 @@ def test_session_lifetime(
         ngw_env.pyramid.options["session.cookie.max_age"] = timedelta(seconds=110)
         frozen_dt.tick(timedelta(seconds=100))
         headers = session_headers(new_session_id)
-        res = cwebapp.post("/test/session_kv", json=dict(_test_var=5), headers=headers)
+        res = cwebapp.post("/test/session_kv", json={"_test_var": 5}, headers=headers)
         assert new_session_id == get_session_id(res)
 
         ngw_env.pyramid.options["session.activity_delta"] = timedelta(seconds=65)
         frozen_dt.tick(timedelta(seconds=60))
-        res = cwebapp.post("/test/session_kv", json=dict(_test_var=6), headers=headers)
+        res = cwebapp.post("/test/session_kv", json={"_test_var": 6}, headers=headers)
         assert get_session_id(res) is None
 
         frozen_dt.tick(timedelta(seconds=60))
-        res = cwebapp.post("/test/session_kv", json=dict(_test_var=7), headers=headers)
+        res = cwebapp.post("/test/session_kv", json={"_test_var": 7}, headers=headers)
         session_id = get_session_id(res)
         assert session_id is not None
         assert new_session_id != session_id
@@ -170,7 +170,7 @@ def test_session_lifetime(
         ("list", []),
         pytest.param("tuple", (1, 2, ("nested", "tuple")), id="tuple"),
         pytest.param("deep", ("we", ("need", ("to", ("go", ("deeper",))))), id="deep"),
-        pytest.param("mutable", ("ok", (None, (True, ("bad", dict())))), id="mutable"),
+        pytest.param("mutable", ("ok", (None, (True, ("bad", {})))), id="mutable"),
         pytest.param("k" * 1024, "v" * 1024, id="long"),
     ),
 )

@@ -26,7 +26,7 @@ LENGTH_FLAT = 10718924.816779
 
 @pytest.fixture(scope="module")
 def srs_ids():
-    srs_add = dict()
+    srs_add = {}
     with transaction.manager:
         for srs_info in srs_def:
             display_name = srs_info["display_name"]
@@ -42,7 +42,7 @@ def srs_ids():
 
 @pytest.fixture(scope="module")
 def wrong_srs_ids():
-    srs_wrong = dict()
+    srs_wrong = {}
     with transaction.manager:
         for srs_info in wrong_srs_def:
             display_name = srs_info["display_name"]
@@ -54,7 +54,7 @@ def wrong_srs_ids():
 
 
 def test_protected(ngw_webtest_app: WebTestApp, ngw_auth_administrator):
-    data = dict(wkt=srs_def[0]["wkt"])
+    data = {"wkt": srs_def[0]["wkt"]}
     ngw_webtest_app.put("/api/component/spatial_ref_sys/3857", json=data, status=422)
 
 

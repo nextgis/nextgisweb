@@ -22,7 +22,7 @@ def test_field_ids(test_layer_id):
 def fetch_names(app: WebTestApp, layer_id: int, **query) -> set[str]:
     resp = app.get(
         f"/api/resource/{layer_id}/feature/",
-        query={k: v for k, v in query.items()},
+        query=dict(query.items()),
         status=200,
     )
     return {f["fields"]["name"] for f in resp.json}
@@ -31,7 +31,7 @@ def fetch_names(app: WebTestApp, layer_id: int, **query) -> set[str]:
 def fetch_search_context(app: WebTestApp, layer_id: int, **query):
     resp = app.get(
         f"/api/resource/{layer_id}/feature/",
-        query={k: v for k, v in query.items()},
+        query=dict(query.items()),
         status=200,
     )
     return {f["fields"]["name"]: f["search_context"] for f in resp.json}

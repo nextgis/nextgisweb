@@ -11,7 +11,7 @@ def test_user_exception():
             title="Title",
             message="Message",
             detail="Detail",
-            data=dict(key="value"),
+            data={"key": "value"},
             http_status_code=418,
         )
 
@@ -20,7 +20,7 @@ def test_user_exception():
     assert exc.title == "Title"
     assert exc.message == "Message"
     assert exc.detail == "Detail"
-    assert exc.data == dict(key="value")
+    assert exc.data == {"key": "value"}
     assert exc.http_status_code == 418
 
 

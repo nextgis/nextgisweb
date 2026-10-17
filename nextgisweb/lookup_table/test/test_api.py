@@ -23,7 +23,7 @@ def resource_id():
 
 
 def items_product():
-    items = dict(z="b", a="x", l="p", k="a")
+    items = {"z": "b", "a": "x", "l": "p", "k": "a"}
     for sort, expected in (
         (
             "VALUE_ASC",
@@ -53,12 +53,12 @@ def items_product():
             ),
         ),
     ):
-        data = dict(sort=sort, items=items)
+        data = {"sort": sort, "items": items}
         yield pytest.param(data, expected, id=sort.lower())
 
     expected_ordered = (("l", "p"), ("a", "x"), ("z", "b"), ("k", "a"))
     yield pytest.param(
-        dict(sort="CUSTOM", order=("l", "a", "z", "k")), expected_ordered, id="custom-ordered"
+        {"sort": "CUSTOM", "order": ("l", "a", "z", "k")}, expected_ordered, id="custom-ordered"
     )
 
 

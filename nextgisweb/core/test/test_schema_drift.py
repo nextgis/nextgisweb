@@ -29,7 +29,7 @@ def tables(conn):
         ),
         schema="test_2",
     )
-    for schema in set(t.schema for t in meta.tables.values() if t.schema is not None):
+    for schema in {t.schema for t in meta.tables.values() if t.schema is not None}:
         conn.execute(sa.schema.CreateSchema(schema))
     meta.create_all(conn)
 

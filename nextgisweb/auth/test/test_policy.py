@@ -40,7 +40,7 @@ def test_api_login_logout(ngw_webtest_app: WebTestApp):
     ngw_webtest_app.get("/api/component/auth/user/", status=200)
 
     resp = ngw_webtest_app.post("/api/component/auth/logout")
-    assert resp.json == dict()
+    assert resp.json == {}
     ngw_webtest_app.get("/api/component/auth/user/", status=403)
 
 

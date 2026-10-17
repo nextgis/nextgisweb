@@ -19,7 +19,7 @@ from ..util import environ_substitution, load_config
     ),
 )
 def test_environ_substitution(value, environ, expected):
-    items = dict(key=value)
+    items = {"key": value}
     environ_substitution(items, environ)
     assert items["key"] == expected
 

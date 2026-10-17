@@ -83,7 +83,7 @@ def sql_compare_set_update(value: bool) -> None:
 def sql_compare(sql, file):
     transpile = get_sqlglot_transpile()
 
-    out = list()
+    out = []
     for s in sql:
         if isinstance(s, Raw):
             out.append(s + "\n")

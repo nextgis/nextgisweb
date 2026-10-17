@@ -55,7 +55,7 @@ def test_annotation_post_get(webmap, ngw_webtest_app: WebTestApp):
     "options, ok",
     (
         pytest.param(None, False, id="null"),
-        pytest.param(dict(), True, id="empty"),
+        pytest.param({}, True, id="empty"),
         pytest.param({"unknown": True}, False, id="unknown-key"),
         pytest.param({"webmap.identification_geometry": "wrong-type"}, False, id="wrong-type"),
         pytest.param({"webmap.identification_geometry": True}, True, id="known"),

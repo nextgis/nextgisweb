@@ -59,7 +59,7 @@ def user(group1, ngw_resource_group):
 def test_delete(group1, group2, user, ngw_webtest_app: WebTestApp):
     rapi = ResourceAPI()
     api = ngw_webtest_app.with_url("/api/resource/delete")
-    query_base = dict(resources=[group1, group2])
+    query_base = {"resources": [group1, group2]}
 
     _get_json = lambda: api.get(query=dict(query_base)).json
 
@@ -108,6 +108,6 @@ def test_delete_nested(ngw_webtest_app: WebTestApp):
 
     api = ngw_webtest_app.with_url("/api/resource/delete")
 
-    assert api.post(query=dict(resources=[parent_id])).json == {
+    assert api.post(query={"resources": [parent_id]}).json == {
         "deleted": [child_id, parent_id],
     }

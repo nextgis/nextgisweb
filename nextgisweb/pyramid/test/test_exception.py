@@ -11,7 +11,7 @@ class ErrorTest(UserException):
     title = "Test title"
     message = "Test message"
     detail = "Test detail"
-    data = dict()
+    data = {}
     http_status_code = 418
 
 

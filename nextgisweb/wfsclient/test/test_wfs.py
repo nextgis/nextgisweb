@@ -97,12 +97,12 @@ def test_layer(layer_id, ngw_webtest_app: WebTestApp):
 
     feature1 = ngw_webtest_app.get(
         "%s/feature/1" % layer_url,
-        query=dict(geom_format="geojson"),
+        query={"geom_format": "geojson"},
     ).json
 
     feature2 = ngw_webtest_app.get(
         "%s/feature/2" % layer_url,
-        query=dict(geom_format="geojson"),
+        query={"geom_format": "geojson"},
     ).json
 
     # Intersects
@@ -119,7 +119,7 @@ def test_layer(layer_id, ngw_webtest_app: WebTestApp):
 
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        query=dict(geom_format="geojson", intersects=poly.wkt),
+        query={"geom_format": "geojson", "intersects": poly.wkt},
     )
     assert res.json == [feature1]
 
@@ -127,25 +127,25 @@ def test_layer(layer_id, ngw_webtest_app: WebTestApp):
 
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        query=dict(geom_format="geojson", intersects=poly.wkt),
+        query={"geom_format": "geojson", "intersects": poly.wkt},
     )
     assert len(res.json) == 0
 
     # Limit, offset
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        query=dict(geom_format="geojson", limit=0),
+        query={"geom_format": "geojson", "limit": 0},
     )
     assert len(res.json) == 0
 
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        query=dict(geom_format="geojson", limit=1, offset=1),
+        query={"geom_format": "geojson", "limit": 1, "offset": 1},
     )
     assert res.json == [feature2]
 
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        query=dict(geom_format="geojson", limit=1, offset=0),
+        query={"geom_format": "geojson", "limit": 1, "offset": 0},
     )
     assert res.json == [feature1]

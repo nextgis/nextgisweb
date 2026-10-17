@@ -209,8 +209,8 @@ def test_resolve_srs_several(srs_without_authority):
 @pytest.mark.parametrize(
     "kwargs, message",
     [
-        pytest.param(dict(point_format_id=3), "point formats", id="pdrf"),
-        pytest.param(dict(npoints=0), "hierarchy", id="empty"),
+        pytest.param({"point_format_id": 3}, "point formats", id="pdrf"),
+        pytest.param({"npoints": 0}, "hierarchy", id="empty"),
     ],
 )
 def test_inspect_invalid(kwargs, message, ngw_txn):

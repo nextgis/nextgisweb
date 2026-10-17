@@ -10,7 +10,7 @@ def test_index_file_read_write(tmp_path):
     data = [
         IndexRecord(1, "none-value", None),
         IndexRecord(2, "zero-byte", "\x00"),
-        IndexRecord(3, "complex", dict(int=1, str="str")),
+        IndexRecord(3, "complex", {"int": 1, "str": "str"}),
     ]
 
     with ifile.writer() as write:

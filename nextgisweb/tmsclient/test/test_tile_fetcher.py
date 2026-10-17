@@ -55,4 +55,4 @@ def test_unexpected_status_code(connection):
             list(TMSConnection.filter_by(id=connection).one().get_tiles("ngw", 0, 0, 0, 0, 0))
 
     assert "(500)" in str(exc_info.value.message)
-    assert exc_info.value.data == dict(status_code=500)
+    assert exc_info.value.data == {"status_code": 500}

@@ -67,12 +67,12 @@ def update_field(layer_id, ngw_webtest_app: WebTestApp):
 @pytest.fixture()
 def export_geojson(layer_id, ngw_webtest_app: WebTestApp):
     def wrapped(display_name=False, fid=None, intersects=None, intersects_srs=None):
-        qs = dict(
-            format="GeoJSON",
-            srs="4326",
-            zipped="false",
-            display_name=str(display_name).lower(),
-        )
+        qs = {
+            "format": "GeoJSON",
+            "srs": "4326",
+            "zipped": "false",
+            "display_name": str(display_name).lower(),
+        }
         if intersects is not None:
             qs["intersects"] = intersects
         if intersects_srs is not None:
@@ -133,7 +133,7 @@ def test_intersects(intersects, count, export_geojson):
 def layer_3857():
     with transaction.manager:
         layer = VectorLayer(geometry_type="POINT", srs=SRS.filter_by(id=3857).one()).persist()
-        layer.setup_from_fields([dict(keyname="fid", datatype=FIELD_TYPE.STRING)])
+        layer.setup_from_fields([{"keyname": "fid", "datatype": FIELD_TYPE.STRING}])
 
         f = Feature()
         f.geom = Geometry.from_wkt("POINT (1000000 2000000)")
@@ -144,7 +144,7 @@ def layer_3857():
 
 
 def _export_point(ngw_webtest_app, layer_id, *, format, srs=None):
-    qs = dict(format=format, zipped="false")
+    qs = {"format": format, "zipped": "false"}
     if srs is not None:
         qs["srs"] = srs
     resp = ngw_webtest_app.get(f"/api/resource/{layer_id}/export", query=qs, status=200)
@@ -209,8 +209,8 @@ def resources():
             layer = VectorLayer(geometry_type="POINT").persist()
             layer.setup_from_fields(
                 [
-                    dict(keyname="fid", datatype=FIELD_TYPE.STRING),
-                    dict(keyname="geom", datatype=FIELD_TYPE.INTEGER),
+                    {"keyname": "fid", "datatype": FIELD_TYPE.STRING},
+                    {"keyname": "geom", "datatype": FIELD_TYPE.INTEGER},
                 ]
             )
 
@@ -222,7 +222,7 @@ def resources():
             f.fields["geom"] = i
             layer.feature_create(f)
 
-            params.append(dict(id=layer.id, name=layer_name))
+            params.append({"id": layer.id, "name": layer_name})
 
     yield params
 

@@ -23,7 +23,7 @@ def test_ogr_feature():
     )
 
     defn = ogr.FeatureDefn()
-    fields = dict()
+    fields = {}
     for ft, value in data:
         ogr_ft = _FIELD_TYPE_2_ENUM_REVERSED[ft]
         defn.AddFieldDefn(ogr.FieldDefn(ft, ogr_ft))

@@ -193,15 +193,15 @@ def principals():
 @pytest.mark.parametrize(
     "tdata, key, expected",
     (
-        pytest.param(dict(simple="role"), "simple", {"role"}, id="simple"),
+        pytest.param({"simple": "role"}, "simple", {"role"}, id="simple"),
         pytest.param(
-            dict(deep1=dict(deep2=dict(deep3=["role1", "role2"]))),
+            {"deep1": {"deep2": {"deep3": ["role1", "role2"]}}},
             "deep1.deep2.deep3",
             {"role1", "role2"},
             id="deep",
         ),
         pytest.param(
-            dict(list=[dict(role="role1"), dict(role="role2")]),
+            {"list": [{"role": "role1"}, {"role": "role2"}]},
             "list.role",
             {"role1", "role2"},
             id="list",
@@ -220,7 +220,7 @@ def test_member_of_parse(tdata, key, expected):
 )
 @pytest.mark.parametrize(
     "roles, result",
-    [line for line in [([], {_pg[1]}), ([_pg[2], _pg[3]], {_pg[1], _pg[2]})]],
+    [([], {_pg[1]}), ([_pg[2], _pg[3]], {_pg[1], _pg[2]})],
 )
 @pytest.mark.usefixtures("principals", "ngw_txn")
 def test_update_member_of(roles, result, ngw_env):
@@ -247,7 +247,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app: We
     options = ngw_env.auth.options.with_prefix("oauth")
 
     next_url = "http://localhost/some-location"
-    resp = ngw_webtest_app.get("/oauth", query=dict(next=next_url), status=302)
+    resp = ngw_webtest_app.get("/oauth", query={"next": next_url}, status=302)
     redirect = resp.headers["Location"]
     assert redirect.startswith(options["server.auth_endpoint"])
     redirect_qs = dict(parse_qsl(urlsplit(redirect).query))
@@ -283,30 +283,30 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app: We
 
     def introspection_response(user):
         start_tstamp = int(utcnow_naive().timestamp())
-        return dict(
-            exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
-            sub=user["sub"],
-            name=user["name"],
-            first_name=user["first_name"],
-            family_name=user["family_name"],
-            preferred_username=user["keyname"],
-            active=user["active"],
-        )
+        return {
+            "exp": start_tstamp + ACCESS_TOKEN_LIFETIME,
+            "sub": user["sub"],
+            "name": user["name"],
+            "first_name": user["first_name"],
+            "family_name": user["family_name"],
+            "preferred_username": user["keyname"],
+            "active": user["active"],
+        }
 
     with (
         server_response_mock(
             "token",
-            dict(grant_type="authorization_code"),
-            response=dict(
-                access_token=access_token,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_token=refresh_token,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {"grant_type": "authorization_code"},
+            response={
+                "access_token": access_token,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_token": refresh_token,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
             "introspection",
-            dict(token=access_token),
+            {"token": access_token},
             response=introspection_response(ouser1),
         ),
     ):
@@ -322,13 +322,13 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app: We
 
     with server_response_mock(
         "token",
-        dict(grant_type="refresh_token", refresh_token=refresh_token),
-        response=dict(
-            access_token=access_token_next,
-            expires_in=ACCESS_TOKEN_LIFETIME,
-            refresh_token=refresh_token_next,
-            refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        ),
+        {"grant_type": "refresh_token", "refresh_token": refresh_token},
+        response={
+            "access_token": access_token_next,
+            "expires_in": ACCESS_TOKEN_LIFETIME,
+            "refresh_token": refresh_token_next,
+            "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+        },
     ):
         user = ngw_webtest_app.get("/api/component/auth/current_user").json
         assert user["keyname"] == ouser1["keyname"]
@@ -343,7 +343,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app: We
 
     with server_response_mock(
         "token",
-        dict(grant_type="refresh_token", refresh_token=refresh_token),
+        {"grant_type": "refresh_token", "refresh_token": refresh_token},
         response=OAuthErrorResponse("expired"),
     ):
         ngw_webtest_app.get("/api/component/auth/current_user")
@@ -382,17 +382,17 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app: We
     with (
         server_response_mock(
             "token",
-            dict(grant_type="password", username=ouser1["keyname"], password=ouser1["pwd"]),
-            dict(
-                access_token=access_token,
-                refresh_token=refresh_token,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {"grant_type": "password", "username": ouser1["keyname"], "password": ouser1["pwd"]},
+            {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
             "introspection",
-            dict(token=access_token),
+            {"token": access_token},
             introspection_response(ouser1),
         ),
         patch.object(
@@ -424,7 +424,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app: We
     ngw_webtest_app.authorization = ("Bearer", access_token)
     with server_response_mock(
         "introspection",
-        dict(token=access_token),
+        {"token": access_token},
         introspection_response(ouser2),
     ):
         keyname = ngw_webtest_app.get("/api/component/auth/current_user").json["keyname"]
@@ -446,7 +446,7 @@ def test_bind(local_user, server_response_mock, ngw_webtest_app: WebTestApp):
         json={"login": local_user.keyname, "password": local_user.password_plaintext},
     )
 
-    resp = ngw_webtest_app.get("/oauth", query=dict(bind=1), status=302)
+    resp = ngw_webtest_app.get("/oauth", query={"bind": 1}, status=302)
     redirect = resp.headers["Location"]
     redirect_qs = dict(parse_qsl(urlsplit(redirect).query))
     state_key = redirect_qs["state"]
@@ -456,7 +456,7 @@ def test_bind(local_user, server_response_mock, ngw_webtest_app: WebTestApp):
 
     def introspection_response():
         start_tstamp = int(datetime.now(timezone.utc).timestamp())
-        return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub=sub)
+        return {"exp": start_tstamp + ACCESS_TOKEN_LIFETIME, "sub": sub}
 
     access_token = token_urlsafe()
     refresh_token = token_urlsafe()
@@ -464,17 +464,17 @@ def test_bind(local_user, server_response_mock, ngw_webtest_app: WebTestApp):
     with (
         server_response_mock(
             "token",
-            dict(grant_type="authorization_code"),
-            response=dict(
-                access_token=access_token,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_token=refresh_token,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {"grant_type": "authorization_code"},
+            response={
+                "access_token": access_token,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_token": refresh_token,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
             "introspection",
-            dict(token=access_token),
+            {"token": access_token},
             response=introspection_response(),
         ),
     ):
@@ -513,22 +513,22 @@ def test_scope(scope, ok, server_response_mock, ngw_webtest_app: WebTestApp):
     with (
         server_response_mock(
             "token",
-            dict(grant_type="authorization_code"),
-            response=dict(
-                access_token=access_token,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_token=refresh_token,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {"grant_type": "authorization_code"},
+            response={
+                "access_token": access_token,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_token": refresh_token,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
             "introspection",
-            dict(token=access_token),
-            response=dict(
-                exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
-                sub="sub",
-                scope=" ".join(scope),
-            ),
+            {"token": access_token},
+            response={
+                "exp": start_tstamp + ACCESS_TOKEN_LIFETIME,
+                "sub": "sub",
+                "scope": " ".join(scope),
+            },
         ),
     ):
         cb_url = f"/oauth?state={state_key}&code={code}"
@@ -550,33 +550,33 @@ def test_password_token_basic(
     refresh_token = token_urlsafe()
     sub = "sub_" + token_hex()
 
-    creds = dict(login=disabled_local_user.keyname, password=token_urlsafe())
+    creds = {"login": disabled_local_user.keyname, "password": token_urlsafe()}
 
     def introspection_response():
         start_tstamp = int(utcnow_naive().timestamp())
-        return dict(
-            exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
-            refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            sub=sub,
-        )
+        return {
+            "exp": start_tstamp + ACCESS_TOKEN_LIFETIME,
+            "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            "sub": sub,
+        }
 
     with (
         server_response_mock(
             "token",
-            dict(
-                grant_type="password",
-                username=creds["login"],
-                password=creds["password"],
-            ),
-            response=dict(
-                access_token=access_token,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_token=refresh_token,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {
+                "grant_type": "password",
+                "username": creds["login"],
+                "password": creds["password"],
+            },
+            response={
+                "access_token": access_token,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_token": refresh_token,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
-            "introspection", dict(token=access_token), response=introspection_response()
+            "introspection", {"token": access_token}, response=introspection_response()
         ),
     ):
         ngw_webtest_app.authorization = ("Basic", tuple(creds.values()))
@@ -595,16 +595,16 @@ def test_password_token_basic(
     with (
         server_response_mock(
             "token",
-            dict(grant_type="refresh_token", refresh_token=refresh_token),
-            response=dict(
-                access_token=access_token_next,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_token=refresh_token_next,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {"grant_type": "refresh_token", "refresh_token": refresh_token},
+            response={
+                "access_token": access_token_next,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_token": refresh_token_next,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
-            "introspection", dict(token=access_token_next), response=introspection_response()
+            "introspection", {"token": access_token_next}, response=introspection_response()
         ),
     ):
         resp = ngw_webtest_app.get("/api/component/auth/current_user").json
@@ -619,16 +619,16 @@ def test_password_token_basic(
     with (
         server_response_mock(
             "token",
-            dict(grant_type="password"),
-            response=dict(
-                access_token=access_token_next,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_token=refresh_token_next,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {"grant_type": "password"},
+            response={
+                "access_token": access_token_next,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_token": refresh_token_next,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
-            "introspection", dict(token=access_token_next), response=introspection_response()
+            "introspection", {"token": access_token_next}, response=introspection_response()
         ),
     ):
         resp = ngw_webtest_app.get("/api/component/auth/current_user").json
@@ -641,26 +641,26 @@ def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app
     refresh_token = token_urlsafe()
 
     user = User.test_instance()
-    creds = dict(login=user.keyname, password=user.password_plaintext)
+    creds = {"login": user.keyname, "password": user.password_plaintext}
     sub = "sub_" + token_hex()
 
     def introspection_response():
         start_tstamp = int(utcnow_naive().timestamp())
-        return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub=sub)
+        return {"exp": start_tstamp + ACCESS_TOKEN_LIFETIME, "sub": sub}
 
     with (
         server_response_mock(
             "token",
-            dict(grant_type="password"),
-            response=dict(
-                access_token=access_token,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_token=refresh_token,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {"grant_type": "password"},
+            response={
+                "access_token": access_token,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_token": refresh_token,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
-            "introspection", dict(token=access_token), response=introspection_response()
+            "introspection", {"token": access_token}, response=introspection_response()
         ),
     ):
         ngw_webtest_app.post("/api/component/auth/login", json=creds)
@@ -677,13 +677,13 @@ def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app
 
     with server_response_mock(
         "token",
-        dict(grant_type="refresh_token", refresh_token=refresh_token),
-        response=dict(
-            access_token=access_token_next,
-            expires_in=ACCESS_TOKEN_LIFETIME,
-            refresh_token=refresh_token_next,
-            refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        ),
+        {"grant_type": "refresh_token", "refresh_token": refresh_token},
+        response={
+            "access_token": access_token_next,
+            "expires_in": ACCESS_TOKEN_LIFETIME,
+            "refresh_token": refresh_token_next,
+            "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+        },
     ):
         resp = ngw_webtest_app.get("/api/component/auth/current_user").json
         assert resp["keyname"] == sub
@@ -693,7 +693,7 @@ def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app
 
     with server_response_mock(
         "token",
-        dict(grant_type="refresh_token", refresh_token=refresh_token_next),
+        {"grant_type": "refresh_token", "refresh_token": refresh_token_next},
         response=OAuthErrorResponse("expired"),
     ):
         resp = ngw_webtest_app.get("/api/component/auth/current_user").json
@@ -738,33 +738,33 @@ def test_register_limit(
 
     def introspection_response():
         start_tstamp = int(utcnow_naive().timestamp())
-        return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub=sub)
+        return {"exp": start_tstamp + ACCESS_TOKEN_LIFETIME, "sub": sub}
 
     user = User.test_instance()
-    creds = dict(login=user.keyname, password=user.password_plaintext)
+    creds = {"login": user.keyname, "password": user.password_plaintext}
 
     if ok:
-        userinfo_mock = server_response_mock("userinfo", dict(), response=dict())
+        userinfo_mock = server_response_mock("userinfo", {}, response={})
     else:
         userinfo_mock = nullcontext()
 
     with (
         server_response_mock(
             "token",
-            dict(grant_type="password"),
-            response=dict(
-                access_token=access_token,
-                expires_in=ACCESS_TOKEN_LIFETIME,
-                refresh_token=refresh_token,
-                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            ),
+            {"grant_type": "password"},
+            response={
+                "access_token": access_token,
+                "expires_in": ACCESS_TOKEN_LIFETIME,
+                "refresh_token": refresh_token,
+                "refresh_expires_in": REFRESH_TOKEN_LIFETIME,
+            },
         ),
         server_response_mock(
-            "introspection", dict(token=access_token), response=introspection_response()
+            "introspection", {"token": access_token}, response=introspection_response()
         ),
         userinfo_mock,
     ):
-        with ngw_env.auth.options.override(dict(user_limit=user_limit)):
+        with ngw_env.auth.options.override({"user_limit": user_limit}):
             ngw_webtest_app.post(
                 "/api/component/auth/login",
                 json=creds,

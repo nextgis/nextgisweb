@@ -80,7 +80,7 @@ def test_relation_delete(layer_id, connection_id, ngw_webtest_app: WebTestApp):
 
     resp = ngw_webtest_app.post(
         "/api/resource/delete",
-        query=dict(resources=[connection_id]),
+        query={"resources": [connection_id]},
         status=422,
     )
     references_data = resp.json["data"]["references_data"]
@@ -88,6 +88,6 @@ def test_relation_delete(layer_id, connection_id, ngw_webtest_app: WebTestApp):
 
     ngw_webtest_app.post(
         "/api/resource/delete",
-        query=dict(resources=[connection_id, layer_id]),
+        query={"resources": [connection_id, layer_id]},
         status=200,
     )
