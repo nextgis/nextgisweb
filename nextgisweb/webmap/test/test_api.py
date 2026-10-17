@@ -75,3 +75,27 @@ def test_options(options, ok, webmap, ngw_webtest_app: WebTestApp):
 
     data = rapi.read(webmap)
     assert data["webmap"]["options"] == options
+
+
+def test_panorama_provider(ngw_webtest_app: WebTestApp):
+    url = "/api/component/pyramid/csettings"
+    orig = ngw_webtest_app.get(url, query={"webmap": ["all"]}).json
+
+    def set_api_key(provider, value):
+        ngw_webtest_app.put(url, json={"webmap": {f"{provider}_api_panorama_key": value}})
+        return ngw_webtest_app.get(url, query={"webmap": ["panorama_provider"]}).json["webmap"][
+            "panorama_provider"
+        ]
+
+    try:
+        assert set_api_key("google", None) is None
+        assert set_api_key("yandex", None) is None
+
+        ngw_webtest_app.put(url, json={"webmap": {"yandex_api_panorama_key": ""}}, status=422)
+
+        assert set_api_key("google", "") == "google"
+        assert set_api_key("yandex", "test_api_key") == "google"
+        assert set_api_key("google", None) == "yandex"
+        assert set_api_key("yandex", None) is None
+    finally:
+        ngw_webtest_app.put(url, json=orig)

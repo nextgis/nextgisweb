@@ -19,6 +19,8 @@ import type { WebMapCSettingsUpdate } from "@nextgisweb/webmap/type/api";
 
 import { LegendSymbolsSelect, msgLegendSymbolsLabel } from "../component";
 
+import { PanoramaSettings, isPanoramaSettingsValid } from "./PanoramaSettings";
+import type { PanoramaSettingsValue } from "./PanoramaSettings";
 import {
   AddressGeocoderOptions,
   DegreeFormatOptions,
@@ -49,10 +51,23 @@ export const SettingsForm: FC<SettingsFormProps> = ({
     WebMapCSettingsUpdate["address_geocoder"]
   >(initialValues?.address_geocoder || "nominatim");
 
+  const [panorama, setPanorama] = useState<PanoramaSettingsValue>({
+    google_api_panorama_key: initialValues?.google_api_panorama_key ?? null,
+    yandex_api_panorama_key: initialValues?.yandex_api_panorama_key ?? null,
+  });
+
   const onValuesChange = (allValues: WebMapCSettingsUpdate) => {
     if ("address_geocoder" in allValues) {
       setGeocoder(allValues.address_geocoder);
     }
+  };
+
+  const [panoramaValidate, setPanoramaValidate] = useState(false);
+
+  const onFormFinish = (values: WebMapCSettingsUpdate) => {
+    setPanoramaValidate(true);
+    if (!isPanoramaSettingsValid(panorama)) return;
+    onFinish({ ...values, ...panorama });
   };
 
   return (
@@ -60,7 +75,8 @@ export const SettingsForm: FC<SettingsFormProps> = ({
       name="webmap_settings"
       className="webmap-settings-form"
       initialValues={initialValues}
-      onFinish={onFinish}
+      onFinish={onFormFinish}
+      onFinishFailed={() => setPanoramaValidate(true)}
       onValuesChange={onValuesChange}
       layout="vertical"
     >
@@ -239,6 +255,14 @@ export const SettingsForm: FC<SettingsFormProps> = ({
           )}
         </Col>
       </Row>
+
+      <Title level={4}>{gettext("Panorama")}</Title>
+
+      <PanoramaSettings
+        value={panorama}
+        onChange={setPanorama}
+        validate={panoramaValidate}
+      />
 
       <Row className="row-submit">
         <Col>

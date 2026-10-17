@@ -2,16 +2,18 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING, Annotated, Any, ForwardRef, Literal, TypeAlias, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, ForwardRef, Literal, TypeAlias, cast
 
 import shapely.wkb
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, gettextf, inject
 from nextgisweb.lib.apitype.util import EmptyObject
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.safehtml import sanitize
 
+from nextgisweb.core import CoreComponent
+from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import FeatureLayerMixin, IFilterableFeatureLayer
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
@@ -27,6 +29,7 @@ from .adapter import ImageAdapter, WebMapAdapter
 from .component import WebMapComponent
 from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
 from .option import WebMapOption
+from .panorama import PanoramaProvider
 from .plugin import WebmapGroupPlugin, WebmapLayerPlugin, WebmapPlugin
 
 AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
@@ -462,6 +465,54 @@ csetting("degree_format", DegreeFormat, default="dd")
 csetting("measurement_srid", int, default=4326)
 csetting("legend_symbols", str | None, default=None)
 csetting("hide_nav_menu", bool, default=False)
+csetting("panorama_enabled", bool, default=False)
+
+PanoramaProviderIdentity = Literal["google", "yandex"]
+
+
+def sync_panorama_provider(key_setting: csetting):
+    provider_setting = csetting.registry[key_setting.component]["panorama_provider"]
+    provider_setting.setter(provider_setting.getter())
+
+
+class PanoramaApiKey(csetting if TYPE_CHECKING else object):
+    vtype = str | None
+    provider: ClassVar[PanoramaProviderIdentity]
+
+    def normalize(self, value: str) -> str | None:
+        provider = PanoramaProvider.registry[self.provider]
+        if provider.requires_key and not value:
+            raise VE(message=gettextf("{} API key can't be empty.")(provider.title))
+        return value
+
+    @inject()
+    def setter(self, value: str | None, *, core: CoreComponent = inject.arg()):
+        super().setter(value, core=core)
+        sync_panorama_provider(self)
+
+
+class google_api_panorama_key(PanoramaApiKey, csetting):
+    provider = "google"
+
+
+class yandex_api_panorama_key(PanoramaApiKey, csetting):
+    provider = "yandex"
+
+
+class panorama_provider(csetting):
+    vtype = PanoramaProviderIdentity | None
+
+    @inject()
+    def setter(self, value: str | None, *, core: CoreComponent = inject.arg()):
+        settings = csetting.registry[self.component]
+        configured = [
+            provider.identity
+            for provider in PanoramaProvider.registry.values()
+            if settings[provider.api_key].getter() is not None
+        ]
+        if len(configured) <= 1:
+            value = configured[0] if configured else None
+        super().setter(value, core=core)
 
 
 AnnotationVisibleMode = Literal["no", "yes", "messages"]
