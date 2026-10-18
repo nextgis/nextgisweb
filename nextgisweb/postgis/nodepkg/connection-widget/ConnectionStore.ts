@@ -11,6 +11,7 @@ const {
   username,
   password,
   database,
+  user_context,
   $load: load,
   $error: error,
   $dirty: dirty,
@@ -32,6 +33,7 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
   readonly username = username.init("", this);
   readonly password = password.init("", this);
   readonly database = database.init("", this);
+  readonly user_context = user_context.init(false, this);
 
   @observableRef accessor validate = false;
 
@@ -49,6 +51,7 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
       ...this.username.jsonPart(),
       ...this.password.jsonPart(),
       ...this.database.jsonPart(),
+      ...this.user_context.jsonPart(),
     };
   }
 

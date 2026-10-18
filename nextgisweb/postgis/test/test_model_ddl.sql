@@ -19,6 +19,7 @@ CREATE TABLE postgis_connection (
     password character varying NOT NULL,
     port integer,
     sslmode character varying(50),
+    user_context boolean NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (id) REFERENCES resource (id)
 );

@@ -346,6 +346,10 @@ msgstr "Пароль"
 msgid "Database"
 msgstr "База данных"
 
+#: nodepkg/connection-widget/ConnectionWidget.tsx:89
+msgid "Pass user context"
+msgstr "Передавать контекст пользователя"
+
 #: nodepkg/diagnostics-widget/DiagnosticsWidget.tsx:22
 msgid "Unknown"
 msgstr "Неизвестно"

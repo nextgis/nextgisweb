@@ -22,6 +22,7 @@ from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import postgres_url
 
+from nextgisweb.auth import User
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
@@ -139,6 +140,26 @@ def calculate_extent(layer, where=None, geomcol=None):
     return extent
 
 
+def _setup_user_context(conn: sa.Connection, user: User) -> None:
+    values = (
+        ("nextgisweb.user_id", str(user.id)),
+        ("nextgisweb.user_keyname", user.keyname),
+        ("nextgisweb.user_oauth_subject", user.oauth_subject),
+        ("nextgisweb.user_display_name", user.display_name),
+    )
+    pairs = [(key, value) for key, value in values if value is not None]
+
+    params: dict[str, str] = {}
+    statements: list[str] = []
+
+    for i, (key, value) in enumerate(pairs):
+        params[f"name{i}"] = key
+        params[f"value{i}"] = value
+        statements.append(f"set_config(:name{i}, :value{i}, true)")
+
+    conn.execute(text("SELECT " + ", ".join(statements)), params)
+
+
 class SSLMode(Enum):
     disable = "disable"
     allow = "allow"
@@ -160,6 +181,7 @@ class PostgisConnection(Resource):
     password: Mapped[str] = mapped_column(sa.Unicode)
     port: Mapped[int | None] = mapped_column(sa.Integer)
     sslmode: Mapped[SSLMode | None] = mapped_column(saext.Enum(SSLMode))
+    user_context: Mapped[bool] = mapped_column(sa.Boolean, default=False)
 
     @classmethod
     def check_parent(cls, parent):
@@ -234,7 +256,7 @@ class PostgisConnection(Resource):
         return engine
 
     @contextmanager
-    def connect(self):
+    def connect(self, *, user: User | None = None):
         try:
             conn = self.get_engine().connect()
         except OperationalError:
@@ -242,6 +264,8 @@ class PostgisConnection(Resource):
 
         with conn:
             try:
+                if self.user_context and user is not None:
+                    _setup_user_context(conn, user)
                 yield conn
             except SQLAlchemyError as exc:
                 raise ExternalDatabaseError(sa_error=exc)
@@ -258,6 +282,7 @@ class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     database = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    user_context = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 class PostgisLayerField(LayerField):
@@ -296,12 +321,12 @@ class PostgisLayer(FeatureLayerWritableMixin, Resource):
         return isinstance(parent, ResourceGroup)
 
     @contextmanager
-    def connect(self, tx=False):
+    def connect(self, tx=False, *, user: User | None = None):
         if getattr(self, "_conn", None) is not None:
             assert not tx
             yield self._conn
         else:
-            with self.connection.connect() as conn:
+            with self.connection.connect(user=user) as conn:
                 self._conn = DBConnection(conn)
                 try:
                     yield self._conn
@@ -513,15 +538,17 @@ class PostgisLayer(FeatureLayerWritableMixin, Resource):
         return values
 
     @contextmanager
-    def _connection_context(self):
-        with self.connect(tx=True) as conn:
+    def _connection_context(self, user: User | None = None):
+        with self.connect(tx=True, user=user) as conn:
             yield
             if conn.has_changes:
                 conn.commit()
 
     def feature_transaction_enter(self, ftxn: FeatureLayerTransactionContext) -> None:
         super().feature_transaction_enter(ftxn)
-        ftxn.enter_context(self._connection_context())
+        source = ftxn.source
+        user = getattr(source, "user", None) if source is not None else None
+        ftxn.enter_context(self._connection_context(user))
 
     def feature_put(self, feature):
         """Update existing object

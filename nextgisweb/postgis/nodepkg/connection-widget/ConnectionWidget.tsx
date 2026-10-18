@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 
 import {
+  CheckboxValue,
   InputNumber,
   InputValue,
   PasswordValue,
@@ -79,6 +80,15 @@ export const ConnectionWidget: EditorWidget<ConnectionStore> = observer(
           label={gettext("Database")}
           value={store.database}
           component={InputValue}
+        />
+        <LotMV
+          row
+          label={false}
+          value={store.user_context}
+          props={{
+            children: gettext("Pass user context"),
+          }}
+          component={CheckboxValue}
         />
       </Area>
     );
