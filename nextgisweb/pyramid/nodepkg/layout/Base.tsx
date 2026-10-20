@@ -26,6 +26,9 @@ declare module "@nextgisweb/pyramid/cblock" {
   interface CBlocks {
     // Banner at the top of the page above the header
     "pyramid.banner": undefined;
+
+    // Sidebar on the right side of the page
+    "pyramid.sidebar": undefined;
   }
 }
 
@@ -118,12 +121,14 @@ function PyramidLayout({
           {dynMenuResourceId !== undefined ? (
             <div className="ngw-pyramid-layout-sidebar">
               <Attrmenu resourceId={dynMenuResourceId} />
+              <CBlock slot="pyramid.sidebar" />
             </div>
           ) : (
             dynMenuItems &&
             dynMenuItems.length > 0 && (
               <div className="ngw-pyramid-layout-sidebar">
                 <Dynmenu items={dynMenuItems} />
+                <CBlock slot="pyramid.sidebar" />
               </div>
             )
           )}
