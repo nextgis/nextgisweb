@@ -10,13 +10,15 @@ from .. import VectorLayer
 
 
 @contextmanager
-def create_feature_layer(ogrlayer, parent_id, **kwargs):
+def create_feature_layer(ogrlayer, *, ngw_httptest_app=None, **kwargs):
+    assert all(k in ("parent_id",) for k in kwargs.keys())
+
     with transaction.manager:
         layer = VectorLayer(
-            parent_id=parent_id,
             display_name=token_hex(),
             owner_user=User.by_keyname("administrator"),
             srs=SRS.filter_by(id=3857).one(),
+            **kwargs,
         ).persist()
         layer.from_source(ogrlayer)
 

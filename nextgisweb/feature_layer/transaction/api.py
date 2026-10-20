@@ -27,7 +27,7 @@ Commited = Annotated[datetime, Meta(description="Commit timestamp", tz=False)]
 
 class TransactionFactory:
     def __init__(self):
-        self.resource_factory = ResourceFactory(context=FVersioningMixin)
+        self.resource_factory = ResourceFactory(context=FeatureLayerWritableMixin)
 
     def __call__(self, request: Request) -> Transaction:
         resource = self.resource_factory(request)
@@ -77,7 +77,7 @@ def cpost(
 
     request.resource_permission(DataScope.write)
 
-    if resource.fversioning is None:
+    if not isinstance(resource, FVersioningMixin) or resource.fversioning is None:
         pass
     elif body.epoch is UNSET:
         raise FVersioningEpochRequired()

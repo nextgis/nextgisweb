@@ -44,7 +44,7 @@ def layer_product():
 @pytest.mark.parametrize("create_resource, ds", layer_product())
 def test_extent(create_resource, ds, ngw_resource_group_sub, ngw_webtest_app: WebTestApp):
     ogrlayer = ds.GetLayer(0)
-    with create_resource(ogrlayer, ngw_resource_group_sub) as layer:
+    with create_resource(ogrlayer, parent_id=ngw_resource_group_sub) as layer:
         resp = ngw_webtest_app.get("/api/resource/%d/extent" % layer.id, status=200)
         extent = resp.json["extent"]
         extent_ogr = ogrlayer.GetExtent()

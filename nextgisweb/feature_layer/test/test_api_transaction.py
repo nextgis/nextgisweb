@@ -1,39 +1,64 @@
 from base64 import b64encode
+from contextlib import ExitStack, contextmanager
+from functools import partial
 
 import pytest
 import transaction
+from msgspec import UNSET
+from osgeo import ogr
 
-from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.osrhelper import sr_from_epsg
 
-from nextgisweb.vector_layer.model import VectorLayer, VectorLayerField
+from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
+from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
 
-from ..feature import Feature
-from . import FeatureLayerAPI, parametrize_versioning
+from . import FeatureLayerAPI
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
-@pytest.fixture(scope="module")
-def mkres():
-    def _mkres(versioning, fdict):
-        with transaction.manager:
-            obj = VectorLayer(geometry_type="POINTZ").persist()
-            obj.fields = [VectorLayerField(keyname="foo", datatype="STRING", display_name="foo")]
-            obj.fversioning_configure(enabled=versioning)
+def parametrize_feature_layer():
+    ds = ogr.GetDriverByName("MEM").CreateDataSource("")
+    layer = ds.CreateLayer("", srs=sr_from_epsg(3857), geom_type=ogr.wkbPoint25D)
+    layer._ds = ds  # Keep reference against GC
+    layer.CreateField(ogr.FieldDefn("foo", ogr.OFTString))
+    defn = layer.GetLayerDefn()
+    for i in (1, 2, 3, 4):
+        feat = ogr.Feature(defn)
+        geom = ogr.CreateGeometryFromWkt(f"POINT Z (0 0 {i})")
+        feat.SetGeometry(geom)
+        feat.SetField("foo", "Original")
+        layer.CreateFeature(feat)
 
-            for i in (1, 2, 3, 4):
-                feat = Feature(geom=Geometry.from_wkt(f"POINT Z (0 0 {i})"))
-                feat.fields["foo"] = "Original"
-                obj.feature_create(feat)
+    @contextmanager
+    def _mkres(fdict, *, create_resource, versioning=UNSET):
+        with create_resource(layer) as obj:
+            fld_id = obj.fields[0].id
+            fld = (lambda v: {"foo": v}) if fdict else (lambda v: [(fld_id, v)])
 
-            DBSession.flush()
+            if versioning is not UNSET:
+                with transaction.manager:
+                    obj = obj.__class__.filter_by(id=obj.id).one()
+                    obj.fversioning_configure(enabled=versioning)
+
+            versioning = versioning is True
             epoch = obj.fversioning.epoch if versioning else None
+            yield obj.id, epoch, fld, versioning
 
-        fld_id = obj.fields[0].id
-        return (obj.id, epoch, (lambda v: {"foo": v}) if fdict else (lambda v: [(fld_id, v)]))
+    params = []
 
-    yield _mkres
+    for versioning in (True, False):
+        fun = partial(_mkres, create_resource=create_vector_layer, versioning=versioning)
+        params.append(
+            pytest.param(fun, id=f"vector-layer-{'' if versioning else 'no-'}versioning")
+        )
+
+    params.append(
+        pytest.param(partial(_mkres, create_resource=create_postgis_layer), id="postgis-layer")
+    )
+
+    return pytest.mark.parametrize("mkres", params)
 
 
 def wkb64(wkt):
@@ -54,10 +79,16 @@ def parametrize_fdict():
     )
 
 
-@parametrize_versioning()
+@pytest.fixture
+def exit_stack():
+    with ExitStack() as stack:
+        yield stack
+
+
+@parametrize_feature_layer()
 @parametrize_fdict()
-def test_workflow(versioning, fdict, mkres):
-    (res, epoch, fld) = mkres(versioning, fdict)
+def test_workflow(mkres, fdict, exit_stack):
+    res, epoch, fld, versioning = exit_stack.enter_context(mkres(fdict))
 
     fapi = FeatureLayerAPI(res)
     vid = lambda v: {"vid": v} if versioning else {}
@@ -150,10 +181,10 @@ def test_workflow(versioning, fdict, mkres):
     }
 
 
-@parametrize_versioning()
+@parametrize_feature_layer()
 @parametrize_fdict()
-def test_errors(versioning, fdict, mkres):
-    (res, epoch, fld) = mkres(versioning, fdict)
+def test_errors(mkres, fdict, exit_stack):
+    res, epoch, fld, versioning = exit_stack.enter_context(mkres(fdict))
 
     fapi = FeatureLayerAPI(res)
     vid = lambda v: {"vid": v} if versioning else {}

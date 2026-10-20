@@ -61,7 +61,10 @@ class FeatureLayerAPI:
         return data["feature_layer"]["versioning"]
 
     def transaction(self, *, epoch: int | None = None) -> TransactionAPI:
-        epoch = epoch if epoch is not None else self.versioning().get("epoch")
+        if epoch is None:
+            versioning = self.versioning()
+            if versioning is not None:
+                epoch = versioning.get("epoch")
         return TransactionAPI(self.resource_id, client=self.client, epoch=epoch)
 
     def changes(

@@ -15,10 +15,12 @@ from .. import WFSConnection, WFSLayer
 
 
 @contextmanager
-def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
-    with create_vector_layer(ogrlayer, parent_id) as vlayer:
+def create_feature_layer(ogrlayer, *, ngw_httptest_app, **kwargs):
+    assert all(k in ("parent_id",) for k in kwargs.keys())
+
+    with create_vector_layer(ogrlayer, **kwargs) as vlayer:
         with transaction.manager:
-            res_common = {"parent_id": parent_id, "owner_user": User.by_keyname("administrator")}
+            res_common = {"owner_user": User.by_keyname("administrator"), **kwargs}
             service = WFSService(
                 display_name=token_hex(),
                 **res_common,

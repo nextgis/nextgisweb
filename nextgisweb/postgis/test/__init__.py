@@ -22,7 +22,9 @@ from .. import PostgisConnection, PostgisLayer
 
 
 @contextmanager
-def create_feature_layer(ogrlayer, parent_id, **kwargs):
+def create_feature_layer(ogrlayer, *, ngw_httptest_app=None, **kwargs):
+    assert all(k in ("parent_id",) for k in kwargs.keys())
+
     opts_db = CoreComponent.current().options.with_prefix("test.database")
 
     for o in ("host", "name", "user"):
@@ -73,8 +75,8 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
 
     with engine.connect() as conn:
         with conn.begin():
-            for i, feature in enumerate(ogrlayer, start=1):
-                values = {"id": i}
+            for feature in ogrlayer:
+                values = {}
                 geom = feature.GetGeometryRef()
                 values[column_geom] = geom_wkb(geom.ExportToWkb(ogr.wkbNDR))
 
@@ -89,7 +91,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
                 conn.execute(table.insert().values(**values))
 
     with transaction.manager:
-        res_common = {"parent_id": parent_id, "owner_user": User.by_keyname("administrator")}
+        res_common = {"owner_user": User.by_keyname("administrator"), **kwargs}
 
         connection = PostgisConnection(
             **res_common,

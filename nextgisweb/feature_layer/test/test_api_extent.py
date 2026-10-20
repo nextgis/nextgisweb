@@ -113,7 +113,7 @@ def test_filtered_extent(
     ds = ogr.Open(str(data))
     ogrlayer = ds.GetLayer(0)
 
-    with create_resource(ogrlayer, ngw_resource_group_sub) as layer:
+    with create_resource(ogrlayer, parent_id=ngw_resource_group_sub) as layer:
         query_filter = ""
         if filter_ is not None:
             t, op, v = filter_

@@ -90,7 +90,7 @@ def test_attributes(
     ogrlayer = ds.GetLayer(0)
 
     with create_resource(
-        ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
+        ogrlayer, parent_id=ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
     ) as layer:
         layer.persist()
 
@@ -210,7 +210,7 @@ def test_geometry(
     ogrlayer = ds.GetLayer(0)
 
     with create_resource(
-        ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
+        ogrlayer, parent_id=ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
     ) as layer:
         layer.persist()
 
@@ -273,7 +273,7 @@ def test_filtered_extent(
     ogrlayer = ds.GetLayer(0)
 
     with create_resource(
-        ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
+        ogrlayer, parent_id=ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
     ) as layer:
         layer.persist()
 
@@ -307,7 +307,7 @@ def test_edit(
     ogrlayer = ds.GetLayer(0)
 
     with create_resource(
-        ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
+        ogrlayer, parent_id=ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
     ) as layer:
         layer.persist()
 

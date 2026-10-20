@@ -529,9 +529,12 @@ class PostgisLayer(FeatureLayerWritableMixin, Resource):
         :param feature: object description
         :type feature:  Feature
         """
+        values = self._makevals(feature)
+        if len(values) == 0:
+            return  # Nothing to update
         idcol = sa.sql.column(self.column_id)
         tab = self._sa_table(True)
-        stmt = sa.update(tab).values(self._makevals(feature)).where(idcol == feature.id)
+        stmt = sa.update(tab).values(values).where(idcol == feature.id)
 
         with self.connect() as conn:
             conn.execute(stmt, update=True)
