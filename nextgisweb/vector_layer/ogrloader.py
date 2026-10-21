@@ -70,12 +70,35 @@ class LoaderParams(Struct, kw_only=True, frozen=True):
     cast_is_multi: CastAutoYesNo = None
     cast_has_z: CastAutoYesNo = None
     validate: bool = True
+    field_filter: dict[str, str] | None = None
 
     def __post_init__(self):
         if self.skip_other_geometry_types and self.cast_geometry_type is None:
             raise VE(
                 "Parameter 'cast_geometry_type' is required with 'skip_other_geometry_types=true'."
             )
+
+    def geom_filter(self) -> set[str]:
+        match self.cast_geometry_type:
+            case GEOM_TYPE.POINT:
+                geom_filter = set(GEOM_TYPE.points)
+            case GEOM_TYPE.LINESTRING:
+                geom_filter = set(GEOM_TYPE.linestrings)
+            case GEOM_TYPE.POLYGON:
+                geom_filter = set(GEOM_TYPE.polygons)
+            case _:
+                geom_filter = set(GEOM_TYPE.enum)
+        match self.cast_is_multi:
+            case TOGGLE.NO:
+                geom_filter -= set(GEOM_TYPE.is_multi)
+            case TOGGLE.YES:
+                geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
+        match self.cast_has_z:
+            case TOGGLE.NO:
+                geom_filter -= set(GEOM_TYPE.has_z)
+            case TOGGLE.YES:
+                geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
+        return geom_filter
 
 
 class LoaderField(Struct, kw_only=False):
@@ -208,14 +231,23 @@ class UniquenessExplorer(FeatureExplorer):
 
 
 class OGRLoader:
-    geometry_type: str
     fid_field: LoaderField | None
     fields: dict[int, LoaderField]
 
-    def __init__(self, ogrlayer, params: LoaderParams):
+    def __init__(self, ogrlayer, *, geometry_type=None, params: LoaderParams):
         self.ogrlayer = ogrlayer
         self.params = params
+        if geometry_type is not None:
+            assert params.cast_geometry_type is None
+            assert params.cast_is_multi is None
+            assert params.cast_has_z is None
+        self._geometry_type = geometry_type
         self._scan()
+
+    @property
+    def geometry_type(self) -> str:
+        assert self._geometry_type is not None
+        return self._geometry_type
 
     def _scan(self):
         ogrlayer = self.ogrlayer
@@ -235,38 +267,19 @@ class OGRLoader:
             return result
 
         # Geom type
-
-        if params.cast_geometry_type == GEOM_TYPE.POINT:
-            geom_filter = set(GEOM_TYPE.points)
-        elif params.cast_geometry_type == GEOM_TYPE.LINESTRING:
-            geom_filter = set(GEOM_TYPE.linestrings)
-        elif params.cast_geometry_type == GEOM_TYPE.POLYGON:
-            geom_filter = set(GEOM_TYPE.polygons)
-        else:
-            geom_filter = set(GEOM_TYPE.enum)
-
-        if params.cast_is_multi == TOGGLE.NO:
-            geom_filter -= set(GEOM_TYPE.is_multi)
-        elif params.cast_is_multi == TOGGLE.YES:
-            geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
-
-        if params.cast_has_z == TOGGLE.NO:
-            geom_filter -= set(GEOM_TYPE.has_z)
-        elif params.cast_has_z == TOGGLE.YES:
-            geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
-
-        ltype = ogrlayer.GetGeomType()
-
-        geometry_type = None
-        if ltype == ogr.wkbNone:
-            geometry_type = GEOM_TYPE.NONE
-        elif len(geom_filter) == 1:
-            geometry_type = geom_filter.pop()
-        elif ltype in GEOM_TYPE_OGR and GEOM_TYPE_OGR_2_GEOM_TYPE[ltype] in geom_filter:
-            geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ltype]
-        elif len(geom_filter) > 1:
-            # Can't determine single geometry type, need exploration
-            add_explorer(GeomTypeExplorer(geom_filter, params))
+        if self._geometry_type is None:
+            ltype = ogrlayer.GetGeomType()
+            if ltype == ogr.wkbNone:
+                self._geometry_type = GEOM_TYPE.NONE
+            else:
+                geom_filter = params.geom_filter()
+                if len(geom_filter) == 1:
+                    self._geometry_type = geom_filter.pop()
+                elif ltype in GEOM_TYPE_OGR and GEOM_TYPE_OGR_2_GEOM_TYPE[ltype] in geom_filter:
+                    self._geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ltype]
+                elif len(geom_filter) > 1:
+                    # Can't determine single geometry type, need exploration
+                    add_explorer(GeomTypeExplorer(geom_filter, params))
 
         # FID field
 
@@ -310,18 +323,18 @@ class OGRLoader:
             geom_filter = gt_explorer.geom_filter
 
             if params.cast_is_multi == TOGGLE.AUTO and not gt_explorer.is_multi:
-                geom_filter = geom_filter - set(GEOM_TYPE.is_multi)
+                geom_filter -= set(GEOM_TYPE.is_multi)
 
             if params.cast_has_z == TOGGLE.AUTO and not gt_explorer.has_z:
-                geom_filter = geom_filter - set(GEOM_TYPE.has_z)
+                geom_filter -= set(GEOM_TYPE.has_z)
 
             if len(geom_filter) == 1:
-                geometry_type = geom_filter.pop()
+                self._geometry_type = geom_filter.pop()
 
-        if geometry_type is None:
+        if self._geometry_type is None:
             gt_explorer = get_explorer(GeomTypeExplorer)
             if gt_explorer is not None and gt_explorer.explored_any and not gt_explorer.found_any:
-                geometry_type = GEOM_TYPE.NONE
+                self._geometry_type = GEOM_TYPE.NONE
             else:
                 err_msg = gettext("Could not determine a geometry type.")
                 if len(geom_filter) == 0:
@@ -381,6 +394,12 @@ class OGRLoader:
 
             fld_defn = defn.GetFieldDefn(i)
             fld_name = fld_defn.GetNameRef()
+            if params.field_filter is not None:
+                if fld_name not in params.field_filter:
+                    continue
+                datatype_filter = params.field_filter[fld_name]
+            else:
+                datatype_filter = None
             fixed_fld_name = fix_encoding(fld_name)
 
             if fld_name != fixed_fld_name and params.fix_errors != FIX_ERRORS.LOSSY:
@@ -403,10 +422,11 @@ class OGRLoader:
                     fld_type = FIELD_TYPE_2_ENUM[fld_type_ogr]
                 except KeyError:
                     raise VE(gettext("Unsupported field type: %r.") % fld_defn.GetTypeName())
+            if datatype_filter is not None and fld_type != datatype_filter:
+                continue
 
             fields[i] = LoaderField(i, fld_name, fld_type_ogr, fld_type)
 
-        self.geometry_type = geometry_type
         self.fid_field = fid_field
         self.fields = fields
 
@@ -594,6 +614,12 @@ class FeatureGeometryTypeInvalid(FeatureError):
     pass
 
 
+class FeatureGeometryTypeUnsuitable(FeatureGeometryTypeInvalid):
+    def __init__(self, fid, wkb_type):
+        msg = gettext("Feature #%d has unsuitable geometry type: %d (%s).")
+        super().__init__(msg % (fid, wkb_type, ogr.GeometryTypeToName(wkb_type)))
+
+
 def _fid_fget(feature, ogr_fid, *, fget, fidx, fname):
     if not feature.IsFieldSet(fidx):
         raise FeatureError(
@@ -630,7 +656,10 @@ def _validate_geom(geom, target, *, fix_errors, fid):
         geom.Set3D(target in _wkb_has_z)
 
     # Extract GeometryCollection
-    if wkb_type in _wkb_collections and fix_errors != FIX_ERRORS.NONE:
+    if wkb_type in _wkb_collections:
+        if fix_errors == FIX_ERRORS.NONE:
+            raise FeatureGeometryTypeUnsuitable(fid, wkb_type)
+
         geom_candidate = None
         for j in range(geom.GetGeometryCount()):
             member_geom = geom.GetGeometryRef(j)
@@ -666,10 +695,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
         or (target in _wkb_linestrings and wkb_type in _wkb_linestrings)
         or (target in _wkb_polygons and wkb_type in _wkb_polygons)
     ):
-        raise FeatureGeometryTypeInvalid(
-            gettext("Feature #%d has unsuitable geometry type: %d (%s).")
-            % (fid, wkb_type, ogr.GeometryTypeToName(wkb_type))
-        )
+        raise FeatureGeometryTypeUnsuitable(fid, wkb_type)
 
     if (target in _wkb_multi) == (wkb_type in _wkb_multi):
         pass

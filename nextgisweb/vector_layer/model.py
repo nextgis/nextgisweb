@@ -186,11 +186,19 @@ class VectorLayer(
     def _tablename(self):
         return "layer_%s" % self.tbl_uuid
 
-    def from_source(self, source, *, layer=UNSET, **kw):
+    def from_source(self, source, *, layer=UNSET, keep=False, **kw):
         lp_kw = dict()
         for k in list(kw.keys()):
             if k in LoaderParams.__annotations__:
+                if keep and k not in (
+                    "fix_errors",
+                    "skip_errors",
+                    "skip_other_geometry_types",
+                ):
+                    raise VE(f"'{k}' parameter is not supported for adding features.")
                 lp_kw[k] = kw.pop(k)
+        if keep:
+            lp_kw["field_filter"] = {f.keyname: f.datatype for f in self.fields}
         lparams = LoaderParams(**lp_kw)
 
         if isinstance(source, Path):
@@ -213,21 +221,27 @@ class VectorLayer(
             dataset_ref = None
             assert layer is UNSET
 
-        loader = OGRLoader(source, params=lparams)
-        self.geometry_type = loader.geometry_type
-        if self.geometry_type == GEOM_TYPE.NONE:
-            self.srs = None
-        self.fields[:] = [
-            VectorLayerField(
-                keyname=lf.name,
-                datatype=lf.datatype,
-                display_name=lf.name,
-            )
-            for lf in loader.fields.values()
-        ]
-
         session = self.require_session()
-        session.flush()
+
+        loader_kw = {"params": lparams}
+        if keep:
+            loader_kw["geometry_type"] = self.geometry_type
+        loader = OGRLoader(source, **loader_kw)
+        if not keep:
+            self.geometry_type = loader.geometry_type
+            if self.geometry_type == GEOM_TYPE.NONE:
+                self.srs = None
+
+            self.fields[:] = [
+                VectorLayerField(
+                    keyname=lf.name,
+                    datatype=lf.datatype,
+                    display_name=lf.name,
+                )
+                for lf in loader.fields.values()
+            ]
+
+            session.flush()
 
         vls = self.vlschema()
         columns = {lf.idx: vls.ctab.fields[lf.name].name for lf in loader.fields.values()}
@@ -241,7 +255,7 @@ class VectorLayer(
             connection=session.connection(),
         )
 
-        if self.fversioning:
+        if not keep and self.fversioning:
             session.execute(vls.dml_initfill())
 
         CoreComponent.current().reserve_storage(
@@ -890,7 +904,10 @@ class SourceAttr(SAttribute):
         obj.from_source(ogrlayer, **kw)
 
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
-        if srlzr.obj.id is not None:
+        keep = not create and srlzr.data.keep is True
+        if keep and srlzr.obj.fversioning:
+            raise FVersioningNotImplemented
+        if srlzr.obj.id is not None and not keep:
             srlzr.obj._vlschema_wipe()
             srlzr.obj.require_session().flush()
 
@@ -904,7 +921,7 @@ class SourceAttr(SAttribute):
         for k, a in VectorLayerSerializer.__dict__.items():
             if (
                 not isinstance(a, LoaderAttr)
-                or k == "source_layer"
+                or k in ("source_layer", "keep")
                 or (v := getattr(srlzr.data, k)) is UNSET
             ):
                 continue
@@ -915,6 +932,7 @@ class SourceAttr(SAttribute):
         self._setup_layer(
             srlzr.obj,
             ogrlayer,
+            keep=keep,
             **kwargs,
         )
 
@@ -1019,6 +1037,7 @@ class VectorLayerSerializer(Serializer, resource=VectorLayer, force_create=True)
 
     source = SourceAttr(write=DataScope.write)
     source_layer = LoaderAttr(str)
+    keep = LoaderAttr(bool)
     fix_errors = LoaderAttr(FixErrors)
     skip_errors = LoaderAttr(bool)
     skip_other_geometry_types = LoaderAttr(bool)
