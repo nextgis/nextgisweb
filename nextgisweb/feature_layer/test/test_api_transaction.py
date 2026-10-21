@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 
 
 def parametrize_feature_layer():
-    ds = ogr.GetDriverByName("MEM").CreateDataSource("")
+    ds = ogr.GetDriverByName("Memory").CreateDataSource("")
     layer = ds.CreateLayer("", srs=sr_from_epsg(3857), geom_type=ogr.wkbPoint25D)
     layer._ds = ds  # Keep reference against GC
     layer.CreateField(ogr.FieldDefn("foo", ogr.OFTString))
