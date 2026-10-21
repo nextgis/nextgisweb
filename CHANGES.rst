@@ -1,6 +1,29 @@
 Changes
 =======
 
+5.6.0
+-----
+
+- Support for vector tile basemaps.
+- Improved web map search panel.
+- Group-level visibility control for web map layers.
+- Aggregate calculations for numeric fields in feature tables.
+- Coordinate input for geometry creation on web maps.
+- Support for navigation between panoramas using interactive markers.
+- Feature description import and export via UI.
+- Сonfigurable web map background color and option to disable basemaps.
+- Format-specific default coordinate systems for feature export.
+- Reorganized web map layer context menu.
+- Improved snapping controls for feature editing on web maps.
+- Clearer highlighting of identified raster pixels on web maps.
+- Improved transaction handling for external PostGIS layers.
+- More detailed error messages for external services.
+- Better support for right-to-left (RTL) layouts.
+- Improved bulk deletion of resources in the UI.
+- Enhanced string comparison in feature filters.
+- Upgraded dependencies: MobX 7, React 19.3, and Psycopg 3.
+
+
 5.5.0
 -----
 
