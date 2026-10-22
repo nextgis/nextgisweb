@@ -75,15 +75,15 @@ def pkginfo():
     optional = {"raster_mosaic", "point_cloud"}
     assert all((i in components) for i in optional)
 
-    return dict(
-        components={
-            comp: dict(
-                module="nextgisweb.{}".format(comp),
-                enabled=comp not in optional,
-            )
+    return {
+        "components": {
+            comp: {
+                "module": "nextgisweb.{}".format(comp),
+                "enabled": comp not in optional,
+            }
             for comp in components
         }
-    )
+    }
 
 
 def main(global_config=None, **settings):

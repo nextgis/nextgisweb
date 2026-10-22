@@ -67,8 +67,8 @@ requires = [
     "zope.event==6.1",
 ]
 
-extras_require = dict(
-    development=[
+extras_require = {
+    "development": [
         "bump2version",
         "coverage",
         "freezegun",
@@ -83,7 +83,7 @@ extras_require = dict(
         "types-lxml",
         "webtest",
     ]
-)
+}
 
 entry_points = {
     "paste.app_factory": ["main = nextgisweb:main"],
