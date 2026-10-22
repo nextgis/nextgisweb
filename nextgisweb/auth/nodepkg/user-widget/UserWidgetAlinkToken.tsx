@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Flex, Input, Select } from "@nextgisweb/gui/antd";
 import type { InputProps } from "@nextgisweb/gui/antd";
+import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -54,6 +55,8 @@ export function UserWidgetAlinkToken({
       .map((m) => ({ value: m.key, label: m.label }));
   }, [state]);
 
+  const url = ngwConfig.applicationUrl + "/alink/" + state[1];
+
   return (
     <Flex gap="medium" align="center">
       <Select
@@ -73,11 +76,14 @@ export function UserWidgetAlinkToken({
         }}
       />
       {state[0] === "keep" && (
-        <Input
-          style={{ flexGrow: "1" }}
-          value={ngwConfig.applicationUrl + "/alink/" + state[1]}
-          readOnly={true}
-        />
+        <>
+          <Input.Password
+            style={{ flexGrow: "1" }}
+            value={url}
+            readOnly={true}
+          />
+          <CopyToClipboardButton type="link" getTextToCopy={() => url} iconOnly />
+        </>
       )}
       {state[0] === "assign" && (
         <span style={{ flexGrow: "1" }}>

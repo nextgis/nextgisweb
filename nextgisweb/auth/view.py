@@ -140,6 +140,9 @@ def alink(request: Request, token: str):
             message=gettext("Usage of authorization link is forbidden for administrators.")
         )
 
+    if user.oauth_subject is not None:
+        raise ALinkException(gettext("Usage of authorization link is forbidden for OAuth users."))
+
     remember(request, (user.id, None))
 
     next_url = request.params.get("next", request.application_url)
