@@ -18,7 +18,7 @@ export function createCacheKey({
     "visibleFields",
     [...visibleFields].sort().join("_"),
     "orderBy",
-    orderBy ? orderBy.join("_") : "",
+    orderBy ? orderBy.map((value) => String(value)).join("_") : "",
     ...Object.entries(restParams)
       .filter((val) => !!val[1])
       .map(([key, val]) => [key, String(val)])

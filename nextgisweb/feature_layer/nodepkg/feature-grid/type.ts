@@ -8,7 +8,7 @@ import type { CompositeRead } from "@nextgisweb/resource/type/api";
 import type { FilterExpressionString } from "../feature-filter/type";
 import type { NgwAttributeType } from "../type";
 
-import type { $FID, $VID } from "./constant";
+import type { $FID, $VID, FID_ORDER_KEY } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
 
 export type FeatureAttrs = Record<string, NgwAttributeType> & {
@@ -21,7 +21,7 @@ export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export type ColOrder = "asc" | "desc" | null;
 
-export type OrderBy = [keynme: string, ordering: ColOrder];
+export type OrderBy = [key: string | typeof FID_ORDER_KEY, ordering: ColOrder];
 
 export interface FeatureLayerFieldCol extends Pick<
   FeatureLayerFieldRead,

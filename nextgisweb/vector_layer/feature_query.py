@@ -11,6 +11,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import (
+    FID_KEY,
     GEOM_TYPE,
     Feature,
     FeatureQueryIntersectsMixin,
@@ -237,7 +238,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         order_by = []
         if self._order_by:
             for order, fld_k in self._order_by:
-                order_by.append(getattr(fields[fld_k], order)())
+                col = idcol if fld_k is FID_KEY else fields[fld_k]
+                order_by.append(getattr(col, order)())
         order_by.append(idcol.asc())
 
         qbase = select(idcol)

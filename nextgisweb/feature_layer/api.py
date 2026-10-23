@@ -31,10 +31,12 @@ from .filter import FilterParser, legacy_to_expression, str_contains_filter
 from .interface import (
     FIELD_TYPE,
     IAggregatableFeatureQuery,
+    IFeatureQueryOrderBy,
     IFilterableFeatureLayer,
     IWritableFeatureLayer,
 )
 from .numutil import BIGINT_DUMPERS, BigIntFormat, bigint_loader, bool_loader, int_loader
+from .sort import parse_sort
 from .versioning import FVersioningNotEnabled, FVersioningOutOfRange
 
 FeatureID = Annotated[int, Meta(description="Feature ID")]
@@ -505,6 +507,10 @@ def cget(
     *,
     dumper_params: Annotated[DumperParams, Query(spread=True)],
     order_by: str | None = None,
+    sort: Annotated[
+        str | None,
+        Meta(description='Sort expression (JSON string), e.g. [["desc", ["fid"]]]'),
+    ] = None,
     limit: Annotated[int, Meta(ge=0)] | None = None,
     offset: Annotated[int, Meta(ge=0)] = 0,
     filter: Annotated[str | None, Meta(description="Filter expression (JSON string)")] = None,
@@ -551,8 +557,18 @@ def cget(
             query.set_text_search_context(spec)
 
     # Ordering
-    order_by_ = []
-    if order_by is not None:
+    if sort is not None:
+        if order_by is not None:
+            raise ValidationError(
+                gettext("Parameters 'sort' and 'order_by' are mutually exclusive.")
+            )
+        sort_spec = parse_sort(resource, sort)
+        if sort_spec:
+            if not IFeatureQueryOrderBy.providedBy(query):
+                raise ValidationError(gettext("Ordering is not supported for this layer."))
+            query.order_by(*sort_spec)
+    elif order_by is not None:
+        order_by_ = []
         for order_def in list(order_by.split(",")):
             m = re.match(r"^(\-|\+|%2B)?(.*)$", order_def)
             assert m is not None
@@ -561,8 +577,10 @@ def cget(
                 order = ["asc", "desc"][order == "-"]
                 order_by_.append([order, colname])
 
-    if order_by_:
-        query.order_by(*order_by_)
+        if order_by_:
+            if not IFeatureQueryOrderBy.providedBy(query):
+                raise ValidationError(gettext("Ordering is not supported for this layer."))
+            query.order_by(*order_by_)
 
     result = []
     for feature in query():

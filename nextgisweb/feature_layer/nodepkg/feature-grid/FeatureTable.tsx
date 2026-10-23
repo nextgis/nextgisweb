@@ -21,7 +21,12 @@ import { FeatureTableRows } from "./FeatureTableRows";
 import { AggrCols } from "./component/AggrCols";
 import { HeaderCols } from "./component/HeaderCols";
 import { HeaderHandles } from "./component/HeaderHandles";
-import { $FID, KEY_FIELD_ID, LAST_CHANGED_FIELD_ID } from "./constant";
+import {
+  $FID,
+  FID_ORDER_KEY,
+  KEY_FIELD_ID,
+  LAST_CHANGED_FIELD_ID,
+} from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type { QueryParams } from "./hook/useFeatureTable";
 import { useGridAggregation } from "./hook/useGridAggregation";
@@ -207,7 +212,16 @@ function FeatureTable({
     curOrder: ColOrder = null
   ) => {
     if (field === $FID) {
-      setOrderBy(undefined);
+      // Features are already ordered by id ascending, so the first click
+      // immediately shows the newest features first
+      setOrderBy((old) => {
+        const fidOrder =
+          old && old[0] === FID_ORDER_KEY ? old[1] : (curOrder ?? null);
+        const fidOrderSeq: ColOrder[] = ["desc", null];
+        const nextOrder =
+          fidOrderSeq[(fidOrderSeq.indexOf(fidOrder) + 1) % fidOrderSeq.length];
+        return nextOrder ? [FID_ORDER_KEY, nextOrder] : undefined;
+      });
       return;
     }
     const sortOrderSeq: ColOrder[] = ["asc", "desc", null];

@@ -1,10 +1,12 @@
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Final, Literal
 
 from osgeo import ogr
 from zope.interface import Attribute, Interface
 
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import IResourceBase
+
+FID_KEY: Final[None] = None
 
 GEOM_TYPE_OGR = (
     ogr.wkbPoint,

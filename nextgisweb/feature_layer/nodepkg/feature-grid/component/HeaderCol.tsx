@@ -3,7 +3,7 @@ import type { Ref } from "react";
 import { ExpandableText } from "@nextgisweb/gui/index";
 
 import SortIcon from "../component/SortIcon";
-import { $FID, KEY_FIELD_ID } from "../constant";
+import { $FID, FID_ORDER_KEY, KEY_FIELD_ID } from "../constant";
 import type { ColOrder, FeatureLayerFieldCol, OrderBy } from "../type";
 import { getColumnStyle } from "../util/getColumnStyle";
 
@@ -24,7 +24,8 @@ export function HeaderCol({
 }: HeaderColProps) {
   const { keyname, id, display_name: label } = column;
 
-  const colSort = orderBy && orderBy[0] === keyname && orderBy[1];
+  const sortKey = id === KEY_FIELD_ID ? FID_ORDER_KEY : keyname;
+  const colSort = orderBy && sortKey && orderBy[0] === sortKey && orderBy[1];
 
   const style = getColumnStyle(column, userDefinedWidths);
 

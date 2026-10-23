@@ -2,7 +2,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import type Routes from "@nextgisweb/pyramid/type/route";
 
 import type { FeatureItem } from "../../type";
-import { $FID, $VID } from "../constant";
+import { $FID, $VID, FID_ORDER_KEY } from "../constant";
 import type { OrderBy } from "../type";
 
 type FeatureLayerQuery =
@@ -12,6 +12,7 @@ type FeatureLayerQuery =
     ilike?: string;
     intersects?: string;
     filter?: string;
+    sort?: string;
   };
 
 export interface FetchFeaturesOptions {
@@ -52,7 +53,9 @@ export function fetchFeaturesItems({
     fields,
   };
   if (orderBy && orderBy[1]) {
-    query.order_by = `${orderBy[1] === "desc" ? "-" : ""}${orderBy[0]}`;
+    const operand =
+      orderBy[0] === FID_ORDER_KEY ? ["fid"] : ["get", orderBy[0]];
+    query.sort = JSON.stringify([[orderBy[1], operand]]);
   }
   if (like) {
     query.like = like;

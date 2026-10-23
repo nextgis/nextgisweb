@@ -25,6 +25,7 @@ from nextgisweb.lib.saext import postgres_url
 from nextgisweb.auth import User
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.feature_layer import (
+    FID_KEY,
     FIELD_TYPE,
     GEOM_TYPE,
     Feature,
@@ -836,11 +837,13 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         order_criterion = []
         if self._order_by:
             for order, k in self._order_by:
-                field = self.layer.field_by_keyname(k)
-                assert isinstance(field, PostgisLayerField)
-                order_criterion.append(
-                    dict(asc=sa.asc, desc=sa.desc)[order](tab.columns[field.column_name])
-                )
+                if k is FID_KEY:
+                    col = idcol
+                else:
+                    field = self.layer.field_by_keyname(k)
+                    assert isinstance(field, PostgisLayerField)
+                    col = tab.columns[field.column_name]
+                order_criterion.append(dict(asc=sa.asc, desc=sa.desc)[order](col))
         order_criterion.append(idcol)
         search_flags_ref = search_flags
 

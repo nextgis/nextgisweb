@@ -2,6 +2,7 @@ from .component import FeatureLayerComponent
 from .extension import FeatureExtension
 from .feature import Feature, FeatureSet
 from .interface import (
+    FID_KEY,
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     GEOM_TYPE,
@@ -33,6 +34,7 @@ from .transaction import FeatureLayerTransaction
 from .versioning import FVersioningMeta, FVersioningMixin, FVersioningObj
 
 __all__ = [
+    "FID_KEY",
     "FIELD_TYPE",
     "FIELD_TYPE_OGR",
     "GEOM_TYPE",
