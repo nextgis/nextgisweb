@@ -1,7 +1,10 @@
 from struct import pack, unpack
+from typing import Self
 
-from osgeo import gdal, ogr, osr
+from osgeo import gdal, osr
+from osgeo import ogr as osgeo_ogr
 from pyproj import CRS
+from shapely import Geometry as SHPGeometry
 from shapely import wkb, wkt
 from shapely.geometry import box as geometry_box
 from shapely.geometry import mapping as geometry_mapping
@@ -10,6 +13,14 @@ from shapely.ops import transform as map_coords
 
 from ..ogrhelper import cohere_bytes
 from ..osrhelper import sr_from_wkt
+
+__all__ = [
+    "Geometry",
+    "GeometryNotValid",
+    "Transformer",
+    "geom_area",
+    "geom_length",
+]
 
 
 class GeometryNotValid(ValueError):
@@ -22,7 +33,15 @@ class Geometry:
 
     __slots__ = ("_wkb", "_wkt", "_ogr", "_shape", "_srid")
 
-    def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None, validate=False):
+    def __init__(
+        self,
+        wkb: bytes | None = None,
+        wkt: str | None = None,
+        ogr: osgeo_ogr.Geometry | None = None,
+        shape: SHPGeometry = None,
+        srid: int | None = None,
+        validate: bool = False,
+    ) -> None:
         if wkb is None and wkt is None and ogr is None and shape is None:
             raise ValueError("None base format is not defined.")
 
@@ -55,52 +74,58 @@ class Geometry:
                 raise GeometryNotValid from e
 
     @property
-    def srid(self):
+    def srid(self) -> int | None:
         return self._srid
 
     # Base constructors
 
     @classmethod
-    def from_wkb(cls, data, srid=None, validate=True):
+    def from_wkb(cls, data: bytes, srid: int | None = None, validate: bool = True) -> Self:
         return cls(wkb=data, srid=srid, validate=validate)
 
     @classmethod
-    def from_wkt(cls, data, srid=None, validate=True):
+    def from_wkt(cls, data: str, srid: int | None = None, validate: bool = True) -> Self:
         return cls(wkt=data, srid=srid, validate=validate)
 
     @classmethod
-    def from_ogr(cls, data, srid=None, validate=True):
+    def from_ogr(
+        cls, data: osgeo_ogr.Geometry, srid: int | None = None, validate: bool = True
+    ) -> Self:
         return cls(ogr=data, srid=srid, validate=validate)
 
     @classmethod
-    def from_shape(cls, data, srid=None, validate=False):
+    def from_shape(
+        cls, data: SHPGeometry, srid: int | None = None, validate: bool = False
+    ) -> Self:
         return cls(shape=data, srid=srid, validate=validate)
 
     # Additional constructors
 
     @classmethod
-    def from_geojson(cls, data, srid=None, validate=True):
+    def from_geojson(cls, data: dict, srid: int | None = None, validate: bool = True) -> Self:
         shape = geometry_shape(data)
         return cls.from_shape(shape, srid=srid, validate=validate)
 
     @classmethod
-    def from_box(cls, minx, miny, maxx, maxy, srid=None):
+    def from_box(
+        cls, minx: float, miny: float, maxx: float, maxy: float, srid: int | None = None
+    ) -> Self:
         return cls.from_shape(geometry_box(minx, miny, maxx, maxy), srid=srid)
 
     # Base output formats
 
     @property
-    def wkb(self):
+    def wkb(self) -> bytes:
         if self._wkb is None:
             if self._ogr is None and self._shape is not None:
                 self._wkb = self._shape.wkb
             else:
                 # ORG is the fastest, so convert to OGR and then to WKB.
-                self._wkb = cohere_bytes(self.ogr.ExportToWkb(ogr.wkbNDR))
+                self._wkb = cohere_bytes(self.ogr.ExportToWkb(osgeo_ogr.wkbNDR))
         return self._wkb
 
     @property
-    def wkt(self):
+    def wkt(self) -> str:
         if self._wkt is None:
             if self._ogr is None and self._shape is not None:
                 self._wkt = self._shape.wkt
@@ -110,13 +135,13 @@ class Geometry:
         return self._wkt
 
     @property
-    def ogr(self):
+    def ogr(self) -> osgeo_ogr.Geometry:
         if self._ogr is None:
             if self._wkb is None and self._wkt is not None:
-                self._ogr = ogr.CreateGeometryFromWkt(self._wkt)
+                self._ogr = osgeo_ogr.CreateGeometryFromWkt(self._wkt)
             else:
                 # WKB is the fastest, so convert to WKB and then to OGR.
-                self._ogr = ogr.CreateGeometryFromWkb(self.wkb)
+                self._ogr = osgeo_ogr.CreateGeometryFromWkb(self.wkb)
 
         if self._ogr is None:
             raise GeometryNotValid("Invalid geometry WKB/WKT value!")
@@ -124,7 +149,7 @@ class Geometry:
         return self._ogr
 
     @property
-    def shape(self):
+    def shape(self) -> SHPGeometry:
         if self._shape is None:
             if self._wkb is None and self._wkt is not None:
                 self._shape = wkt.loads(self._wkt)
@@ -135,11 +160,11 @@ class Geometry:
 
     # Additional output formats
 
-    def to_geojson(self):
+    def to_geojson(self) -> dict:
         # NB: srid is not considered
         return geometry_mapping(self.shape)
 
-    def to_ewkb(self):
+    def to_ewkb(self) -> bytes:
         wkb = self.wkb
         if (srid := self.srid) is None:
             return wkb
@@ -157,19 +182,20 @@ class Geometry:
 
     # Editors
 
-    def flip_coordinates(self):
+    def flip_coordinates(self) -> Self:
         shape = map_coords(lambda x, y: (y, x), self.shape)
+        # ty: ignore[invalid-return-type]
         return Geometry.from_shape(shape, srid=self.srid)
 
     # Shapely providers
 
     @property
-    def bounds(self):
+    def bounds(self) -> tuple[float, float, float, float]:
         return self.shape.bounds
 
 
 class Transformer:
-    def __init__(self, wkt_from, wkt_to):
+    def __init__(self, wkt_from: str, wkt_to: str) -> None:
         sr_from = sr_from_wkt(wkt_from)
         sr_to = sr_from_wkt(wkt_to)
 
@@ -178,7 +204,7 @@ class Transformer:
         else:
             self._transformation = osr.CoordinateTransformation(sr_from, sr_to)
 
-    def transform(self, geom):
+    def transform(self, geom: Geometry) -> Geometry:
         # NB: geom.srid is not considered
         ogr_geom = geom.ogr.Clone()
         if self._transformation is not None:

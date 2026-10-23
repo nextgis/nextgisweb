@@ -1,3 +1,5 @@
 from msgspec import Meta
 
-DEPRECATED = Meta(extra_json_schema=dict(deprecated=True))
+__all__ = ["DEPRECATED"]
+
+DEPRECATED = Meta(extra_json_schema={"deprecated": True})

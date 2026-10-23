@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 
+__all__ = ["utcnow_naive"]
+
 
 def utcnow_naive() -> datetime:
     """Get the current UTC datetime as a naive `datetime` object

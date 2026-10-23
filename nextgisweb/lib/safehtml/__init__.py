@@ -1,7 +1,9 @@
 import re
 
 import nh3
-from lxml.html import document_fromstring
+from lxml.html import HtmlElement, document_fromstring
+
+__all__ = ["URL_PATTERN", "sanitize"]
 
 URL_SCHEMES = nh3.ALLOWED_URL_SCHEMES | {"e1c"}
 URL_PATTERN = r"^(?:(?:(?:{})\:)|\/)(?:[^\s].*|)$".format(
@@ -12,7 +14,7 @@ URL_PATTERN = r"^(?:(?:(?:{})\:)|\/)(?:[^\s].*|)$".format(
 URL_SCHEMES_WITH_DATA = URL_SCHEMES | {"data"}
 
 
-def attribute_filter(tag, attr, value):
+def attribute_filter(tag: str, attr: str, value: str) -> str | None:
     if attr in ("href", "src") and value.startswith("data:"):
         if tag == "img" and attr == "src" and value.startswith("data:image/"):
             return value
@@ -20,7 +22,13 @@ def attribute_filter(tag, attr, value):
     return value
 
 
-def sanitize(text, *, validate=False):
+def body_fromstring(text: str) -> HtmlElement:
+    doc = document_fromstring("<html><body>" + text + "</body></html>")
+    assert doc.body is not None
+    return doc.body
+
+
+def sanitize(text: str | None, *, validate: bool = False) -> str | None:
     if text is None:
         return None
 
@@ -33,15 +41,15 @@ def sanitize(text, *, validate=False):
 
     if validate:
         # LXML should handle anything without exceptions
-        doc = document_fromstring("<html><body>" + text + "</body></html>")
-        doc_cleaned = document_fromstring("<html><body>" + cleaned + "</body></html>")
-        if not compare(doc.body, doc_cleaned.body):
+        body = body_fromstring(text)
+        body_cleaned = body_fromstring(cleaned)
+        if not compare(body, body_cleaned):
             raise ValueError
 
     return cleaned
 
 
-def compare(a, b):
+def compare(a: HtmlElement, b: HtmlElement) -> bool:
     if a.tag != b.tag or a.text != b.text or a.tail != b.tail:
         return False
     if len(a.attrib) != len(b.attrib):

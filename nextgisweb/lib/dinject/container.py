@@ -13,7 +13,7 @@ class Container:
     _container_invalidate: dict[KeyType, list[Callable[[], None]]]
 
     def __init__(self) -> None:
-        self._container_registry = dict()
+        self._container_registry = {}
         self._container_invalidate = defaultdict(list)
 
     def wire(self) -> Self:

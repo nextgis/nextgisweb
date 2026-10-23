@@ -1,5 +1,7 @@
 from pathlib import Path
 
+__all__ = ["update_text_file"]
+
 
 def update_text_file(path: Path, content: str) -> None:
     """Write text content to a file, but only if it has changed

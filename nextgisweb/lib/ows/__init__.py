@@ -6,31 +6,39 @@ from lxml import etree
 
 from nextgisweb.pyramid.tomb import Request
 
+__all__ = [
+    "FIELD_TYPE_WFS",
+    "SRSParseError",
+    "get_work_version",
+    "parse_request",
+    "parse_srs",
+]
+
 _ns_xsd = "http://www.w3.org/2001/XMLSchema"
 
 
-FIELD_TYPE_WFS = dict(
-    XSD_INT=(_ns_xsd, "int"),
-    XSD_INTEGER=(_ns_xsd, "integer"),
-    XSD_LONG=(_ns_xsd, "long"),
-    XSD_DOUBLE=(_ns_xsd, "double"),
-    XSD_STRING=(_ns_xsd, "string"),
-    XSD_DATE=(_ns_xsd, "date"),
-    XSD_TIME=(_ns_xsd, "time"),
-    XSD_DATETIME=(_ns_xsd, "dateTime"),
-    XSD_DECIMAL=(_ns_xsd, "decimal"),
-    XSD_BOOLEAN=(_ns_xsd, "boolean"),
-    GML_TIME_INSTANT=("http://www.opengis.net/gml/3.2", "TimeInstantType"),
-)
+FIELD_TYPE_WFS = {
+    "XSD_INT": (_ns_xsd, "int"),
+    "XSD_INTEGER": (_ns_xsd, "integer"),
+    "XSD_LONG": (_ns_xsd, "long"),
+    "XSD_DOUBLE": (_ns_xsd, "double"),
+    "XSD_STRING": (_ns_xsd, "string"),
+    "XSD_DATE": (_ns_xsd, "date"),
+    "XSD_TIME": (_ns_xsd, "time"),
+    "XSD_DATETIME": (_ns_xsd, "dateTime"),
+    "XSD_DECIMAL": (_ns_xsd, "decimal"),
+    "XSD_BOOLEAN": (_ns_xsd, "boolean"),
+    "GML_TIME_INSTANT": ("http://www.opengis.net/gml/3.2", "TimeInstantType"),
+}
 
 
-def _ns_trim(value):
+def _ns_trim(value: str) -> str:
     pos = max(value.find("}"), value.rfind(":"))
     return value[pos + 1 :]
 
 
-def parse_request(request: Request):
-    params = dict()
+def parse_request(request: Request) -> tuple[dict[str, str], etree.Element | None]:
+    params = {}
     root_body = None
 
     if request.method == "GET":
@@ -38,13 +46,14 @@ def parse_request(request: Request):
     elif request.method == "POST":
         parser = etree.XMLParser(recover=True)
         root_body = etree.parse(BytesIO(request.body), parser=parser).getroot()
+        assert isinstance(root_body.tag, str)
         params = root_body.attrib
         params["REQUEST"] = _ns_trim(root_body.tag)
     else:
         pass
 
     # Parameter names shall not be case sensitive
-    params = dict((k.upper(), v) for k, v in params.items())
+    params = {k.upper(): v for k, v in params.items()}
 
     return params, root_body
 
@@ -58,23 +67,23 @@ class SRSFormatDefinition(NamedTuple):
     axis_xy: bool
 
 
-srs_formats = dict(
-    short=SRSFormatDefinition(
+srs_formats = {
+    "short": SRSFormatDefinition(
         pattern=re.compile(r"EPSG:(\d+)"),
         axis_xy=True,
     ),
-    ogc_urn=SRSFormatDefinition(
+    "ogc_urn": SRSFormatDefinition(
         pattern=re.compile(r"urn:ogc:def:crs:EPSG::(\d+)"),
         axis_xy=False,
     ),
-    ogc_url=SRSFormatDefinition(
+    "ogc_url": SRSFormatDefinition(
         pattern=re.compile(r"http://www.opengis.net/def/crs/EPSG/0/(\d+)"),
         axis_xy=False,
     ),
-)
+}
 
 
-def parse_srs(value) -> tuple[int, bool]:
+def parse_srs(value: str) -> tuple[int, bool]:
     for srs_format in srs_formats.values():
         match = srs_format.pattern.match(value)
         if match is not None:
@@ -82,7 +91,12 @@ def parse_srs(value) -> tuple[int, bool]:
     raise SRSParseError("Could not recognize SRS format '%s'." % value)
 
 
-def get_work_version(p_version, p_acceptversions, version_supported, version_default):
+def get_work_version(
+    p_version: str | None,
+    p_acceptversions: str | None,
+    version_supported: tuple[str, ...],
+    version_default: str,
+) -> str | None:
     version = p_version
     if version is None:
         if p_acceptversions is not None:

@@ -1,9 +1,16 @@
+from collections.abc import Callable
+
 import numpy
 from osgeo import gdal, gdal_array
 from PIL import Image
 
+__all__ = ["heif_init", "reproject_render"]
 
-def heif_init():
+Extent = tuple[float, float, float, float]
+Size = tuple[int, int]
+
+
+def heif_init() -> None:
     if not getattr(heif_init, "_done", False):
         from pillow_heif import register_heif_opener
 
@@ -11,7 +18,13 @@ def heif_init():
         setattr(heif_init, "_done", True)
 
 
-def reproject_render(render_fn, extent, size, dst_wkt, src_wkt):
+def reproject_render(
+    render_fn: Callable[[Extent, Size], Image.Image],
+    extent: Extent,
+    size: Size,
+    dst_wkt: str,
+    src_wkt: str,
+) -> Image.Image:
     xmin, ymin, xmax, ymax = extent
     width, height = size
 

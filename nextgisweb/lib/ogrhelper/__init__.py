@@ -1,12 +1,28 @@
 import zipfile
+from collections.abc import Generator
 from contextlib import contextmanager
 from datetime import date, datetime, time
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any, Protocol
 
 from osgeo import gdal, ogr
 
-FIELD_GETTER = {}
+__all__ = [
+    "FIELD_GETTER",
+    "cohere_bytes",
+    "geometry_force_multi",
+    "ogr_use_exceptions",
+    "read_dataset",
+    "read_layer_features",
+]
+
+
+class FeatureGet(Protocol):
+    def __call__(self, feat: ogr.Feature, fidx: int) -> Any: ...
+
+
+FIELD_GETTER = dict[int, FeatureGet]()
 
 OGR_VRT_LAYER = """
 <OGRVRTLayer name="{}">
@@ -24,12 +40,12 @@ OGR_VRT_LAYER_NO_GEOM = """
 
 
 class AutoCleaningTemporaryDirectory(TemporaryDirectory):
-    def __del__(self):
+    def __del__(self) -> None:
         self.cleanup()
 
 
 @contextmanager
-def ogr_use_exceptions():
+def ogr_use_exceptions() -> Generator[None, None, None]:
     if ogr.GetUseExceptions():
         yield
         return
@@ -41,7 +57,7 @@ def ogr_use_exceptions():
         ogr.DontUseExceptions()
 
 
-def read_dataset(filename, **kw):
+def read_dataset(filename: str, **kw: Any) -> gdal.Dataset | None:
     vrt_layers = None
     source_filename = kw.pop("source_filename", None)
     allowed_drivers = kw.pop("allowed_drivers", ())
@@ -83,7 +99,7 @@ def read_dataset(filename, **kw):
             dst_path = Path(tempdir.name) / Path(filename).with_suffix(suffix).name
             dst_path.symlink_to(filename)
 
-            filename = dst_path
+            filename = dst_path  # ty: ignore[invalid-assignment]
 
     kw["allowed_drivers"] = allowed_drivers
 
@@ -100,7 +116,11 @@ def read_dataset(filename, **kw):
     return result
 
 
-def read_layer_features(layer, geometry_format=None):
+def read_layer_features(
+    layer: ogr.Layer, geometry_format: str | None = None
+) -> Generator[
+    tuple[int, ogr.Geometry | str | bytearray | None, list[tuple[str, Any]]], None, None
+]:
     geometry_format = "wkt" if geometry_format is None else geometry_format.lower()
     if geometry_format == "raw":
         geom_func = _geometry_copy
@@ -110,7 +130,7 @@ def read_layer_features(layer, geometry_format=None):
         geom_func = _geometry_wkb
 
     defn = layer.GetLayerDefn()
-    fieldmap = list()
+    fieldmap = []
     for fidx in range(defn.GetFieldCount()):
         fdefn = defn.GetFieldDefn(fidx)
         fname = fdefn.GetName()
@@ -132,7 +152,7 @@ def read_layer_features(layer, geometry_format=None):
         )
 
 
-def geometry_force_multi(ogr_geom):
+def geometry_force_multi(ogr_geom: ogr.Geometry) -> ogr.Geometry:
     geom_type = ogr_geom.GetGeometryType()
     if geom_type == ogr.wkbPoint:
         return ogr.ForceToMultiPoint(ogr_geom)
@@ -143,7 +163,7 @@ def geometry_force_multi(ogr_geom):
     return ogr_geom
 
 
-def cohere_bytes(value):
+def cohere_bytes(value: bytes | bytearray) -> bytes:
     if isinstance(value, bytearray):
         return bytes(value)
     elif isinstance(value, bytes):
@@ -152,62 +172,62 @@ def cohere_bytes(value):
         raise ValueError(f"Bytes or bytearray expected, got {type(value).__name__}")
 
 
-def _geometry_copy(ogr_geom):
+def _geometry_copy(ogr_geom: ogr.Geometry) -> ogr.Geometry:
     return ogr_geom.Clone()
 
 
-def _geometry_wkt(ogr_geom):
+def _geometry_wkt(ogr_geom: ogr.Geometry) -> str:
     return ogr_geom.ExportToWkt()
 
 
-def _geometry_wkb(ogr_geom):
+def _geometry_wkb(ogr_geom: ogr.Geometry) -> bytearray:
     return ogr_geom.ExportToWkb(ogr.wkbNDR)
 
 
-def _get_integer(feat, fidx):
+def _get_integer(feat: ogr.Feature, fidx: int) -> int:
     return feat.GetFieldAsInteger(fidx)
 
 
-def _get_integer_list(feat, fidx):
+def _get_integer_list(feat: ogr.Feature, fidx: int) -> list[int]:
     return feat.GetFieldAsIntegerList(fidx)
 
 
-def _get_integer64(feat, fidx):
+def _get_integer64(feat: ogr.Feature, fidx: int) -> int:
     return feat.GetFieldAsInteger64(fidx)
 
 
-def _get_integer64_list(feat, fidx):
+def _get_integer64_list(feat: ogr.Feature, fidx: int) -> list[int]:
     return feat.GetFieldAsInteger64List(fidx)
 
 
-def _get_real(feat, fidx):
+def _get_real(feat: ogr.Feature, fidx: int) -> float:
     return feat.GetFieldAsDouble(fidx)
 
 
-def _get_real_list(feat, fidx):
+def _get_real_list(feat: ogr.Feature, fidx: int) -> list[float]:
     return feat.GetFieldAsDoubleList(fidx)
 
 
-def _get_string(feat, fidx):
+def _get_string(feat: ogr.Feature, fidx: int) -> str:
     return feat.GetFieldAsString(fidx)
 
 
-def _get_string_list(feat, fidx):
+def _get_string_list(feat: ogr.Feature, fidx: int) -> list[str]:
     return feat.GetFieldAsStringList(fidx)
 
 
-def _get_date(feat, fidx):
+def _get_date(feat: ogr.Feature, fidx: int) -> date:
     return date(*feat.GetFieldAsDateTime(fidx)[0:3])
 
 
-def _get_time(feat, fidx):
+def _get_time(feat: ogr.Feature, fidx: int) -> time:
     hour, minute, sec = feat.GetFieldAsDateTime(fidx)[3:6]
     sec_int = int(sec)
     msec = int((sec - sec_int) * 1000)
     return time(hour, minute, sec_int, msec)
 
 
-def _get_datetime(feat, fidx):
+def _get_datetime(feat: ogr.Feature, fidx: int) -> datetime:
     year, month, day, hour, minute, sec = feat.GetFieldAsDateTime(fidx)[0:6]
     sec_int = int(sec)
     msec = int((sec - sec_int) * 1000)

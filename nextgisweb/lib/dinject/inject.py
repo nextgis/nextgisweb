@@ -33,8 +33,8 @@ class Injector[C: Container]:
         return None
 
     def _wrap[T: Callable](self, func: T) -> T:
-        new_params = list()
-        inj_params = list()
+        new_params = []
+        inj_params = []
         sig = signature(func, eval_str=True)
         for name, p in sig.parameters.items():
             if p.kind != p.KEYWORD_ONLY:
@@ -119,7 +119,7 @@ class inject_wrapper:
         update_wrapper(self, func)
         self.__signature__ = signature
 
-        self._inj_values = dict()
+        self._inj_values = {}
         self._bound_args = {arg.name: arg for arg in iargs}
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
