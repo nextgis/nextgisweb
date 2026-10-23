@@ -1,12 +1,13 @@
 import type { ViewOptions } from "ol/View";
 import { get as getProjection } from "ol/proj";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
 import { prepareBaselayerConfig } from "@nextgisweb/basemap/util/baselayer";
 import { useObjectState } from "@nextgisweb/gui/hook";
 import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
-import type { MapExtent, MapStore } from "@nextgisweb/webmap/ol/MapStore";
+import type { MapExtent } from "@nextgisweb/webmap/map-adapter";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { ExtentWSEN } from "@nextgisweb/webmap/type/api";
 
 import { createMapAdapter } from "../util/createMapAdapter";
@@ -18,6 +19,7 @@ export interface MapProps extends ViewOptions {
   basemap?: boolean;
   mapStore?: MapStore;
   mapExtent?: MapExtent;
+  allowMapModeChange?: boolean;
 }
 
 export function useMapAdapter({
@@ -29,6 +31,7 @@ export function useMapAdapter({
   maxZoom,
   mapStore: mapStoreProp,
   mapExtent: mapExtentProp,
+  allowMapModeChange = true,
   ...restViewOptions
 }: MapProps) {
   const [center] = useObjectState(centerProp);
@@ -47,18 +50,30 @@ export function useMapAdapter({
     );
   }, [mapExtent, mapSRSId]);
 
-  const mapStore = useMemo(() => {
-    if (mapStoreProp) {
-      return mapStoreProp;
-    } else {
-      return createMapAdapter({
+  const mapStoreRef = useRef<MapStore>(null);
+  let mapStore = mapStoreProp;
+  if (!mapStore) {
+    if (!mapStoreRef.current) {
+      mapStoreRef.current = createMapAdapter({
         viewOptions: {
           projection: `EPSG:${mapSRSId}`,
           ...viewOptions,
         },
+        initialView: {
+          center,
+          zoom,
+          minZoom,
+          maxZoom,
+          extent: effectiveExtent,
+        },
       });
     }
-  }, [mapSRSId, mapStoreProp, viewOptions]);
+    mapStore = mapStoreRef.current;
+  }
+
+  useEffect(() => {
+    mapStore.setMapModeOptions({ allowMapModeChange });
+  }, [mapStore, allowMapModeChange]);
 
   const basemaps = useMemo(() => {
     if (!basemap) return [];
@@ -69,42 +84,10 @@ export function useMapAdapter({
   useBaselayers({ mapStore, basemaps });
 
   useEffect(() => {
-    return () => {
-      if (!mapStoreProp && mapStore?.olMap) {
-        mapStore.detach();
-      }
-    };
-  }, [mapStore, mapStoreProp]);
-
-  const setView = useCallback((): void => {
-    if (!mapStore.olMap) return;
-
-    const curView = mapStore.olMap.getView();
-
-    if (minZoom !== undefined) {
-      curView.setMinZoom(minZoom);
-    }
-    if (maxZoom !== undefined) {
-      curView.setMaxZoom(maxZoom);
-    }
-
-    if (effectiveExtent) {
-      mapStore.fitNGWExtent(effectiveExtent);
-    } else {
-      if (center) {
-        curView.setCenter(center);
-      }
-      if (zoom !== undefined) {
-        curView.setZoom(zoom);
-      }
-    }
-  }, [mapStore, center, zoom, minZoom, maxZoom, effectiveExtent]);
-
-  useEffect(() => {
     if (mapStore.started) {
-      setView();
+      mapStore.setViewOptions({ minZoom, maxZoom });
     }
-  }, [mapStore.started, setView]);
+  }, [mapStore, mapStore.adapter, mapStore.started, minZoom, maxZoom]);
 
   return { mapStore };
 }

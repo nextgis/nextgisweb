@@ -1,6 +1,5 @@
 import { action, computed, observableRef } from "mobx";
 
-import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
 import { assert } from "@nextgisweb/jsrealm/error";
@@ -15,6 +14,7 @@ import type {
   TMSLayerRead,
   TMSLayerUpdate,
 } from "@nextgisweb/tmsclient/type/api";
+import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/webmap/map-adapter/constant";
 
 type MapperLayerCreate = NullableProps<
   TMSLayerCreate,

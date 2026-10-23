@@ -56,6 +56,7 @@ export function StyleResourceEditorModal({
           maxScaleDenom: newItemConfig.maxScaleDenom,
           plugin: newItemConfig.plugin,
         });
+        display.reloadLayer(nodeData);
         display.treeStore.updateResourceLegendSymbols([id]);
       });
     }

@@ -19,6 +19,7 @@ export abstract class PluginBase<T extends TreeItemStore = TreeLayerStore> {
   type: TreeItemType = "layer";
 
   run?(nodeData: T, options?: PluginRunOptions): Promise<boolean | undefined>;
+  isEnabled?: (display: Display) => boolean;
   getMenuItem?(nodeData: T, options?: PluginRunOptions): PluginMenuItem;
   render?(params: PluginState<T>): ReactNode;
   renderMap?: ComponentType<{ display: Display; identity: string }>;

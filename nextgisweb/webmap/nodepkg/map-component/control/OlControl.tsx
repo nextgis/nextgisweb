@@ -1,3 +1,4 @@
+import type OlMap from "ol/Map";
 import type Control from "ol/control/Control";
 import { useEffect } from "react";
 
@@ -7,36 +8,46 @@ import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import { useMapControl } from "../hook/useMapControl";
 
 export interface OlControlProps<T extends Control> {
-  ctor: (map: MapStore) => T | Promise<T>;
+  olMap: OlMap;
   position?: TargetPosition;
   order?: number;
+  ctor: (map: MapStore) => T | Promise<T>;
 }
 
-export default function OlControl<T extends Control>({
-  ctor,
+function OlControl<T extends Control>({
+  olMap,
   order,
   position,
+  ctor,
 }: OlControlProps<T>) {
-  const { setInstance, context } = useMapControl({ position, order });
+  const { element, context } = useMapControl({ position, order });
 
   useEffect(() => {
     let ctrl: T | undefined = undefined;
+    let canceled = false;
     const map = context.mapStore;
-    if (map) {
-      async function setupControl(map_: MapStore) {
-        ctrl = await ctor(map_);
-        setInstance(ctrl);
+
+    async function setupControl() {
+      const control = await ctor(map);
+      if (canceled) {
+        control.dispose();
+        return;
       }
-      setupControl(map);
+      ctrl = control;
+      control.setTarget(element);
+      olMap.addControl(control);
     }
+    setupControl();
 
     return () => {
-      if (ctrl && context.mapStore) {
-        context.mapStore.olMap.removeControl(ctrl);
-        setInstance(null);
+      canceled = true;
+      if (ctrl) {
+        olMap.removeControl(ctrl);
       }
     };
-  }, [ctor, context.mapStore, setInstance]);
+  }, [ctor, context.mapStore, element, olMap]);
 
   return null;
 }
+
+export default OlControl;

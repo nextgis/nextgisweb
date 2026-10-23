@@ -5,10 +5,10 @@ import type { Options as ImageWMSOptions } from "ol/source/ImageWMS";
 
 import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
 
-import { CoreLayer } from "./CoreLayer";
-import type { LayerOptions } from "./CoreLayer";
+import { OlLayerAdapter } from "./OlLayerAdapter";
+import type { LayerOptions } from "./OlLayerAdapter";
 
-export default class Image extends CoreLayer<
+export default class Image extends OlLayerAdapter<
   ImageWMS,
   ImageLayer<ImageWMS>,
   ImageWMSOptions

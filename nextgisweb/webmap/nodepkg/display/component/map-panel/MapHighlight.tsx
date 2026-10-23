@@ -1,31 +1,26 @@
 import { observer } from "mobx-react-lite";
 import { Feature } from "ol";
 import type { Geometry } from "ol/geom";
-import type VectorSource from "ol/source/Vector";
-import { Circle, Stroke, Style } from "ol/style";
-import type { StyleLike } from "ol/style/Style";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useCssVariable } from "@nextgisweb/gui/hook";
 import type { HighlightStore } from "@nextgisweb/webmap/highlight-store";
 import type { HighlightEvent } from "@nextgisweb/webmap/highlight-store/HighlightStore";
+import type { GeoJsonLayerDefinition } from "@nextgisweb/webmap/layer-adapter";
+import { useMapLayer } from "@nextgisweb/webmap/map-component/hook/useMapLayer";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
-import Vector from "@nextgisweb/webmap/ol/layer/Vector";
-
-import { createTargetSymbolStyle } from "./targetSymbolStyle";
 
 type Props = {
   mapStore: MapStore;
   highlightStore: HighlightStore;
 };
 
-function toOlFeature(e: HighlightEvent, style: StyleLike): Feature<Geometry> {
+function toOlFeature(e: HighlightEvent): Feature<Geometry> {
   const feature = new Feature<Geometry>({
     geometry: e.geom,
     layerId: e.layerId,
     featureId: e.featureId,
   });
-  feature.setStyle(style);
   return feature;
 }
 
@@ -33,53 +28,50 @@ export const MapHighlight = observer(function MapHighlight({
   mapStore,
   highlightStore,
 }: Props) {
-  const overlayRef = useRef<Vector | null>(null);
-  const sourceRef = useRef<VectorSource | null>(null);
-
   const strokeColor = useCssVariable({
     name: "--ngw-webmap-selection-color",
     defaultValue: "rgba(255,255,0,1)",
   });
 
-  useEffect(() => {
-    const layer = new Vector("highlight", {
-      title: "Highlight Overlay",
-      isTopLayer: true,
-    });
-
-    const source = layer.olLayer.getSource();
-    if (!source) return;
-
-    overlayRef.current = layer;
-    sourceRef.current = source;
-
-    mapStore.addLayer(layer);
-
-    return () => {
-      if (layer) {
-        mapStore.removeLayer(layer);
-      }
-    };
-  }, [mapStore]);
+  const layerDefinition = useMemo<GeoJsonLayerDefinition>(
+    () => ({
+      type: "geojson",
+      options: {
+        name: "highlight",
+        title: "Highlight Overlay",
+        isTopLayer: true,
+        target: true,
+        featureProjection: mapStore.displayProjection,
+      },
+    }),
+    [mapStore]
+  );
+  const layer = useMapLayer(mapStore, layerDefinition);
 
   useEffect(() => {
-    const hlStroke = new Stroke({ width: 3, color: strokeColor });
-    const hlStyle = new Style({
-      stroke: hlStroke,
-      image: new Circle({ stroke: hlStroke, radius: 5 }),
+    const stroke = { color: strokeColor, width: 3 };
+    layer?.setStyle({
+      rules: [
+        {
+          symbolizers: [
+            {
+              type: "point",
+              graphic: {
+                size: 10,
+                mark: { well_known_name: "circle", stroke },
+              },
+            },
+            { type: "line", stroke },
+            { type: "polygon", stroke },
+          ],
+        },
+      ],
     });
+  }, [layer, strokeColor]);
 
-    const style = createTargetSymbolStyle(hlStyle, strokeColor);
-
-    const source = sourceRef.current;
-    if (!source) return;
-    source.clear();
-
-    for (const e of highlightStore.highlighted) {
-      const feature = toOlFeature(e, style);
-      source.addFeature(feature);
-    }
-  }, [highlightStore.highlighted, strokeColor]);
+  useEffect(() => {
+    layer?.setFeatures(highlightStore.highlighted.map(toOlFeature));
+  }, [layer, highlightStore.highlighted]);
 
   return null;
 });

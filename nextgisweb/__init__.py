@@ -51,6 +51,7 @@ def pkginfo():
         "render",
         "svg_marker_library",
         "webmap",
+        "viewport_3d",
         "file_storage",
         "vector_layer",
         "lookup_table",

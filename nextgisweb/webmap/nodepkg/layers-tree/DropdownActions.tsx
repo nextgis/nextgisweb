@@ -106,10 +106,9 @@ export function DropdownActions(props: DropdownActionsProps) {
 
     try {
       setIsLoading(true);
-      const plugins = await display.installPlugins(
-        Object.keys(nodeData.plugin)
-      );
+      await display.installPlugins(Object.keys(nodeData.plugin));
       if (canceledRef.current) return;
+      const plugins = display.availablePlugins;
 
       const newMenuItems: (NonNullable<MenuProps["items"]>[number] & {
         order?: number;

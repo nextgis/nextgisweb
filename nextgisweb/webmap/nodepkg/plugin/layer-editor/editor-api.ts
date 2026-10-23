@@ -165,7 +165,7 @@ export async function saveChanges({
 
   await patchFeaturesOnServer({ resourceId, features });
 
-  display.map.getLayer(item.id)?.reload();
+  display.reloadLayer(item);
 
   topic.publish("/webmap/feature-table/refresh", item.layerId);
 }

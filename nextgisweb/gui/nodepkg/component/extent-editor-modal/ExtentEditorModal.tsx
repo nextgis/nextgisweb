@@ -5,18 +5,18 @@ import { get as getProjection, transformExtent } from "ol/proj";
 import VectorSource from "ol/source/Vector";
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  DEFAULT_PADDING,
-  DEFAULT_SRS,
-} from "@nextgisweb/feature-layer/geometry-editor/constant";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import {
   clampExtent,
   convertWSENToNgwExtent,
 } from "@nextgisweb/gui/util/extent";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { MapExtent } from "@nextgisweb/webmap/map-adapter";
+import {
+  DEFAULT_EXTENT_SRS,
+  DEFAULT_FIT_PADDING,
+} from "@nextgisweb/webmap/map-adapter/constant";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
-import type { MapExtent } from "@nextgisweb/webmap/ol/MapStore";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 import type { ExtentWSEN } from "@nextgisweb/webmap/type/api";
 import { normalizeExtent } from "@nextgisweb/webmap/utils/normalizeExtent";
@@ -103,8 +103,8 @@ export function ExtentEditorModal({
     if (initialOlExtent) {
       return {
         extent: convertWSENToNgwExtent(initialOlExtent),
-        padding: DEFAULT_PADDING,
-        srs: DEFAULT_SRS,
+        padding: DEFAULT_FIT_PADDING,
+        srs: DEFAULT_EXTENT_SRS,
       };
     }
 
@@ -139,6 +139,7 @@ export function ExtentEditorModal({
       <PreviewMap
         style={{ height: "60vh", width: "60vw" }}
         basemap
+        allowMapModeChange={false}
         initialMapExtent={initialMapExtent}
         multiWorld={false}
         extent={projExtent}

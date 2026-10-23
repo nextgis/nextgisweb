@@ -1,0 +1,10 @@
+{
+  "name": "@nextgisweb/viewport-3d",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@giro3d/giro3d": "2.0.4",
+    "@types/three": "~0.180.0",
+    "three": "~0.180.0"
+  }
+}
