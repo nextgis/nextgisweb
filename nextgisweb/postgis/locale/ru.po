@@ -409,3 +409,95 @@ msgstr "Диагностика"
 #: view.py:47
 msgid "PostGIS diagnostics"
 msgstr "Диагностика PostGIS"
+
+#: model.py
+msgid "WHERE expression uses functions that are not allowed: %(functions)s"
+msgstr "Выражение WHERE использует недопустимые функции: %(functions)s"
+
+#: model.py
+msgid "WHERE function name must be a string!"
+msgstr "Имя функции WHERE должно быть строкой!"
+
+#: model.py
+msgid "Invalid WHERE function name: %(name)s"
+msgstr "Недопустимое имя функции WHERE: %(name)s"
+
+#: model.py
+msgid "Cannot remove WHERE functions used by layers: %(functions)s"
+msgstr "Невозможно удалить функции WHERE, используемые слоями: %(functions)s"
+
+#: model.py
+msgid "WHERE expression uses operators that are not allowed: %(operators)s"
+msgstr "Выражение WHERE использует недопустимые операторы: %(operators)s"
+
+#: model.py
+msgid "WHERE operator name must be a string!"
+msgstr "Имя оператора WHERE должно быть строкой!"
+
+#: model.py
+msgid "Invalid WHERE operator name: %(name)s"
+msgstr "Недопустимое имя оператора WHERE: %(name)s"
+
+#: model.py
+msgid "Cannot remove WHERE operators used by layers: %(operators)s"
+msgstr "Невозможно удалить операторы WHERE, используемые слоями: %(operators)s"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx
+msgid "Additional WHERE functions"
+msgstr "Дополнительные функции WHERE"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx
+msgid "Function name"
+msgstr "Имя функции"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx
+msgid "Additional WHERE operators"
+msgstr "Дополнительные операторы WHERE"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx
+msgid "Operator name"
+msgstr "Имя оператора"
+
+#: nodepkg/layer-widget/LayerWidget.tsx
+msgid "Filter expression (WHERE)"
+msgstr "Выражение фильтрации (WHERE)"
+
+#: where.py
+msgid "Node '{}' is not allowed in the WHERE expression."
+msgstr "Узел '{}' не допускается в выражении WHERE."
+
+#: where.py
+msgid "Operator '{}' is not allowed in the WHERE expression."
+msgstr "Оператор '{}' не допускается в выражении WHERE."
+
+#: where.py
+msgid "Table columns in the WHERE expression must be prefixed with 'src.'."
+msgstr "Имена столбцов в выражении WHERE должны начинаться с префикса 'src.'."
+
+#: where.py
+msgid "Aggregate and window functions are not allowed in the WHERE expression."
+msgstr "Агрегатные и оконные функции не допускаются в выражении WHERE."
+
+#: where.py
+msgid "Function '{}' is not allowed in the WHERE expression."
+msgstr "Функция '{}' не допускается в выражении WHERE."
+
+#: where.py
+msgid "WHERE expression is empty."
+msgstr "Выражение WHERE пусто."
+
+#: where.py
+msgid "WHERE expression is too long, maximum length is {} characters."
+msgstr "Выражение WHERE слишком длинное, максимальная длина — {} символов."
+
+#: where.py
+msgid "Comments are not allowed in the WHERE expression."
+msgstr "Комментарии не допускаются в выражении WHERE."
+
+#: where.py
+msgid "Invalid WHERE expression."
+msgstr "Некорректное выражение WHERE."
+
+#: where.py
+msgid "Only a single WHERE expression is allowed."
+msgstr "Допускается только одно выражение WHERE."

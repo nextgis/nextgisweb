@@ -16,7 +16,7 @@ from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import Base, gettext
+from nextgisweb.env import Base, DBSession, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
@@ -60,6 +60,13 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from . import aggregation as postgis_aggregation
 from .exception import ExternalDatabaseError
+from .where import (
+    DEFAULT_WHERE_FUNCTIONS,
+    DEFAULT_WHERE_OPERATORS,
+    WHERE_FUNCTION_NAME_RE,
+    WHERE_OPERATOR_NAME_RE,
+    validate_where_expression,
+)
 
 Base.depends_on("resource", "feature_layer")
 
@@ -108,18 +115,32 @@ class DBConnection:
         return self._conn.commit(*args, **kwargs)
 
 
-def calculate_extent(layer, where=None, geomcol=None):
-    tab = layer._sa_table(True)
+def _where_clause(layer) -> sa.ColumnElement[bool] | None:
+    expression = layer.where_expression
+    if expression is None:
+        return None
 
-    # ty: ignore[invalid-argument-type]
-    where_geom_exist = not (where is None and geomcol is None) and len(where) > 0
-    geomcol = geomcol if where_geom_exist else tab.columns[layer.column_geom]
+    layer.validate_where()
+    return sa.literal_column(f"({expression})", type_=sa.Boolean)
+
+
+def calculate_extent(layer, where=None, geomcol=None):
+    tab = alias(layer._sa_table(True), name="src")
+
+    if where is None:
+        where = []
+        if (clause := _where_clause(layer)) is not None:
+            where.append(clause)
+
+    if geomcol is None:
+        geomcol = tab.columns[layer.column_geom]
+
+    has_where = len(where) > 0
 
     # TODO: Why do we use ST_SetSRID(ST_Force2D(...), ...) here?
     extent_fn = st_extent(st_transform(st_setsrid(st_force2d(geomcol), layer.geometry_srid), 4326))
 
-    if where_geom_exist:
-        # ty: ignore[not-iterable]
+    if has_where:
         bbox = sql.select(extent_fn).where(sql_and(True, *where)).label("bbox")
     else:
         bbox = extent_fn.label("bbox")
@@ -183,6 +204,8 @@ class PostgisConnection(Resource):
     port: Mapped[int | None] = mapped_column(sa.Integer)
     sslmode: Mapped[SSLMode | None] = mapped_column(saext.Enum(SSLMode))
     user_context: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    where_functions: Mapped[list[str] | None] = mapped_column(JSONB, default=list)
+    where_operators: Mapped[list[str] | None] = mapped_column(JSONB, default=list)
 
     @classmethod
     def check_parent(cls, parent):
@@ -276,6 +299,76 @@ class SSLModeAttr(SColumn):
     ctypes = CRUTypes(SSLMode | None, SSLMode | None, SSLMode | None)
 
 
+class WhereNamesAttr(SAttribute):
+    ctypes = CRUTypes(list[str] | None, list[str], list[str] | None)
+
+    field: ClassVar[str]
+    defaults: ClassVar[frozenset[str]]
+    pattern: ClassVar[re.Pattern[str]]
+    lowercase: ClassVar[bool]
+    msg_not_string: ClassVar[str]
+    msg_invalid_name: ClassVar[str]
+    msg_removed: ClassVar[str]
+    removed_key: ClassVar[str]
+
+    @classmethod
+    def _normalize(cls, value: list[str] | None) -> list[str]:
+        result: set[str] = set()
+        for item in value or ():
+            if not isinstance(item, str):
+                raise ValidationError(gettext(cls.msg_not_string))
+            name = item.strip().lower() if cls.lowercase else item.strip().upper()
+            if not name:
+                continue
+            if not cls.pattern.fullmatch(name):
+                raise ValidationError(gettext(cls.msg_invalid_name) % dict(name=item))
+            result.add(name)
+        return sorted(result)
+
+    def set(self, srlzr: Serializer, value: list[str] | None, *, create: bool):
+        value = self._normalize(value)
+
+        if not create:
+            column = getattr(PostgisLayer, self.field)
+            stmt = (
+                select(column)
+                .where(PostgisLayer.connection_id == srlzr.obj.id)
+                .where(column.isnot(None))
+            )
+            used: set[str] = set()
+            for names in DBSession.execute(stmt).scalars():
+                used.update(names or ())
+            used -= self.defaults
+            if removed := sorted(used - set(value)):
+                raise ValidationError(
+                    gettext(self.msg_removed) % {self.removed_key: ", ".join(removed)}
+                )
+
+        setattr(srlzr.obj, self.field, value)
+
+
+class WhereFunctionsAttr(WhereNamesAttr):
+    field = "where_functions"
+    defaults = DEFAULT_WHERE_FUNCTIONS
+    pattern = WHERE_FUNCTION_NAME_RE
+    lowercase = True
+    msg_not_string = "WHERE function name must be a string!"
+    msg_invalid_name = "Invalid WHERE function name: %(name)s"
+    msg_removed = "Cannot remove WHERE functions used by layers: %(functions)s"
+    removed_key = "functions"
+
+
+class WhereOperatorsAttr(WhereNamesAttr):
+    field = "where_operators"
+    defaults = DEFAULT_WHERE_OPERATORS
+    pattern = WHERE_OPERATOR_NAME_RE
+    lowercase = False
+    msg_not_string = "WHERE operator name must be a string!"
+    msg_invalid_name = "Invalid WHERE operator name: %(name)s"
+    msg_removed = "Cannot remove WHERE operators used by layers: %(operators)s"
+    removed_key = "operators"
+
+
 class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
     hostname = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     port = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -284,6 +377,8 @@ class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     database = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     user_context = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    where_functions = WhereFunctionsAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    where_operators = WhereOperatorsAttr(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 class PostgisLayerField(LayerField):
@@ -309,6 +404,9 @@ class PostgisLayer(FeatureLayerWritableMixin, Resource):
     column_id: Mapped[str] = mapped_column(sa.Unicode)
     column_geom: Mapped[str] = mapped_column(sa.Unicode)
     geometry_srid: Mapped[int] = mapped_column(sa.Integer)
+    where_expression: Mapped[str | None] = mapped_column(sa.Text)
+    where_functions: Mapped[list[str] | None] = mapped_column(JSONB)
+    where_operators: Mapped[list[str] | None] = mapped_column(JSONB)
 
     __field_class__ = PostgisLayerField
 
@@ -320,6 +418,38 @@ class PostgisLayer(FeatureLayerWritableMixin, Resource):
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
+
+    def allowed_where_functions(self) -> frozenset[str]:
+        extra = self.connection.where_functions if self.connection is not None else ()
+        return DEFAULT_WHERE_FUNCTIONS | frozenset(extra or ())
+
+    def allowed_where_operators(self) -> frozenset[str]:
+        extra = self.connection.where_operators if self.connection is not None else ()
+        return DEFAULT_WHERE_OPERATORS | frozenset(extra or ())
+
+    def validate_where(self):
+        """Check the stored WHERE against the current connection's allowlists.
+
+        Re-run after a connection change, since SResource can replace the
+        connection without going through WhereExpressionAttr.set().
+        """
+        missing_functions = sorted(
+            set(self.where_functions or ()) - self.allowed_where_functions()
+        )
+        if missing_functions:
+            raise ValidationError(
+                gettext("WHERE expression uses functions that are not allowed: %(functions)s")
+                % dict(functions=", ".join(missing_functions))
+            )
+
+        missing_operators = sorted(
+            set(self.where_operators or ()) - self.allowed_where_operators()
+        )
+        if missing_operators:
+            raise ValidationError(
+                gettext("WHERE expression uses operators that are not allowed: %(operators)s")
+                % dict(operators=", ".join(missing_operators))
+            )
 
     @contextmanager
     def connect(self, tx=False, *, user: User | None = None):
@@ -640,6 +770,27 @@ class FieldsAttr(SAttribute):
                 raise ForbiddenError()
 
 
+class WhereExpressionAttr(SAttribute):
+    ctypes = CRUTypes(str | None, str | None, str | None)
+
+    def set(self, srlzr: Serializer, value: str | None, *, create: bool):
+        value = value.strip() if value is not None else None
+        if not value:
+            srlzr.obj.where_expression = None
+            srlzr.obj.where_functions = None
+            srlzr.obj.where_operators = None
+            return
+
+        validated = validate_where_expression(
+            value,
+            srlzr.obj.allowed_where_functions(),
+            srlzr.obj.allowed_where_operators(),
+        )
+        srlzr.obj.where_expression = validated.expression
+        srlzr.obj.where_functions = list(validated.functions) or None
+        srlzr.obj.where_operators = list(validated.operators) or None
+
+
 class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     schema = SColumn(read=ResourceScope.read, write=ResourceScope.update)
@@ -649,8 +800,19 @@ class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
     geometry_srid = GeometrySridAttr(read=ResourceScope.read, write=ResourceScope.update)
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
+    where_expression = WhereExpressionAttr(read=ResourceScope.read, write=ResourceScope.update)
 
     fields = FieldsAttr(read=None, write=ResourceScope.update)
+
+    def deserialize(self):
+        super().deserialize()
+        # SResource may replace the connection without re-running
+        # WhereExpressionAttr.set(), so recheck the stored WHERE here.
+        try:
+            self.obj.validate_where()
+        except ValidationError as exc:
+            exc.data["attribute"] = "where_expression"
+            raise
 
 
 @implementer(
@@ -714,7 +876,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def build_query_context(self):
         """Return (tab, col_map, where) for use in feature query and aggregation."""
-        tab = alias(self.layer._sa_table(True), name="tab")
+        tab = alias(self.layer._sa_table(True), name="src")
 
         idcol = tab.columns[self.layer.column_id]
         geomcol = tab.columns[self.layer.column_geom]
@@ -724,6 +886,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             col_map[field.keyname] = tab.columns[field.column_name]
 
         where: list[sa.ColumnElement[bool]] = [idcol.isnot(None)]
+
+        if (clause := _where_clause(self.layer)) is not None:
+            where.append(clause)
 
         if self._filter_program is not None:
             virtual_operands_mapping = {"fid": idcol}

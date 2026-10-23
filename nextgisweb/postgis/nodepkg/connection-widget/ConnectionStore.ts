@@ -12,6 +12,8 @@ const {
   password,
   database,
   user_context,
+  where_functions: whereFunctions,
+  where_operators: whereOperators,
   $load: load,
   $error: error,
   $dirty: dirty,
@@ -34,6 +36,8 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
   readonly password = password.init("", this);
   readonly database = database.init("", this);
   readonly user_context = user_context.init(false, this);
+  readonly whereFunctions = whereFunctions.init([], this);
+  readonly whereOperators = whereOperators.init([], this);
 
   @observableRef accessor validate = false;
 
@@ -52,6 +56,8 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
       ...this.password.jsonPart(),
       ...this.database.jsonPart(),
       ...this.user_context.jsonPart(),
+      ...this.whereFunctions.jsonPart(),
+      ...this.whereOperators.jsonPart(),
     };
   }
 

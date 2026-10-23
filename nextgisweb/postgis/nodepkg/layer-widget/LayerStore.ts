@@ -20,6 +20,7 @@ interface Value {
   column_geom: string;
   geometry_type: string | null;
   geometry_srid: number | null;
+  where_expression: string | null;
   fields: "keep" | "update";
 }
 
@@ -31,6 +32,7 @@ const {
   column_geom: columnGeom,
   geometry_type: geometryType,
   geometry_srid: geometrySrid,
+  where_expression: whereExpression,
   fields: fields,
   $load: load,
   $error: error,
@@ -61,6 +63,7 @@ export class LayerStore implements EditorStore<Value> {
   readonly columnGeom = columnGeom.init("", this);
   readonly geometryType = geometryType.init(null, this);
   readonly geometrySrid = geometrySrid.init(null, this);
+  readonly whereExpression = whereExpression.init(null, this);
   readonly fields = fields.init("update", this);
 
   @observableRef accessor dirty = false;
@@ -87,6 +90,7 @@ export class LayerStore implements EditorStore<Value> {
       ...this.columnGeom.jsonPart(),
       ...this.geometryType.jsonPart(),
       ...this.geometrySrid.jsonPart(),
+      ...this.whereExpression.jsonPart(),
       ...this.fields.jsonPart(),
       ...(this.composite.operation === "create"
         ? { srs: srsSettings.default }

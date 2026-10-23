@@ -2,7 +2,8 @@ import { uniq } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import { InputNumber, Select } from "@nextgisweb/gui/antd";
+import { Input, InputNumber, Select } from "@nextgisweb/gui/antd";
+import type { TextAreaProps } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { AutoCompleteInput } from "@nextgisweb/gui/component";
 import { Area } from "@nextgisweb/gui/mayout";
@@ -23,6 +24,7 @@ const msgAutodetect = gettext("Autodetect");
 const msgGeometryType = gettext("Geometry type");
 const msgSrid = gettext("SRID");
 const msgFields = gettext("Fields");
+const msgWhereExpression = gettext("Filter expression (WHERE)");
 
 async function inspConFetch([conId]: [number], opts: { signal: AbortSignal }) {
   const data = await route("postgis.connection.inspect", conId).get({
@@ -77,6 +79,21 @@ const geometryTypeOptions = [
   { value: "MULTILINESTRINGZ", label: gettext("Multiline Z") },
   { value: "MULTIPOLYGONZ", label: gettext("Multipolygon Z") },
 ];
+
+const TextAreaValue = ({
+  value,
+  onChange,
+  ...props
+}: Omit<TextAreaProps, "value" | "onChange"> & {
+  value?: string | null;
+  onChange?: (value: string) => void;
+}) => (
+  <Input.TextArea
+    value={value ?? ""}
+    onChange={(evt) => onChange?.(evt.target.value)}
+    {...props}
+  />
+);
 
 const fieldsOptions = [
   { value: "keep", label: gettext("Keep existing definitions untouched") },
@@ -205,6 +222,13 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
           placeholder: msgAutodetect,
           style: { width: "100%" },
         }}
+      />
+      <LotMV
+        row
+        label={msgWhereExpression}
+        value={store.whereExpression}
+        component={TextAreaValue}
+        props={{ rows: 2, placeholder: "src.column > 0" }}
       />
       <LotMV
         row

@@ -83,6 +83,30 @@ export const ConnectionWidget: EditorWidget<ConnectionStore> = observer(
         />
         <LotMV
           row
+          label={gettext("Additional WHERE functions")}
+          value={store.whereFunctions}
+          component={Select}
+          props={{
+            mode: "tags",
+            placeholder: gettext("Function name"),
+            tokenSeparators: [",", " "],
+            style: { width: "100%" },
+          }}
+        />
+        <LotMV
+          row
+          label={gettext("Additional WHERE operators")}
+          value={store.whereOperators}
+          component={Select}
+          props={{
+            mode: "tags",
+            placeholder: gettext("Operator name"),
+            tokenSeparators: [",", " "],
+            style: { width: "100%" },
+          }}
+        />
+        <LotMV
+          row
           label={false}
           value={store.user_context}
           props={{
