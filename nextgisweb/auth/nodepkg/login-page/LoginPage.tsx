@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import { LoginBox } from "../login";
-import type { LoginFormProps } from "../login/type";
+import type { LoginFormProps } from "../login";
 import { authStore } from "../store";
 
 export function LoginPage(props: LoginFormProps) {

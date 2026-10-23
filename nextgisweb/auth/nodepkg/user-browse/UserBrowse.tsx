@@ -6,13 +6,15 @@ import { Alert, Tooltip } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
-import type { ControlProps } from "@nextgisweb/gui/model-browse/ModelBrowse";
+import type {
+  ControlProps,
+  ModalBrowseData,
+} from "@nextgisweb/gui/model-browse";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import { makeTeamManageButton, default as oauth } from "../oauth";
 
-import { ToggleSelectedUsers } from "./component/ToggleSelectedUsers";
-import type { UserBrowseData } from "./type";
+import { ToggleSelectedUsers } from "./ToggleSelectedUsers";
 
 type Col = NonNullable<TableProps["columns"]>[0];
 
@@ -105,6 +107,11 @@ const columns: TableProps["columns"] = [
   createLastActivityColumn(),
   createStatusColumn(),
 ];
+
+export interface UserBrowseData extends ModalBrowseData {
+  disabled?: boolean;
+  system?: boolean;
+}
 
 export function UserBrowse({ readonly }: UserBrowseProps) {
   const DisableSelectedUsers = (props: ControlProps<UserBrowseData>) => {

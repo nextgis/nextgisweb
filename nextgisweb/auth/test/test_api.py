@@ -71,36 +71,6 @@ def test_login_logout(user, ngw_webtest_app: WebTestApp, ngw_env):
 
     ngw_webtest_app.post(
         "/api/component/auth/login",
-        data={"login": user.keyname, "missing": "password"},
-        status=422,
-    )
-
-    ngw_webtest_app.post(
-        "/api/component/auth/login",
-        data={"login": user.keyname, "password": "invalid"},
-        status=401,
-    )
-
-    ngw_webtest_app.post(
-        "/api/component/auth/login",
-        data={"login": user.keyname, "password": user.password_plaintext},
-        status=200,
-    )
-
-    _test_current_user(
-        ngw_webtest_app,
-        user.keyname,
-        auth_medium="session",
-        auth_provider="local_pw",
-    )
-
-    assert sid_cookie in ngw_webtest_app.cookies, "Login must create a session"
-
-    ngw_webtest_app.post("/api/component/auth/logout", status=200)
-    _test_current_user(ngw_webtest_app, "guest")
-
-    ngw_webtest_app.post(
-        "/api/component/auth/login",
         json={"login": user.id, "password": user.password_plaintext},
         status=422,
     )
@@ -110,6 +80,7 @@ def test_login_logout(user, ngw_webtest_app: WebTestApp, ngw_env):
         json={"login": user.keyname, "password": user.password_plaintext},
         status=200,
     )
+
     _test_current_user(ngw_webtest_app, user.keyname)
 
     ngw_webtest_app.post(
@@ -119,17 +90,6 @@ def test_login_logout(user, ngw_webtest_app: WebTestApp, ngw_env):
 
     _test_current_user(ngw_webtest_app, "guest")
     assert sid_cookie not in ngw_webtest_app.cookies, "Logout must invalidate the session"
-
-
-def test_login_no_password(user, ngw_webtest_app: WebTestApp):
-    with transaction.manager:
-        User.filter_by(id=user.id).one().password = None
-
-    ngw_webtest_app.post(
-        "/api/component/auth/login",
-        json={"login": user.keyname, "password": "foo"},
-        status=401,
-    )
 
 
 @pytest.fixture

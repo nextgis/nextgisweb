@@ -587,6 +587,11 @@ def current_user(
     return result
 
 
+class LoginBody(Struct, kw_only=True):
+    login: KeynameUser
+    password: str
+
+
 class LoginResponse(Struct, kw_only=True):
     id: UserID
     keyname: KeynameUser
@@ -594,28 +599,11 @@ class LoginResponse(Struct, kw_only=True):
     home_url: str | UnsetType = UNSET
 
 
-def login(request: Request) -> LoginResponse:
-    """Log in into session
-
-    Parameters `login` and `password` can be passed in a JSON encoded body or as
-    POST parameters (`application/x-www-form-urlencoded`).
-
-    :returns: Session created, returns user info and session token"""
-    if len(request.POST) > 0:
-        login = request.POST.get("login")
-        password = request.POST.get("password")
-    else:
-        json_body = request.json_body
-        if not isinstance(json_body, dict):
-            raise ValidationError()
-        login = json_body.get("login")
-        password = json_body.get("password")
-
-    if not isinstance(login, str) or not isinstance(password, str):
-        raise ValidationError()
+def login(request, *, body: LoginBody) -> LoginResponse:
+    """Log in into session"""
 
     policy = request.registry.getUtility(ISecurityPolicy)
-    user, headers, event = policy.login(login, password, request=request)
+    user, headers, event = policy.login(body.login, body.password, request=request)
     request.response.headerlist.extend(headers)
 
     result = LoginResponse(id=user.id, keyname=user.keyname, display_name=user.display_name)

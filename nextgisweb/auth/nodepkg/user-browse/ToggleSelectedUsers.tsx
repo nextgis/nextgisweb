@@ -6,7 +6,7 @@ import type { ControlProps } from "@nextgisweb/gui/model-browse/ModelBrowse";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { UserBrowseData } from "../type";
+import type { UserBrowseData } from "./UserBrowse";
 
 export const ToggleSelectedUsers = ({
   disable,

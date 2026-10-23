@@ -1,7 +1,7 @@
 import { ContentCard } from "@nextgisweb/gui/component";
 
 import { LoginForm } from "./LoginForm";
-import type { LoginFormProps } from "./type";
+import type { LoginFormProps } from "./LoginForm";
 
 export function LoginBox(props: LoginFormProps) {
   return (

@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
+import type { LoginBody } from "@nextgisweb/auth/type/api";
 import { Alert, Button, Form, Input } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -13,8 +14,6 @@ import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import oauth from "../oauth";
 import { authStore } from "../store";
 
-import type { Credentials, CredsOnChangeOptions, LoginFormProps } from "./type";
-
 import LoginIcon from "@nextgisweb/icon/material/login";
 
 import "./LoginForm.less";
@@ -26,17 +25,19 @@ const msgSignIn = gettext("Sign in");
 const isLoginLocation = location.pathname === routeURL("auth.login");
 const { contactAdministratorUrl } = pyramidSettings;
 
+export interface LoginFormProps {
+  onChange?: (creds: LoginBody | undefined) => void;
+  reloadAfterLogin?: boolean;
+}
+
 export const LoginForm = observer((props: LoginFormProps) => {
-  const [creds, setCreds] = useState<Credentials>({
-    login: "",
-    password: "",
-  });
+  const [creds, setCreds] = useState<LoginBody>({ login: "", password: "" });
 
   const form = Form.useForm()[0];
   const queryParams = new URLSearchParams(location.search);
   const nextQueryParam = queryParams.get("next");
 
-  const fields = useMemo<FormField<keyof Credentials>[]>(
+  const fields = useMemo<FormField<keyof LoginBody>[]>(
     () => [
       {
         name: "login",
@@ -57,6 +58,11 @@ export const LoginForm = observer((props: LoginFormProps) => {
       props.onChange(creds);
     }
   }, [creds, props]);
+
+  interface CredsOnChangeOptions {
+    value: LoginBody;
+    isValid: () => Promise<boolean>;
+  }
 
   const onChange = (e: CredsOnChangeOptions) => {
     setCreds((oldVal) => ({ ...oldVal, ...e.value }));
@@ -148,4 +154,4 @@ export const LoginForm = observer((props: LoginFormProps) => {
   );
 });
 
-// LoginForm.displayName = "LoginForm";
+LoginForm.displayName = "LoginForm";
