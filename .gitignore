@@ -6,6 +6,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+crates/**/target/
 *.egg-info
 build/
 dist/

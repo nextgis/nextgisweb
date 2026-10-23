@@ -65,6 +65,7 @@ requires = [
     "zope.sqlalchemy==4.1",
     "zope.interface==8.3",
     "zope.event==6.1",
+    "nextgisweb-mvt",
 ]
 
 extras_require = {
@@ -82,7 +83,7 @@ extras_require = {
         "ty",
         "types-lxml",
         "webtest",
-    ]
+    ],
 }
 
 entry_points = {

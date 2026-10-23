@@ -132,7 +132,7 @@ class MVTLink(ExternalAccessLink):
     @classmethod
     def is_applicable(cls, obj, request: Request) -> bool:
         return (
-            MVT_DRIVER_EXIST
+            (request.env.feature_layer.mvt_native or MVT_DRIVER_EXIST)
             and super().is_applicable(obj, request)
             and obj.geometry_type != GEOM_TYPE.NONE
         )

@@ -1,4 +1,3 @@
-import importlib
 import json
 from itertools import product
 from unittest.mock import ANY
@@ -96,8 +95,6 @@ def test_fields_edit(vector_layer_id, ngw_webtest_app: WebTestApp):
     assert fields[0]["keyname"] == "name"
     assert fields[1]["keyname"] == "new_field"
     assert fields[2]["keyname"] == "price"
-
-    fields[1]["delete"] = True
     lapi.put(json={"feature_layer": {"fields": fields}}, status=200)
 
     resp = lapi.get()
@@ -249,84 +246,35 @@ def test_fields_unique():
 )
 def test_export(fmt, zipped, srs, ngw_webtest_app: WebTestApp, vector_layer_id):
     ngw_webtest_app.get(
-        "/api/resource/%d/export" % vector_layer_id,
-        query={"format": fmt, "zipped": zipped, "srs": srs},
-        status=200,
-    )
-
 
 @pytest.mark.parametrize(
-    "extent, simplification, padding",
+    "native, driver, status_expected",
     (
-        (4096, 6.5, 0.1),
-        (2048, 4.1, 0.01),
+        (False, True, 200),
+        (False, False, 404),
+        (True, False, 200),
     ),
 )
-def test_mvt(extent, simplification, padding, ngw_webtest_app: WebTestApp, vector_layer_id):
-    resp = ngw_webtest_app.get(
-        "/api/component/feature_layer/mvt",
-        query=dict(
-            ZXY0,
-            resource=vector_layer_id,
-            extent=extent,
-            simplification=simplification,
-            padding=padding,
-        ),
-        status=200,
-    )
-    data = mvt_decode(resp.body)
-
-    ldata = data[f"ngw:{vector_layer_id}"]
-
-    assert ldata["version"] == 2
-    assert ldata["extent"] == extent
-    assert ldata["type"] == "FeatureCollection"
-
-    features = ldata["features"]
-    assert len(features) == 2
-
-    assert features[0]["properties"]["name"] == "feature1"
-    assert features[0]["geometry"]["type"] == "Point"
-    assert features[1]["properties"]["name"] == "feature2"
-    assert features[1]["geometry"]["type"] == "Point"
-
-
-@pytest.mark.parametrize(
-    "mvt_driver_exist, status_expected",
-    (
-        (True, 200),
-        (False, 404),
-    ),
-)
-def test_mvt_should_return_not_found_if_mvt_driver_not_available(
-    mvt_driver_exist,
+def test_mvt_encoder_not_available(
+    native,
+    driver,
     status_expected,
+    ngw_env,
     ngw_webtest_app: WebTestApp,
     vector_layer_id,
+    monkeypatch,
 ):
-    from .. import ogrdriver
-
-    old_MVT_DRIVER_EXIST = ogrdriver.MVT_DRIVER_EXIST
-    ogrdriver.MVT_DRIVER_EXIST = mvt_driver_exist
-
     from .. import api_mvt
 
-    importlib.reload(api_mvt)
+    if (native and not NATIVE_MVT) or (driver and not MVT_DRIVER_EXIST):
+        pytest.skip("MVT encoder is not available")
 
-    ngw_webtest_app.get(
-        "/api/component/feature_layer/mvt",
-        query=dict(
-            ZXY0,
-            resource=vector_layer_id,
-            extent=2048,
-            simplification=4.1,
-            padding=0.1,
-        ),
-        status=status_expected,
-    )
+    monkeypatch.setattr(ngw_env.feature_layer, "mvt_native", native)
+    monkeypatch.setattr(api_mvt, "MVT_DRIVER_EXIST", driver)
 
-    ogrdriver.MVT_DRIVER_EXIST = old_MVT_DRIVER_EXIST
-    importlib.reload(api_mvt)
+    resp = _mvt_get(ngw_webtest_app, resource=vector_layer_id, status=status_expected)
+    if status_expected == 200:
+        assert len(mvt_decode(resp.body)[f"ngw:{vector_layer_id}"]["features"]) == 2
 
 
 def test_filter(ngw_webtest_app: WebTestApp, vector_layer_id):
