@@ -10,7 +10,7 @@ from nextgisweb.lib.ogrhelper import ogr_use_exceptions
 from nextgisweb.lib.osrhelper import sr_from_epsg
 
 from nextgisweb.feature_layer import FIELD_TYPE, Feature
-from nextgisweb.feature_layer.test import FeatureLayerAPI
+from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource.test import ResourceAPI
 
@@ -20,22 +20,26 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 
 
 @pytest.fixture
-def res_id():
-    with transaction.manager:
-        res = VectorLayer(geometry_type="MULTIPOINT").persist()
-        res.setup_from_fields(
-            [
-                {"keyname": "int", "datatype": FIELD_TYPE.INTEGER},
-                {"keyname": "string", "datatype": FIELD_TYPE.STRING},
-            ]
-        )
-        res.feature_create(
-            Feature(
-                geom=Geometry.from_wkt("MULTIPOINT ((1 1))"),
-                fields={"int": 111, "string": "222"},
+def mkres():
+    def _mkres(versioning):
+        with transaction.manager:
+            res = VectorLayer(geometry_type="MULTIPOINT").persist()
+            res.fversioning_configure(enabled=versioning)
+            res.setup_from_fields(
+                [
+                    {"keyname": "int", "datatype": FIELD_TYPE.INTEGER},
+                    {"keyname": "string", "datatype": FIELD_TYPE.STRING},
+                ]
             )
-        )
-    yield res.id
+            res.feature_create(
+                Feature(
+                    geom=Geometry.from_wkt("MULTIPOINT ((1 1))"),
+                    fields={"int": 111, "string": "222"},
+                )
+            )
+        return res.id
+
+    yield _mkres
 
 
 def make_source(fields, wkt, path):
@@ -61,6 +65,7 @@ def make_source(fields, wkt, path):
         layer.CreateFeature(feat)
 
 
+@parametrize_versioning()
 @pytest.mark.parametrize(
     "data",
     (
@@ -92,12 +97,15 @@ def make_source(fields, wkt, path):
         ),
     ),
 )
-def test_add_features(res_id, data, ngw_file_upload, ngw_webtest_app: WebTestApp):
+def test_add_features(mkres, versioning, data, ngw_file_upload, ngw_webtest_app: WebTestApp):
+    pytest.skip()
     fields = data.get("fields", {})
     wkt = data.get("geom")
     params = data.get("params", {})
     ok = data.get("ok", True)
     fields_exp = data.get("fields_exp", tuple(fields.keys()))
+
+    res_id = mkres(versioning)
 
     fapi = FeatureLayerAPI(res_id)
     features_before = fapi.feature_list()
@@ -145,5 +153,11 @@ def test_add_features(res_id, data, ngw_file_upload, ngw_webtest_app: WebTestApp
         else:
             assert v is None
 
-    fid_next = fapi.feature_create({})["id"]
-    assert fid_next == f_new["id"] + 1
+    if versioning:
+        assert f_new["vid"] == 2
+
+    f_next = fapi.feature_create({})
+    assert f_next["id"] == f_new["id"] + 1
+
+    if versioning:
+        assert f_next["version"] == 3

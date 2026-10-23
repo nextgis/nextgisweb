@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 import sqlalchemy as sa
+from osgeo import gdal
 from sqlalchemy.dialects.postgresql import JSONB
 
 from nextgisweb.env import COMP_ID, gettext
@@ -69,7 +70,7 @@ msg_supported_formats = gettext(
 )
 
 
-def read_dataset_vector(filename, allowed_drivers=DRIVERS.enum, **kw):
+def read_dataset_vector(filename, allowed_drivers=DRIVERS.enum, **kw) -> gdal.Dataset | None:
     return read_dataset(
         filename,
         allowed_drivers=allowed_drivers,

@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from functools import partial
 from itertools import product
-from typing import ClassVar, Literal
+from typing import Any, ClassVar, Literal
 
 import sqlalchemy as sa
 from msgspec import DecodeError, Struct
@@ -10,6 +11,7 @@ from osgeo import ogr, osr
 from sqlalchemy.dialects.postgresql import JSONB
 
 from nextgisweb.env import gettext
+from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.json import dumps, loads
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
 
@@ -234,7 +236,9 @@ class OGRLoader:
     fid_field: LoaderField | None
     fields: dict[int, LoaderField]
 
-    def __init__(self, ogrlayer, *, geometry_type=None, params: LoaderParams):
+    def __init__(
+        self, ogrlayer: ogr.Layer, *, geometry_type: str | None = None, params: LoaderParams
+    ) -> None:
         self.ogrlayer = ogrlayer
         self.params = params
         if geometry_type is not None:
@@ -249,7 +253,7 @@ class OGRLoader:
         assert self._geometry_type is not None
         return self._geometry_type
 
-    def _scan(self):
+    def _scan(self) -> None:
         ogrlayer = self.ogrlayer
         params = self.params
 
@@ -439,6 +443,7 @@ class OGRLoader:
         sequence: str,
         columns: dict[int, str],
         connection: sa.engine.Connection,
+        vlayer: object = None,
     ):
         ogrlayer = self.ogrlayer
         params = self.params
@@ -513,6 +518,24 @@ class OGRLoader:
         chunk = []
 
         def insert_feature(data=None, *, flush=False):
+            from nextgisweb.lib.geometry import Geometry
+
+            from nextgisweb.feature_layer import Feature
+
+            if vlayer:
+                if data is None:
+                    return
+                assert "id" not in data
+                f = Feature()
+                if "geom" in data:
+                    if (geom_bytes := data.pop("geom")) is not None:
+                        geom = Geometry.from_wkb(bytes(geom_bytes))
+                        f.geom = geom
+                for k, v in data.items():
+                    fname = self.fields[int(k)].name
+                    f.fields[fname] = v
+                vlayer.feature_create(f)
+                return
             nonlocal feature_count
             if data is not None:
                 chunk.append(data)
@@ -521,7 +544,7 @@ class OGRLoader:
                 feature_count += len(chunk)
                 chunk.clear()
 
-        errors = []
+        errors = list[TrStr]()
         for ogr_fid, feature in enumerate(ogrlayer, start=1):
             ctx = dict(fix_errors=params.fix_errors, fid=ogr_fid)
             try:
@@ -588,7 +611,7 @@ class OGRLoader:
 
         if len(errors) > 0:
             detail = ""
-            for i, err in enumerate(errors):
+            for err in errors:
                 if detail != "":
                     detail += "\n"
                 detail += "* " + err
@@ -620,7 +643,14 @@ class FeatureGeometryTypeUnsuitable(FeatureGeometryTypeInvalid):
         super().__init__(msg % (fid, wkb_type, ogr.GeometryTypeToName(wkb_type)))
 
 
-def _fid_fget(feature, ogr_fid, *, fget, fidx, fname):
+def _fid_fget(
+    feature: ogr.Feature,
+    ogr_fid: int,
+    *,
+    fget: Callable[[ogr.Feature], Any],
+    fidx: int,
+    fname: str,
+) -> Any:
     if not feature.IsFieldSet(fidx):
         raise FeatureError(
             gettext("Feature (seq. #%d) doesn't have a FID field '%s'.") % (ogr_fid, fname)

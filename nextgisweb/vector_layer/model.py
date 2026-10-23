@@ -2,7 +2,7 @@ import re
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -186,7 +186,47 @@ class VectorLayer(
     def _tablename(self):
         return "layer_%s" % self.tbl_uuid
 
-    def from_source(self, source, *, layer=UNSET, keep=False, **kw):
+    def _write_initial(self, loader: OGRLoader) -> int:
+        session = self.require_session()
+
+        self.geometry_type = loader.geometry_type
+        if self.geometry_type == GEOM_TYPE.NONE:
+            self.srs = None
+
+        self.fields[:] = [
+            VectorLayerField(
+                keyname=lf.name,
+                datatype=lf.datatype,
+                display_name=lf.name,
+            )
+            for lf in loader.fields.values()
+        ]
+
+        session.flush()
+
+        vls = self.vlschema()
+        columns = {lf.idx: vls.ctab.fields[lf.name].name for lf in loader.fields.values()}
+        size = loader.write(
+            srs=self.srs,
+            schema=vls.ctab.schema,
+            table=vls.ctab.name,
+            sequence=vls.cseq.name,
+            columns=columns,
+            connection=session.connection(),
+        )
+
+        if self.fversioning:
+            session.execute(vls.dml_initfill())
+        return size
+
+    def from_source(
+        self,
+        source: Path | str | gdal.Dataset | ogr.Layer,
+        *,
+        layer=UNSET,
+        keep: bool = False,
+        **kw,
+    ) -> Self:
         lp_kw = dict()
         for k in list(kw.keys()):
             if k in LoaderParams.__annotations__:
@@ -205,7 +245,9 @@ class VectorLayer(
             source = str(source)
 
         if isinstance(source, str):
-            source = read_dataset_vector(source, **kw)
+            ds_result = read_dataset_vector(source, **kw)
+            assert ds_result is not None
+            source = ds_result
         else:
             assert len(kw) == 0, f"Unconsumed arguments: {kw}"
 
@@ -221,42 +263,16 @@ class VectorLayer(
             dataset_ref = None
             assert layer is UNSET
 
-        session = self.require_session()
-
         loader_kw = {"params": lparams}
         if keep:
             loader_kw["geometry_type"] = self.geometry_type
         loader = OGRLoader(source, **loader_kw)
+
         if not keep:
-            self.geometry_type = loader.geometry_type
-            if self.geometry_type == GEOM_TYPE.NONE:
-                self.srs = None
-
-            self.fields[:] = [
-                VectorLayerField(
-                    keyname=lf.name,
-                    datatype=lf.datatype,
-                    display_name=lf.name,
-                )
-                for lf in loader.fields.values()
-            ]
-
-            session.flush()
-
-        vls = self.vlschema()
-        columns = {lf.idx: vls.ctab.fields[lf.name].name for lf in loader.fields.values()}
-
-        size = loader.write(
-            srs=self.srs,
-            schema=vls.ctab.schema,
-            table=vls.ctab.name,
-            sequence=vls.cseq.name,
-            columns=columns,
-            connection=session.connection(),
-        )
-
-        if not keep and self.fversioning:
-            session.execute(vls.dml_initfill())
+            size = self._write_initial(loader)
+        else:
+            with self.feature_transaction():
+                raise NotImplementedError  # TODO
 
         CoreComponent.current().reserve_storage(
             COMP_ID,
@@ -905,8 +921,6 @@ class SourceAttr(SAttribute):
 
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
         keep = not create and srlzr.data.keep is True
-        if keep and srlzr.obj.fversioning:
-            raise FVersioningNotImplemented
         if srlzr.obj.id is not None and not keep:
             srlzr.obj._vlschema_wipe()
             srlzr.obj.require_session().flush()
