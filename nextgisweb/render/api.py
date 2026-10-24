@@ -477,6 +477,7 @@ class LegendIcon(Struct, kw_only=True):
 
 class LegendSymbol(Struct, kw_only=True):
     index: int
+    parent: int | None
     render: bool | None
     display_name: str
     icon: LegendIcon
@@ -486,6 +487,7 @@ class LegendSymbol(Struct, kw_only=True):
         return [
             cls(
                 index=item.index,
+                parent=item.parent,
                 render=item.render,
                 display_name=translate(item.display_name),
                 icon=LegendIcon.from_image(item.icon),
