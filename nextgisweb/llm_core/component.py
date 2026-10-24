@@ -1,7 +1,12 @@
-from openai import OpenAI
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
+
+if TYPE_CHECKING:
+    from openai import OpenAI
 
 
 class LLMCoreComponent(Component):
@@ -19,6 +24,8 @@ class LLMCoreComponent(Component):
         return self.options.get("model")
 
     def make_client(self):
+        from openai import OpenAI
+
         if self._client is None:
             base_url = self.options.get("base_url")
             api_key = self.options.get("api_key")

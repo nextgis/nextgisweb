@@ -4,7 +4,6 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from laspy.copc import CopcReader
 from osgeo import osr
 from pyproj import CRS
 
@@ -182,6 +181,8 @@ def resolve_srs(crs: FileCRS | None, srs: SRS | None) -> SRS:
 
 
 def inspect_copc(path: Path) -> PointCloudInfo:
+    from laspy.copc import CopcReader
+
     try:
         reader = CopcReader.open(str(path))
     except Exception as exc:
