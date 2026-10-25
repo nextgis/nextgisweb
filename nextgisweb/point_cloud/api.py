@@ -1,11 +1,10 @@
 from pathlib import Path
 
 from msgspec import Struct
-from pyramid.response import FileResponse, Response
 
 from nextgisweb.core.exception import InsufficientPermissions, ValidationError
 from nextgisweb.file_upload import FileUploadRef
-from nextgisweb.pyramid.tomb import Configurator, Request
+from nextgisweb.pyramid.tomb import Configurator, FileResponse, Request, Response
 from nextgisweb.raster_layer.api import RangeFileWrapper
 from nextgisweb.resource import DataScope, ResourceFactory
 

@@ -1,10 +1,9 @@
 from contextlib import contextmanager
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 import sqlalchemy as sa
 import transaction
-from pyramid.testing import DummyRequest
 
 from nextgisweb.env import DBSession
 
@@ -219,7 +218,7 @@ def context_layer(creds, db_tx_ctx):
 def test_user_context_enabled(context_layer, context_user):
     layer = context_layer(user_context=True)
 
-    with layer.feature_transaction(DummyRequest(user=context_user)):
+    with layer.feature_transaction(Mock(user=context_user)):
         assert read_setting(layer, "nextgisweb.user_id") == str(context_user.id)
         assert read_setting(layer, "nextgisweb.user_keyname") == "user_context_test"
         assert read_setting(layer, "nextgisweb.user_display_name") == "User context test"
@@ -235,7 +234,7 @@ def test_user_context_enabled(context_layer, context_user):
 def test_user_context_disabled(context_layer, context_user):
     layer = context_layer(user_context=False)
 
-    with layer.feature_transaction(DummyRequest(user=context_user)):
+    with layer.feature_transaction(Mock(user=context_user)):
         assert read_setting(layer, "nextgisweb.user_id") in (None, "")
         assert read_setting(layer, "nextgisweb.user_keyname") in (None, "")
         assert read_setting(layer, "nextgisweb.user_display_name") in (None, "")
