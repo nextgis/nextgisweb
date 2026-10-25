@@ -76,7 +76,7 @@ def fake_copc(
 ):
     header = _FakeHeader(point_format_id=point_format_id, mins=mins, maxs=maxs, crs=crs)
     return patch(
-        "nextgisweb.point_cloud.validation.CopcReader.open",
+        "laspy.copc.CopcReader.open",
         return_value=_FakeReader(header, npoints, rgb_peak),
     )
 
