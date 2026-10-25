@@ -269,7 +269,7 @@ def component_utility[T](factory: Callable[[str], T]) -> ComponentUtility[T]:
 
     def get(depth: int = 1, *, cident: str | None = None) -> T:
         if cident is None:
-            mod = module_from_stack(depth, ("nextgisweb.env.",))
+            mod = module_from_stack(depth, skip=("nextgisweb.env.",))
             cident = pkginfo.component_by_module(mod, required=True)
 
         try:

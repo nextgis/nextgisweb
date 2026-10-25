@@ -17,7 +17,7 @@ class Icon(Struct, frozen=True):
 def icon(name: str, *, variant: str | None = None, depth: int = 0) -> str:
     parts = name.split("/", maxsplit=1)
     if len(parts) == 1:
-        py_module = module_from_stack(depth, (__name__))
+        py_module = module_from_stack(depth, skip=(__name__,))
         collection = pkginfo.component_by_module(py_module)
         glyph = name
     else:

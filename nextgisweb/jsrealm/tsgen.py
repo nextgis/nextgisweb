@@ -415,7 +415,7 @@ class TSExport:
         self.name = name
         if not module.startswith("@"):
             if component is None:
-                mod = module_from_stack(depth, (__name__,))
+                mod = module_from_stack(depth, skip=(__name__,))
                 component = pkginfo.component_by_module(mod, required=True)
             module = component_tsmodule(component, module)
         self.module = module

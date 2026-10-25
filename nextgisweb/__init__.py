@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import logging
 import sys
 from typing import TYPE_CHECKING
-from warnings import filterwarnings
 
-from nextgisweb.lib.imptool import deprecate  # noqa: F401
+from . import workaround  # noqa: F401
 
 __all__ = [
     "load_config",
@@ -11,11 +12,11 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from nextgisweb.env.package import single_component
+    from nextgisweb.env.package import PackageInfo, single_component
     from nextgisweb.lib.config import load_config
 
 
-def __getattr__(name: str):
+def __getattr__(name: str) -> object:
     match name:
         case "single_component":
             from nextgisweb.env.package import single_component as v
@@ -26,11 +27,7 @@ def __getattr__(name: str):
     return v
 
 
-# Enable deprecation warnings for nextgisweb and nextgisweb_* packages.
-filterwarnings("once", module=r"^nextgisweb(_\w+)?(\..*|$)", category=DeprecationWarning)
-
-
-def pkginfo():
+def pkginfo() -> PackageInfo:
     components = (
         "core",
         "sentry",
@@ -85,7 +82,7 @@ def pkginfo():
     }
 
 
-def main(global_config=None, **settings):
+def main(global_config=None, **settings) -> None:  # noqa: ANN001, ANN003
     """This function returns a Pyramid WSGI application."""
 
     def _smaps_rollup() -> str:
@@ -147,7 +144,3 @@ def main(global_config=None, **settings):
         )
 
     return app
-
-
-# NOTE: For hot module replacement with deprecation warning:
-# deprecate("nextgisweb.some", "nextgisweb.lib.some", since="4.5.0.dev0", remove="4.6.0.dev0")

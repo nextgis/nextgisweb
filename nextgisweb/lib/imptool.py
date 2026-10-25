@@ -1,42 +1,14 @@
 import sys
-from dataclasses import dataclass
-from importlib import abc
-from importlib.util import spec_from_loader
+from collections.abc import Sequence
 from pathlib import Path
-from warnings import filterwarnings, warn
-
-# Deprecated pkg_registry is used extensively by Pyramid, setuptools is pinned.
-filterwarnings(
-    "ignore",
-    r"^pkg_resources is deprecated as an API.*$",
-    category=UserWarning,
-)
-
-# Prevent warning about missing __init__.py in migration directory. Is's OK
-# and migration directory is intended for migration scripts.
-filterwarnings(
-    "ignore",
-    r"^Not importing.*/core/migration.*__init__\.py$",
-    category=ImportWarning,
-)
-
-# Exceptions will be enabled by default in GDAL 4 - OK, got it!
-filterwarnings(
-    "ignore",
-    r"^Neither (gdal|ogr|osr)\.UseExceptions\(\) nor (gdal|ogr|osr)\.DontUseExceptions\(\).*$",
-    category=FutureWarning,
-)
-
-# Ignore osgeo imp module deprecation warning
-filterwarnings("ignore", module="osgeo", category=DeprecationWarning)
-import osgeo  # noqa: E402, F401
 
 
-def module_path(module_name: str) -> Path:
-    """Extract module's path from sys.modules and sys.meta_path
+def module_path(module_name: str, /) -> Path:
+    """Extract module's path from sys.modules and sys.meta_path.
 
     Importlib's find_spec() is always importing the top-level package for
-    modules which causes problems with single-component packages."""
+    modules which causes problems with single-component packages.
+    """
 
     rest = module_name.split(".")
     root = rest.pop(0)
@@ -61,8 +33,14 @@ def module_path(module_name: str) -> Path:
     return (root_path / "/".join(rest)) if rest else root_path
 
 
-def module_from_stack(depth=0, skip=None):
-    """Extract module name from stack"""
+def module_from_stack(depth: int = 0, *, skip: Sequence[str] | None = None) -> str:
+    """Extract module name from stack.
+
+    :param depth: Number of stack frames to skip before searching. A value of 0 starts at the
+        caller's caller, so a depth of 1 would start at the caller's caller's caller.
+    :param skip: Module name prefixes to ignore during the search.
+    :return: Name of the first matching module.
+    """
 
     if skip is not None:
         skip = tuple(m if m.endswith(".") else (m + ".") for m in skip)
@@ -80,52 +58,3 @@ def module_from_stack(depth=0, skip=None):
             cur_depth += 1
         else:
             return mod
-
-
-@dataclass
-class Record:
-    name: str
-    repl: str
-    since: str | None = None
-    remove: str | None = None
-
-
-class Loader(abc.Loader):
-    def __init__(self, rec):
-        self.rec = rec
-
-    def exec_module(self, module):
-        code = f"from {self.rec.repl} import *"
-        exec(code, module.__dict__)
-
-
-class MetaPathFinder(abc.MetaPathFinder):
-    registry: dict[str, Record]
-
-    def __init__(self):
-        self.registry = dict()
-
-    def substitute(self, name, repl, *, since=None, remove=None):
-        rec = Record(name, repl, since=since, remove=remove)
-        self.registry[rec.name] = rec
-
-    def find_spec(self, fullname, path, target=None):
-        try:
-            rec = self.registry[fullname]
-        except KeyError:
-            return
-
-        s = spec_from_loader(rec.name, loader=Loader(rec))
-        m = (
-            f"'{rec.name}' module has been deprecated by '{rec.repl}'"
-            + (f" since {rec.since}" if rec.since else "")
-            + (f", removing in {rec.remove}" if rec.remove else "")
-        )
-
-        warn(m, DeprecationWarning, stacklevel=2)
-        return s
-
-
-meta_path_finder = MetaPathFinder()
-sys.meta_path.insert(0, meta_path_finder)
-deprecate = meta_path_finder.substitute

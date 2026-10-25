@@ -6,8 +6,6 @@ from textwrap import wrap
 
 from msgspec import UNSET
 
-from .workaround import *  # isort: skip  # noqa: F403
-
 from nextgisweb.env import Env
 from nextgisweb.env.cli import bootstrap, cli
 from nextgisweb.lib.clann import ArgumentParser

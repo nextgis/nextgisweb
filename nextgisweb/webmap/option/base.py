@@ -58,7 +58,7 @@ class WebMapOption:
     order: ClassVar[int] = 0
 
     def __init_subclass__(cls) -> None:
-        mod = module_from_stack(depth=1, skip=(__name__,))
+        mod = module_from_stack(1, skip=(__name__,))
         cls.component = pkginfo.component_by_module(mod, required=True)
         cls.identity = f"{cls.component}.{cls.name}"
 
