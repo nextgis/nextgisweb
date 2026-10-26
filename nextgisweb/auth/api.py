@@ -588,7 +588,7 @@ def current_user(
 
 
 class LoginBody(Struct, kw_only=True):
-    login: KeynameUser
+    login: str
     password: str
 
 
