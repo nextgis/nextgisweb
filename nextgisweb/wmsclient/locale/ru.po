@@ -6,31 +6,31 @@ msgstr "Соединение WMS"
 msgid "Unable to get a response from the remote server."
 msgstr "Не удалось получить ответ от удаленного сервера."
 
-#: model.py:186
+#: model.py:183
 msgid "Failed to parse the XML response from the remote server."
 msgstr "Не удалось разобрать XML-ответ от удаленного сервера."
 
-#: model.py:209
+#: model.py:208
 msgid "WMS capabilities"
 msgstr "Возможности WMS"
 
-#: model.py:210 nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:168
+#: model.py:209 nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:112
 msgid "Image format"
 msgstr "Формат изображения"
 
-#: model.py:311
+#: model.py:310
 msgid "WMS layer"
 msgstr "Слой WMS"
 
-#: model.py:371
+#: model.py:369
 msgid "Image processing error."
 msgstr "Ошибка обработки изображения."
 
-#: model.py:372
+#: model.py:370
 msgid "Response Content-Type is {}."
 msgstr "Content-Type ответа: {}."
 
-#: model.py:386
+#: model.py:384
 msgid "The remote server returned an unexpected HTTP status code ({})."
 msgstr "Удаленный сервер вернул неожиданный код статуса HTTP ({})."
 
@@ -79,32 +79,28 @@ msgid "Skip SSL/TLS certificate verification"
 msgstr "Не проверять сертификат SSL/TLS"
 
 #: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:112
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:155
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:99
 msgid "WMS Connection"
 msgstr "WMS Соединение"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:87
-msgid "Add to Web GIS"
-msgstr "Добавить в Веб ГИС"
-
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:179
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:123
 msgid "WMS layers"
 msgstr "Слои WMS"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:188
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:132
 msgid "Remote SRS"
 msgstr "Удалённая СК"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:199
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:144
 #: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:65
 msgid "Vendor parameters"
 msgstr "Вендор параметры"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:212
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:157
 msgid "Edit vendor parameters"
 msgstr "Изменить вендор параметры"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:221
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:166
 msgid "WMS Layer"
 msgstr "Слой WMS"
 

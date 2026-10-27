@@ -1,22 +1,23 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
-import { Alert, Button, Select } from "@nextgisweb/gui/antd";
-import type { OptionType } from "@nextgisweb/gui/antd";
+import { Alert } from "@nextgisweb/gui/antd";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
+import { SrsSelectExpandable } from "@nextgisweb/spatial-ref-sys/srs-select-expandable";
 
 import type { EditorStore, Inspection } from "./EditorStore";
+import { useInspectionSrsItems } from "./useInspectionSrsItems";
+import { formatCrs } from "./util";
 
 // prettier-ignore
-const [msgSelectDataset, msgSupportedFormats, msgInspect, msgPoints, msgPointFormat, msgSrs, msgFileCrs, msgHeights, msgNoCrs, msgNotRegistered, msgAddToWebGIS, msgCheckAgain] = [
+const [msgSelectDataset, msgSupportedFormats, msgInspect, msgPoints, msgPointFormat, msgSrs, msgFileCrs, msgHeights, msgNoCrs, msgNotRegistered] = [
   gettext("Select a dataset"),
   gettext("Cloud Optimized Point Cloud (COPC) files with point formats 6, 7, and 8 are supported."),
   gettext("Inspecting point cloud"),
@@ -27,13 +28,7 @@ const [msgSelectDataset, msgSupportedFormats, msgInspect, msgPoints, msgPointFor
   gettext("Heights"),
   gettext("The file has no coordinate system info. Select it manually: a wrong choice will misplace the point cloud."),
   gettext("The coordinate system of the file is not registered in NextGIS Web."),
-  gettext("Add to Web GIS"),
-  gettext("Check again"),
 ];
-
-function formatCrs(name: string, auth: string | null) {
-  return auth ? `${name} (${auth})` : name;
-}
 
 function InspectionSummary({ inspection }: { inspection: Inspection }) {
   const { crs } = inspection;
@@ -69,33 +64,20 @@ function InspectionSummary({ inspection }: { inspection: Inspection }) {
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
   ({ store }) => {
-    const inspect = useCallback(
-      async (fileMeta: FileMeta, signal?: AbortSignal) => {
-        store.setInspecting(true);
+    const inspectUpload = useCallback(
+      async (value: FileMeta[], { signal }: { signal: AbortSignal }) => {
+        if (!value[0]) return;
         try {
-          const inspection = await route("point_cloud.inspect").post({
-            json: { id: fileMeta.id },
-            signal,
-          });
-          store.setInspection(fileMeta.id, inspection);
+          await store.inspectSource(value[0].id, signal);
         } catch (err) {
           if (!isAbortError(err)) {
             errorModal(err);
           }
           store.setSource(null);
           throw err;
-        } finally {
-          store.setInspecting(false);
         }
       },
       [store]
-    );
-
-    const inspectUpload = useCallback(
-      async (value: FileMeta[], { signal }: { signal: AbortSignal }) => {
-        if (value[0]) await inspect(value[0], signal);
-      },
-      [inspect]
     );
 
     // Inspect the stored file to show its coordinate system on update
@@ -103,58 +85,19 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
     const { resourceId } = store.composite;
     useEffect(() => {
       if (resourceId === null) return;
-      route("point_cloud.layer_inspect", resourceId)
-        .get({ signal: makeSignal() })
-        .then(store.setStoredInspection)
-        .catch((err) => {
-          if (!isAbortError(err)) errorModal(err);
-        });
+      store.loadStoredInspection(makeSignal()).catch((err) => {
+        if (!isAbortError(err)) errorModal(err);
+      });
     }, [resourceId, store, makeSignal]);
 
     const { source } = store;
     const inspection = store.currentInspection;
     const crs = inspection?.crs;
 
-    // Only coordinate systems equivalent to the file one can be selected,
-    // as the point cloud is not reprojected
-    const candidateOptions = useMemo<OptionType[] | undefined>(() => {
-      if (!inspection || !crs) return undefined;
-      if (inspection.srs_candidates.length) {
-        return inspection.srs_candidates.map((srs) => ({
-          value: srs.id,
-          label: srs.display_name,
-        }));
-      }
-      return [
-        {
-          value: undefined,
-          disabled: true,
-          label: (
-            <span>
-              {formatCrs(crs.display_name, crs.auth)}{" "}
-              {crs.auth && (
-                <a
-                  href={
-                    routeURL("srs.catalog") +
-                    "?q=" +
-                    encodeURIComponent(crs.auth)
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {msgAddToWebGIS}
-                </a>
-              )}
-            </span>
-          ),
-        },
-      ];
-    }, [inspection, crs]);
+    const { srsItems, refresh: refreshSrs } = useInspectionSrsItems(store);
 
     const showSrs = !!inspection;
-    const notRegistered =
-      !!candidateOptions && !inspection?.srs_candidates.length;
+    const notRegistered = !!crs && !inspection?.srs_candidates.length;
 
     return (
       <Area pad>
@@ -177,11 +120,12 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
         )}
         {showSrs && (
           <Lot label={msgSrs}>
-            {candidateOptions ? (
-              <Select<number>
+            {srsItems ? (
+              <SrsSelectExpandable
                 style={{ width: "100%" }}
                 value={store.srsId ?? undefined}
-                options={candidateOptions}
+                items={srsItems}
+                refresh={refreshSrs}
                 onChange={(value) => store.setSrsId(value ?? null)}
               />
             ) : (
@@ -195,20 +139,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
         )}
         {notRegistered && source && (
           <Lot label={false}>
-            <Alert
-              type="warning"
-              showIcon
-              title={msgNotRegistered}
-              action={
-                <Button
-                  size="small"
-                  loading={store.inspecting}
-                  onClick={() => inspect(source).catch(() => {})}
-                >
-                  {msgCheckAgain}
-                </Button>
-              }
-            />
+            <Alert type="warning" showIcon title={msgNotRegistered} />
           </Lot>
         )}
       </Area>

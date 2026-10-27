@@ -32,9 +32,22 @@ interface SRSRow extends SRSRead {
   auth_name_srid: string | null;
 }
 
-export function CatalogBrowse() {
+export interface CatalogBrowseProps {
+  initialSearch?: string;
+  onImportClick?: (catalogId: number) => void;
+  scroll?: TableProps["scroll"];
+}
+
+export function CatalogBrowse({
+  initialSearch,
+  onImportClick,
+  scroll,
+}: CatalogBrowseProps) {
   const [search, setSearch] = useState(
-    () => new URLSearchParams(window.location.search).get("q") ?? ""
+    () =>
+      initialSearch ??
+      new URLSearchParams(window.location.search).get("q") ??
+      ""
   );
   const [lon, setLon] = useState<number | null>(null);
   const [lat, setLat] = useState<number | null>(null);
@@ -81,10 +94,9 @@ export function CatalogBrowse() {
     setRows(newRows);
   }, [srs]);
 
-  const onImportClick = (id: number) => {
-    const url = routeURL("srs.catalog.import", id);
-    window.open(url, "_self");
-  };
+  const handleImport =
+    onImportClick ??
+    ((id: number) => window.open(routeURL("srs.catalog.import", id), "_self"));
 
   const columns: TableProps["columns"] = [
     {
@@ -118,7 +130,7 @@ export function CatalogBrowse() {
     {
       title: "",
       key: "action",
-      width: "0px",
+      width: 64,
       align: "center",
       render: (text, record) => (
         <div style={{ whiteSpace: "nowrap" }}>
@@ -127,7 +139,7 @@ export function CatalogBrowse() {
               type="text"
               shape="circle"
               icon={<InputOutlineIcon />}
-              onClick={() => onImportClick(record.id)}
+              onClick={() => handleImport(record.id)}
             />
           </Tooltip>
         </div>
@@ -195,6 +207,7 @@ export function CatalogBrowse() {
         loading={isLoading}
         columns={columns}
         dataSource={rows}
+        scroll={scroll}
       />
     </Space>
   );

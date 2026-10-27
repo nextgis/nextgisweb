@@ -2,6 +2,7 @@ import { action, actionBound, computed, observableRef } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import type * as apitype from "@nextgisweb/point-cloud/type/api";
+import { route } from "@nextgisweb/pyramid/api";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
   DumpParams,
@@ -27,6 +28,8 @@ export class EditorStore implements IEditorStore<
   @observableRef accessor srsIdInitial: number | null = null;
   @observableRef accessor uploading = false;
   @observableRef accessor inspecting = false;
+
+  private inspectAbort: AbortController | null = null;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;
@@ -76,10 +79,45 @@ export class EditorStore implements IEditorStore<
     // FileUploader runs afterUpload loaders before onChange, so the
     // inspection of the same file must be kept
     if (!value || value.id !== this.inspectedId) {
+      this.inspectAbort?.abort();
       this.inspection = null;
       this.inspectedId = null;
       this.srsId = this.srsIdInitial;
     }
+  }
+
+  @actionBound
+  async inspectSource(fileId: string, signal?: AbortSignal) {
+    this.inspectAbort?.abort();
+    const controller = new AbortController();
+    this.inspectAbort = controller;
+    signal?.addEventListener("abort", () => controller.abort(signal.reason), {
+      once: true,
+    });
+    this.setInspecting(true);
+    try {
+      const value = await route("point_cloud.inspect").post({
+        json: { id: fileId },
+        signal: controller.signal,
+      });
+      controller.signal.throwIfAborted();
+      this.setInspection(fileId, value);
+    } finally {
+      if (this.inspectAbort === controller) {
+        this.inspectAbort = null;
+        this.setInspecting(false);
+      }
+    }
+  }
+
+  @actionBound
+  async loadStoredInspection(signal?: AbortSignal) {
+    const { resourceId } = this.composite;
+    if (resourceId === null) return;
+    const value = await route("point_cloud.layer_inspect", resourceId).get({
+      signal,
+    });
+    this.setStoredInspection(value);
   }
 
   @actionBound

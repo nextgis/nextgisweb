@@ -26,50 +26,50 @@ msgstr "Аттрибуты организации СК должны быть у�
 msgid "SRS #{} already exists."
 msgstr "СК #{} уже существует."
 
-#: model.py:71 model.py:72 nodepkg/control-panel-plugin.tsx:33 view.py:19
+#: model.py:69 model.py:70 nodepkg/control-panel-plugin.tsx:33 view.py:22
 msgid "Spatial reference systems"
 msgstr "Системы координат"
 
-#: model.py:90
+#: model.py:88
 msgid "Invalid OGC WKT definition!"
 msgstr "Неверное определение OGC WKT!"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:91
-#: nodepkg/catalog-import/CatalogImport.tsx:30 nodepkg/srs-browse/SrsBrowse.tsx:37
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:101
+#: nodepkg/catalog-import/CatalogImport.tsx:45 nodepkg/srs-browse/SrsBrowse.tsx:37
 #: nodepkg/srs-widget/SRSWidget.tsx:35
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:99
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:109
 msgid "Show in catalog"
 msgstr "Показать в каталоге"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:113 nodepkg/srs-widget/SRSWidget.tsx:41
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:123 nodepkg/srs-widget/SRSWidget.tsx:41
 msgid "Authority and code"
 msgstr "Источник и код"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:125
-#: nodepkg/catalog-import/CatalogImport.tsx:89
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:135
+#: nodepkg/catalog-import/CatalogImport.tsx:108
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:142
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:152
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:160
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:170
 msgid "Latitude"
 msgstr "Широта"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:174
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:184
 msgid "Longitude"
 msgstr "Долгота"
 
-#: nodepkg/catalog-import/CatalogImport.tsx:35 nodepkg/srs-widget/SRSWidget.tsx:48
+#: nodepkg/catalog-import/CatalogImport.tsx:50 nodepkg/srs-widget/SRSWidget.tsx:48
 msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
 
-#: nodepkg/catalog-import/CatalogImport.tsx:79
+#: nodepkg/catalog-import/CatalogImport.tsx:98
 msgid "View details"
 msgstr "Подробнее"
 
@@ -88,6 +88,22 @@ msgstr "Создать"
 #: nodepkg/srs-browse/SrsBrowse.tsx:25
 msgid "Import from catalog"
 msgstr "Импортировать из каталога"
+
+#: nodepkg/srs-catalog-modal/SrsCatalogModal.tsx:10
+msgid "Add spatial reference system"
+msgstr "Добавить систему координат"
+
+#: nodepkg/srs-select-expandable/SrsSelectExpandable.tsx:25
+msgid "Add to Web GIS"
+msgstr "Добавить в Веб ГИС"
+
+#: nodepkg/srs-select-expandable/SrsSelectExpandable.tsx:26
+msgid "Insufficient permissions to add a coordinate system"
+msgstr "Недостаточно прав для добавления системы координат"
+
+#: nodepkg/srs-select-expandable/SrsSelectExpandable.tsx:29
+msgid "Choose or add coordinate system"
+msgstr "Выберите или добавьте систему координат"
 
 #: nodepkg/srs-widget/SRSImportForm.tsx:63
 msgid "Format"
@@ -117,14 +133,14 @@ msgstr "Неверная система координат MapInfo: %s"
 msgid "Unknown spatial reference system format: %s!"
 msgstr "Неверный формат системы координат: %s!"
 
-#: view.py:29
+#: view.py:32
 msgid "Create new Spatial reference system"
 msgstr "Создать новую Систему координат"
 
-#: view.py:50
+#: view.py:52
 msgid "Spatial reference system catalog"
 msgstr "Каталог систем координат"
 
-#: view.py:62
+#: view.py:63
 msgid "Spatial reference system"
 msgstr "Система координат"

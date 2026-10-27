@@ -1,20 +1,21 @@
 import { observer } from "mobx-react-lite";
-import { lazy, useEffect, useMemo, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
 import { Button, Select } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
-import { assert } from "@nextgisweb/jsrealm/error";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { useAbortController, useRouteGet } from "@nextgisweb/pyramid/hook";
+import { route } from "@nextgisweb/pyramid/api";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
+import { SrsSelectExpandable } from "@nextgisweb/spatial-ref-sys/srs-select-expandable";
 import type { WMSConnectionLayer } from "@nextgisweb/wmsclient/type/api";
 
 import type { WmsClientLayerStore } from "./WmsClientLayerStore";
+import { useWmsSrsItems } from "./useWmsSrsItems";
 
 const VendorParamsModalLazy = lazy(
   () => import("./component/VendorParamsModal")
@@ -46,68 +47,10 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
     const { showModal, modalHolder } = useShowModal();
     const { makeSignal } = useAbortController();
 
-    const { data: localSrsList } = useRouteGet("spatial_ref_sys.collection");
-    const remoteSrsInitialId = store.remote_srs.initial?.id;
-
-    const srsOptions = useMemo<OptionType[] | undefined>(() => {
-      if (wmsSrsCodes === undefined || !localSrsList) return undefined;
-
-      if (wmsSrsCodes === null) {
-        // Old connection: capcache has no SRS info - show saved value or fall back to EPSG:3857
-        const id = remoteSrsInitialId ?? 3857;
-        const local = localSrsList.find((s) => s.id === id);
-        return local ? [{ value: local.id, label: local.display_name }] : [];
-      }
-
-      const options: OptionType[] = wmsSrsCodes.flatMap((code) => {
-        const match = code.match(/^([A-Z]+):(\d+)$/i);
-        if (!match) return [];
-        const [, authName, authSrid] = match;
-        const local = localSrsList.find(
-          (s) =>
-            s.auth_name?.toUpperCase() === authName.toUpperCase() &&
-            s.auth_srid === parseInt(authSrid)
-        );
-        return [
-          {
-            value: local?.id,
-            label: local ? (
-              local.display_name
-            ) : (
-              <span>
-                {code}{" "}
-                <a
-                  href={
-                    routeURL("srs.catalog") + "?q=" + encodeURIComponent(code)
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {gettext("Add to Web GIS")}
-                </a>
-              </span>
-            ),
-            disabled: !local,
-          },
-        ];
-      });
-
-      // If the saved SRS is not in the WMS list, prepend it with a warning
-      if (
-        remoteSrsInitialId !== undefined &&
-        !options.some((o) => o.value === remoteSrsInitialId)
-      ) {
-        const local = localSrsList.find((s) => s.id === remoteSrsInitialId);
-        assert(local, "Initial remote SRS not found in local SRS list");
-        options.unshift({
-          value: local.id,
-          label: `⚠ ${local.display_name}`,
-        });
-      }
-
-      return options;
-    }, [wmsSrsCodes, localSrsList, remoteSrsInitialId]);
+    const { srsItems, refresh: refreshSrs } = useWmsSrsItems({
+      wmsSrsCodes,
+      remoteSrs: store.remote_srs,
+    });
 
     const connectionId = store.connection.value?.id;
     useEffect(() => {
@@ -134,18 +77,11 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
               label: item,
             }))
           );
-          const srsCodes = capcache.srs?.length ? capcache.srs : null;
-          setWmsSrsCodes(srsCodes);
-          if (store.remote_srs.value === null) {
-            const has3857 =
-              srsCodes === null ||
-              srsCodes.some((c) => c.toUpperCase() === "EPSG:3857");
-            if (has3857) store.remote_srs.value = { id: 3857 };
-          }
+          setWmsSrsCodes(capcache.srs?.length ? capcache.srs : null);
         }
       };
       getCapcache();
-    }, [connectionId, makeSignal, store.remote_srs]);
+    }, [connectionId, makeSignal]);
 
     return (
       <Area pad cols={["1fr", "1fr"]}>
@@ -186,13 +122,14 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
         />
 
         <Lot row label={gettext("Remote SRS")} error={store.remote_srs.error}>
-          <Select
+          <SrsSelectExpandable
             style={{ width: "100%" }}
             value={store.remote_srs.value?.id}
-            options={srsOptions}
+            items={srsItems}
             onChange={(id) => {
               store.remote_srs.value = id !== undefined ? { id } : null;
             }}
+            refresh={refreshSrs}
           />
         </Lot>
 
