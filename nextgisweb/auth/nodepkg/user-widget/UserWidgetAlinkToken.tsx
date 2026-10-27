@@ -28,11 +28,13 @@ type ModeKey = (typeof modes)[number]["key"];
 
 type UserWidgetAlinkTokenProps = Omit<InputProps, "value" | "onChange"> & {
   value?: boolean | string | null;
+  available: boolean;
   onChange?: (val: boolean | undefined) => void;
 };
 
 export function UserWidgetAlinkToken({
   value,
+  available,
   onChange,
 }: UserWidgetAlinkTokenProps) {
   const [state, setState] = useState<[ModeKey, string | null]>(() => {
@@ -44,16 +46,20 @@ export function UserWidgetAlinkToken({
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  const token = state[1];
   useEffect(() => {
-    if (token) onChangeRef.current?.(undefined);
-  }, [token]);
+    if (value === null || typeof value === "string") {
+      onChangeRef.current?.(undefined);
+    }
+  }, [value]);
 
   const availableModes = useMemo(() => {
     return modes
-      .filter((m) => m.key !== "keep" || state[1])
+      .filter(
+        (m) =>
+          (m.key !== "keep" || state[1]) && (m.key !== "assign" || available)
+      )
       .map((m) => ({ value: m.key, label: m.label }));
-  }, [state]);
+  }, [available, state]);
 
   const url = ngwConfig.applicationUrl + "/alink/" + state[1];
 
@@ -70,9 +76,9 @@ export function UserWidgetAlinkToken({
         options={availableModes}
         onChange={(value) => {
           setState([value, state[1]]);
-          const model = modes.find((m) => m.key === value)?.model;
-          assert(model !== undefined);
-          onChangeRef.current?.(model);
+          const mode = modes.find((m) => m.key === value);
+          assert(mode !== undefined);
+          onChangeRef.current?.(mode.model);
         }}
       />
       {state[0] === "keep" && (
@@ -82,7 +88,11 @@ export function UserWidgetAlinkToken({
             value={url}
             readOnly={true}
           />
-          <CopyToClipboardButton type="link" getTextToCopy={() => url} iconOnly />
+          <CopyToClipboardButton
+            type="link"
+            getTextToCopy={() => url}
+            iconOnly
+          />
         </>
       )}
       {state[0] === "assign" && (

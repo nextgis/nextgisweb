@@ -1,7 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import settings from "@nextgisweb/auth/client-settings";
-import type { GroupRead } from "@nextgisweb/auth/type/api";
+import type {
+  GroupRead,
+  UserRead,
+  UserUpdate,
+} from "@nextgisweb/auth/type/api";
 import { Alert, Checkbox, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { LanguageSelect } from "@nextgisweb/gui/component/language-select";
@@ -26,6 +30,11 @@ const messages = {
   deleteSuccess: gettext("User deleted"),
 };
 
+type UserFormValues = Omit<UserRead, "alink" | "password"> & {
+  alink: UserRead["alink"] | UserUpdate["alink"];
+  password: UserRead["password"] | UserUpdate["password"];
+};
+
 interface UserWidgetProps {
   id: number;
   readonly: boolean;
@@ -36,11 +45,14 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
     "auth.group.collection"
   );
 
+  const [alinkValues, setAlinkValues] = useState<Partial<UserFormValues>>({});
+
   const isNewUser = useMemo(() => id === undefined, [id]);
+  const alinkAvailable = alinkValues.alink_available ?? isNewUser;
 
   const showFullColumns = settings.userLimit.local !== 0;
 
-  const fields = useMemo<FormField[]>(() => {
+  const fields = useMemo<FormField<keyof UserFormValues>[]>(() => {
     return [
       {
         name: "display_name",
@@ -58,7 +70,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
       ...(showFullColumns
         ? [
             {
-              name: "password",
+              name: "password" as const,
               label: gettext("Password"),
               formItem: isNewUser ? (
                 <Input.Password
@@ -84,8 +96,8 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
       {
         name: "alink",
         label: gettext("Authorization link"),
-        formItem: <UserWidgetAlinkToken />,
-        included: settings.alink,
+        formItem: <UserWidgetAlinkToken available={alinkAvailable} />,
+        included: settings.alink && (alinkAvailable || !!alinkValues.alink),
       },
       {
         name: "disabled",
@@ -114,7 +126,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
         formItem: <Input.TextArea />,
       },
     ];
-  }, [isNewUser, showFullColumns]);
+  }, [alinkAvailable, alinkValues.alink, isNewUser, showFullColumns]);
 
   const infoNGID = useMemo(
     () =>
@@ -143,7 +155,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
   return (
     <div className="ngw-auth-user-widget">
       {infoNGID}
-      <ModelForm
+      <ModelForm<UserFormValues>
         fields={fields}
         initialValues={{
           member_of:
@@ -157,6 +169,11 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
         model={model}
         id={id}
         messages={messages}
+        onChange={({ value }) => {
+          if (value.alink_available !== undefined) {
+            setAlinkValues(value);
+          }
+        }}
       />
     </div>
   );

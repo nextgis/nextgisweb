@@ -33,14 +33,16 @@ export interface Model {
   browse: RouteName;
 }
 
-interface ModelFormProps extends Omit<FormProps, "initialValues"> {
+interface ModelFormProps<
+  V extends Record<string, any> = Record<string, unknown>,
+> extends Omit<FormProps, "initialValues"> {
   id?: number;
   children?: ReactNode;
   model: Model;
   initialValues?: Record<string, unknown>;
-  fields: FormField[];
-  form?: FormInstance;
-  onChange?: (val: { value: unknown }) => void;
+  fields: FormField<Extract<keyof V, string>>[];
+  form?: FormInstance<V>;
+  onChange?: (val: { value: Partial<V> }) => void;
   allowDelete?: boolean;
   messages?: Messages;
   readonly?: boolean;
@@ -53,7 +55,9 @@ const btnTitleAliases = {
   delete: gettext("Delete"),
 };
 
-export function ModelForm(props: ModelFormProps) {
+export function ModelForm<
+  V extends Record<string, any> = Record<string, unknown>,
+>(props: ModelFormProps<V>) {
   const {
     id,
     model: m,
@@ -87,13 +91,13 @@ export function ModelForm(props: ModelFormProps) {
         } as Model)
       : m;
 
-  const form = Form.useForm(props.form)[0];
+  const form = Form.useForm<V>(props.form)[0];
   const { makeSignal } = useAbortController();
 
   const [status, setStatus] = useState<
     "loading" | "saving" | "deleting" | null
   >("loading");
-  const [value, setValue] = useState({});
+  const [value, setValue] = useState<Partial<V>>({});
 
   const submit = async () => {
     setStatus("saving");
@@ -149,7 +153,7 @@ export function ModelForm(props: ModelFormProps) {
 
   const setInitialValues = useEffectEvent(async () => {
     setStatus("loading");
-    const initialValues: Record<string, unknown> = {};
+    const initialValues: Partial<V> = {};
     if (id) {
       try {
         const resp = await route(model.item, id).get({
@@ -167,9 +171,11 @@ export function ModelForm(props: ModelFormProps) {
     for (const [name, defaultValue] of Object.entries(defaultValues ?? {})) {
       if (defaultValue !== undefined && initialValues[name] === undefined) {
         if (typeof defaultValue === "function") {
-          initialValues[name] = defaultValue(initialValues);
+          Object.assign(initialValues, {
+            [name]: defaultValue(initialValues),
+          });
         } else {
-          initialValues[name] = defaultValue;
+          Object.assign(initialValues, { [name]: defaultValue });
         }
       }
     }
@@ -191,7 +197,7 @@ export function ModelForm(props: ModelFormProps) {
   return (
     <Space orientation="vertical" style={{ width: "100%" }}>
       {contextHolder}
-      <FieldsForm
+      <FieldsForm<V>
         initialValues={value}
         fields={fields}
         form={form}
