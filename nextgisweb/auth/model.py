@@ -24,8 +24,9 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import maintenance_hook
 from nextgisweb.core.backup import BackupConfiguration, backup_configure_hook
-from nextgisweb.core.exception import ForbiddenError
+from nextgisweb.core.exception import ForbiddenError, UserException
 
+from .exception import ALinkException, UserDisabledException
 from .permission import Permission
 
 if TYPE_CHECKING:
@@ -250,6 +251,24 @@ class User(Principal):
     def require_permission(self, *args) -> None:
         if not self.has_permission(*args):
             raise ForbiddenError
+
+    def check_alink_available(self, *, raiseerr: bool):
+        try:
+            if self.disabled:
+                raise UserDisabledException
+            if self.is_administrator:
+                raise ALinkException(
+                    gettext("Usage of authorization link is forbidden for administrators.")
+                )
+            if self.oauth_subject is not None:
+                raise ALinkException(
+                    gettext("Usage of authorization link is forbidden for OAuth users.")
+                )
+        except UserException:
+            if raiseerr:
+                raise
+            return False
+        return True
 
 
 class Group(Principal):

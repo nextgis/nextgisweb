@@ -258,7 +258,7 @@ class AuthComponent(Component):
 
     # fmt: off
     option_annotations = OptionAnnotations((
-        Option("alink", bool, default=False, doc="Allow authentication via link."),
+        Option("alink", bool, default=True, doc="Allow authentication via link."),
 
         Option("login_route_name", default="auth.login"),
         Option("logout_route_name", default="auth.logout"),

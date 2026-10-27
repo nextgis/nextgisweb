@@ -109,6 +109,8 @@ def serialize_principal(src, cls, *, tr):
             attrs[k] = src.password_hash is not None
         elif k == "alink":
             attrs[k] = src.alink_token
+        elif k == "alink_available":
+            attrs[k] = src.check_alink_available(raiseerr=False)
         else:
             attrs[k] = getattr(src, k)
     return cls(**attrs)
@@ -299,6 +301,7 @@ class UserRead(Struct, kw_only=True):
     disabled: bool
     password: bool
     alink: str | None
+    alink_available: bool
     description: Description | None
     language: Language | LanguageAutodetect
     last_activity: DatetimeNaive | None

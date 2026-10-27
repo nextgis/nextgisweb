@@ -31,7 +31,7 @@ from nextgisweb.pyramid.view import ModelFactory
 
 from . import permission
 from .component import AuthComponent
-from .exception import ALinkException, InvalidCredentialsException, UserDisabledException
+from .exception import ALinkException, InvalidCredentialsException
 from .model import Group, User
 from .oauth import AuthorizationException, InvalidTokenException, TeamMembershipRequiredException
 from .policy import AP_OAUTH_AC, AuthState, OnUserLogin
@@ -132,13 +132,7 @@ def alink(request: Request, token: str):
             )
         )
 
-    if user.disabled:
-        raise UserDisabledException()
-
-    if user.is_administrator:
-        raise ALinkException(
-            message=gettext("Usage of authorization link is forbidden for administrators.")
-        )
+    user.check_alink_available(raiseerr=True)
 
     remember(request, (user.id, None))
 
