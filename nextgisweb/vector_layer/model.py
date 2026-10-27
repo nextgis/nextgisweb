@@ -2,7 +2,7 @@ import re
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -10,12 +10,14 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from osgeo import gdal, ogr
 from sqlalchemy import CursorResult, inspect, select, text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import COMP_ID, Base, DBSession, gettext
 from nextgisweb.lib import saext
+from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError as VE
@@ -23,6 +25,7 @@ from nextgisweb.core.storage import StorageEstimateResult, storage_estimate_hook
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
+    Feature,
     FeatureLayerEditableFieldsMixin,
     FeatureLayerGeometryType,
     FeatureLayerMixin,
@@ -186,18 +189,109 @@ class VectorLayer(
     def _tablename(self):
         return "layer_%s" % self.tbl_uuid
 
-    def from_source(self, source, *, layer=UNSET, **kw):
+    def _write_initial(self, loader: OGRLoader) -> None:
+        session = self.require_session()
+
+        self.geometry_type = loader.geometry_type
+        none_geom = self.geometry_type == GEOM_TYPE.NONE
+        if none_geom:
+            self.srs = None
+
+        self.fields[:] = [
+            VectorLayerField(
+                keyname=lf.name,
+                datatype=lf.datatype,
+                display_name=lf.name,
+            )
+            for lf in loader.fields.values()
+        ]
+
+        session.flush()
+
+        srs = self.srs
+        vls = self.vlschema()
+        schema = vls.ctab.schema
+        table = vls.ctab.name
+        connection = session.connection()
+
+        tab_sn = f"{schema}.{table}"
+        seq_sn = f"{schema}.{vls.cseq.name}"
+        load_fid = loader.fid_field is not None
+
+        vcolumns = [sa.column("id")]
+        qparams = dict[str, sa.ColumnElement](
+            id=sa.bindparam("id") if load_fid else sa.literal_column(f"nextval('{seq_sn}')")
+        )
+
+        if not none_geom:
+            vcolumns.append(sa.column("geom"))
+            qparams["geom"] = sa.func.ST_GeomFromWKB(sa.bindparam("geom"), sa.text(str(srs.id)))
+
+        fld_alias = dict[int, str]()
+        for lf in loader.fields.values():
+            fcol = vls.ctab.fields[lf.name].name
+            vcolumns.append(sa.column(fcol))
+            alias = fld_alias[lf.idx] = str(lf)
+            bp = sa.bindparam(alias)
+            qparams[fcol] = sa.type_coerce(bp, JSONB()) if lf.datatype == FIELD_TYPE.JSON else bp
+
+        vtable = sa.table(table, *vcolumns, schema=schema)
+        query_insert = sa.insert(vtable).values(**qparams)
+        chunk = list[dict[str, Any]]()
+
+        def insert_feature(data: dict[str, Any] | None = None, *, flush: bool = False) -> None:
+            if data is not None:
+                chunk.append(data)
+            if len(chunk) >= 1000 or (flush and len(chunk) > 0):
+                connection.execute(query_insert, chunk)
+                chunk.clear()
+
+        for fid, geom_bytes, data in loader.load(srs=self.srs, fld_alias=fld_alias):
+            if load_fid:
+                data["id"] = fid
+            if not none_geom:
+                data["geom"] = geom_bytes
+            insert_feature(data)
+        insert_feature(flush=True)
+
+        # Set sequence next value
+        if loader.fid_field is not None:
+            max_fid = connection.scalar(sa.text(f"SELECT COALESCE(MAX(id), 0) FROM {tab_sn}"))
+            sql_alter_seq = f"ALTER SEQUENCE {seq_sn} RESTART WITH {max_fid + 1}"
+            connection.execute(sa.text(sql_alter_seq))
+
+        if self.fversioning:
+            session.execute(vls.dml_initfill())
+
+    def from_source(
+        self,
+        source: Path | str | gdal.Dataset | ogr.Layer,
+        *,
+        layer=UNSET,
+        keep: bool = False,
+        **kw,
+    ) -> Self:
         lp_kw = dict()
         for k in list(kw.keys()):
             if k in LoaderParams.__annotations__:
+                if keep and k not in (
+                    "fix_errors",
+                    "skip_errors",
+                    "skip_other_geometry_types",
+                ):
+                    raise VE(f"'{k}' parameter is not supported for adding features.")
                 lp_kw[k] = kw.pop(k)
+        if keep:
+            lp_kw["field_filter"] = {f.keyname: f.datatype for f in self.fields}
         lparams = LoaderParams(**lp_kw)
 
         if isinstance(source, Path):
             source = str(source)
 
         if isinstance(source, str):
-            source = read_dataset_vector(source, **kw)
+            ds_result = read_dataset_vector(source, **kw)
+            assert ds_result is not None
+            source = ds_result
         else:
             assert len(kw) == 0, f"Unconsumed arguments: {kw}"
 
@@ -213,37 +307,28 @@ class VectorLayer(
             dataset_ref = None
             assert layer is UNSET
 
-        loader = OGRLoader(source, params=lparams)
-        self.geometry_type = loader.geometry_type
-        if self.geometry_type == GEOM_TYPE.NONE:
-            self.srs = None
-        self.fields[:] = [
-            VectorLayerField(
-                keyname=lf.name,
-                datatype=lf.datatype,
-                display_name=lf.name,
-            )
-            for lf in loader.fields.values()
-        ]
+        loader_kw = {"params": lparams}
+        if keep:
+            loader_kw["geometry_type"] = self.geometry_type
+        loader = OGRLoader(source, **loader_kw)
 
-        session = self.require_session()
-        session.flush()
+        if not keep:
+            self._write_initial(loader)
+        else:
+            fld_alias = {lf.idx: lf.name for lf in loader.fields.values()}
+            with self.feature_transaction():
+                for _, geom_bytes, fld_values in loader.load(srs=self.srs, fld_alias=fld_alias):
+                    feat = Feature(fields=fld_values)
+                    if geom_bytes is not None:
+                        feat.geom = Geometry.from_wkb(bytes(geom_bytes))
+                    self.feature_create(feat)
 
-        vls = self.vlschema()
-        columns = {lf.idx: vls.ctab.fields[lf.name].name for lf in loader.fields.values()}
-
-        size = loader.write(
-            srs=self.srs,
-            schema=vls.ctab.schema,
-            table=vls.ctab.name,
-            sequence=vls.cseq.name,
-            columns=columns,
-            connection=session.connection(),
-        )
-
-        if self.fversioning:
-            session.execute(vls.dml_initfill())
-
+        stat = loader.load_stat()
+        static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # FID column
+        for fld in self.fields:
+            if fld.datatype not in (FIELD_TYPE.STRING, FIELD_TYPE.JSON):
+                static_size += FIELD_TYPE_SIZE[fld.datatype]
+        size = static_size * stat["feature_count"] + stat["dynamic_size"]
         CoreComponent.current().reserve_storage(
             COMP_ID,
             VectorLayerData,
@@ -890,7 +975,8 @@ class SourceAttr(SAttribute):
         obj.from_source(ogrlayer, **kw)
 
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
-        if srlzr.obj.id is not None:
+        keep = not create and srlzr.data.keep is True
+        if srlzr.obj.id is not None and not keep:
             srlzr.obj._vlschema_wipe()
             srlzr.obj.require_session().flush()
 
@@ -904,7 +990,7 @@ class SourceAttr(SAttribute):
         for k, a in VectorLayerSerializer.__dict__.items():
             if (
                 not isinstance(a, LoaderAttr)
-                or k == "source_layer"
+                or k in ("source_layer", "keep")
                 or (v := getattr(srlzr.data, k)) is UNSET
             ):
                 continue
@@ -915,6 +1001,7 @@ class SourceAttr(SAttribute):
         self._setup_layer(
             srlzr.obj,
             ogrlayer,
+            keep=keep,
             **kwargs,
         )
 
@@ -1019,6 +1106,7 @@ class VectorLayerSerializer(Serializer, resource=VectorLayer, force_create=True)
 
     source = SourceAttr(write=DataScope.write)
     source_layer = LoaderAttr(str)
+    keep = LoaderAttr(bool)
     fix_errors = LoaderAttr(FixErrors)
     skip_errors = LoaderAttr(bool)
     skip_other_geometry_types = LoaderAttr(bool)

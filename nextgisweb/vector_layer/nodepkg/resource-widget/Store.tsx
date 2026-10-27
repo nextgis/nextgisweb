@@ -19,7 +19,14 @@ import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/vector-layer/type/api";
 
-export type Mode = "file" | "copy" | "empty" | "gtype" | "keep" | "delete";
+export type Mode =
+  | "file"
+  | "file-add"
+  | "copy"
+  | "empty"
+  | "gtype"
+  | "keep"
+  | "delete";
 export type GeometryType = Required<apitype.VectorLayerUpdate>["geometry_type"];
 
 type SourceOptions = Required<
@@ -33,6 +40,7 @@ type SourceOptions = Required<
     | "cast_has_z"
     | "fid_source"
     | "fid_field"
+    | "keep"
   >
 >;
 
@@ -57,6 +65,7 @@ export class Store implements EditorStore<
     fid_source: "AUTO",
     fid_field: "ngw_id, id",
     skip_other_geometry_types: false,
+    keep: false,
   };
 
   @observableRef accessor geometryType: GeometryType | null = null;
@@ -75,6 +84,14 @@ export class Store implements EditorStore<
   @action
   load(value: apitype.VectorLayerRead) {
     this.geometryTypeInitial = value.geometry_type;
+    const gti = this.geometryTypeInitial;
+    if (gti !== null && gti !== "NONE") {
+      const btype = gti.replace(/^(?:MULTI)?(.*?)Z?$/, "$1") as
+        | "POINT"
+        | "LINESTRING"
+        | "POLYGON";
+      this.sourceOptions.cast_geometry_type = btype;
+    }
     this.dirty = false;
   }
 
@@ -83,7 +100,7 @@ export class Store implements EditorStore<
 
     const result: apitype.VectorLayerUpdate = {};
 
-    if (this.mode === "file") {
+    if (this.mode === "file" || this.mode === "file-add") {
       lunkwill.suggest(true);
       result.source = this.source!;
       result.source_layer = this.sourceLayer!;
@@ -110,10 +127,21 @@ export class Store implements EditorStore<
           so[k] = vmap[val];
         }
       };
-      onull("cast_geometry_type");
-      ayn("cast_is_multi");
-      ayn("cast_has_z");
-      Object.assign(result, so);
+
+      const keep = this.mode === "file-add";
+      if (keep) {
+        Object.assign(result, {
+          keep: true,
+          fix_errors: so["fix_errors"],
+          skip_errors: so["skip_errors"],
+          skip_other_geometry_types: so["skip_other_geometry_types"],
+        });
+      } else {
+        onull("cast_geometry_type");
+        ayn("cast_is_multi");
+        ayn("cast_has_z");
+        Object.assign(result, so);
+      }
     } else if (this.mode === "copy") {
       lunkwill.suggest(true);
       return {
@@ -154,7 +182,7 @@ export class Store implements EditorStore<
   @computed
   get isValid() {
     if (this.confirmMsg && !this.confirm) return false;
-    if (this.mode === "file") {
+    if (this.mode === "file" || this.mode === "file-add") {
       return !this.uploading && !!this.source && this.sourceLayer !== null;
     }
     if (this.mode === "copy") {

@@ -48,110 +48,120 @@ const RadioGroup = (props: RadioGroupProps) => (
   <Radio.Group optionType="button" buttonStyle="outline" {...props} />
 );
 
-const SourceOptions = observer(({ store }: { store: Store }) => {
-  const so = store.sourceOptions;
-  const optsFixErrors = useMemo(() => {
-    return [
-      { value: "LOSSY", label: gettext("Whenever possible") },
-      { value: "SAFE", label: gettext("Without losing data") },
-      { value: "NONE", label: gettext("None") },
-    ];
-  }, []);
+const SourceOptions = observer(
+  ({ store, fileReplaceMode }: { store: Store; fileReplaceMode: boolean }) => {
+    const so = store.sourceOptions;
+    const optsFixErrors = useMemo(() => {
+      return [
+        { value: "LOSSY", label: gettext("Whenever possible") },
+        { value: "SAFE", label: gettext("Without losing data") },
+        { value: "NONE", label: gettext("None") },
+      ];
+    }, []);
 
-  const optsGType = useMemo(() => {
-    return [
-      { value: "NONE", label: gettext("Auto") },
-      { value: "POINT", label: gettext("Point") },
-      { value: "LINESTRING", label: gettext("Line") },
-      { value: "POLYGON", label: gettext("Polygon") },
-    ];
-  }, []);
+    const optsGType = useMemo(() => {
+      return [
+        { value: "NONE", label: gettext("Auto") },
+        { value: "POINT", label: gettext("Point") },
+        { value: "LINESTRING", label: gettext("Line") },
+        { value: "POLYGON", label: gettext("Polygon") },
+      ];
+    }, []);
 
-  const optsAutoYesNo = useMemo(() => {
-    return [
-      { value: "NONE", label: gettext("Auto") },
-      { value: "YES", label: gettext("Yes") },
-      { value: "NO", label: gettext("No") },
-    ];
-  }, []);
+    const optsAutoYesNo = useMemo(() => {
+      return [
+        { value: "NONE", label: gettext("Auto") },
+        { value: "YES", label: gettext("Yes") },
+        { value: "NO", label: gettext("No") },
+      ];
+    }, []);
 
-  const optsFidSource = useMemo(() => {
-    return [
-      { value: "AUTO", label: gettext("Auto") },
-      { value: "SEQUENCE", label: gettext("Sequence") },
-      { value: "FIELD", label: gettext("Field") },
-    ];
-  }, []);
+    const optsFidSource = useMemo(() => {
+      return [
+        { value: "AUTO", label: gettext("Auto") },
+        { value: "SEQUENCE", label: gettext("Sequence") },
+        { value: "FIELD", label: gettext("Field") },
+      ];
+    }, []);
 
-  const brg = (key: string): RadioGroupProps => {
-    const a = key as keyof typeof so;
-    return {
-      value: so[a] ?? "NONE",
-      onChange: (e) => {
-        let value = e.target.value;
-        if (value === "NONE" && a !== "fix_errors") value = null;
-        store.updateSourceOptions({ [a]: value });
-      },
+    const brg = (key: string): RadioGroupProps => {
+      const a = key as keyof typeof so;
+      return {
+        value: so[a] ?? "NONE",
+        onChange: (e) => {
+          let value = e.target.value;
+          if (value === "NONE" && a !== "fix_errors") value = null;
+          store.updateSourceOptions({ [a]: value });
+        },
+      };
     };
-  };
 
-  const bcb = (key: string) => {
-    const a = key as keyof typeof so;
-    return {
-      value: !!so[a],
-      onChange: (value: boolean) => {
-        store.updateSourceOptions({ [a]: value });
-      },
+    const bcb = (key: string) => {
+      const a = key as keyof typeof so;
+      return {
+        value: !!so[a],
+        onChange: (value: boolean) => {
+          store.updateSourceOptions({ [a]: value });
+        },
+      };
     };
-  };
 
-  return (
-    <Area>
-      <Lot label={msgFixErrors}>
-        <Space orientation="horizontal">
-          <RadioGroup options={optsFixErrors} {...brg("fix_errors")} />
-          <CheckboxValue {...bcb("skip_errors")}>
-            {msgSkipUnfixable}
-          </CheckboxValue>
-        </Space>
-      </Lot>
+    return (
+      <Area>
+        <Lot label={msgFixErrors}>
+          <Space orientation="horizontal">
+            <RadioGroup options={optsFixErrors} {...brg("fix_errors")} />
+            <CheckboxValue {...bcb("skip_errors")}>
+              {msgSkipUnfixable}
+            </CheckboxValue>
+          </Space>
+        </Lot>
 
-      <Lot label={msgGeomType}>
-        <Space orientation="horizontal">
-          <RadioGroup options={optsGType} {...brg("cast_geometry_type")} />
-          <CheckboxValue
-            {...bcb("skip_other_geometry_types")}
-            disabled={store.sourceOptions.cast_geometry_type === null}
-          >
-            {msgGeomTypeSkip}
-          </CheckboxValue>
-        </Space>
-      </Lot>
+        <Lot label={msgGeomType}>
+          <Space orientation="horizontal">
+            <RadioGroup
+              options={optsGType}
+              {...brg("cast_geometry_type")}
+              disabled={!fileReplaceMode}
+            />
+            <CheckboxValue
+              {...bcb("skip_other_geometry_types")}
+              disabled={store.sourceOptions.cast_geometry_type === null}
+            >
+              {msgGeomTypeSkip}
+            </CheckboxValue>
+          </Space>
+        </Lot>
 
-      <Lot label={msgGeomTypeMulti}>
-        <RadioGroup options={optsAutoYesNo} {...brg("cast_is_multi")} />
-      </Lot>
+        {fileReplaceMode && (
+          <>
+            <Lot label={msgGeomTypeMulti}>
+              <RadioGroup options={optsAutoYesNo} {...brg("cast_is_multi")} />
+            </Lot>
 
-      <Lot label={msgGeomTypeZ}>
-        <RadioGroup options={optsAutoYesNo} {...brg("cast_has_z")} />
-      </Lot>
+            <Lot label={msgGeomTypeZ}>
+              <RadioGroup options={optsAutoYesNo} {...brg("cast_has_z")} />
+            </Lot>
 
-      <Lot label={msgFidSource}>
-        <Space orientation="horizontal">
-          <RadioGroup options={optsFidSource} {...brg("fid_source")} />
-          <Input
-            value={so.fid_field}
-            onChange={(e) => {
-              store.updateSourceOptions({
-                fid_field: e.target.value,
-              });
-            }}
-          />
-        </Space>
-      </Lot>
-    </Area>
-  );
-});
+            <Lot label={msgFidSource}>
+              <Space orientation="horizontal">
+                <RadioGroup options={optsFidSource} {...brg("fid_source")} />
+                <Input
+                  value={so.fid_field}
+                  onChange={(e) => {
+                    store.updateSourceOptions({
+                      fid_field: e.target.value,
+                    });
+                  }}
+                />
+              </Space>
+            </Lot>
+          </>
+        )}
+      </Area>
+    );
+  }
+);
 
 SourceOptions.displayName = "SourceOptions";
 
@@ -172,6 +182,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
       add("keep", gettext("Keep existing features"));
       add("gtype", gettext("Change geometry type"));
       add("file", gettext("Replace features from file"));
+      add("file-add", gettext("Add features from file"));
       add("delete", gettext("Delete all features"));
     }
 
@@ -268,7 +279,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
         options={modeOpts}
         onChange={(value) => store.update({ mode: value })}
       />
-      {mode === "file" && (
+      {(mode === "file" || mode === "file-add") && (
         <>
           <FileUploader
             fileMeta={store.source ?? undefined}
@@ -334,7 +345,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
           </CheckboxValue>
         </>
       )}
-      {mode === "file" && (
+      {(mode === "file" || mode === "file-add") && (
         <Collapse
           size="small"
           ghost={true}
@@ -346,7 +357,12 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
             {
               key: "default",
               label: gettext("Advanced options"),
-              children: <SourceOptions store={store} />,
+              children: (
+                <SourceOptions
+                  store={store}
+                  fileReplaceMode={mode === "file"}
+                />
+              ),
             },
           ]}
         />

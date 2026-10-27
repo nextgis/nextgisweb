@@ -172,6 +172,15 @@ def cohere_bytes(value: bytes | bytearray) -> bytes:
         raise ValueError(f"Bytes or bytearray expected, got {type(value).__name__}")
 
 
+def cohere_bytearray(value: bytes | bytearray) -> bytearray:
+    if isinstance(value, bytearray):
+        return value
+    elif isinstance(value, bytes):
+        return bytearray(value)
+    else:
+        raise ValueError(f"Bytes or bytearray expected, got {type(value).__name__}")
+
+
 def _geometry_copy(ogr_geom: ogr.Geometry) -> ogr.Geometry:
     return ogr_geom.Clone()
 
