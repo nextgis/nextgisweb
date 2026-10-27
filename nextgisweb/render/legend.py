@@ -8,6 +8,7 @@ from nextgisweb.resource import IResourceBase
 
 class LegendSymbol(Struct, kw_only=True):
     index: int
+    parent: int | None
     render: bool | None
     display_name: str | TrStr
     icon: Image
