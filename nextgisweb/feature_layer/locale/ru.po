@@ -2,31 +2,39 @@
 msgid "Aggregation '{}' is not applicable to fields of type '{}'."
 msgstr "Агрегация '{}' не применима к полям типа '{}'."
 
-#: api.py:119 api_identify.py:29
+#: api.py:121 api_identify.py:29
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:380
+#: api.py:382
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:498 api_export.py:219
+#: api.py:500 api_export.py:219
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:546
+#: api.py:552
 msgid "The 'text_search_context' parameter requires the 'text_search' parameter."
 msgstr "Параметр 'text_search_context' требует наличия параметра 'text_search'."
 
-#: api.py:794
+#: api.py:563
+msgid "Parameters 'sort' and 'order_by' are mutually exclusive."
+msgstr "Параметры 'sort' и 'order_by' взаимоисключающие."
+
+#: api.py:568 api.py:582
+msgid "Ordering is not supported for this layer."
+msgstr "Сортировка не поддерживается для этого слоя."
+
+#: api.py:812
 msgid "Aggregation is not supported for this layer."
 msgstr "Агрегация не поддерживается для этого слоя."
 
-#: api.py:807
+#: api.py:825
 msgid "Aggregation '{}' is not supported for this layer."
 msgstr "Агрегация '{}' не поддерживается для этого слоя."
 
-#: api.py:813 api.py:820
+#: api.py:831 api.py:838
 msgid "Field '{}' not found."
 msgstr "Поле '{}' не найдено."
 
@@ -578,7 +586,7 @@ msgstr "Поиск..."
 msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
-#: nodepkg/feature-grid/FeatureTable.tsx:104
+#: nodepkg/feature-grid/FeatureTable.tsx:109
 #: nodepkg/feature-grid/component/TableConfigModal.tsx:98
 msgid "Last changed"
 msgstr "Последнее изменение"
@@ -1018,6 +1026,10 @@ msgstr "Получено некорректное значение BIGINT: {}."
 #: numutil.py:93
 msgid "Got an invalid BOOLEAN value: {}."
 msgstr "Получено некорректное значение BOOLEAN: {}."
+
+#: sort.py:18
+msgid "Invalid sort expression"
+msgstr "Неверное выражение для сортировки"
 
 #: transaction/exception.py:7
 msgid "Transaction not found"
