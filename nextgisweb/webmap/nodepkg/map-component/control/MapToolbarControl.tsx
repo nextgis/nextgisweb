@@ -11,7 +11,7 @@ import {
 
 type Direction = "horizontal" | "vertical";
 
-interface MapToolbarControlProps extends MapControlProps {
+export interface MapToolbarControlProps extends MapControlProps {
   direction?: Direction;
   gap?: number | string;
   align?: CSSProperties["alignItems"];

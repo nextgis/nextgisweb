@@ -3,6 +3,8 @@ import { lazy } from "react";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { EDITING_ID } from "@nextgisweb/webmap/constant";
+import type { Display } from "@nextgisweb/webmap/display";
+import { hasOlMap } from "@nextgisweb/webmap/ol/util/hasOlMap";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 import type { PluginMenuItem, PluginState } from "@nextgisweb/webmap/type";
 
@@ -15,16 +17,17 @@ const LayerEditorMapLazy = lazy(() => import("./LayerEditorMap"));
 
 export class LayerEditor extends PluginBase {
   renderMap = LayerEditorMapLazy;
+  isEnabled = ({ map, config, isTinyMode }: Display) =>
+    map.ready &&
+    hasOlMap(map.adapter) &&
+    !isTinyMode &&
+    !!config.webmapEditable;
 
   getPluginState(nodeData: TreeLayerStore): PluginState {
     const state = super.getPluginState(nodeData);
-    const disabled =
-      this.display.isTinyMode || !this.display.config.webmapEditable;
-
     return {
       ...state,
       enabled:
-        !disabled &&
         nodeData.type === "layer" &&
         (nodeData.plugin[this.identity] as LayerEditorWebMapPluginConfig)
           ?.writable,

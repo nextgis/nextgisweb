@@ -1,3 +1,4 @@
+import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 
@@ -19,6 +20,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
+import { hasOlMap } from "@nextgisweb/webmap/ol/util/hasOlMap";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 
 import type { FeatureAttachment } from "../../type";
@@ -313,7 +315,10 @@ const fetchFeaturesAttachments = async (
   return result;
 };
 
-function AttachmentsTab({ display }: AttachmentsTabProps) {
+const AttachmentsTab = observer(function AttachmentsTab({
+  display,
+}: AttachmentsTabProps) {
+  const { adapter } = display.map;
   const [loading, setLoading] = useState(false);
   const { makeSignal, abort } = useAbortController();
   const [geomWKT, setGeomWKT] = useState<string>();
@@ -367,15 +372,18 @@ function AttachmentsTab({ display }: AttachmentsTabProps) {
   return (
     <div className="attachments-tab">
       <div className="header">
-        <Space.Compact>
-          <FilterExtentBtn
-            id="attachments"
-            display={display}
-            onGeomChange={(geom, geomWKT) => {
-              setGeomWKT(geomWKT);
-            }}
-          />
-        </Space.Compact>
+        {hasOlMap(adapter) && (
+          <Space.Compact>
+            <FilterExtentBtn
+              id="attachments"
+              display={display}
+              olMap={adapter.map}
+              onGeomChange={(geom, geomWKT) => {
+                setGeomWKT(geomWKT);
+              }}
+            />
+          </Space.Compact>
+        )}
 
         {buttonBulkLoad}
 
@@ -388,6 +396,6 @@ function AttachmentsTab({ display }: AttachmentsTabProps) {
       <div className="content">{content}</div>
     </div>
   );
-}
+});
 
 export default AttachmentsTab;

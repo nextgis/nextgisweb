@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { Collection } from "ol";
 import type { Feature as OlFeature } from "ol";
+import type OlMap from "ol/Map";
 import type { Geometry } from "ol/geom";
 import type { Interaction } from "ol/interaction";
 import VectorLayer from "ol/layer/Vector";
@@ -13,7 +14,6 @@ import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import { useDebounce } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
-import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
 import { ToggleGroup } from "@nextgisweb/webmap/map-component/control/toggle-group";
 
 import { EditorContext } from "./context/useEditorContext";
@@ -25,6 +25,7 @@ type UndoAction = () => void;
 export interface EditableItemProps {
   id?: string | number;
   source?: VectorSource;
+  olMap: OlMap;
 
   enabled?: boolean;
   children?: ReactNode;
@@ -47,6 +48,7 @@ function once<T extends (...args: any[]) => any>(fn: T): T {
 export const EditableItem = observer(
   ({
     id,
+    olMap,
     source: outerSource,
     enabled,
     children,
@@ -54,9 +56,6 @@ export const EditableItem = observer(
     onEditingMode,
     onDirtyChange,
   }: EditableItemProps) => {
-    const { mapStore } = useMapContext();
-    const { olMap } = mapStore;
-
     const interactionsRef = useRef<Map<string, Interaction>>(new Map());
     const [interactionsVersion, setInteractionsVersion] = useState(0);
 

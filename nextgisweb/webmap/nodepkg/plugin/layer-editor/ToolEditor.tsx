@@ -8,8 +8,10 @@ import { gettextf } from "@nextgisweb/pyramid/i18n";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
 import type { MapControlProps } from "@nextgisweb/webmap/map-component";
+import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
 import MapToolbarControl from "@nextgisweb/webmap/map-component/control/MapToolbarControl";
 import { useToggleGroupItem } from "@nextgisweb/webmap/map-component/control/toggle-group";
+import { hasOlMap } from "@nextgisweb/webmap/ol/util/hasOlMap";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 
 import { EditableResource } from "./EditableResource";
@@ -30,6 +32,9 @@ const FinishEditingDialogLazy = lazy(
 const ToolEditor = observer(
   ({ order = 0, position, groupId }: ToolEditorProps) => {
     const { display } = useDisplayContext();
+    const { mapStore } = useMapContext();
+    const { adapter } = mapStore;
+    const olMap = hasOlMap(adapter) ? adapter.map : undefined;
     const { activate, deactivate, isActive } = useToggleGroupItem(groupId);
 
     const [snapSettings, setSnapSettings] = useState<SnapSettings>({
@@ -46,6 +51,11 @@ const ToolEditor = observer(
     const [source] = useState(() => new VectorSource());
 
     const [editableItems, setEditableItems] = useState<TreeLayerStore[]>([]);
+
+    useEffect(() => {
+      display.setEditingInProgress(editableItems.length > 0);
+      return () => display.setEditingInProgress(false);
+    }, [display, editableItems.length]);
 
     const dirtyRef = useRef<Map<number, boolean>>(new Map());
 
@@ -156,7 +166,7 @@ const ToolEditor = observer(
       activate,
     ]);
 
-    if (!editableItems.length) {
+    if (!olMap || !editableItems.length) {
       return null;
     }
     return (
@@ -175,6 +185,7 @@ const ToolEditor = observer(
           {editableItems.map(({ id, layerId }) => (
             <EditableResource
               key={id}
+              olMap={olMap}
               source={source}
               snapSettings={snapSettings}
               enabled={display.item?.id === id}

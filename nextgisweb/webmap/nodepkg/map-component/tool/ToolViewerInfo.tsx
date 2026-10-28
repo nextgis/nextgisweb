@@ -1,8 +1,9 @@
+import type OlMap from "ol/Map";
+
 import MapViewerInfoComp, {
   CoordinateSystemDisplay,
 } from "../../map-viewer-info";
 import { useMeasurementToolsActive } from "../../map-viewer-info/hook/useMeasurementToolsActive";
-import { useMapContext } from "../context/useMapContext";
 import { MapControl } from "../control";
 import type { MapControlProps } from "../control";
 import { useToggleControl } from "../control/hook/useToggleControl";
@@ -11,9 +12,10 @@ import type { UseToggleControlOptions } from "../control/hook/useToggleControl";
 import Icon from "@nextgisweb/icon/material/location_searching";
 
 type ToolZoomProps = MapControlProps &
-  UseToggleControlOptions & { label?: string };
+  UseToggleControlOptions & { label?: string; olMap: OlMap };
 
 export default function ToolViewerInfo({
+  olMap,
   initialValue: defaultValue = false,
   groupId,
   value: controlledValue,
@@ -22,7 +24,6 @@ export default function ToolViewerInfo({
   canToggle,
   ...rest
 }: ToolZoomProps) {
-  const { mapStore } = useMapContext();
   const { toggle, value } = useToggleControl({
     initialValue: defaultValue,
     groupId,
@@ -44,7 +45,7 @@ export default function ToolViewerInfo({
         <Icon />
       </button>
 
-      {value && <MapViewerInfoComp map={mapStore.olMap} />}
+      {value && <MapViewerInfoComp map={olMap} />}
 
       {shouldShowCoordinateSystem && <CoordinateSystemDisplay />}
     </MapControl>

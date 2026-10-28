@@ -1,12 +1,12 @@
 import { observer } from "mobx-react-lite";
 import type { FitOptions } from "ol/View";
 import type { Options as OlZoomControlOptions } from "ol/control/Zoom";
-import { easeOut } from "ol/easing";
 import type { Extent } from "ol/extent";
 import type { ProjectionLike } from "ol/proj";
 import { useCallback, useEffect, useState } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { DEFAULT_VIEW_ANIMATION_DURATION } from "@nextgisweb/webmap/map-adapter/constant";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
 import { useMapContext } from "../context/useMapContext";
@@ -74,7 +74,7 @@ export const ZoomControl = observer(
     order,
     extent,
     position,
-    duration = 250,
+    duration = DEFAULT_VIEW_ANIMATION_DURATION,
     className,
     fitOptions,
     showZoomLevel = false,
@@ -84,45 +84,11 @@ export const ZoomControl = observer(
   }: ZoomControlProps) => {
     const { mapStore } = useMapContext();
 
-    const [canZoomIn, setCanZoomIn] = useState(true);
-    const [canZoomOut, setCanZoomOut] = useState(true);
-
-    useEffect(() => {
-      const view = mapStore.olMap.getView();
-      const current = view.getZoom();
-      if (typeof current !== "number") {
-        setCanZoomIn(false);
-        setCanZoomOut(false);
-        return;
-      }
-      const nextInc = view.getConstrainedZoom(current + Math.abs(delta));
-      const nextDec = view.getConstrainedZoom(current - Math.abs(delta));
-      setCanZoomIn(typeof nextInc === "number" && nextInc > current);
-      setCanZoomOut(typeof nextDec === "number" && nextDec < current);
-    }, [mapStore, mapStore.resolution, delta]);
+    const canZoomIn = mapStore.canZoomBy(Math.abs(delta));
+    const canZoomOut = mapStore.canZoomBy(-Math.abs(delta));
 
     const zoomBy = useCallback(
-      (d: number) => {
-        const view = mapStore.olMap.getView();
-        const current = view.getZoom();
-        if (typeof current !== "number") return;
-
-        const newZoom = view.getConstrainedZoom(current + d);
-        if (typeof newZoom === "number") {
-          if (duration > 0) {
-            if (view.getAnimating?.()) {
-              view.cancelAnimations?.();
-            }
-            view.animate({
-              zoom: newZoom,
-              duration,
-              easing: easeOut,
-            });
-          } else {
-            view.setZoom(newZoom);
-          }
-        }
-      },
+      (d: number) => mapStore.zoomBy(d, duration),
       [mapStore, duration]
     );
 

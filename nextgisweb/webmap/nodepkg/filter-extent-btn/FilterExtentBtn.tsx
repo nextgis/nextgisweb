@@ -1,4 +1,5 @@
 import type Feature from "ol/Feature";
+import type OlMap from "ol/Map";
 import { WKT } from "ol/format";
 import type { Circle, Geometry } from "ol/geom";
 import { fromCircle } from "ol/geom/Polygon";
@@ -9,7 +10,14 @@ import type { Vector as OlVectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
 import { Text } from "ol/style";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Button, Dropdown, Space } from "@nextgisweb/gui/antd";
 import type { MenuProps, SizeType } from "@nextgisweb/gui/antd";
@@ -31,6 +39,7 @@ import ZoomInIcon from "@nextgisweb/icon/material/zoom_in/outline";
 export interface FilterExtentBtnProps {
   id: number | string;
   display: Display;
+  olMap: OlMap;
   size?: SizeType;
   onGeomChange?: (
     geom: Geometry | undefined,
@@ -145,6 +154,7 @@ interface InteractionInfo {
 
 const buildInteraction = (
   display: Display,
+  olMap: OlMap,
   uniqueLayerId: number | string,
   geomType: string,
   onDrawEnd?: (event: DrawEvent) => void
@@ -164,7 +174,6 @@ const buildInteraction = (
     vectorLayer.setStyle(geomTypeInfo.styleFunc);
   }
 
-  const olMap = display.map.olMap;
   olMap.addLayer(vectorLayer);
   vectorLayer.setZIndex(1000);
 
@@ -204,12 +213,12 @@ const buildInteraction = (
 
 const clearDrawInteraction = (
   display: Display,
+  olMap: OlMap,
   interactionInfo: InteractionInfo
 ): InteractionInfo | undefined => {
   if (!display || !interactionInfo) return;
 
   if (interactionInfo.interaction) {
-    const olMap = display.map.olMap;
     olMap.removeInteraction(interactionInfo.interaction);
   }
 
@@ -231,6 +240,7 @@ const clearDrawInteraction = (
 export const FilterExtentBtn = ({
   id,
   display,
+  olMap,
   size = "middle",
   onGeomChange,
 }: FilterExtentBtnProps) => {
@@ -238,6 +248,7 @@ export const FilterExtentBtn = ({
   const [geomType, setGeomType] = useState<string>();
   const [visibleGeom, setVisibleGeom] = useState<boolean>(true);
   const [drawEnd, setDrawEnd] = useState<DrawEvent>();
+  const prevGeometryWKT = useRef<string>(undefined);
 
   const mode = useMemo<FilterExtentBtnMode>(() => {
     if (drawEnd) {
@@ -251,28 +262,35 @@ export const FilterExtentBtn = ({
     interactionInfo.current = undefined;
     if (!display || !info) return;
 
-    const olMap = display.map.olMap;
-    clearDrawInteraction(display, info);
+    clearDrawInteraction(display, olMap, info);
     olMap.removeLayer(info.layer);
-  }, [display]);
+  }, [display, olMap]);
 
   const clearGeometry = useCallback(() => {
     if (!interactionInfo.current) return;
     clearInteraction();
     setDrawEnd(undefined);
     setGeomType(undefined);
+    prevGeometryWKT.current = undefined;
     if (onGeomChange) {
       onGeomChange(undefined, undefined);
     }
   }, [clearInteraction, onGeomChange]);
 
+  const resetFilter = useEffectEvent(() => {
+    onGeomChange?.(undefined, undefined);
+  });
+
   useEffect(() => {
     return () => {
       clearInteraction();
+      if (prevGeometryWKT.current !== undefined) {
+        prevGeometryWKT.current = undefined;
+        resetFilter();
+      }
     };
   }, [clearInteraction]);
 
-  const prevGeometryWKT = useRef<string>(undefined);
   useEffect(() => {
     if (!drawEnd) return;
 
@@ -291,16 +309,17 @@ export const FilterExtentBtn = ({
     if (interactionInfo.current) {
       interactionInfo.current = clearDrawInteraction(
         display,
+        olMap,
         interactionInfo.current
       );
     }
-  }, [display, drawEnd, onGeomChange]);
+  }, [display, drawEnd, onGeomChange, olMap]);
 
   const geomTypesMenuItems: MenuProps = {
     items: geomTypesOptions,
     onClick: (item) => {
       setGeomType(item.key);
-      const info = buildInteraction(display, id, item.key, setDrawEnd);
+      const info = buildInteraction(display, olMap, id, item.key, setDrawEnd);
       interactionInfo.current = info;
     },
   };
@@ -326,13 +345,12 @@ export const FilterExtentBtn = ({
   const zoomToGeom = useCallback(() => {
     const source = interactionInfo.current?.source;
     if (source) {
-      const map = display.map.olMap;
       const extent = source.getExtent();
       if (extent) {
-        map.getView().fit(extent);
+        olMap.getView().fit(extent);
       }
     }
-  }, [display]);
+  }, [olMap]);
 
   const handleGeomAction = useCallback(
     (key: string) => {

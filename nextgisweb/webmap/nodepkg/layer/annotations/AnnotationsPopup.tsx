@@ -1,9 +1,8 @@
 import classNames from "classnames";
+import type OlMap from "ol/Map";
 import Overlay from "ol/Overlay";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-
-import type { MapStore } from "../../ol/MapStore";
 
 import type {
   AnnotationChangeCallback,
@@ -20,7 +19,7 @@ export interface AnnotationPopupOverlay extends Overlay {
 interface AnnotationsPopupProps {
   annFeature: AnnotationFeature;
   editable?: boolean;
-  map: MapStore;
+  map: OlMap;
   onChange?: AnnotationChangeCallback;
 }
 
@@ -53,12 +52,12 @@ export function AnnotationsPopup({
 
     overlay.annFeature = annFeature;
     setOverlay(overlay);
-    map.olMap.addOverlay(overlay);
+    map.addOverlay(overlay);
 
     return () => {
-      map.olMap.removeOverlay(overlay);
+      map.removeOverlay(overlay);
     };
-  }, [annFeature, map.olMap]);
+  }, [annFeature, map]);
 
   const element = useMemo(() => {
     return overlay?.getElement();

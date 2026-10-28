@@ -1,11 +1,9 @@
 import basemapSettings from "@nextgisweb/basemap/client-settings";
 import type { BasemapConfig } from "@nextgisweb/basemap/layer-widget/type";
-import {
-  createTileLayer,
-  prepareBaselayerConfig,
-} from "@nextgisweb/basemap/util/baselayer";
+import { prepareBaselayerConfig } from "@nextgisweb/basemap/util/baselayer";
 import { route } from "@nextgisweb/pyramid/api";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
+import { createURLLayer } from "@nextgisweb/webmap/ol/createURLLayer";
 
 import type { TileSource } from "./PointCloudViewer";
 
@@ -72,7 +70,7 @@ export function defaultBasemapKey(options: BasemapOption[]) {
 export async function createBasemapSource(
   config: BasemapConfig
 ): Promise<TileSource | null> {
-  const layer = await createTileLayer(prepareBaselayerConfig(config));
+  const layer = await createURLLayer(prepareBaselayerConfig(config));
   return layer && "getTileUrlFunction" in layer.olSource
     ? (layer.olSource as TileSource)
     : null;

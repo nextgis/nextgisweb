@@ -1,4 +1,3 @@
-import type Control from "ol/control/Control";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { TargetPosition } from "@nextgisweb/webmap/control-container/ControlContainer";
@@ -9,13 +8,13 @@ import type { ControlOptions } from "../control";
 
 const DEFAULT_POSITION: TargetPosition = "top-left";
 
-export function useMapControl<T extends Control>({
+export function useMapControl({
   id,
   order,
   targetStyle,
   ...props
 }: ControlOptions) {
-  const [instance, setInstance] = useState<T | null>(null);
+  const [element] = useState(() => document.createElement("div"));
   const context = useMapContext();
   const parent = useMapControlContext();
   const inside = parent && parent.id;
@@ -37,52 +36,38 @@ export function useMapControl<T extends Control>({
   const orderRef = useRef(order);
   const positionRef = useRef(position);
 
-  const added = useRef<Control>(null);
-
   useEffect(
     function addControl() {
       const mapStore = context.mapStore;
-      if (instance && mapStore) {
-        const control = mapStore.addControl({
-          id,
-          order: orderRef.current,
-          control: instance,
-          position: positionRef.current,
-          targetStyle: targetStyleRef.current,
-        });
-        if (control) {
-          added.current = control;
-        }
-      }
+      mapStore.addControl({
+        id,
+        order: orderRef.current,
+        element,
+        position: positionRef.current,
+        targetStyle: targetStyleRef.current,
+      });
 
       return function removeControl() {
-        if (mapStore && added.current) {
-          mapStore.removeControl(added.current);
-          added.current = null;
-        }
+        mapStore.removeControl(element);
       };
     },
-    [instance, context.mapStore, id]
+    [element, context.mapStore, id]
   );
 
   useEffect(() => {
-    if (added.current) {
-      const target = context.mapStore.panelControl.getTarget(added.current);
-      if (target) {
-        Object.assign(target.style, targetStyle);
-      }
+    const target = context.mapStore.getControlTarget(element);
+    if (target) {
+      Object.assign(target.style, targetStyle);
     }
-  }, [targetStyle, context.mapStore]);
+  }, [element, targetStyle, context.mapStore]);
 
   useEffect(() => {
     const mapStore = context.mapStore;
     orderRef.current = order;
     positionRef.current = position;
 
-    if (mapStore && added.current) {
-      mapStore.updateControlPlacement(added.current, position, order);
-    }
-  }, [context, order, position]);
+    mapStore.updateControlPlacement(element, position, order);
+  }, [element, context, order, position]);
 
-  return { ...props, setInstance, instance, position, margin, context };
+  return { ...props, element, position, margin, context };
 }

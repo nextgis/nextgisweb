@@ -7,7 +7,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { geoTIFFLoadFunction } from "@nextgisweb/pyramid/util";
 import type { RasterBand } from "@nextgisweb/raster-layer/type/api";
 
-import type { CreateDisplayAdapterLayerOptions } from "../DisplayLayerAdapter";
+import type { WebmapLayerOptions } from "../layer-adapter";
 import type { CreateLayerOptions } from "../type/CreateLayerOptions";
 
 interface CreateGeoTIFFLayerOptions extends CreateLayerOptions {
@@ -49,7 +49,7 @@ function createAlphaExpression(
 
 function createSource(
   sourceOptions: GeoTIFFSourceOptions,
-  options?: CreateDisplayAdapterLayerOptions
+  options?: WebmapLayerOptions
 ) {
   return new GeoTIFFSource({
     ...sourceOptions,
@@ -69,7 +69,7 @@ function createSource(
 }
 
 function getLayerOptions(
-  item: CreateGeoTIFFLayerOptions
+  item: Omit<CreateGeoTIFFLayerOptions, "styleId">
 ): WebGLTileLayerOptions {
   return {
     visible: item.visibility,
@@ -232,12 +232,11 @@ export function setGeoTIFFRGBIntensityStyle(
   );
 }
 
-export function createGeoTIFFLayer(
-  item: CreateGeoTIFFLayerOptions,
-  options?: CreateDisplayAdapterLayerOptions
+export function createGeoTIFFLayerFromSource(
+  url: string,
+  item: Omit<CreateGeoTIFFLayerOptions, "styleId">,
+  options?: WebmapLayerOptions
 ) {
-  const url = routeURL("raster_layer.cog", item.styleId);
-
   const redIdx = getBandIndex(item.bands, "Red");
   const greenIdx = getBandIndex(item.bands, "Green");
   const blueIdx = getBandIndex(item.bands, "Blue");
@@ -317,4 +316,15 @@ export function createGeoTIFFLayer(
       options
     ),
   });
+}
+
+export function createGeoTIFFLayer(
+  item: CreateGeoTIFFLayerOptions,
+  options?: WebmapLayerOptions
+) {
+  return createGeoTIFFLayerFromSource(
+    routeURL("raster_layer.cog", item.styleId),
+    item,
+    options
+  );
 }

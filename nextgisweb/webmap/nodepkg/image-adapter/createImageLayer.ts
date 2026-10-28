@@ -9,8 +9,9 @@ import {
   transparentImage,
 } from "@nextgisweb/pyramid/util";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
+import { renderStyleParams } from "@nextgisweb/webmap/utils/renderRequest";
 
-import type { CreateDisplayAdapterLayerOptions } from "../DisplayLayerAdapter";
+import type { WebmapLayerOptions } from "../layer-adapter";
 import type { CreateLayerOptions } from "../type/CreateLayerOptions";
 
 interface QueryParams {
@@ -39,7 +40,7 @@ function parseQueryParams(queryString: string): QueryParams {
 
 export function createImageLayer(
   item: CreateLayerOptions,
-  options?: CreateDisplayAdapterLayerOptions
+  options?: WebmapLayerOptions
 ) {
   const name =
     item.id !== undefined
@@ -66,20 +67,15 @@ export function createImageLayer(
 
         const resource = queryObject.resource;
         const symbolsParam = queryObject.symbols;
-        const filterParam = queryObject.filter;
-
-        const filter = filterParam ? `&filter[${resource}]=${filterParam}` : "";
-        const symbols = symbolsParam
-          ? `&symbols[${resource}]=${symbolsParam === "-1" ? "" : symbolsParam}`
-          : "";
-
-        const newSrc =
-          `${url}?resource=${resource}` +
-          `&extent=${queryObject.BBOX}` +
-          `&size=${queryObject.WIDTH},${queryObject.HEIGHT}` +
-          "&nd=204" +
-          filter +
-          symbols;
+        const params = renderStyleParams(resource, {
+          filter: queryObject.filter,
+          symbols: symbolsParam === "-1" ? "-1" : symbolsParam?.split(","),
+        });
+        params.set("resource", resource);
+        params.set("extent", String(queryObject.BBOX));
+        params.set("size", queryObject.WIDTH + "," + queryObject.HEIGHT);
+        params.set("nd", "204");
+        const newSrc = url + "?" + params;
 
         const img = imageTile.getImage() as HTMLImageElement;
         const id = getUid(this);

@@ -47,6 +47,7 @@ const FeatureEditorModal = lazy(
 
 export const EditableResource = observer(
   ({
+    olMap,
     editingMode,
     resourceId,
     snapSettings,
@@ -151,6 +152,7 @@ export const EditableResource = observer(
         ) : (
           <EditableItem
             id={resourceId}
+            olMap={olMap}
             source={source}
             enabled={enabled}
             editingMode={editingMode}
