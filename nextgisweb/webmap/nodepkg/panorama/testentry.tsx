@@ -14,7 +14,7 @@ import type { PanoramaStatus } from "./type";
 const PanoramaTestentry = observer(() => {
   const [store] = useState(() => {
     const s = new PanoramaStore();
-    s.setPosition(56.324808, 43.98455);
+    s.setPosition({ lat: 56.324808, lng: 43.98455 });
     return s;
   });
   const [checkStatus, setCheckStatus] = useState<PanoramaStatus>();
@@ -28,8 +28,7 @@ const PanoramaTestentry = observer(() => {
   const position = store.position ?? { lat: 0, lng: 0 };
 
   const updatePosition = (next: Partial<typeof position>) => {
-    const { lat, lng } = { ...position, ...next };
-    store.setPosition(lat, lng);
+    store.setPosition({ ...position, ...next });
     setCheckStatus(undefined);
   };
 

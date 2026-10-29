@@ -13,7 +13,7 @@ export class PanoramaStore {
   @observableRef accessor provider: PanoramaProviderIdentity | null =
     cs.panorama.provider;
   @observableRef accessor position: PanoramaPosition | null = null;
-  @observableRef accessor pov: PanoramaPov = { heading: 0, pitch: 0 };
+  @observableRef accessor pov: PanoramaPov = { heading: 0, pitch: 0, fov: 90 };
   @observableRef accessor status: PanoramaStatus | null = null;
 
   @actionBound
@@ -22,13 +22,13 @@ export class PanoramaStore {
   }
 
   @actionBound
-  setPosition(lat: number, lng: number) {
-    this.position = { lat, lng };
+  setPosition(position: PanoramaPosition) {
+    this.position = position;
   }
 
   @actionBound
-  setPov(heading: number, pitch: number) {
-    this.pov = { heading, pitch };
+  setPov(pov: PanoramaPov) {
+    this.pov = pov;
   }
 
   @actionBound
@@ -39,7 +39,11 @@ export class PanoramaStore {
   @actionBound
   clear() {
     this.position = null;
-    this.pov = { heading: 0, pitch: 0 };
+    this.pov = { heading: 0, pitch: 0, fov: 90 };
     this.status = null;
   }
+}
+
+export function panoramaInjection() {
+  return new PanoramaStore();
 }

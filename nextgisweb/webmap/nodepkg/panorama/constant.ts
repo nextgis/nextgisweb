@@ -1,0 +1,1 @@
+export const PANORAMA_SEARCH_RADIUS = 50;

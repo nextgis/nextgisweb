@@ -7,11 +7,8 @@ let target: PanoramaProviderHost | null = null;
 let remotePromise: Promise<PanoramaMessageHandler | null> | null = null;
 
 const methods: PanoramaProviderHost = {
-  setPosition: async (lat, lng) =>
-    target ? target.setPosition(lat, lng) : "error",
-  setProvider: async (identity) => {
-    await target?.setProvider(identity);
-  },
+  show: async (identity, position, pov) =>
+    target ? target.show(identity, position, pov) : "error",
   checkAvailability: async (identity, lat, lng) =>
     target ? target.checkAvailability(identity, lat, lng) : { status: "error" },
 };
@@ -31,11 +28,11 @@ function connectParent(): Promise<PanoramaMessageHandler | null> {
 }
 
 const handler: PanoramaMessageHandler = {
-  onPositionChanged: (lat, lng) => {
-    connectParent().then((remote) => remote?.onPositionChanged(lat, lng));
+  onPositionChanged: (position) => {
+    connectParent().then((remote) => remote?.onPositionChanged(position));
   },
-  onPovChanged: (heading, pitch) => {
-    connectParent().then((remote) => remote?.onPovChanged(heading, pitch));
+  onPovChanged: (pov) => {
+    connectParent().then((remote) => remote?.onPovChanged(pov));
   },
 };
 

@@ -42,16 +42,12 @@ export const PanoramaViewer = observer(
     const [displayed, setDisplayed] = useState(false);
     const providerRef = useRef(provider);
     const reportedRef = useRef<PanoramaPosition | null>(null);
+    const requestIdRef = useRef(0);
 
-    const {
-      iframeRef,
-      ready,
-      setPosition,
-      setProvider: setHostProvider,
-    } = usePanoramaHandler({
-      onPositionChanged: (lat, lng) => {
-        reportedRef.current = { lat, lng };
-        store.setPosition(lat, lng);
+    const { iframeRef, ready, show } = usePanoramaHandler({
+      onPositionChanged: (position) => {
+        reportedRef.current = position;
+        store.setPosition(position);
       },
       onPovChanged: store.setPov,
     });
@@ -67,8 +63,19 @@ export const PanoramaViewer = observer(
     const lat = position?.lat;
     const lng = position?.lng;
 
+    useEffect(
+      () => () => {
+        requestIdRef.current++;
+        reportedRef.current = null;
+      },
+      [store]
+    );
+
     useEffect(() => {
       if (!ready || lat === undefined || lng === undefined || !provider) {
+        requestIdRef.current++;
+        reportedRef.current = null;
+        setDisplayed(false);
         return;
       }
 
@@ -81,12 +88,14 @@ export const PanoramaViewer = observer(
         if (reported && reported.lat === lat && reported.lng === lng) return;
       }
 
+      reportedRef.current = null;
+      const requestId = ++requestIdRef.current;
       updateStatus("loading");
-      setHostProvider(provider)
-        .catch(() => {})
-        .then(() => setPosition(lat, lng))
-        .then(updateStatus);
-    }, [ready, lat, lng, provider, setHostProvider, setPosition, updateStatus]);
+      show(provider, { lat, lng }, store.pov).then((status) => {
+        if (requestId !== requestIdRef.current) return;
+        updateStatus(status);
+      });
+    }, [ready, lat, lng, provider, show, store, updateStatus]);
 
     const placeholder =
       status === "unavailable" || status === "error"

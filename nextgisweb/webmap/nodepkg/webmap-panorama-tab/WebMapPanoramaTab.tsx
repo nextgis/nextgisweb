@@ -1,14 +1,13 @@
-import { PanoramaViewer } from "../panorama/PanoramaViewer";
+import { useInjection } from "@nextgisweb/pyramid/di";
 
-import type { WebMapPanoramaStore } from "./WebMapPanoramaStore";
+import { panoramaInjection } from "../panorama/PanoramaStore";
+import { PanoramaViewer } from "../panorama/PanoramaViewer";
 
 import "./WebMapPanoramaTab.less";
 
-interface WebMapPanoramaTabProps {
-  store: WebMapPanoramaStore;
-}
+export function WebMapPanoramaTab() {
+  const store = useInjection(panoramaInjection);
 
-export function WebMapPanoramaTab({ store }: WebMapPanoramaTabProps) {
   return (
     <PanoramaViewer
       store={store}

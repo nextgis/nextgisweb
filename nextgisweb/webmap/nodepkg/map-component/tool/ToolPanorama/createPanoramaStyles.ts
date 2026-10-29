@@ -4,10 +4,11 @@ import { getPointResolution } from "ol/proj";
 import type { ProjectionLike } from "ol/proj";
 import { Circle, Fill, Stroke, Style } from "ol/style";
 
-import { PANORAMA_SEARCH_RADIUS } from "@nextgisweb/webmap/panorama/provider/PanoramaProviderHost";
+import { PANORAMA_SEARCH_RADIUS } from "@nextgisweb/webmap/panorama/constant";
 
 export function createPanoramaStyles(projection: ProjectionLike): {
   dot: Style;
+  camera: Style;
   search: Style[];
 } {
   const color = getComputedStyle(document.documentElement)
@@ -21,6 +22,13 @@ export function createPanoramaStyles(projection: ProjectionLike): {
       fill: new Fill({ color }),
       stroke: new Stroke({ color: "#fff", width: 2 }),
     }),
+    zIndex: 1,
+  });
+
+  const camera = new Style({
+    fill: new Fill({ color: [r, g, b, 0.15] }),
+    stroke: new Stroke({ color, width: 1.5 }),
+    zIndex: 0,
   });
 
   const area = new Style({
@@ -36,5 +44,5 @@ export function createPanoramaStyles(projection: ProjectionLike): {
     stroke: new Stroke({ color, width: 1.5 }),
   });
 
-  return { dot, search: [area, dot] };
+  return { dot, camera, search: [area, dot] };
 }

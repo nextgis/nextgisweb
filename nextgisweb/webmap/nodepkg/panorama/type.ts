@@ -17,11 +17,15 @@ export type AvailabilityResult =
 export interface PanoramaPov {
   heading: number;
   pitch: number;
+  fov: number;
 }
 
 export type PanoramaProviderHost = {
-  setPosition(lat: number, lng: number): Promise<AvailabilityStatus>;
-  setProvider(identity: PanoramaProviderIdentity): Promise<void>;
+  show(
+    identity: PanoramaProviderIdentity,
+    position: PanoramaPosition,
+    pov: PanoramaPov
+  ): Promise<AvailabilityStatus>;
   checkAvailability(
     identity: PanoramaProviderIdentity,
     lat: number,
@@ -30,13 +34,28 @@ export type PanoramaProviderHost = {
 };
 
 export type PanoramaMessageHandler = {
-  onPositionChanged(lat: number, lng: number): void;
-  onPovChanged(heading: number, pitch: number): void;
+  onPositionChanged(position: PanoramaPosition): void;
+  onPovChanged(pov: PanoramaPov): void;
 };
+
+export interface PanoramaPlayer {
+  show(
+    position: PanoramaPosition,
+    pov: PanoramaPov
+  ): Promise<AvailabilityStatus>;
+  destroy(): void;
+}
+
+export type PanoramaPlayerFactory = (
+  container: HTMLElement,
+  apiKey: string,
+  handler: PanoramaMessageHandler
+) => PanoramaPlayer;
 
 export interface PanoramaProviderProps extends PanoramaMessageHandler {
   apiKey: string;
   title: string;
   position: PanoramaPosition;
+  pov: PanoramaPov;
   onStatusChanged: (status: AvailabilityStatus) => void;
 }

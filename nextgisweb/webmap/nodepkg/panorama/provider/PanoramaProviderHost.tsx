@@ -1,32 +1,39 @@
-import { Suspense, useCallback, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
 import { configuredProviders as providers } from "../client-settings";
 import { usePanoramaHost } from "../hook/usePanoramaHost";
 import type {
   AvailabilityStatus,
   PanoramaPosition,
-  PanoramaProviderIdentity,
+  PanoramaPov,
 } from "../type";
 
-export const PANORAMA_SEARCH_RADIUS = 50;
+interface PanoramaState {
+  provider: (typeof providers)[number];
+  position: PanoramaPosition;
+  pov: PanoramaPov;
+  resolve: (status: AvailabilityStatus) => void;
+}
 
 export default function PanoramaProviderHost() {
-  const [identity, setIdentity] = useState<PanoramaProviderIdentity | null>(
-    null
-  );
-  const [position, setPosition] = useState<PanoramaPosition | null>(null);
-
-  const pendingRef = useRef<((status: AvailabilityStatus) => void)[]>([]);
+  const [panorama, setPanorama] = useState<PanoramaState | null>(null);
+  const pendingRef = useRef<PanoramaState | null>(null);
 
   const { onPositionChanged, onPovChanged } = usePanoramaHost({
-    setPosition: (lat, lng) =>
-      new Promise((resolve) => {
-        pendingRef.current.push(resolve);
-        setPosition({ lat, lng });
-      }),
-    setProvider: async (next) => {
-      if (!providers.some((p) => p.identity === next)) return;
-      setIdentity(next);
+    show: (identity, position, pov) => {
+      pendingRef.current?.resolve("error");
+      pendingRef.current = null;
+      const provider = providers.find((p) => p.identity === identity);
+      if (!provider) {
+        setPanorama(null);
+        return Promise.resolve("error");
+      }
+
+      return new Promise<AvailabilityStatus>((resolve) => {
+        const next = { provider, position, pov, resolve };
+        pendingRef.current = next;
+        setPanorama(next);
+      });
     },
     checkAvailability: async (providerIdentity, lat, lng) => {
       const provider = providers.find((p) => p.identity === providerIdentity);
@@ -39,15 +46,25 @@ export default function PanoramaProviderHost() {
     },
   });
 
-  const onStatusChanged = useCallback((status: AvailabilityStatus) => {
-    const pending = pendingRef.current;
-    pendingRef.current = [];
-    pending.forEach((resolve) => resolve(status));
+  const onStatusChanged = useCallback(
+    (status: AvailabilityStatus) => {
+      if (panorama && pendingRef.current === panorama) {
+        pendingRef.current = null;
+        panorama.resolve(status);
+      }
+    },
+    [panorama]
+  );
+
+  useEffect(() => {
+    return () => {
+      pendingRef.current?.resolve("error");
+      pendingRef.current = null;
+    };
   }, []);
 
-  const current = providers.find((p) => p.identity === identity);
-  if (!current || !position) return null;
-
+  if (!panorama) return null;
+  const { provider: current, position, pov } = panorama;
   const Provider = current.component;
 
   return (
@@ -57,6 +74,7 @@ export default function PanoramaProviderHost() {
         apiKey={current.apiKey}
         title={current.title}
         position={position}
+        pov={pov}
         onStatusChanged={onStatusChanged}
         onPositionChanged={onPositionChanged}
         onPovChanged={onPovChanged}

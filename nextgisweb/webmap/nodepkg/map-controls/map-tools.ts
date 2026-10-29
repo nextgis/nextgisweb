@@ -18,6 +18,9 @@ const ToolViewerInfoLazy = lazy(
 const ToolPanoramaLazy = lazy(
   () => import("../map-component/tool/ToolPanorama")
 );
+const WebMapPanoramaLazy = lazy(
+  () => import("../webmap-panorama-tab/WebMapPanorama")
+);
 
 mapControlRegistry(COMP_ID, {
   key: "zi",
@@ -95,6 +98,12 @@ mapControlRegistry(COMP_ID, {
   }),
 });
 if (cs.panorama.enabled && cs.panorama.provider) {
+  mapControlRegistry(COMP_ID, {
+    key: "pt",
+    component: WebMapPanoramaLazy,
+    embeddedShowMode: "always",
+    showOnPreview: false,
+  });
   mapControlRegistry(COMP_ID, {
     key: "pa",
     isEnabled: ({ map }) => hasOlMap(map.adapter),

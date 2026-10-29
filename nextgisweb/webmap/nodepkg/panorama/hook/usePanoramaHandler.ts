@@ -5,6 +5,8 @@ import type {
   AvailabilityResult,
   AvailabilityStatus,
   PanoramaMessageHandler,
+  PanoramaPosition,
+  PanoramaPov,
   PanoramaProviderHost,
   PanoramaProviderIdentity,
 } from "../type";
@@ -25,11 +27,11 @@ function connectIframe(iframe: HTMLIFrameElement): IframeConnection | null {
   if (!remoteWindow) return null;
 
   const methods: PanoramaMessageHandler = {
-    onPositionChanged: (lat, lng) => {
-      connections.get(iframe)?.handler?.onPositionChanged?.(lat, lng);
+    onPositionChanged: (position) => {
+      connections.get(iframe)?.handler?.onPositionChanged?.(position);
     },
-    onPovChanged: (heading, pitch) => {
-      connections.get(iframe)?.handler?.onPovChanged?.(heading, pitch);
+    onPovChanged: (pov) => {
+      connections.get(iframe)?.handler?.onPovChanged?.(pov);
     },
   };
 
@@ -76,19 +78,15 @@ export function usePanoramaHandler(handler: Partial<PanoramaMessageHandler>) {
     return (await connections.get(iframe)?.promise) ?? null;
   }, [iframe]);
 
-  const setPosition = useCallback(
-    async (lat: number, lng: number): Promise<AvailabilityStatus> => {
+  const show = useCallback(
+    async (
+      identity: PanoramaProviderIdentity,
+      position: PanoramaPosition,
+      pov: PanoramaPov
+    ): Promise<AvailabilityStatus> => {
       const host = await getHost();
       if (!host) return "error";
-      return host.setPosition(lat, lng).catch(() => "error" as const);
-    },
-    [getHost]
-  );
-
-  const setProvider = useCallback(
-    async (identity: PanoramaProviderIdentity) => {
-      const host = await getHost();
-      await host?.setProvider(identity);
+      return host.show(identity, position, pov).catch(() => "error" as const);
     },
     [getHost]
   );
@@ -111,8 +109,7 @@ export function usePanoramaHandler(handler: Partial<PanoramaMessageHandler>) {
   return {
     iframeRef: setIframe,
     ready: iframe !== null,
-    setPosition,
-    setProvider,
+    show,
     checkAvailability,
   };
 }
