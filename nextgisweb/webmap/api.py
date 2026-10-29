@@ -5,13 +5,15 @@ from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, Annotated, Any, ForwardRef, Literal, TypeAlias, cast
 
 import shapely.wkb
-from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
+from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError, field
+from msgspec.structs import replace
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, gettextf
 from nextgisweb.lib.apitype.util import EmptyObject
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.safehtml import sanitize
 
+from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import FeatureLayerMixin, IFilterableFeatureLayer
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
@@ -462,6 +464,39 @@ csetting("degree_format", DegreeFormat, default="dd")
 csetting("measurement_srid", int, default=4326)
 csetting("legend_symbols", str | None, default=None)
 csetting("hide_nav_menu", bool, default=False)
+
+
+PanoramaProviderIdentity = Annotated[
+    Literal["google", "yandex"], TSExport("PanoramaProviderIdentity")
+]
+
+
+PANORAMA_PROVIDERS_REQUIRE_KEY: dict[str, bool] = {"google": False, "yandex": True}
+
+
+class PanoramaSettings(Struct, kw_only=True):
+    enabled: bool = True
+    provider: PanoramaProviderIdentity | None = None
+    keys: dict[str, str] = field(default_factory=dict)
+
+
+class panorama(csetting):
+    vtype = PanoramaSettings
+    default = PanoramaSettings()
+
+    def normalize(self, value: PanoramaSettings) -> PanoramaSettings | None:
+        for identity, key in value.keys.items():
+            requires_key = PANORAMA_PROVIDERS_REQUIRE_KEY.get(identity)
+            if requires_key is None:
+                raise VE(message=gettextf("Unknown panorama provider '{}'.")(identity))
+            if requires_key and not key:
+                msg = gettextf("API key for panorama provider '{}' is required.")
+                raise VE(message=msg(identity))
+
+        configured = [i for i in PANORAMA_PROVIDERS_REQUIRE_KEY if i in value.keys]
+        if value.provider not in configured:
+            value = replace(value, provider=configured[0] if configured else None)
+        return value
 
 
 AnnotationVisibleMode = Literal["no", "yes", "messages"]

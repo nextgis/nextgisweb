@@ -15,10 +15,15 @@ import {
 } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { WebMapCSettingsUpdate } from "@nextgisweb/webmap/type/api";
+import { registry as panoramaRegistry } from "@nextgisweb/webmap/panorama/provider/registry";
+import type {
+  PanoramaProviderIdentity,
+  WebMapCSettingsUpdate,
+} from "@nextgisweb/webmap/type/api";
 
 import { LegendSymbolsSelect, msgLegendSymbolsLabel } from "../component";
 
+import { PanoramaSettings } from "./PanoramaSettings";
 import {
   AddressGeocoderOptions,
   DegreeFormatOptions,
@@ -49,10 +54,34 @@ export const SettingsForm: FC<SettingsFormProps> = ({
     WebMapCSettingsUpdate["address_geocoder"]
   >(initialValues?.address_geocoder || "nominatim");
 
+  const [panorama, setPanorama] = useState<PanoramaProviderIdentity[]>(() =>
+    panoramaRegistry
+      .queryAll()
+      .map((p) => p.identity)
+      .filter((identity) => identity in (initialValues?.panorama?.keys ?? {}))
+  );
+
   const onValuesChange = (allValues: WebMapCSettingsUpdate) => {
     if ("address_geocoder" in allValues) {
       setGeocoder(allValues.address_geocoder);
     }
+  };
+
+  const onFormFinish = (values: WebMapCSettingsUpdate) => {
+    const keys = Object.fromEntries(
+      panorama.map((identity) => [
+        identity,
+        values.panorama?.keys?.[identity] ?? "",
+      ])
+    );
+    onFinish({
+      ...values,
+      panorama: {
+        enabled: values.panorama?.enabled ?? false,
+        provider: values.panorama?.provider ?? null,
+        keys,
+      },
+    });
   };
 
   return (
@@ -60,7 +89,7 @@ export const SettingsForm: FC<SettingsFormProps> = ({
       name="webmap_settings"
       className="webmap-settings-form"
       initialValues={initialValues}
-      onFinish={onFinish}
+      onFinish={onFormFinish}
       onValuesChange={onValuesChange}
       layout="vertical"
     >
@@ -239,6 +268,10 @@ export const SettingsForm: FC<SettingsFormProps> = ({
           )}
         </Col>
       </Row>
+
+      <Title level={4}>{gettext("Search panorama")}</Title>
+
+      <PanoramaSettings value={panorama} onChange={setPanorama} />
 
       <Row className="row-submit">
         <Col>
