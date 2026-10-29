@@ -10,6 +10,7 @@ import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import { CBlock } from "../cblock";
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
 import { resolveControlPanelDynMenuItems } from "../control-panel/resolveControlPanelDynMenuItems";
+import { InjectionProvider } from "../di";
 import { useAbortController } from "../hook";
 
 import { Attrmenu } from "./attrmenu/Attrmenu";
@@ -211,29 +212,31 @@ export function Base({
   );
 
   return (
-    <StrictMode>
-      <title>{title}</title>
+    <InjectionProvider>
+      <StrictMode>
+        <title>{title}</title>
 
-      {modalContextHolder}
-      {modalHolder}
-      {layoutMode === "nullSpace" ? (
-        renderBody
-      ) : (
-        <PyramidLayout
-          title={title}
-          header={header}
-          hideMenu={hideMenu}
-          maxwidth={maxwidth}
-          maxheight={maxheight}
-          layoutMode={layoutMode}
-          breadcrumbs={breadcrumbs}
-          dynMenuResourceId={dynMenuResourceId}
-          dynMenuItems={dynMenuItems}
-          hideResourceFilter={hideResourceFilter}
-        >
-          {renderBody}
-        </PyramidLayout>
-      )}
-    </StrictMode>
+        {modalContextHolder}
+        {modalHolder}
+        {layoutMode === "nullSpace" ? (
+          renderBody
+        ) : (
+          <PyramidLayout
+            title={title}
+            header={header}
+            hideMenu={hideMenu}
+            maxwidth={maxwidth}
+            maxheight={maxheight}
+            layoutMode={layoutMode}
+            breadcrumbs={breadcrumbs}
+            dynMenuResourceId={dynMenuResourceId}
+            dynMenuItems={dynMenuItems}
+            hideResourceFilter={hideResourceFilter}
+          >
+            {renderBody}
+          </PyramidLayout>
+        )}
+      </StrictMode>
+    </InjectionProvider>
   );
 }
