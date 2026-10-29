@@ -16,7 +16,7 @@ from nextgisweb.resource.view import resource_sections
 from .component import FeatureLayerComponent
 from .interface import GEOM_TYPE
 from .model import FeatureLayerMixin
-from .ogrdriver import MVT_DRIVER_EXIST, OGR_DRIVER_NAME_2_EXPORT_FORMATS
+from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 from .versioning import FVersioningMixin, FVersioningNotEnabled
 
 
@@ -131,11 +131,7 @@ class MVTLink(ExternalAccessLink):
 
     @classmethod
     def is_applicable(cls, obj, request: Request) -> bool:
-        return (
-            MVT_DRIVER_EXIST
-            and super().is_applicable(obj, request)
-            and obj.geometry_type != GEOM_TYPE.NONE
-        )
+        return super().is_applicable(obj, request) and obj.geometry_type != GEOM_TYPE.NONE
 
     @classmethod
     def url_factory(cls, obj, request: Request) -> str:

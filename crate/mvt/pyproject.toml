@@ -1,0 +1,13 @@
+[build-system]
+requires = ["maturin>=1.15,<2"]
+build-backend = "maturin"
+
+[project]
+name = "nextgisweb-mvt"
+dynamic = ["version"]
+requires-python = ">=3.12"
+
+[tool.maturin]
+module-name = "nextgisweb_mvt"
+manifest-path = "Cargo.toml"
+features = ["pyo3/extension-module"]

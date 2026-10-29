@@ -1,4 +1,3 @@
-import importlib
 import json
 from itertools import product
 from unittest.mock import ANY
@@ -289,44 +288,6 @@ def test_mvt(extent, simplification, padding, ngw_webtest_app: WebTestApp, vecto
     assert features[0]["geometry"]["type"] == "Point"
     assert features[1]["properties"]["name"] == "feature2"
     assert features[1]["geometry"]["type"] == "Point"
-
-
-@pytest.mark.parametrize(
-    "mvt_driver_exist, status_expected",
-    (
-        (True, 200),
-        (False, 404),
-    ),
-)
-def test_mvt_should_return_not_found_if_mvt_driver_not_available(
-    mvt_driver_exist,
-    status_expected,
-    ngw_webtest_app: WebTestApp,
-    vector_layer_id,
-):
-    from .. import ogrdriver
-
-    old_MVT_DRIVER_EXIST = ogrdriver.MVT_DRIVER_EXIST
-    ogrdriver.MVT_DRIVER_EXIST = mvt_driver_exist
-
-    from .. import api_mvt
-
-    importlib.reload(api_mvt)
-
-    ngw_webtest_app.get(
-        "/api/component/feature_layer/mvt",
-        query=dict(
-            ZXY0,
-            resource=vector_layer_id,
-            extent=2048,
-            simplification=4.1,
-            padding=0.1,
-        ),
-        status=status_expected,
-    )
-
-    ogrdriver.MVT_DRIVER_EXIST = old_MVT_DRIVER_EXIST
-    importlib.reload(api_mvt)
 
 
 def test_filter(ngw_webtest_app: WebTestApp, vector_layer_id):

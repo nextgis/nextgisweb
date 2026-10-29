@@ -10,6 +10,7 @@ __pycache__/
 build/
 dist/
 sdist/
+crate/**/target/
 node_modules/
 
 # Translations

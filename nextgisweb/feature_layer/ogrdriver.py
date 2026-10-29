@@ -165,8 +165,3 @@ OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
     for format_id, driver in EXPORT_FORMAT_OGR.items()
     if test_driver_capability(driver.name, ogr.ODrCCreateDataSource)
 ]
-
-MVT_DRIVER_NAME = "MVT"
-MVT_DRIVER_EXIST = (get_driver_by_name(MVT_DRIVER_NAME) is not None) and test_driver_capability(
-    MVT_DRIVER_NAME, ogr.ODrCCreateDataSource
-)

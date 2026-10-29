@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ngwdocker import PackageBase
 from ngwdocker.base import AppImage
-from ngwdocker.util import copyfiles
+from ngwdocker.util import copyfiles, git_ls_files
 
 
 class Package(PackageBase):
@@ -61,6 +61,14 @@ def on_user_dir(event):
         copyfiles([fontpath], event.source / "build" / "font", fontpath)
 
 
+@AppImage.on_package_files.handler
+def on_package_files(event):
+    if event.package.name != "nextgisweb" or not event.image.context.is_development():
+        return
+
+    event.files.extend(git_ls_files(event.package.path / "crate"))
+
+
 @AppImage.on_virtualenv.handler
 def on_virtualenv(event):
     pip_install = f"{event.path}/bin/pip install --no-cache-dir"
@@ -71,7 +79,16 @@ def on_virtualenv(event):
         f"{pip_install} --no-build-isolation \"$(echo $gdal_numpy_spec | cut -d ' ' -f 1)\"",
     )
 
+    # Build native MVT encoder from source with a temporary Rust toolchain, which is removed in the
+    # same layer. The toolchain version is pinned by rust-toolchain.toml.
+    event.before_install(
+        "export RUSTUP_HOME=/tmp/rustup CARGO_HOME=/tmp/cargo PATH=/tmp/cargo/bin:$PATH",
+        "curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none",
+    )
+    event.requirement("$CRATER_ROOT/package/nextgisweb/crate/mvt")
+
     event.after_install(
+        "rm -rf /tmp/rustup /tmp/cargo",
         "ln -s package/nextgisweb/.prettierrc.cjs $CRATER_ROOT/",
         "ln -s package/nextgisweb/eslint.config.ts $CRATER_ROOT/",
     )
