@@ -128,7 +128,6 @@ def search_page(request: Request):
         hide_resource_filter=True,
         maxwidth=True,
         maxheight=True,
-        adaptive=True,
     )
 
 

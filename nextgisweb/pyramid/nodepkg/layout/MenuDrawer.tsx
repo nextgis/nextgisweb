@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 
-import { Drawer } from "@nextgisweb/gui/antd";
+import { Divider, Drawer, Flex } from "@nextgisweb/gui/antd";
 import { useConfig } from "@nextgisweb/gui/antd/config-provider";
 
 import { MenuItem } from "./MenuItem";
@@ -18,7 +18,7 @@ interface MenuDrawerProps extends HeaderProps {
 }
 
 const MenuDrawer = observer<MenuDrawerProps>(
-  ({ visible, setVisible, ...headerProps }) => {
+  ({ visible, setVisible, sidebar, ...headerProps }) => {
     const [pluginMenuItems] = useState(() => {
       const plugins = Array.from(registry.query({ menuItem: true }));
       const pluginMenuItems: HeaderComponent[] = [];
@@ -41,9 +41,19 @@ const MenuDrawer = observer<MenuDrawerProps>(
         open={visible}
         onClose={() => setVisible(false)}
       >
-        {[...storeMenuItems, ...pluginMenuItems].map((item, i) => {
-          return <MenuItem key={i} item={item} />;
-        })}
+        {sidebar && (
+          <>
+            <Flex vertical gap={24} style={{ padding: 24 }}>
+              {sidebar}
+            </Flex>
+            <Divider size="small" />
+          </>
+        )}
+        <div className="ngw-pyramid-menu-drawer-main">
+          {[...storeMenuItems, ...pluginMenuItems].map((item, i) => {
+            return <MenuItem key={i} item={item} />;
+          })}
+        </div>
       </Drawer>
     );
   }

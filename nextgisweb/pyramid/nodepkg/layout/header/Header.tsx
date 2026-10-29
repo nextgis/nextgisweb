@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef } from "react";
+import type { ReactNode } from "react";
 
 import { Avatar } from "../Avatar";
 import { Menu } from "../Menu";
@@ -15,6 +16,7 @@ export interface HeaderProps {
   header: string;
   hideResourceFilter?: boolean;
   hideMenu?: boolean;
+  sidebar?: ReactNode;
 }
 
 export const Header = observer<HeaderProps>((props: HeaderProps) => {

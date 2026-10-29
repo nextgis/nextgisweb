@@ -176,7 +176,6 @@ def html_error_response(*, exc: UserException, request: Request, **kwargs) -> Re
             props=dict(error_json=err_data),
             layout_mode="headerOnly",
             title=err_data.title,
-            adaptive=True,
         ),
         request=request,
     )
