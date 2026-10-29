@@ -1,18 +1,19 @@
 import { observer } from "mobx-react-lite";
 import Feature from "ol/Feature";
-import type OlMap from "ol/Map";
 import { Point } from "ol/geom";
-import { Draw } from "ol/interaction";
-import type { DrawEvent } from "ol/interaction/Draw";
+import { circular } from "ol/geom/Polygon";
 import { fromLonLat, toLonLat } from "ol/proj";
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import { useInjection } from "@nextgisweb/pyramid/di";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context";
-import Vector from "@nextgisweb/webmap/ol/layer/Vector";
+import type { GeoJsonLayerDefinition } from "@nextgisweb/webmap/layer-adapter";
+import type { MapClickEvent } from "@nextgisweb/webmap/map-adapter";
+import { useMapLayer } from "@nextgisweb/webmap/map-component/hook/useMapLayer";
 import { panoramaInjection } from "@nextgisweb/webmap/panorama/PanoramaStore";
+import { PANORAMA_SEARCH_RADIUS } from "@nextgisweb/webmap/panorama/constant";
 import { usePanoramaAvailability } from "@nextgisweb/webmap/panorama/hook/usePanoramaAvailability";
 
 import { ToggleControl } from "../../control";
@@ -30,15 +31,14 @@ msgUnavailable = gettext("No panorama available at this location"),
 msgError = gettext("The panorama service is currently unavailable. Please try again at a later time or contact Web GIS administrator.");
 
 export interface ToolPanoramaProps extends ToggleControlProps {
-  olMap: OlMap;
   groupId: string;
 }
 
 const ToolPanorama = observer((props: ToolPanoramaProps) => {
-  const { olMap, groupId, ...rest } = props;
+  const { groupId, ...rest } = props;
   const { display } = useDisplayContext();
   const { map: mapStore } = display;
-  const adapter = mapStore.adapter;
+  const { adapter, started, displayProjection, pointer } = mapStore;
   const store = useInjection(panoramaInjection);
   const { provider, position } = store;
   const { heading, fov } = store.pov;
@@ -47,21 +47,50 @@ const ToolPanorama = observer((props: ToolPanoramaProps) => {
   const [messageApi, contextHolder] = message.useMessage();
   const { element: checker, check } = usePanoramaAvailability(provider);
 
-  const vectorRef = useRef<Vector | null>(null);
-  const interactionRef = useRef<Draw | null>(null);
+  const layerDefinition = useMemo<GeoJsonLayerDefinition>(
+    () => ({
+      type: "geojson",
+      options: {
+        name: "panorama",
+        title: "Panorama",
+        isTopLayer: true,
+        featureProjection: displayProjection,
+        style: createPanoramaStyles(),
+      },
+    }),
+    [displayProjection]
+  );
+  const vector = useMapLayer(mapStore, layerDefinition);
+  const searchLayerDefinition = useMemo<GeoJsonLayerDefinition>(
+    () => ({
+      ...layerDefinition,
+      options: { ...layerDefinition.options, name: "panorama-search" },
+    }),
+    [layerDefinition]
+  );
+  const search = useMapLayer(
+    mapStore,
+    isActive ? searchLayerDefinition : undefined
+  );
   const requestIdRef = useRef(0);
+  const [pendingCoordinates, setPendingCoordinates] = useState<number[] | null>(
+    null
+  );
+  const searchCoordinates =
+    pendingCoordinates ?? (pointer?.dragging ? null : pointer?.coordinate);
 
-  const onDrawEnd = useEffectEvent(async (evt: DrawEvent) => {
-    const geometry = evt.feature.getGeometry();
-    if (!(geometry instanceof Point)) return;
+  const onMapClick = useEffectEvent(async (event: MapClickEvent) => {
+    const coordinates = adapter.getCoordinateFromPixel(event.pixel);
+    if (!coordinates) return;
 
-    const projection = olMap.getView().getProjection();
-    const [lng, lat] = toLonLat(geometry.getCoordinates(), projection);
+    const [lng, lat] = toLonLat(coordinates, displayProjection);
 
     const requestId = ++requestIdRef.current;
+    setPendingCoordinates([...coordinates]);
     const result = await check(lat, lng);
     if (requestId !== requestIdRef.current) return;
 
+    setPendingCoordinates(null);
     if (result.status === "available") {
       store.setPosition(result.position);
     } else {
@@ -70,56 +99,68 @@ const ToolPanorama = observer((props: ToolPanoramaProps) => {
   });
 
   useEffect(() => {
-    const { dot, camera, search } = createPanoramaStyles(
-      olMap.getView().getProjection()
-    );
-    const vector = new Vector("panorama", {
-      title: "Panorama",
-      isTopLayer: true,
-    });
-    vector
-      .getLayer()
-      .setStyle((feature) =>
-        feature.getGeometry() instanceof Point ? dot : camera
-      );
-    vectorRef.current = vector;
-    mapStore.addLayer(vector, undefined, adapter);
+    if (!search) return;
 
-    const interaction = new Draw({ type: "Point", style: search });
-    interaction.setActive(false);
-    interactionRef.current = interaction;
-    olMap.addInteraction(interaction);
+    const coordinates = searchCoordinates;
+    if (!coordinates) {
+      search.setFeatures([]);
+      return;
+    }
 
-    interaction.on("drawend", onDrawEnd);
-
-    return () => {
-      interaction.setActive(false);
-      olMap.removeInteraction(interaction);
-      vector.getSource()?.clear();
-      mapStore.removeLayer(vector, adapter);
-
-      interactionRef.current = null;
-      vectorRef.current = null;
-    };
-  }, [adapter, mapStore, olMap]);
-
-  useEffect(() => {
-    const source = vectorRef.current?.getSource();
-    if (!source) return;
-
-    source.clear();
-    if (!position) return;
-
-    const projection = olMap.getView().getProjection();
-    const { lat, lng } = position;
-    const coordinates = fromLonLat([lng, lat], projection);
-    source.addFeatures([
+    search.setFeatures([
       new Feature(
-        createPanoramaCameraGeometry(position, { heading, fov }, projection)
+        circular(
+          toLonLat(coordinates, displayProjection),
+          PANORAMA_SEARCH_RADIUS
+        ).transform("EPSG:4326", displayProjection)
       ),
       new Feature(new Point(coordinates)),
     ]);
-  }, [fov, heading, olMap, position]);
+  }, [displayProjection, searchCoordinates, search]);
+
+  useEffect(() => {
+    if (!search) return;
+    search.setOpacity(1);
+    if (!pendingCoordinates) return;
+
+    let animationFrame = 0;
+    const delay = setTimeout(() => {
+      const start = performance.now();
+      const animate = (now: number) => {
+        const pulseProgress = (now - start) / 1000;
+        search.setOpacity(0.65 + 0.35 * Math.cos(pulseProgress * 2 * Math.PI));
+        animationFrame = requestAnimationFrame(animate);
+      };
+      animationFrame = requestAnimationFrame(animate);
+    }, 300);
+
+    return () => {
+      clearTimeout(delay);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [pendingCoordinates, search]);
+
+  useEffect(() => {
+    if (!vector) return;
+
+    if (!position) {
+      vector.setFeatures([]);
+      return;
+    }
+
+    const { lat, lng } = position;
+    const coordinates = fromLonLat([lng, lat], displayProjection);
+    vector.setFeatures([
+      new Feature(
+        createPanoramaCameraGeometry(
+          position,
+          { heading, fov },
+          displayProjection
+        )
+      ),
+      new Feature(new Point(coordinates)),
+    ]);
+  }, [fov, heading, displayProjection, position, vector]);
 
   useEffect(() => {
     if (!position) return;
@@ -130,10 +171,20 @@ const ToolPanorama = observer((props: ToolPanoramaProps) => {
   }, [display, position]);
 
   useEffect(() => {
-    requestIdRef.current++;
-    interactionRef.current?.setActive(isActive);
+    const cancelRequests = () => {
+      requestIdRef.current++;
+      setPendingCoordinates(null);
+    };
+    cancelRequests();
     if (!isActive) store.clear();
-  }, [isActive, olMap, store]);
+    if (!isActive || !started) return;
+
+    const unsubscribe = adapter.subscribeClick(onMapClick);
+    return () => {
+      cancelRequests();
+      unsubscribe();
+    };
+  }, [adapter, isActive, started, provider, store]);
 
   return (
     <>

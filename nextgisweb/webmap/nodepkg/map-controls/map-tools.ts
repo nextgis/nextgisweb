@@ -106,7 +106,6 @@ if (cs.panorama.enabled && cs.panorama.provider) {
   });
   mapControlRegistry(COMP_ID, {
     key: "pa",
-    isEnabled: ({ map }) => hasOlMap(map.adapter),
     order: 60,
     component: ToolPanoramaLazy,
     label: gettext("Search panorama"),
@@ -114,8 +113,7 @@ if (cs.panorama.enabled && cs.panorama.provider) {
     embeddedShowMode: "customize",
     hideOnMobile: true,
     showOnPreview: false,
-    getProps: (context) => ({
-      ...getOlMapProps(context),
+    getProps: () => ({
       groupId: "searchPanorama",
     }),
   });
