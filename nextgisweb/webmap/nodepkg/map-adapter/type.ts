@@ -46,8 +46,15 @@ export interface MapClickEvent {
   pixel: number[];
 }
 
+export interface MapPointerState {
+  pixel: number[];
+  coordinate: number[] | null;
+  dragging: boolean;
+}
+
 export interface MapAdapter<TLayer extends CoreLayer = CoreLayer> {
   readonly layerAdapters: LayerAdapters<TLayer>;
+  readonly pointer: MapPointerState | null;
   mount(target: HTMLElement): Promise<void>;
   zoomBy(delta: number, duration?: number): void;
   resize(): void;

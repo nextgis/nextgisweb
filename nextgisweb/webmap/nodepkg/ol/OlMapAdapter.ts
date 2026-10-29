@@ -1,10 +1,19 @@
+import { throttle } from "lodash-es";
+import {
+  action,
+  observableStruct,
+  onBecomeObserved,
+  onBecomeUnobserved,
+} from "mobx";
 import OlMap from "ol/Map";
 import type { MapOptions } from "ol/Map";
+import MapBrowserEvent from "ol/MapBrowserEvent";
 import { unByKey } from "ol/Observable";
 import View from "ol/View";
 import type { FitOptions } from "ol/View";
 import { easeOut } from "ol/easing";
-import type { EventsKey } from "ol/events";
+import { listen } from "ol/events";
+import type { EventsKey, ListenerFunction } from "ol/events";
 import { getCenter, getHeight, getWidth } from "ol/extent";
 import type { Extent } from "ol/extent";
 import Interaction from "ol/interaction/Interaction";
@@ -23,6 +32,7 @@ import type {
   MapAdapterStatus,
   MapClickEvent,
   MapFitOptions,
+  MapPointerState,
   MapViewOptions,
   MapViewState,
 } from "../map-adapter/type";
@@ -36,7 +46,6 @@ import "ol/ol.css";
 export class OpenLayersMapAdapter implements MapAdapter<OlLayerAdapter> {
   readonly maxZoom = DEFAULT_MAP_MAX_ZOOM;
   readonly displayProjection = DEFAULT_MAP_PROJECTION;
-
   readonly map: OlMap;
   readonly layerAdapters = layerAdapters;
 
@@ -47,9 +56,14 @@ export class OpenLayersMapAdapter implements MapAdapter<OlLayerAdapter> {
   };
   private readonly changeListeners = new Set<() => void>();
   private readonly clickDisposers = new Set<() => void>();
+
   private viewKeys: EventsKey[] = [];
   private mountKeys: EventsKey[] = [];
   private stopMapStartup?: () => void;
+
+  @observableStruct accessor pointer: MapPointerState | null = null;
+  private pointerObserved = false;
+  private pointerKeys: EventsKey[] = [];
 
   constructor({
     constrainingExtent,
@@ -65,6 +79,16 @@ export class OpenLayersMapAdapter implements MapAdapter<OlLayerAdapter> {
       });
     }
     this.map = new OlMap(viewOptions);
+
+    onBecomeObserved(this, "pointer", () => {
+      this.pointerObserved = true;
+      this.startPointerListening();
+    });
+
+    onBecomeUnobserved(this, "pointer", () => {
+      this.pointerObserved = false;
+      this.stopPointerListening();
+    });
   }
 
   addLayer(layer: OlLayerAdapter): void {
@@ -105,6 +129,11 @@ export class OpenLayersMapAdapter implements MapAdapter<OlLayerAdapter> {
     this.map.setTarget(target);
     this.status.started = true;
     this.status.target = this.map.getTargetElement() ?? null;
+
+    if (this.pointerObserved) {
+      this.startPointerListening();
+    }
+
     this.notify();
   }
 
@@ -116,13 +145,57 @@ export class OpenLayersMapAdapter implements MapAdapter<OlLayerAdapter> {
     this.mountKeys = [];
     this.stopMapStartup?.();
     this.stopMapStartup = undefined;
+    this.updatePointer(null);
     this.map.setTarget(undefined);
     this.status = {
       target: null,
       started: false,
       isLoading: false,
     };
+
+    this.stopPointerListening();
+
     this.notify();
+  }
+
+  private startPointerListening(): void {
+    if (!this.status.started || this.pointerKeys.length) return;
+
+    const onPointerEvent: ListenerFunction = (event) => {
+      if (!(event instanceof MapBrowserEvent)) return;
+
+      const pixel =
+        event.originalEvent.type === "pointercancel" ? null : [...event.pixel];
+
+      this.updatePointerThrottled(pixel, event.dragging);
+    };
+
+    this.pointerKeys = [
+      ...["pointermove", "pointerdrag", "pointerdown", "pointerup"].map(
+        (type) => listen(this.map, type, onPointerEvent)
+      ),
+
+      this.map.on("moveend", () => {
+        const pixel = this.pointer?.pixel;
+
+        if (pixel) {
+          this.updatePointer(pixel, false);
+        }
+      }),
+
+      listen(this.map.getViewport(), "pointerleave", () => {
+        this.updatePointerThrottled.cancel();
+        this.updatePointer(null);
+      }),
+    ];
+  }
+
+  private stopPointerListening(): void {
+    this.pointerKeys.forEach(unByKey);
+    this.pointerKeys = [];
+
+    this.updatePointerThrottled.cancel();
+    this.updatePointer(null);
   }
 
   getStatus(): MapAdapterStatus {
@@ -215,6 +288,27 @@ export class OpenLayersMapAdapter implements MapAdapter<OlLayerAdapter> {
     return dispose;
   }
 
+  @action
+  private updatePointer(pixel: number[] | null, dragging = false): void {
+    const size = this.map.getSize();
+
+    const pointer =
+      pixel &&
+      size &&
+      pixel[0] >= 0 &&
+      pixel[1] >= 0 &&
+      pixel[0] < size[0] &&
+      pixel[1] < size[1]
+        ? {
+            pixel: [...pixel],
+            coordinate: this.getCoordinateFromPixel(pixel) ?? null,
+            dragging,
+          }
+        : null;
+
+    this.pointer = pointer;
+  }
+
   canZoomBy(delta: number): boolean {
     const view = this.map.getView();
     const current = view.getZoom();
@@ -291,6 +385,14 @@ export class OpenLayersMapAdapter implements MapAdapter<OlLayerAdapter> {
     this.map.updateSize();
     this.notify();
   }
+
+  private readonly updatePointerThrottled = throttle(
+    (pixel: number[] | null, dragging = false) => {
+      this.updatePointer(pixel, dragging);
+    },
+    10,
+    { leading: false, trailing: true }
+  );
 
   private notify = (): void => {
     this.changeListeners.forEach((callback) => callback());

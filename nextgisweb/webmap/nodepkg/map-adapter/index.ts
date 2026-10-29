@@ -5,6 +5,7 @@ export type {
   MapClickEvent,
   MapExtent,
   MapFitOptions,
+  MapPointerState,
   MapViewOptions,
   MapViewState,
 } from "./type";

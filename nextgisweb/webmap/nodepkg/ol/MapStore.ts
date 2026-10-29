@@ -33,6 +33,7 @@ import type { MapAdapterPlugin } from "../map-adapter/registry";
 import type {
   MapAdapter,
   MapExtent,
+  MapPointerState,
   MapViewOptions,
   MapViewState,
 } from "../map-adapter/type";
@@ -197,6 +198,11 @@ export class MapStore {
     return (
       this.mapModeChangeAllowed && (this.options.canChangeMapMode?.() ?? true)
     );
+  }
+
+  @computed
+  get pointer(): MapPointerState | null {
+    return this.adapter.pointer;
   }
 
   @actionBound
