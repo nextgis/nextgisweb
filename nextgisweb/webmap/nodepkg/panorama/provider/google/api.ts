@@ -139,7 +139,7 @@ export function createPanoramaPlayer(
       } else {
         const panorama = new google.maps.StreetViewPanorama(container, {
           position: latLng,
-          pov,
+          pov: { heading, pitch },
           visible: true,
           enableCloseButton: false,
           addressControl: false,
