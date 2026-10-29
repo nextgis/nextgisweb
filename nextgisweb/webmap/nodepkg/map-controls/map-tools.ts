@@ -114,7 +114,10 @@ if (cs.panorama.enabled && cs.panorama.provider) {
     embeddedShowMode: "customize",
     hideOnMobile: true,
     showOnPreview: false,
-    getProps: () => ({ groupId: "searchPanorama" }),
+    getProps: (context) => ({
+      ...getOlMapProps(context),
+      groupId: "searchPanorama",
+    }),
   });
 }
 mapControlRegistry(COMP_ID, {

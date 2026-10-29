@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import Feature from "ol/Feature";
+import type OlMap from "ol/Map";
 import { Point } from "ol/geom";
 import { Draw } from "ol/interaction";
 import type { DrawEvent } from "ol/interaction/Draw";
@@ -29,13 +30,15 @@ msgUnavailable = gettext("No panorama available at this location"),
 msgError = gettext("The panorama service is currently unavailable. Please try again at a later time or contact Web GIS administrator.");
 
 export interface ToolPanoramaProps extends ToggleControlProps {
+  olMap: OlMap;
   groupId: string;
 }
 
-const ToolPanorama = observer(({ groupId, ...rest }: ToolPanoramaProps) => {
+const ToolPanorama = observer((props: ToolPanoramaProps) => {
+  const { olMap, groupId, ...rest } = props;
   const { display } = useDisplayContext();
   const { map: mapStore } = display;
-  const { olMap } = mapStore;
+  const adapter = mapStore.adapter;
   const store = useInjection(panoramaInjection);
   const { provider, position } = store;
   const { heading, fov } = store.pov;
@@ -80,7 +83,7 @@ const ToolPanorama = observer(({ groupId, ...rest }: ToolPanoramaProps) => {
         feature.getGeometry() instanceof Point ? dot : camera
       );
     vectorRef.current = vector;
-    mapStore.addLayer(vector);
+    mapStore.addLayer(vector, undefined, adapter);
 
     const interaction = new Draw({ type: "Point", style: search });
     interaction.setActive(false);
@@ -93,12 +96,12 @@ const ToolPanorama = observer(({ groupId, ...rest }: ToolPanoramaProps) => {
       interaction.setActive(false);
       olMap.removeInteraction(interaction);
       vector.getSource()?.clear();
-      mapStore.removeLayer(vector);
+      mapStore.removeLayer(vector, adapter);
 
       interactionRef.current = null;
       vectorRef.current = null;
     };
-  }, [mapStore, olMap]);
+  }, [adapter, mapStore, olMap]);
 
   useEffect(() => {
     const source = vectorRef.current?.getSource();
