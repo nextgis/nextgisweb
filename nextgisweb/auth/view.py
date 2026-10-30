@@ -34,7 +34,7 @@ from .component import AuthComponent
 from .exception import ALinkException, InvalidCredentialsException
 from .model import Group, User
 from .oauth import AuthorizationException, InvalidTokenException, TeamMembershipRequiredException
-from .policy import AP_OAUTH_AC, AuthState, OnUserLogin
+from .policy import AP_ALINK, AP_OAUTH_AC, AuthState, OnUserLogin
 from .util import reset_slg_cookie, sync_ulg_cookie
 
 UserID = Annotated[int, Meta(ge=1, description="User ID", examples=[4])]
@@ -134,7 +134,7 @@ def alink(request: Request, token: str):
 
     user.check_alink_available(raiseerr=True)
 
-    remember(request, (user.id, None))
+    remember(request, (user.id, None), prv=AP_ALINK)
 
     next_url = request.params.get("next", request.application_url)
     return HTTPFound(location=next_url)
