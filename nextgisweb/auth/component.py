@@ -246,8 +246,9 @@ class AuthComponent(Component):
 
     def check_user_limit_local(self):
         if (limit := self.options["user_limit_local"]) is not None:
-            fc = [User.password_hash.is_not(None)]
-            uc_local = _ucnt(*fc)
+            uc_local = _ucnt(
+                sa.or_(User.password_hash.is_not(None), User.alink_token.is_not(None))
+            )
 
             if uc_local > limit:
                 raise ValidationError(

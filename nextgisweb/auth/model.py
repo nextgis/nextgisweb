@@ -170,7 +170,10 @@ class User(Principal):
 
         rnd = token_hex(8)
         obj = UserWithPassword(keyname=f"user_{rnd}", display_name=f"User {rnd}", **kwargs)
-        obj.password = obj.password_plaintext = token_urlsafe()
+        if "password" in kwargs:
+            obj.password_plaintext = kwargs["password"]
+        else:
+            obj.password = obj.password_plaintext = token_urlsafe()
         return obj
 
     def compare(self, other):
