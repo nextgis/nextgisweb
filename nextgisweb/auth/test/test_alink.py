@@ -16,6 +16,7 @@ def setup(ngw_env):
     "user_kw, ok",
     (
         pytest.param({}, True, id="simple"),
+        pytest.param({"password": None}, True, id="no-password"),
         pytest.param({"disabled": True}, False, id="disabled"),
         pytest.param({"oauth_subject": "test-alink"}, False, id="oauth"),
         pytest.param({"member_of": ["administrators"]}, False, id="administrator"),

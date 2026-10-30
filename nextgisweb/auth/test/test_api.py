@@ -222,13 +222,14 @@ def test_user_over_limit(ngw_env, uapi: WebTestApp):
 @pytest.mark.usefixtures("disable_users", "ngw_auth_administrator")
 def test_user_limit_local(uapi: WebTestApp, ngw_env):
     admin = User.filter_by(keyname="administrator").one()
-    limit = 2 if admin.password_hash is not None else 1
+    limit = 2 if (admin.password_hash is not None or admin.alink_token is not None) else 1
     with ngw_env.auth.options.override({"user_limit_local": limit}):
         u1_id = uapi.post(json=_user_data(), status=201).json["id"]
         uapi.post(json=_user_data(), status=422)
         uapi.put(u1_id, json={"disabled": True})
         uapi.post(json=_user_data(), status=201)
         uapi.post(json=_user_data(), status=422)
+        uapi.post(json={**_user_data(), "password": False, "alink": True}, status=422)
         uapi.post(json={**_user_data(), "password": False}, status=201)
         uapi.put(u1_id, json={"disabled": False}, status=422)
 

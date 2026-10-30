@@ -257,8 +257,8 @@ def deserialize_principal(
         if not obj.disabled:
             if create or "disabled" in updated:
                 auth.check_user_limit()
-            if obj.password_hash is not None and (
-                create or "password" in updated or "disabled" in updated
+            if (obj.password_hash is not None or obj.alink_token is not None) and (
+                create or not updated.isdisjoint({"disabled", "password", "alink"})
             ):
                 auth.check_user_limit_local()
 
