@@ -67,4 +67,9 @@ export class LayerStore implements EditorStore<
   get isValid() {
     return !mapperError(this);
   }
+
+  @computed
+  get suggestedDisplayName() {
+    return this.qms?.value?.name;
+  }
 }
