@@ -46,5 +46,7 @@ def test_alink(user_kw, ok, ngw_webtest_app: WebTestApp):
     data = ngw_webtest_app.get("/api/component/auth/current_user").json
     if ok:
         assert data["id"] == user_id
+        assert data["auth_medium"] == "session"
+        assert data["auth_provider"] == "alink"
     else:
         assert data["keyname"] == "guest"

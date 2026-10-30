@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, NewType, Protocol
 
 import sqlalchemy as sa
-from msgspec import Struct, convert, to_builtins
+from msgspec import UNSET, Struct, UnsetType, convert, to_builtins
 from pyramid.authorization import ACLHelper
 from pyramid.interfaces import ISecurityPolicy
 from sqlalchemy.exc import NoResultFound
@@ -50,6 +50,7 @@ AP_LOCAL_PW = make_auth_provider("local_pw")
 AP_OAUTH_AC = make_auth_provider("oauth_ac")
 AP_OAUTH_PW = make_auth_provider("oauth_pw")
 AP_INVITE = make_auth_provider("invite")
+AP_ALINK = make_auth_provider("alink")
 
 AM_SESSION = make_auth_medium("session")
 AM_BASIC = make_auth_medium("basic")
@@ -107,18 +108,20 @@ class SecurityPolicy:
             return aresult.uid
         return None
 
-    def remember(self, request: Request, what, **kw):
+    def remember(self, request: Request, what, *, prv: AuthProvider | UnsetType = UNSET, **kw):
         session = request.session
 
         user_id, tpair = what
         assert user_id is not None
 
         if tpair is None:
-            prv = AP_LOCAL_PW
+            if prv is UNSET:
+                prv = AP_LOCAL_PW
             now = current_tstamp()
             exp = int(now + self.options["local.lifetime"].total_seconds())
             ref = int(now + self.options["local.refresh"].total_seconds())
         else:
+            assert prv is UNSET
             exp = tpair.access_exp
             ref = None
             if tpair.grant_type == "authorization_code":
@@ -266,7 +269,7 @@ class SecurityPolicy:
 
             return AuthResult(state.uid, AM_SESSION, state.prv)
 
-        elif state.prv in (AP_LOCAL_PW, AP_INVITE):
+        elif state.prv in (AP_LOCAL_PW, AP_INVITE, AP_ALINK):
             if state.exp <= now:
                 return None
 
