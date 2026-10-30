@@ -44,7 +44,7 @@ requires = [
     "mako==1.3.11",
     "msgspec==0.21.1",
     "passlib==1.7.4",
-    "pillow==12.2.0",
+    "pillow==13.0.0",
     "pillow-heif==1.3.0",
     "poeditor",
     "psutil==7.2.2",
