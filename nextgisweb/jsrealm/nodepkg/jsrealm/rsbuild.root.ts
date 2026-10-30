@@ -71,6 +71,7 @@ export default defineConfig(async (): Promise<RsbuildConfig> => {
     },
     dev: {
       client: {
+        overlay: false,
         protocol: "ws",
         host: "localhost",
         port: 25784,
