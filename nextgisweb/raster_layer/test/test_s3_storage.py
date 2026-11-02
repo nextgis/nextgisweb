@@ -12,7 +12,13 @@ def test_s3_storage(request, ngw_raster_layer_s3_storage, ngw_commit, ngw_data_p
     storage = RasterLayerStorage(**ngw_raster_layer_s3_storage).persist()
 
     layer = RasterLayer(srs=SRS.filter_by(id=3857).one(), storage=storage).persist()
-    layer.load_file(ngw_data_path / "sochi-aster-dem.tif")
+    with gdal.config_options(
+        {
+            "GDAL_HTTP_CONNECTTIMEOUT": "10",
+            "GDAL_HTTP_TIMEOUT": "10",
+        }
+    ):
+        layer.load_file(ngw_data_path / "sochi-aster-dem.tif")
 
     assert layer.storage_filename
     s3_path = storage.vsi_path(layer.storage_filename)

@@ -512,7 +512,9 @@ class RasterLayer(SpatialLayerMixin, Resource):
         else:
             # Cleanup PAM FileObj reference on replace
             self.fileobj_pam = None
-        return gdal.Open(dst_file, gdalconst.GA_ReadOnly)
+        ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
+        assert ds is not None
+        return ds
 
     def _load_file_s3(self, cmd: list) -> gdal.Dataset:
         storage = self.storage
@@ -539,10 +541,13 @@ class RasterLayer(SpatialLayerMixin, Resource):
                         while chunk := f.read(16 * 1024 * 1024):
                             gdal.VSIFWriteL(chunk, 1, len(chunk), vsi)
                 finally:
-                    gdal.VSIFCloseL(vsi)
-        return self._s3_open(s3_path)
+                    code = gdal.VSIFCloseL(vsi)
+                    assert code == 0, "vsi close error"
+        ds = self._s3_open(s3_path)
+        assert ds is not None
+        return ds
 
-    def _s3_open(self, s3_path: str) -> gdal.Dataset:
+    def _s3_open(self, s3_path: str) -> gdal.Dataset | None:
         storage = self.storage
         assert storage is not None
         storage.configure_gdal()
