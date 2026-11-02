@@ -106,10 +106,17 @@ export async function createURLLayer(
           });
       } else {
         basemapTileQueue.add(
-          ({ signal }) =>
-            tileLoadFunction({
+          ({ signal }) => {
+            const combined = new AbortController();
+            const signals = [signal, controller.signal];
+            const abort = () => combined.abort();
+
+            signals.forEach((s) => {
+              s.addEventListener("abort", abort, { once: true });
+            });
+            return tileLoadFunction({
               src,
-              signal: AbortSignal.any([signal, controller.signal]),
+              signal: combined.signal,
               sentryMetricOptions: { component: "basemap", baseUrl: undefined },
             })
               .then((imageUrl) => {
@@ -119,7 +126,11 @@ export async function createURLLayer(
                   setError();
                 }
               })
-              .catch(setError),
+              .catch(setError)
+              .finally(() => {
+                signals.forEach((s) => s.removeEventListener("abort", abort));
+              });
+          },
           { abort: setError }
         );
       }
