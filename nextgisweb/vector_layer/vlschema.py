@@ -1,8 +1,8 @@
 import dataclasses as dc
 import re
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Iterator, KeysView
 from functools import cached_property, lru_cache
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.ext.compiler import compiles
@@ -24,12 +24,18 @@ from sqlalchemy.schema import (
     Table,
 )
 from sqlalchemy.sql import (
+    ClauseElement,
+    ColumnElement,
+    Executable,
+    FromClause,
+    Select,
     alias,
     bindparam,
     delete,
     func,
     insert,
     literal_column,
+    quoted_name,
     select,
     text,
     union_all,
@@ -38,16 +44,40 @@ from sqlalchemy.sql import (
 from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import cast as sql_cast
 from sqlalchemy.sql import or_ as sql_or
-from sqlalchemy.sql.elements import BindParameter
-from sqlalchemy.types import CHAR, Integer
+from sqlalchemy.sql.compiler import DDLCompiler
+from sqlalchemy.sql.elements import BindParameter, NamedColumn
+from sqlalchemy.sql.selectable import LateralFromClause, NamedFromClause
+from sqlalchemy.types import CHAR, Integer, TypeEngine
 
 from nextgisweb.lib import saext
 
 from .util import SCHEMA
 
+Fields = dict[str | int, Column]
+
+
+if TYPE_CHECKING:
+
+    class AliasWithFields(NamedFromClause):
+        fields: Fields
+
+    class SelectWithFields(Select):
+        fields: Fields
+else:
+    AliasWithFields = NamedFromClause
+    SelectWithFields = Select
+
 
 class VLSchema(MetaData):
-    def __init__(self, *, tbl_uuid, versioning, geom_column_type, fields, schema=SCHEMA):
+    def __init__(
+        self,
+        *,
+        tbl_uuid: str,
+        versioning: bool,
+        geom_column_type: saext.Geometry | None,
+        fields: dict[int | str, tuple[str, type[TypeEngine]]],
+        schema: str = SCHEMA,
+    ) -> None:
         super().__init__(schema=schema)
         self.tbl_uuid = tbl_uuid
         self.versioning = versioning
@@ -55,11 +85,11 @@ class VLSchema(MetaData):
         self.fields = fields
 
     @property
-    def has_geom(self):
+    def has_geom(self) -> bool:
         return self.geom_column_type is not None
 
     @cached_property
-    def cseq(self):
+    def cseq(self) -> Sequence:
         return Sequence(
             self._table_name("id_seq"),
             start=1,
@@ -67,15 +97,15 @@ class VLSchema(MetaData):
             metadata=self,
         )
 
-    def cseq_fn(self):
+    def cseq_fn(self) -> str:
         return ".".join(([self.schema] if self.schema else []) + [self.cseq.name])
 
     @cached_property
-    def cnextval(self):
+    def cnextval(self) -> ClauseElement:
         return text(f"nextval('{self.cseq_fn()}')")
 
     @cached_property
-    def ctab(self):
+    def ctab(self) -> "FieldsTable":
         fields_columns, fields_mapping = self._columns_from_fields()
         cols = [Column("id", Integer, self.cseq, key="fid", primary_key=True)]
         if self.has_geom:
@@ -86,7 +116,7 @@ class VLSchema(MetaData):
         return FieldsTable(self._table_name(), self, *cols, fields=fields_mapping)
 
     @cached_property
-    def ctab_fk(self):
+    def ctab_fk(self) -> ForeignKeyConstraint:
         return ForeignKeyConstraint(
             ["fid"],
             [self.etab.c.fid],
@@ -97,7 +127,7 @@ class VLSchema(MetaData):
         )
 
     @cached_property
-    def etab(self):
+    def etab(self) -> Table:
         table_name = self._table_name("e")
         fid = self._fid_column(autoincrement=False)
         vid = self._vid_column(primary_key=False)
@@ -108,7 +138,7 @@ class VLSchema(MetaData):
         )
 
     @cached_property
-    def htab(self):
+    def htab(self) -> "FieldsTable":
         fields_columns, fields_mapping = self._columns_from_fields()
         table_name = self._table_name("h")
         vid = self._vid_column(primary_key=True)
@@ -136,37 +166,40 @@ class VLSchema(MetaData):
 
     # DDL generation
 
-    def sql_create(self):
+    def sql_create(self) -> Iterator[Executable]:
         yield CreateSequence(self.cseq)
         for tab in self._iter_tabs():
             yield from _create_table_and_indexes(tab)
         if self.versioning:
             yield AddConstraint(self.ctab_fk)
 
-    def sql_drop(self):
+    def sql_drop(self) -> Iterator[Executable]:
         if self.versioning:
             yield DropConstraint(self.ctab_fk)
         yield from (DropTable(t) for t in reversed(list(self._iter_tabs())))
         yield DropSequence(self.cseq)
 
-    def sql_versioning_enable(self):
+    def sql_versioning_enable(self) -> Iterator[Executable]:
         assert self.versioning
         for tab in self._iter_tabs(ctab=False):
             yield from _create_table_and_indexes(tab)
         yield self.dml_initfill()
         yield AddConstraint(self.ctab_fk)
 
-    def sql_versioning_disable(self):
+    def sql_versioning_disable(self) -> Iterator[Executable]:
         assert not self.versioning
         yield DropConstraint(self.ctab_fk)
         tabs = reversed(list(self._iter_tabs(versioning=True, ctab=False)))
         yield from (DropTable(t) for t in tabs)
 
-    def sql_convert_geom_column_type(self, new_value):
+    def sql_convert_geom_column_type(
+        self, new_value: saext.Geometry
+    ) -> Iterator["AlterGeomColumn"]:
         assert not self.versioning
+        assert self.geom_column_type is not None
         yield AlterGeomColumn(self.ctab, self.geom_column_type, new_value)
 
-    def sql_add_fields(self, fields):
+    def sql_add_fields(self, fields: Iterable[str]) -> Iterator["AlterFieldsColumns"]:
         tabs = (self.ctab, self.htab) if self.versioning else (self.ctab,)
         for tab in tabs:
             yield AlterFieldsColumns(
@@ -175,7 +208,7 @@ class VLSchema(MetaData):
                 action="ADD",
             )
 
-    def sql_delete_fields(self, fields):
+    def sql_delete_fields(self, fields: Iterable[str]) -> Iterator["AlterFieldsColumns"]:
         tabs = (self.ctab, self.htab) if self.versioning else (self.ctab,)
         for tab in tabs:
             yield AlterFieldsColumns(
@@ -186,7 +219,13 @@ class VLSchema(MetaData):
 
     # Queries
 
-    def query_pit(self, version, *, subquery="pit", where=lambda s: ()):
+    def query_pit(
+        self,
+        version: BindParameter | int,
+        *,
+        subquery: str = "pit",
+        where: Callable = lambda s: (),
+    ) -> AliasWithFields:
         ct, et, ht = self._aliased_tabs()
         vid = version if isinstance(version, BindParameter) else bindparam("vid", version)
 
@@ -211,10 +250,17 @@ class VLSchema(MetaData):
 
         qu = union_all(qh, qe).subquery(subquery)
         fnames = {k: f"fld_{idx}" for idx, k in enumerate(ct.fields.keys(), start=1)}
-        set_fields(qu, {k: qu.c[n] for k, n in fnames.items()})
-        return qu
+        fields = {}
+        for k, n in fnames.items():
+            c = qu.c[n]
+            assert isinstance(c, Column)
+            fields[k] = c
+        set_fields(qu, fields)
+        return qu  # ty: ignore[invalid-return-type]
 
-    def query_revert(self, version, *, where=lambda s: ()):
+    def query_revert(
+        self, version: BindParameter | int, *, where: Callable = lambda s: ()
+    ) -> SelectWithFields:
         et, ht = self._aliased_tabs()[1:]
         vid = version if isinstance(version, BindParameter) else bindparam("vid", version)
 
@@ -249,10 +295,15 @@ class VLSchema(MetaData):
         ).where(text("current != previous OR (current AND previous)"))
 
         fnames = {k: f"fld_{idx}" for idx, k in enumerate(ht.fields.keys(), start=1)}
-        set_fields(q, {k: q.selected_columns[n] for k, n in fnames.items()})
-        return q
+        fields = {}
+        for k, n in fnames.items():
+            c = q.selected_columns[n]
+            assert isinstance(c, Column)
+            fields[k] = c
+        set_fields(q, fields)
+        return q  # ty: ignore[invalid-return-type]
 
-    def query_changed_fids(self):
+    def query_changed_fids(self) -> Iterator[Select]:
         et, ht = self.etab.alias("et"), self.htab.alias("ht")
         p_initial, p_target = bindparam("p_initial"), bindparam("p_target")
         p_fid_limit = bindparam("p_fid_limit", type_=Integer())
@@ -271,13 +322,13 @@ class VLSchema(MetaData):
                 .limit(p_fid_limit)
             )
 
-    def query_changes(self, *, summary=False):
+    def query_changes(self, *, summary: bool = False) -> tuple[Select, dict[int, int]]:
         ct, et, ht = self._aliased_tabs()
         p_initial = bindparam("p_initial", type_=Integer())
         p_target = bindparam("p_target", type_=Integer())
         p_fid_min, p_fid_max = bindparam("p_fid_min"), bindparam("p_fid_max")
 
-        lc_fields, fmap = list(), dict()
+        lc_fields, fmap = [], {}
         for idx, (fk, fv) in enumerate(self.fields.items(), start=1):
             lc_fields.append(literal_column(f"fld_{fv[0]}").label(f"fld_{idx}"))
             fmap[fk] = idx
@@ -338,8 +389,10 @@ class VLSchema(MetaData):
 
     # DML
 
-    def dml_insert(self, *, fields=None, with_fid=False):
-        bmap, values = dict(), dict()
+    def dml_insert(
+        self, *, fields: KeysView[str] | None = None, with_fid: bool = False
+    ) -> tuple[Executable, dict[str, str]]:
+        bmap, values = {}, {}
         values["fid"] = bindparam("p_fid") if with_fid else self.cnextval
         if self.has_geom:
             values["geom"] = self._geom_value()
@@ -366,9 +419,16 @@ class VLSchema(MetaData):
         iet = iet.returning(et.c.fid.label("id"))
         return iet, bmap
 
-    def dml_update(self, *, id, with_geom, fields=None, geom_raw=False):
+    def dml_update(
+        self,
+        *,
+        id: BindParameter | int,
+        with_geom: bool,
+        fields: KeysView[str] | None = None,
+        geom_raw: bool = False,
+    ) -> tuple[Executable, dict[str | int, str]]:
         ct = self.ctab
-        bmap, values, dif = dict(), dict(), list()
+        bmap, values, dif = {}, {}, []
 
         if with_geom and self.has_geom:
             values["geom"] = geom_value = self._geom_value(raw=geom_raw)
@@ -414,7 +474,7 @@ class VLSchema(MetaData):
         uet = update(et).values(vid=vid, vop=_lc_op_upd).where(iht.c.fid == et.c.fid)
         return uet.returning(et.c.fid.label("id")), bmap
 
-    def dml_delete(self, *, filter_by):
+    def dml_delete(self, *, filter_by: dict[str, BindParameter | Any]) -> Executable:
         ct = self.ctab
         dct = delete(ct).filter_by(**filter_by)
 
@@ -444,8 +504,10 @@ class VLSchema(MetaData):
         uet = uet.where(iht.c.fid == et.c.fid)
         return uet.returning(iht.c.fid.label("id"))
 
-    def dml_restore(self, *, with_geom, fields=None, geom_raw=False):
-        bmap = dict()
+    def dml_restore(
+        self, *, with_geom: bool, fields: KeysView[str] | None = None, geom_raw: bool = False
+    ) -> tuple[Executable, dict[str | int, str]]:
+        bmap = {}
         ct, et, ht = self.ctab, self.etab, self.htab
         fid, vid = bindparam("p_fid"), bindparam("p_vid")
 
@@ -492,7 +554,7 @@ class VLSchema(MetaData):
         uet = uet.where(iht.c.fid == ict.c.fid)
         return uet.returning(et.c.fid.label("id")), bmap
 
-    def dml_initfill(self):
+    def dml_initfill(self) -> Executable:
         assert self.versioning
         ct, et = self.ctab, self.etab
         vid = bindparam("vid", 1)
@@ -500,7 +562,7 @@ class VLSchema(MetaData):
         ins_e = insert(et).from_select(["fid", "vid", "vop"], sel_e)
         return ins_e
 
-    def dml_reset_seq(self):
+    def dml_reset_seq(self) -> Executable:
         fid = self.ctab.c.fid if not self.versioning else self.etab.c.fid
         sub = select(func.max(fid).label("fid")).scalar_subquery()
         return select(
@@ -512,10 +574,10 @@ class VLSchema(MetaData):
 
     # Utilities
 
-    def _table_name(self, suffix=None):
+    def _table_name(self, suffix: str | None = None) -> str:
         return "layer_" + self.tbl_uuid + (f"_{suffix}" if suffix else "")
 
-    def _iter_tabs(self, *, versioning=None, ctab=True):
+    def _iter_tabs(self, *, versioning: bool | None = None, ctab: bool = True) -> Iterator[Table]:
         if ctab:
             yield self.ctab
         versioning = self.versioning if versioning is None else versioning
@@ -523,10 +585,10 @@ class VLSchema(MetaData):
             for i in ("e", "h"):
                 yield getattr(self, f"{i}tab")
 
-    def _fid_column(self, *args, **kwargs):
+    def _fid_column(self, *args: Any, **kwargs: Any) -> Column:
         return Column("fid", Integer, *args, primary_key=True, **kwargs)
 
-    def _vid_column(self, *, primary_key):
+    def _vid_column(self, *, primary_key: bool) -> Column:
         return Column(
             "vid",
             Integer,
@@ -534,7 +596,7 @@ class VLSchema(MetaData):
             nullable=False,
         )
 
-    def _nid_column(self):
+    def _nid_column(self) -> Column:
         return Column(
             "nid",
             Integer,
@@ -542,42 +604,46 @@ class VLSchema(MetaData):
             nullable=False,
         )
 
-    def _geom_column(self, **kwargs):
+    def _geom_column(self, **kwargs: Any) -> Column:
         return Column("geom", self.geom_column_type, **kwargs)
 
-    def _geom_index(self):
+    def _geom_index(self) -> Index:
         return Index(
             f"idx_{self._table_name()}_geom",
             "geom",
             postgresql_using="gist",
         )
 
-    def _geom_value(self, name="geom", raw=False):
+    def _geom_value(self, name: str = "geom", raw: bool = False) -> ColumnElement:
         if raw:
             return bindparam(name)
+        assert self.geom_column_type is not None
         return func.ST_GeomFromWKB(
             bindparam(name),
             text(str(self.geom_column_type.srid)),
         )
 
-    def _columns_from_fields(self):
-        fields_columns = list()
-        fields_mapping = dict()
+    def _columns_from_fields(self) -> tuple[list[Column], dict[str | int, quoted_name]]:
+        fields_columns = []
+        fields_mapping = {}
         for fk, fld in self.fields.items():
             fcol = Column(f"fld_{fld[0]}", *fld[1:])
             fields_columns.append(fcol)
+            assert isinstance(fcol.name, quoted_name)
             fields_mapping[fk] = fcol.name
         return fields_columns, fields_mapping
 
-    def _aliased_tabs(self):
+    def _aliased_tabs(
+        self,
+    ) -> tuple[AliasWithFields, NamedFromClause, AliasWithFields]:
         return (
             alias(self.ctab, "ct"),
             alias(self.etab, "et"),
             alias(self.htab, "ht"),
-        )
+        )  # ty: ignore[invalid-return-type]
 
 
-def _create_table_and_indexes(tab):
+def _create_table_and_indexes(tab: Table) -> Iterator[CreateTable | CreateIndex]:
     yield CreateTable(tab)
     for idx in tab.indexes:
         yield CreateIndex(idx)
@@ -613,13 +679,13 @@ _lc_changes_head = (
 
 
 @lru_cache
-def _lc_changes_geom():
+def _lc_changes_geom() -> NamedColumn:
     lc = literal_column("CASE WHEN dif_geom THEN ST_AsBinary(qt.geom, 'NDR') END")
     return lc.label("geom")
 
 
 @lru_cache
-def _lc_changes_fields(count):
+def _lc_changes_fields(count: int) -> tuple[NamedColumn, ...]:
     return tuple(
         literal_column(f"CASE WHEN dif_{i} THEN qt.fld_{i} END").label(f"fld_{i}")
         for i in range(1, count + 1)
@@ -627,7 +693,7 @@ def _lc_changes_fields(count):
 
 
 @lru_cache
-def _lc_changes_bits(count):
+def _lc_changes_bits(count: int) -> NamedColumn:
     cols = ["dif_geom", *(f"dif_{i}" for i in range(1, count + 1))]
     cols = [f"CASE WHEN {c} THEN '1' ELSE '0' END" for c in cols]
     # NOTE: CONCAT fails here if len(cols) > 100
@@ -635,7 +701,7 @@ def _lc_changes_bits(count):
 
 
 @lru_cache
-def _lat_changes_p():
+def _lat_changes_p() -> LateralFromClause:
     return select(
         literal_column("qi.fid IS NOT NULL AND NOT qi.deleted").label("pi"),
         literal_column("qi.fid IS NOT NULL AND qi.deleted").label("di"),
@@ -644,7 +710,7 @@ def _lat_changes_p():
 
 
 @lru_cache
-def _lat_changes_d(count):
+def _lat_changes_d(count: int) -> LateralFromClause:
     tmpl = "pt AND (NOT pi OR qt.{c} IS DISTINCT FROM qi.{c})"
     lc_geom = literal_column(tmpl.format(c="geom"))
     return select(
@@ -657,40 +723,42 @@ def _lat_changes_d(count):
 
 
 @lru_cache
-def _lat_changes_u(count):
+def _lat_changes_u(count: int) -> LateralFromClause:
     cols = ("dif_geom", *(f"dif_{i}" for i in range(1, count + 1)))
     return select(
         literal_column(" OR ".join(cols)).label("upd"),
     ).lateral("lat_u")
 
 
-def set_fields(obj: object, fields: Mapping) -> None:
+def set_fields(obj: object, fields: Fields) -> None:
     setattr(obj, "fields", fields)
 
 
-def get_fields(obj: object) -> Mapping:
+def get_fields(obj: object) -> Fields:
     return getattr(obj, "fields")
 
 
 class FieldsTable(Table):
-    def __init__(self, *args, fields: dict, **kwargs):
+    def __init__(self, *args: Any, fields: dict[str | int, quoted_name], **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._fields = fields
 
-    def alias(self, *args, **kwargs):
+    def alias(self, *args: Any, **kwargs: Any) -> NamedFromClause:
         obj = super().alias(*args, **kwargs)
         set_fields(obj, self._fields_mapping(obj))
         return obj
 
     @cached_property
-    def fields(self):
+    def fields(self) -> Fields:
         return self._fields_mapping(self)
 
-    def _fields_mapping(self, table):
-        return {
-            field_key: table.columns[field_column_name]
-            for field_key, field_column_name in self._fields.items()
-        }
+    def _fields_mapping(self, table: FromClause) -> Fields:
+        result = {}
+        for field_key, field_column_name in self._fields.items():
+            c = table.columns[field_column_name]
+            assert isinstance(c, Column)
+            result[field_key] = c
+        return result
 
 
 @dc.dataclass
@@ -701,7 +769,9 @@ class AlterGeomColumn(DDLElement):
 
 
 @compiles(AlterGeomColumn)
-def _compile_alter_geometry_column(element, compiler, **kw):
+def _compile_alter_geometry_column(
+    element: AlterGeomColumn, compiler: DDLCompiler, **kw: Any
+) -> str:
     om, ob, oz = _split_geometry_type(element.old_type.geometry_type)
     nm, nb, nz = _split_geometry_type(element.new_type.geometry_type)
 
@@ -738,7 +808,7 @@ def _compile_alter_geometry_column(element, compiler, **kw):
 def _split_geometry_type(
     value: str,
     *,
-    regex=re.compile(r"(MULTI|)(POINT|LINESTRING|POLYGON)(Z|)"),
+    regex: re.Pattern = re.compile(r"(MULTI|)(POINT|LINESTRING|POLYGON)(Z|)"),
 ) -> tuple[str, str, str]:
     m = regex.fullmatch(value)
     assert m is not None
@@ -750,10 +820,10 @@ def _split_geometry_type(
 @dc.dataclass
 class AlterFieldsColumns(DDLElement):
     table: Table
-    fields: Iterable[tuple[str, ...]]
+    fields: Iterable[Column]
     action: Literal["ADD", "DROP"]
 
-    def _compile_column(self, column, *, compiler):
+    def _compile_column(self, column: Column, *, compiler: DDLCompiler) -> str:
         if self.action == "ADD":
             return "ADD COLUMN " + compiler.get_column_specification(column)
         elif self.action == "DROP":
@@ -762,7 +832,9 @@ class AlterFieldsColumns(DDLElement):
 
 
 @compiles(AlterFieldsColumns)
-def _compile_alter_field_columns(element, compiler, **kwargs):
+def _compile_alter_field_columns(
+    element: AlterFieldsColumns, compiler: DDLCompiler, **kwargs: Any
+) -> str:
     field_to_sql = lambda f: element._compile_column(f, compiler=compiler)
     return "ALTER TABLE {table} {operations}".format(
         table=compiler.preparer.format_table(element.table),

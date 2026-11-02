@@ -114,14 +114,14 @@ class FeatureExplorer(ABC):
     identity: ClassVar[str]
 
     @abstractmethod
-    def visit(self, feature) -> bool:
+    def visit(self, feature: ogr.Feature) -> bool:
         """Explore feature and returns True if done"""
 
 
 class GeomTypeExplorer(FeatureExplorer):
     identity = "geom_type"
 
-    def __init__(self, geom_filter, params):
+    def __init__(self, geom_filter: set[str], params: LoaderParams) -> None:
         self.geom_filter = geom_filter
         self.is_multi = False
         self.has_z = False
@@ -129,7 +129,7 @@ class GeomTypeExplorer(FeatureExplorer):
         self.found_any = False
         self._params = params
 
-    def visit(self, feature) -> bool:
+    def visit(self, feature: ogr.Feature) -> bool:
         self.explored_any = True
         geom = feature.GetGeometryRef()
         if geom is None:
@@ -185,11 +185,11 @@ class GeomTypeExplorer(FeatureExplorer):
 class Int32RangeExplorer(FeatureExplorer):
     identity = "int32_range"
 
-    def __init__(self, field_index):
+    def __init__(self, field_index: int) -> None:
         self.result_ok = True
         self._field_index = field_index
 
-    def visit(self, feature) -> bool:
+    def visit(self, feature: ogr.Feature) -> bool:
         i = self._field_index
         if feature.IsFieldSet(i) and not feature.IsFieldNull(i):
             fid = feature.GetFieldAsInteger64(i)
@@ -202,13 +202,13 @@ class Int32RangeExplorer(FeatureExplorer):
 class UniquenessExplorer(FeatureExplorer):
     identity = "unique"
 
-    def __init__(self, field_index, field_type):
+    def __init__(self, field_index: int, field_type: int) -> None:
         self.result_ok = True
         self._field_index = field_index
         self._field_getter = FIELD_GETTER[field_type]
         self._values = set()
 
-    def visit(self, feature) -> bool:
+    def visit(self, feature: ogr.Feature) -> bool:
         i = self._field_index
         if not feature.IsFieldSet(i) or feature.IsFieldNull(i):
             self.result_ok = False
@@ -584,7 +584,7 @@ class FeatureGeometryTypeInvalid(FeatureError):
 
 
 class FeatureGeometryTypeUnsuitable(FeatureGeometryTypeInvalid):
-    def __init__(self, fid, wkb_type):
+    def __init__(self, fid: int, wkb_type: int) -> None:
         msg = gettext("Feature #%d has unsuitable geometry type: %d (%s).")
         super().__init__(msg % (fid, wkb_type, ogr.GeometryTypeToName(wkb_type)))
 
@@ -608,9 +608,9 @@ def _fid_fget[T: Any](
     return fget(feature)
 
 
-def _wkb_product(*args):
-    args = [((arg,) if isinstance(arg, str) else arg) for arg in args]
-    return tuple(getattr(ogr, "wkb" + "".join(ai)) for ai in product(*args))
+def _wkb_product(*args: str | tuple[str, ...]) -> tuple[int, ...]:
+    args2 = [((arg,) if isinstance(arg, str) else arg) for arg in args]
+    return tuple(getattr(ogr, "wkb" + "".join(ai)) for ai in product(*args2))
 
 
 _wkb_points = _wkb_product(("", "Multi"), "Point", ("", "25D"))
@@ -623,7 +623,9 @@ _wkb_has_z = _wkb_product(("", "Multi"), ("Point", "LineString", "Polygon"), "25
 _wkb_supported = _wkb_points + _wkb_linestrings + _wkb_polygons
 
 
-def _validate_geom(geom, target, *, fix_errors, fid):
+def _validate_geom(
+    geom: ogr.Geometry, target: int, *, fix_errors: FixErrors, fid: int
+) -> ogr.Geometry | None:
     if geom.IsMeasured() and fix_errors == FIX_ERRORS.LOSSY:
         geom.SetMeasured(False)
 
@@ -751,13 +753,13 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                 if target in _wkb_multi:
                     geom.RemoveGeometry(part_idx)
                 else:
-                    geom = None
+                    geom = None  # ty: ignore[invalid-assignment]
                     break
 
     return geom
 
 
-def _validate_string(value, fname, *, fix_errors, fid):
+def _validate_string(value: str, fname: str, *, fix_errors: FixErrors, fid: int) -> str:
     fixed = fix_encoding(value)
     if value != fixed:
         if fix_errors == FIX_ERRORS.LOSSY:
@@ -769,6 +771,6 @@ def _validate_string(value, fname, *, fix_errors, fid):
     return value
 
 
-def _iter_reversed_geom(geom):
+def _iter_reversed_geom(geom: ogr.Geometry) -> Iterator[tuple[int, ogr.Geometry]]:
     for i in range(geom.GetGeometryCount() - 1, -1, -1):
         yield i, geom.GetGeometryRef(i)

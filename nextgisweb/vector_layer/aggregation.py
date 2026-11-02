@@ -1,7 +1,10 @@
+from typing import Any
+
 from nextgisweb.env import DBSession
 from nextgisweb.lib.registry import DictRegistry
 
 from nextgisweb.feature_layer.aggregation import (
+    AggregationSpec,
     PgMinMaxAggregation,
     PgSumAggregation,
     PgUniqueValuesAggregation,
@@ -27,7 +30,10 @@ class SumAggregation(PgSumAggregation):
     pass
 
 
-def aggregate(feature_query, specs):
+def aggregate(
+    feature_query,  # noqa: ANN001
+    specs: list[tuple[int, str, AggregationSpec]],
+) -> dict[int, Any]:
     """Execute aggregations using the feature query's table and WHERE context."""
     _, _, col_map, where = feature_query.build_query_context()
     resource = feature_query.layer

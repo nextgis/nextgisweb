@@ -1,4 +1,5 @@
 from datetime import date, datetime, time
+from typing import Any
 from unittest.mock import ANY
 
 import pytest
@@ -397,7 +398,7 @@ def test_error_limit():
         feature.SetGeometry(ogr.CreateGeometryFromWkt(wkt))
         layer.CreateFeature(feature)
 
-    opts = {"fix_errors": FIX_ERRORS.NONE}
+    opts: dict[str, Any] = {"fix_errors": FIX_ERRORS.NONE}
     with pytest.raises(ValidationError) as excinfo:
         res.from_source(layer, **opts, skip_errors=False)
     assert excinfo.value.detail is not None
@@ -423,7 +424,7 @@ def test_id_field(data, ngw_data_path):
     res = VectorLayer().persist()
     src = ngw_data_path / f"{data}.geojson"
 
-    fid_params = {"fid_source": FID_SOURCE.FIELD, "fid_field": ["id"]}
+    fid_params: dict[str, Any] = {"fid_source": FID_SOURCE.FIELD, "fid_field": ["id"]}
     with pytest.raises(ValidationError):
         res.from_source(src, **fid_params)
 

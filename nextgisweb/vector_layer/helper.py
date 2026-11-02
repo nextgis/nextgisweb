@@ -46,8 +46,8 @@ def setup_fields(
     rest = {f.keyname: f for f in res.fields}
     attrs = ("display_name", "grid_visibility", "text_search", "required", "lookup_table")
 
-    present = list()
-    added = list()
+    present = []
+    added = []
 
     ordered = []
     for fd in fields:

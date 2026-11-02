@@ -1,4 +1,5 @@
 import re
+from collections.abc import Callable, Iterable, Iterator
 from functools import partial
 from itertools import chain
 from pathlib import Path
@@ -9,15 +10,17 @@ import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from osgeo import gdal, ogr
-from sqlalchemy import CursorResult, inspect, select, text
+from sqlalchemy import CursorResult, Executable, inspect, select, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.types import TypeEngine
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import COMP_ID, Base, DBSession, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.i18n import TrStr
 
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError as VE
@@ -65,7 +68,7 @@ from nextgisweb.resource import (
 
 from ..feature_layer.filter import FilterParser
 from .component import VectorLayerComponent
-from .feature_query import FeatureQueryBase, calculate_extent
+from .feature_query import Extent, FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
 from .ogrloader import (
     CastAutoYesNo,
@@ -109,27 +112,28 @@ class VectorLayerField(LayerField):
     identity = "vector_layer"
 
     __tablename__ = LayerField.__tablename__ + "_" + identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
+    __mapper_args__ = {"polymorphic_identity": identity}
 
     id: Mapped[int] = mapped_column(sa.ForeignKey(LayerField.id), primary_key=True)
     fld_uuid: Mapped[str] = mapped_column(sa.Unicode(32))
 
-    def __init__(self, *args, **kwagrs):
+    def __init__(self, *args: Any, **kwagrs: Any) -> None:
         if "fld_uuid" not in kwagrs:
             kwagrs["fld_uuid"] = uuid_hex()
         super().__init__(*args, **kwagrs)
 
 
-def vlschema_autoflush(func):
-    def wrapped(*args, **kwargs):
+def vlschema_autoflush(func: Callable) -> Callable:
+    def wrapped(*args: Any, **kwargs: Any) -> Callable:
         _vlschema_autoflush(args[0])
         return func(*args, **kwargs)
 
     return wrapped
 
 
-def _vlschema_autoflush(res):
+def _vlschema_autoflush(res: "VectorLayer") -> None:
     insp = inspect(res)
+    assert insp is not None
     session = insp.session
     if session._flushing:
         return
@@ -166,16 +170,16 @@ class VectorLayer(
 
     __field_class__ = VectorLayerField
 
-    def __init__(self, *args, **kwagrs):
+    def __init__(self, *args: Any, **kwagrs: Any) -> None:
         if "tbl_uuid" not in kwagrs:
             kwagrs["tbl_uuid"] = uuid_hex()
         super().__init__(*args, **kwagrs)
 
     @classmethod
-    def check_parent(cls, parent):
+    def check_parent(cls, parent: Resource) -> bool:
         return isinstance(parent, ResourceGroup)
 
-    def get_info(self):
+    def get_info(self) -> tuple[tuple[TrStr, Any]]:
         return super().get_info() + (
             (
                 gettext("Geometry type"),
@@ -186,7 +190,7 @@ class VectorLayer(
         )
 
     @property
-    def _tablename(self):
+    def _tablename(self) -> str:
         return "layer_%s" % self.tbl_uuid
 
     def _write_initial(self, loader: OGRLoader) -> None:
@@ -267,11 +271,11 @@ class VectorLayer(
         self,
         source: Path | str | gdal.Dataset | ogr.Layer,
         *,
-        layer=UNSET,
+        layer: str | int | UnsetType = UNSET,
         keep: bool = False,
-        **kw,
+        **kw: Any,
     ) -> Self:
-        lp_kw = dict()
+        lp_kw = dict[str, Any]()
         for k in list(kw.keys()):
             if k in LoaderParams.__annotations__:
                 if keep and k not in (
@@ -307,7 +311,7 @@ class VectorLayer(
             dataset_ref = None
             assert layer is UNSET
 
-        loader_kw = {"params": lparams}
+        loader_kw: dict[str, Any] = {"params": lparams}
         if keep:
             loader_kw["geometry_type"] = self.geometry_type
         loader = OGRLoader(source, **loader_kw)
@@ -342,10 +346,10 @@ class VectorLayer(
 
         return self
 
-    def from_ogr(self, *args, **kw):
+    def from_ogr(self, *args: Any, **kw: Any) -> Self:
         return self.from_source(*args, validate=False, **kw)
 
-    def setup_from_fields(self, fields):
+    def setup_from_fields(self, fields: list[dict[str, Any]]) -> None:
         assert len(self.fields) == 0
         keynames = set()
         display_names = set()
@@ -375,10 +379,10 @@ class VectorLayer(
     def vlschema(
         self,
         *,
-        tbl_uuid=None,
-        fversioning_enabled=None,
-        geometry_type=None,
-        fields=None,
+        tbl_uuid: str | None = None,
+        fversioning_enabled: bool | None = None,
+        geometry_type: str | None = None,
+        fields: dict[int | str, tuple[str, type[TypeEngine]]] | None = None,
     ) -> VLSchema:
         if tbl_uuid is None:
             tbl_uuid = self.tbl_uuid
@@ -406,28 +410,28 @@ class VectorLayer(
 
     @property
     @vlschema_autoflush
-    def feature_query(self):
+    def feature_query(self) -> type[FeatureQueryBase]:
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
 
         return BoundFeatureQuery
 
     @property
-    def filter_parser(self):
+    def filter_parser(self) -> FilterParser:
         return FilterParser.from_resource(self)
 
     # IFieldEditableFeatureLayer
 
-    def field_create(self, datatype):
+    def field_create(self, datatype: str) -> VectorLayerField:
         return VectorLayerField(datatype=datatype)
 
-    def field_delete(self, field):
+    def field_delete(self, field: LayerField) -> None:
         DBSession.delete(field)
 
     # IGeometryEditableFeatureLayer
 
     @vlschema_autoflush
-    def geometry_type_change(self, geometry_type):
+    def geometry_type_change(self, geometry_type: str) -> None:
         if self.fversioning:
             raise FVersioningNotImplemented
 
@@ -449,11 +453,11 @@ class VectorLayer(
 
     @vlschema_autoflush
     @fversioning_guard
-    def feature_create(self, feature, with_fid=False):
+    def feature_create(self, feature: Feature, with_fid: bool = False) -> int:
         vls = self.vlschema()
         session = self.require_session()
 
-        data = dict()
+        data = {}
         query, bmap = vls.dml_insert(fields=feature.fields.keys(), with_fid=with_fid)
 
         if with_fid:
@@ -480,11 +484,12 @@ class VectorLayer(
 
     @vlschema_autoflush
     @fversioning_guard
-    def feature_put(self, feature):
+    def feature_put(self, feature: Feature) -> bool:
+        assert feature.id is not None
         vls = self.vlschema()
         session = self.require_session()
 
-        data = dict()
+        data = {}
         with_geom = False
         if (geom := feature.geom) is not UNSET:
             data["geom"] = geom.wkb if geom else None
@@ -515,13 +520,13 @@ class VectorLayer(
 
     @vlschema_autoflush
     @fversioning_guard
-    def feature_delete(self, feature_id):
+    def feature_delete(self, feature_id: int) -> None:
         vls = self.vlschema()
         session = self.require_session()
-        query = vls.dml_delete(filter_by=dict(fid=feature_id))
+        query = vls.dml_delete(filter_by={"fid": feature_id})
 
         if vobj := self.fversioning_vobj:
-            result = session.execute(query, dict(vid=vobj.version_id))
+            result = session.execute(query, {"vid": vobj.version_id})
             assert isinstance(result, CursorResult)
             row_count = result.rowcount
             if row_count > 0:
@@ -537,11 +542,11 @@ class VectorLayer(
 
     @vlschema_autoflush
     @fversioning_guard
-    def feature_restore(self, feature):
+    def feature_restore(self, feature: Feature) -> bool:
         vls = self.vlschema()
         session = self.require_session()
 
-        data = dict(p_fid=feature.id)
+        data = {"p_fid": feature.id}
         with_geom = False
         if (geom := feature.geom) is not UNSET:
             data["geom"] = geom.wkb if geom else None
@@ -571,13 +576,13 @@ class VectorLayer(
 
     @vlschema_autoflush
     @fversioning_guard
-    def feature_delete_all(self):
+    def feature_delete_all(self) -> None:
         vls = self.vlschema()
         session = self.require_session()
         query = vls.dml_delete(filter_by={})
 
         if vobj := self.fversioning_vobj:
-            result = session.execute(query, dict(vid=vobj.version_id))
+            result = session.execute(query, {"vid": vobj.version_id})
             assert isinstance(result, CursorResult)
             if result.rowcount > 0:
                 vobj.mark_features_deleted(all=True)
@@ -592,7 +597,7 @@ class VectorLayer(
 
     @property
     @vlschema_autoflush
-    def extent(self):
+    def extent(self) -> Extent | None:
         if self.geometry_type == GEOM_TYPE.NONE:
             return None
         ctab = self.vlschema(fields={}).ctab
@@ -600,23 +605,27 @@ class VectorLayer(
 
     # Versioning
 
-    def fversioning_changed_fids(self):
+    def fversioning_changed_fids(self) -> Iterator[sa.Select]:
         yield from self.vlschema().query_changed_fids()
 
-    def fversioning_changes(self, *, initial, target, fid_min, fid_max):
+    def fversioning_changes(
+        self, *, initial: int | None, target: int, fid_min: int | None, fid_max: int | None
+    ) -> Iterator[FeatureDelete | FeatureCreate | FeatureUpdate | FeatureRestore]:
         initial = initial or 0
 
-        fields = {fld.id: (fld.fld_uuid, FIELD_TYPE_2_DB[fld.datatype]) for fld in self.fields}
+        fields: dict[int | str, tuple[str, type[TypeEngine]]] = {
+            fld.id: (fld.fld_uuid, FIELD_TYPE_2_DB[fld.datatype]) for fld in self.fields
+        }
 
         query, fmap = self.vlschema(fields=fields).query_changes()
         result = DBSession.execute(
             query,
-            dict(
-                p_initial=initial,
-                p_target=target,
-                p_fid_min=fid_min,
-                p_fid_max=fid_max,
-            ),
+            {
+                "p_initial": initial,
+                "p_target": target,
+                "p_fid_min": fid_min,
+                "p_fid_max": fid_max,
+            },
         )
 
         geom_col_offset = 4
@@ -661,19 +670,21 @@ class VectorLayer(
                 raise NotImplementedError
 
     def fversioning_summary(
-        self, *, initial, target, fid_min, fid_max
+        self, *, initial: int, target: int, fid_min: int | None, fid_max: int | None
     ) -> FVersioningFeatureSummary:
-        fields = {fld.id: (fld.fld_uuid, FIELD_TYPE_2_DB[fld.datatype]) for fld in self.fields}
+        fields: dict[int | str, tuple[str, type[TypeEngine]]] = {
+            fld.id: (fld.fld_uuid, FIELD_TYPE_2_DB[fld.datatype]) for fld in self.fields
+        }
         query, _ = self.vlschema(fields=fields).query_changes(summary=True)
 
         result = DBSession.execute(
             query,
-            dict(
-                p_initial=initial,
-                p_target=target,
-                p_fid_min=fid_min,
-                p_fid_max=fid_max,
-            ),
+            {
+                "p_initial": initial,
+                "p_target": target,
+                "p_fid_min": fid_min,
+                "p_fid_max": fid_max,
+            },
         )
 
         create = update = delete = restore = 0
@@ -702,7 +713,7 @@ class VectorLayer(
             restore=restore,
         )
 
-    def fversioning_revert_layer_features(self, version: int):
+    def fversioning_revert_layer_features(self, version: int) -> bool:
         vls = self.vlschema()
 
         vobj = self.fversioning_vobj
@@ -713,12 +724,12 @@ class VectorLayer(
 
         p_fid = sa.bindparam("p_fid")
         update_query, update_bmap = vls.dml_update(id=p_fid, with_geom=True, geom_raw=True)
-        delete_query = vls.dml_delete(filter_by=dict(fid=p_fid))
+        delete_query = vls.dml_delete(filter_by={"fid": p_fid})
         restore_query, restore_bmap = vls.dml_restore(with_geom=True, geom_raw=True)
 
         session = self.require_session()
         result = False
-        for row in session.execute(query, dict(vid=version)).all():
+        for row in session.execute(query, {"vid": version}).all():
             if not row.current and row.previous:
                 data = dict(
                     p_fid=row.fid,
@@ -731,7 +742,7 @@ class VectorLayer(
                 assert restore_result.rowcount == 1
                 result = result or True
             elif row.current and not row.previous:
-                data = dict(p_fid=row.fid, vid=new_vid)
+                data = {"p_fid": row.fid, "vid": new_vid}
                 delete_result = session.execute(delete_query, data)
                 assert isinstance(delete_result, CursorResult)
                 assert delete_result.rowcount == 1
@@ -755,22 +766,22 @@ class VectorLayer(
 
     # Internals
 
-    def _vlschema_wipe(self):
+    def _vlschema_wipe(self) -> None:
         self.fields[:] = []
         self.tbl_uuid = uuid_hex()
 
     @orm.validates("tbl_uuid")
-    def _tbl_uuid_validate(self, key, value):
+    def _tbl_uuid_validate(self, key: str, value: str) -> str:
         assert self.tbl_uuid is None or self.fields == []
         return value
 
-    def _geom_column_type(self, geometry_type=None):
+    def _geom_column_type(self, geometry_type: str | None = None) -> saext.Geometry | None:
         geometry_type = geometry_type if geometry_type else self.geometry_type
         if geometry_type is None or geometry_type == GEOM_TYPE.NONE:
             return None
         return saext.Geometry(geometry_type, self.srs.id)
 
-    def _reset_seq(self):
+    def _reset_seq(self) -> None:
         session = self.require_session()
         session.execute(self.vlschema().dml_reset_seq())
 
@@ -796,16 +807,17 @@ sa_event.listen(
 def storage_estimate(comp: VectorLayerComponent, /) -> StorageEstimateResult:
     for resource in VectorLayer.query():
         size = estimate_vector_layer_data(resource)
-        yield VectorLayerData, resource.id, size
+        if size is not None:
+            yield VectorLayerData, resource.id, size
 
 
 class VectorLayerSession:
     @classmethod
-    def listen(cls, session):
+    def listen(cls, session: orm.scoped_session) -> None:
         sa_event.listen(session, "before_flush", cls.before_flush)
 
     @classmethod
-    def before_flush(cls, session, flush_context, instances):
+    def before_flush(cls, session: orm.Session, flush_context: Any, instances: Any) -> None:
         exec = partial(_execute_multiple, session=session)
 
         deleted = set()
@@ -818,18 +830,21 @@ class VectorLayerSession:
         for obj in session:
             if isinstance(obj, VectorLayer) and obj not in deleted:
                 insp = inspect(obj)
+                assert insp is not None
                 if insp.pending:
                     exec(obj.vlschema().sql_create())
                 else:
                     cls.handle_changed(obj, insp, exec, session)
 
     @classmethod
-    def handle_changed(cls, obj, insp, exec, session):
+    def handle_changed(
+        cls, obj: VectorLayer, insp: orm.state.InstanceState, exec: Callable, session: orm.Session
+    ) -> None:
         attrs = {"tbl_uuid", "fversioning", "geometry_type", "fields"}
         if insp.unloaded.issuperset(attrs):
             return
 
-        achanges, fadd, fdel = dict(), None, None
+        achanges, fadd, fdel = {}, None, None
         iattrs = insp.attrs
         for attr in attrs:
             a, u, d = getattr(iattrs, attr).history
@@ -868,13 +883,13 @@ class VectorLayerSession:
         elif gt := achanges.pop("geometry_type", None):
             if obj.fversioning:
                 raise FVersioningNotImplemented
+            gt_value = obj._geom_column_type(gt[1])
+            assert gt_value is not None
             exec(
                 obj.vlschema(
                     geometry_type=gt[0],
                     fields={},
-                ).sql_convert_geom_column_type(
-                    obj._geom_column_type(gt[1]),
-                )
+                ).sql_convert_geom_column_type(gt_value)
             )
 
         assert len(achanges) == 0, f"Unconsumed: {achanges}"
@@ -883,7 +898,7 @@ class VectorLayerSession:
             # Collect deleted and added fields to construct VLSchema instance.
             # The 'delete' key goes first as it's better to delete then add new
             # columns.
-            fields, operations = dict(), dict(delete=[], add=[])
+            fields, operations = {}, {"delete": [], "add": []}
             for fidx, (fld, oper) in enumerate(
                 chain(
                     [(i, "add") for i in (fadd if fadd else [])],
@@ -900,7 +915,7 @@ class VectorLayerSession:
                         exec(getattr(vls, f"sql_{oper}_fields")(fidxs))
 
 
-def _execute_multiple(queries, *, session):
+def _execute_multiple(queries: Iterable[Executable], *, session: orm.Session) -> None:
     for q in queries:
         session.execute(q)
 
@@ -908,7 +923,7 @@ def _execute_multiple(queries, *, session):
 VectorLayerSession.listen(DBSession)
 
 
-def estimate_vector_layer_data(resource):
+def estimate_vector_layer_data(resource: VectorLayer) -> int | None:
     # NOTE: Without SQL manipulations it will hit Python recursion limit on 400+
     # columns. Columns name aren't user generated, so it's safe to use them here
     # without escaping.
@@ -930,7 +945,7 @@ def estimate_vector_layer_data(resource):
 
 
 class SourceAttr(SAttribute):
-    def _ogrds(self, file_upload: FileUpload):
+    def _ogrds(self, file_upload: FileUpload) -> gdal.Dataset:
         ogrds = read_dataset_vector(
             str(file_upload.data_path),
             source_filename=file_upload.name,
@@ -941,7 +956,7 @@ class SourceAttr(SAttribute):
 
         return ogrds
 
-    def _ogrlayer(self, ogrds, layer_name=None):
+    def _ogrlayer(self, ogrds: gdal.Dataset, layer_name: str | None = None) -> ogr.Layer:
         if layer_name is not None:
             ogrlayer = ogrds.GetLayerByName(layer_name)
         else:
@@ -962,7 +977,7 @@ class SourceAttr(SAttribute):
 
         return ogrlayer
 
-    def _setup_layer(self, obj, ogrlayer, **kw):
+    def _setup_layer(self, obj: VectorLayer, ogrlayer: ogr.Layer, **kw: Any) -> None:
         try:
             # Apparently OGR_XLSX_HEADERS is taken into account during the GetSpatialRef call
             gdal.SetConfigOption("OGR_XLSX_HEADERS", "FORCE")
@@ -974,7 +989,7 @@ class SourceAttr(SAttribute):
 
         obj.from_source(ogrlayer, **kw)
 
-    def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
+    def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool) -> None:
         keep = not create and srlzr.data.keep is True
         if srlzr.obj.id is not None and not keep:
             srlzr.obj._vlschema_wipe()
@@ -986,7 +1001,7 @@ class SourceAttr(SAttribute):
             layer_name = None
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)
 
-        kwargs = dict()
+        kwargs = {}
         for k, a in VectorLayerSerializer.__dict__.items():
             if (
                 not isinstance(a, LoaderAttr)
@@ -1007,14 +1022,14 @@ class SourceAttr(SAttribute):
 
 
 class LoaderAttr(SAttribute):
-    def __init__(self, type: Any):
+    def __init__(self, type: Any) -> None:
         super().__init__(write=DataScope.write)
         self.type = type
 
-    def setup_types(self):
+    def setup_types(self) -> None:
         self.types = CRUTypes(self.type, None, self.type)
 
-    def set(self, srlzr: Serializer, value: Any, *, create: bool):
+    def set(self, srlzr: Serializer, value: Any, *, create: bool) -> None:
         pass  # Handled by the `source` attribute
 
 
@@ -1023,10 +1038,10 @@ class FeatureLayerAttr(SAttribute):
         resource: ResourceRef
         version: int | UnsetType = UNSET
 
-    def setup_types(self):
+    def setup_types(self) -> None:
         self.types = CRUTypes(self.FeatureLayerSource, UnsetType, UnsetType)
 
-    def set(self, srlzr: Serializer, value: FeatureLayerSource, *, create: bool):
+    def set(self, srlzr: Serializer, value: FeatureLayerSource, *, create: bool) -> None:
         assert create
 
         obj = srlzr.obj
@@ -1073,7 +1088,7 @@ class GeometryTypeAttr(SAttribute):
     def get(self, srlzr: Serializer) -> FeatureLayerGeometryType:
         return super().get(srlzr)
 
-    def set(self, srlzr: Serializer, value: FeatureLayerGeometryType, *, create: bool):
+    def set(self, srlzr: Serializer, value: FeatureLayerGeometryType, *, create: bool) -> None:
         if srlzr.obj.id is None:
             srlzr.obj.geometry_type = value
             if value == GEOM_TYPE.NONE:
@@ -1085,7 +1100,7 @@ class GeometryTypeAttr(SAttribute):
 
 
 class FieldsAttr(SAttribute):
-    def set(self, srlzr: Serializer, value: list[dict[str, Any]], *, create: bool):
+    def set(self, srlzr: Serializer, value: list[dict[str, Any]], *, create: bool) -> None:
         if not create or srlzr.obj.fields:
             return
         # TODO: Improve typing, use types from feature layer APIs
@@ -1093,7 +1108,7 @@ class FieldsAttr(SAttribute):
 
 
 class DeleteAllFeaturesAttr(SAttribute):
-    def set(self, srlzr: Serializer, value: bool, *, create: bool):
+    def set(self, srlzr: Serializer, value: bool, *, create: bool) -> None:
         if not value:
             return
 

@@ -1,10 +1,11 @@
-from typing import TYPE_CHECKING, ClassVar
+from collections.abc import Iterator, Sequence
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, TypedDict
 
 import sqlalchemy as sa
 from msgspec import UNSET
 from shapely.geometry import box
 from sqlalchemy import func
-from sqlalchemy.sql import alias, literal_column, select
+from sqlalchemy.sql import ColumnElement, alias, literal_column, select
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
@@ -23,11 +24,12 @@ from nextgisweb.feature_layer import (
     IFeatureQueryOrderBy,
     IFeatureQuerySimplify,
 )
-from nextgisweb.feature_layer.filter import text_search_match_clause
+from nextgisweb.feature_layer.aggregation import AggregationSpec
+from nextgisweb.feature_layer.filter import FilterProgram, TextSearchSpec, text_search_match_clause
 from nextgisweb.spatial_ref_sys import SRS
 
 from . import aggregation
-from .vlschema import get_fields
+from .vlschema import AliasWithFields, Fields, VLSchema, get_fields
 
 
 @implementer(
@@ -44,7 +46,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         layer: ClassVar[VectorLayer]
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self._pit_version = None
@@ -66,62 +68,64 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._order_by = None
 
     @property
-    def srs_supported(self):
+    def srs_supported(self) -> Sequence[int]:  # ty: ignore[invalid-property-type-override]
         # TODO: The srs_supported attribute needs refactoring. This workaround
         # prevents querying all SRSs during BoundFeatureQuery creation.
         return tuple(row[0] for row in DBSession.query(SRS.id).all())
 
-    def pit(self, version):
+    def pit(self, version: int | None) -> None:
         self._pit_version = version
 
-    def srs(self, srs):
+    def srs(self, srs: SRS) -> None:
         self._srs = srs
 
-    def geom(self):
+    def geom(self) -> None:
         self._geom = True
 
-    def geom_format(self, geom_format):
+    def geom_format(self, geom_format: Literal["WKB", "WKT"]) -> None:
         self._geom_format = geom_format
 
-    def clip_by_box(self, box):
+    def clip_by_box(self, box: Geometry) -> None:
         self._clip_by_box = box
 
-    def simplify(self, tolerance):
+    def simplify(self, tolerance: float) -> None:
         self._simplify = tolerance
 
-    def box(self):
+    def box(self) -> None:
         self._box = True
 
-    def fields(self, *args):
+    def fields(self, *args: Any) -> None:
         self._fields = args
 
-    def limit(self, limit, offset=0):
+    def limit(self, limit: int, offset: int = 0) -> None:
         self._limit = limit
         self._offset = offset
 
-    def set_filter_program(self, program):
+    def set_filter_program(self, program: FilterProgram) -> None:
         self._filter_program = program
 
-    def set_text_search_context(self, spec):
+    def set_text_search_context(self, spec: TextSearchSpec) -> None:
         self._text_search_context = spec
 
-    def order_by(self, *args):
+    def order_by(self, *args: Any) -> None:
         self._order_by = args
 
     supported_aggregations = list(aggregation.vector_aggregations.keys())
 
-    def aggregate(self, specs):
+    def aggregate(self, specs: list[tuple[int, str, AggregationSpec]]) -> dict[int, Any]:
         return aggregation.aggregate(self, specs)
 
-    def build_query_context(self):
+    def build_query_context(self) -> tuple[VLSchema, AliasWithFields, Fields, list[ColumnElement]]:
         """Return (vls, table, columns_mapping, where) for use in feature query and aggregation."""
         vls = self.layer.vlschema()
+        table: AliasWithFields
         if not self._pit_version:
-            table = alias(vls.ctab, "tab")
+            table = alias(vls.ctab, "tab")  # ty: ignore[invalid-assignment]
         else:
             table = vls.query_pit(self._pit_version)
 
         idcol = table.columns.fid
+        assert isinstance(idcol, sa.Column)
         fields = get_fields(table)
         columns_mapping = {"id": idcol}
         columns_mapping.update(fields)
@@ -129,7 +133,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         if self._filter_program is not None:
             virtual_operands_mapping = {"fid": idcol}
-            clause = self._filter_program.to_clause(columns_mapping, virtual_operands_mapping)
+            program_columns: dict[str, sa.Column] = columns_mapping  # ty: ignore[invalid-assignment]
+            clause = self._filter_program.to_clause(program_columns, virtual_operands_mapping)
             if clause is not None:
                 where.append(clause)
 
@@ -172,7 +177,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         return vls, table, columns_mapping, where
 
-    def __call__(self):
+    def __call__(self) -> FeatureSet:
         vls, table, columns_mapping, where = self.build_query_context()
 
         idcol = table.columns.fid
@@ -267,7 +272,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             _limit = self._limit
             _offset = self._offset
 
-            def __iter__(self):
+            def __iter__(self) -> Iterator[Feature]:
                 query = qbase.where(*where).order_by(*order_by)
                 query = query.limit(self._limit).offset(self._offset)
 
@@ -310,12 +315,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     )
 
             @property
-            def total_count(self):
+            def total_count(self) -> int:
                 query = select(func.count(idcol)).where(*where)
-                return DBSession.scalar(query)
+                count = DBSession.scalar(query)
+                assert count is not None
+                return count
 
             @property
-            def extent(self):
+            def extent(self) -> Extent | None:
                 if not has_geom:
                     return None
                 geom_clause = select(geomcol).where(*where).subquery().c[0]
@@ -324,12 +331,19 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         return QueryFeatureSet()
 
 
-def calculate_extent(geom_clause):
-    bbox = func.st_extent(func.st_transform(geom_clause, sa.text("4326")))
-    row = DBSession.query(
-        func.st_xmin(bbox).label("minLon"),
-        func.st_ymin(bbox).label("minLat"),
-        func.st_xmax(bbox).label("maxLon"),
-        func.st_ymax(bbox).label("maxLat"),
+class Extent(TypedDict):
+    minLon: float | None
+    minLat: float | None
+    maxLon: float | None
+    maxLat: float | None
+
+
+def calculate_extent(geom_clause: ColumnElement) -> Extent:
+    bbox = func.st_extent(func.st_transform(geom_clause, 4326))
+    minx, miny, maxx, maxy = DBSession.query(
+        func.st_xmin(bbox),
+        func.st_ymin(bbox),
+        func.st_xmax(bbox),
+        func.st_ymax(bbox),
     ).one()
-    return dict(row._mapping)
+    return Extent(minLon=minx, minLat=miny, maxLon=maxx, maxLat=maxy)

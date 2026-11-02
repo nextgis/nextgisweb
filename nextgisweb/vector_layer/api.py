@@ -32,7 +32,7 @@ def cs_msg_supported_formats(comp: VectorLayerComponent, request: Request) -> st
     return request.translate(msg_supported_formats)
 
 
-def setup_pyramid(comp: VectorLayerComponent, config: Configurator):
+def setup_pyramid(comp: VectorLayerComponent, config: Configurator) -> None:
     config.add_route(
         "vector_layer.inspect",
         "/api/component/vector_layer/inspect",

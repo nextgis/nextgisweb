@@ -16,7 +16,7 @@ class vector_layer:
 class cleanup_orphaned_tables(DryRunOptions, EnvCommand):
     one_per_txn: bool = opt(False, doc="Drop one table per transaction")
 
-    def __call__(self):
+    def __call__(self) -> None:
         con = DBSession.connection()
 
         regexp = r"^layer_[0-9a-f]{32}$"
@@ -34,7 +34,7 @@ class cleanup_orphaned_tables(DryRunOptions, EnvCommand):
         """
         total, orphan = con.execute(
             sa.text(sql_stats),
-            dict(schema=SCHEMA, regexp=regexp),
+            {"schema": SCHEMA, "regexp": regexp},
         ).one()
 
         logger.info(
@@ -47,7 +47,7 @@ class cleanup_orphaned_tables(DryRunOptions, EnvCommand):
             FROM ( {sql_base} ) base
             WHERE base.orphan
         """
-        result = con.execute(sa.text(sql_tables), dict(schema=SCHEMA, regexp=regexp))
+        result = con.execute(sa.text(sql_tables), {"schema": SCHEMA, "regexp": regexp})
 
         if self.dry_run:
             return

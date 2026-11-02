@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import uuid4
 
 import sqlalchemy as sa
@@ -70,7 +71,9 @@ msg_supported_formats = gettext(
 )
 
 
-def read_dataset_vector(filename, allowed_drivers=DRIVERS.enum, **kw) -> gdal.Dataset | None:
+def read_dataset_vector(
+    filename: str, allowed_drivers: tuple[str, ...] = DRIVERS.enum, **kw: Any
+) -> gdal.Dataset | None:
     return read_dataset(
         filename,
         allowed_drivers=allowed_drivers,
@@ -79,24 +82,23 @@ def read_dataset_vector(filename, allowed_drivers=DRIVERS.enum, **kw) -> gdal.Da
     )
 
 
-def test_encoding(s):
+def test_encoding(s: str) -> bool:
     try:
         s.encode("utf-8")
     except UnicodeEncodeError:
         return False
-    else:
-        return True
+    return True
 
 
-def fix_encoding(s):
+def fix_encoding(s: str) -> str:
     while not test_encoding(s):
         s = s[:-1]
     return s
 
 
-def utf8len(s):
+def utf8len(s: str) -> int:
     return len(s.encode("utf-8"))
 
 
-def uuid_hex():
+def uuid_hex() -> str:
     return uuid4().hex
