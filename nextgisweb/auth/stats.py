@@ -1,3 +1,5 @@
+from sqlalchemy import or_
+
 from nextgisweb.core.stats import stats_hook
 
 from .component import AuthComponent, _ucnt, _ula
@@ -8,7 +10,7 @@ from .model import User
 def stats(comp: AuthComponent) -> dict:
     return dict(
         user_count=_ucnt(),
-        local_count=_ucnt(User.password_hash.is_not(None)),
+        local_count=_ucnt(or_(User.password_hash.is_not(None), User.alink_token.is_not(None))),
         oauth_count=_ucnt(User.oauth_subject.is_not(None)),
         last_activity=dict(
             everyone=_ula(),
