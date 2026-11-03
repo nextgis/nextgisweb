@@ -1,4 +1,6 @@
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
+from datetime import datetime
 
 from nextgisweb.lib.json import dumps
 
@@ -16,9 +18,9 @@ class FileBackend(BackendBase):
         # NOTE: Buffering = 1 for line buffering
         self.fd = open(self.options["path"], "a", buffering=1)
 
-    def _write(self, tstamp, body):
+    def _write(self, tstamp: datetime, body: dict) -> None:
         print('{"@timestamp":' + dumps(tstamp) + "," + dumps(body)[1:], file=self.fd)
 
     @contextmanager
-    def __call__(self, request: Request):
+    def __call__(self, request: Request) -> Generator[Callable[[datetime, dict], None]]:
         yield self._write

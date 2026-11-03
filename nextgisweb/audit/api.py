@@ -64,11 +64,11 @@ class QueryFormat(Enum):
     CSV = "csv"
 
 
-def _field_expr(dcol, field):
+def _field_expr(dcol: sa.Column, field: str) -> sa.BinaryExpression:
     return dcol.op("#>")(sa.text(f"'{{{','.join(field.split('.'))}}}'"))
 
 
-def _select_fields(dcol, fields):
+def _select_fields(dcol: sa.Column, fields: list[Field]) -> list[sa.BinaryExpression]:
     terms = []
     op = dcol.op("#>")
     for field in fields:
@@ -187,7 +187,7 @@ def dbase(
         )  # ty: ignore[invalid-return-type]
 
 
-def setup_pyramid(comp: AuditComponent, config: Configurator):
+def setup_pyramid(comp: AuditComponent, config: Configurator) -> None:
     config.add_route(
         "audit.dbase",
         "/api/component/audit/dbase",

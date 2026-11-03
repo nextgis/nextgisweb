@@ -1,34 +1,42 @@
+from collections.abc import Callable
+
+from pyramid.registry import Registry
 from zope.event import notify
 
 from nextgisweb.env import inject
 from nextgisweb.lib.datetime import utcnow_naive
 
-from nextgisweb.pyramid.tomb import Request
+from nextgisweb.pyramid.tomb import Request, Response
 
 from .component import AuditComponent
 
 
 class OnResponse:
-    def __init__(self, request: Request, response, body):
+    def __init__(self, request: Request, response: Response, body: dict) -> None:
         self._request = request
         self._response = response
         self._body = body
 
     @property
-    def request(self):
+    def request(self) -> Request:
         return self._request
 
     @property
-    def response(self):
+    def response(self) -> Response:
         return self._response
 
     @property
-    def body(self):
+    def body(self) -> dict:
         return self._body
 
 
 @inject()
-def factory(handler, registry, *, comp: AuditComponent = inject.arg()):
+def factory(
+    handler: Callable[[Request], Response],
+    registry: Registry,
+    *,
+    comp: AuditComponent = inject.arg(),
+) -> Callable[[Request], Response]:
     fopts = comp.options.with_prefix("filter")
     filters = [
         lambda req: (
@@ -49,7 +57,7 @@ def factory(handler, registry, *, comp: AuditComponent = inject.arg()):
         f_request_path = tuple(f_request_path)
         filters.append(lambda req: req.path_info.startswith(f_request_path))
 
-    def tween(request: Request):
+    def tween(request: Request) -> Response:
         for f in filters:
             if not f(request):
                 return handler(request)
@@ -64,13 +72,13 @@ def factory(handler, registry, *, comp: AuditComponent = inject.arg()):
             response = handler(request)
             timestamp = utcnow_naive()
 
-            body = dict()
+            body = {}
 
-            body_request = body["request"] = dict(
-                method=request.method,
-                path=request.path,
-                remote_addr=request.client_addr,
-            )
+            body_request = body["request"] = {
+                "method": request.method,
+                "path": request.path,
+                "remote_addr": request.client_addr,
+            }
 
             qstring = request.query_string
             if qstring != "":
@@ -78,13 +86,13 @@ def factory(handler, registry, *, comp: AuditComponent = inject.arg()):
 
             user = request.environ.get("auth.user")
             if user is not None:
-                body["user"] = dict(
-                    id=user["id"],
-                    keyname=user["keyname"],
-                    display_name=user["display_name"],
-                )
+                body["user"] = {
+                    "id": user["id"],
+                    "keyname": user["keyname"],
+                    "display_name": user["display_name"],
+                }
 
-            body_response = body["response"] = dict(status_code=response.status_code)
+            body_response = body["response"] = {"status_code": response.status_code}
 
             if request.matched_route is not None:
                 body_response["route_name"] = request.matched_route.name

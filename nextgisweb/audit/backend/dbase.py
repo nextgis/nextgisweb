@@ -1,9 +1,10 @@
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import partial
 
 import transaction
-from sqlalchemy import create_engine
+from sqlalchemy import Connection, create_engine
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import DBSession
@@ -34,11 +35,11 @@ class DatabaseBackend(BackendBase):
 
         self.insert = tab_journal.insert()
 
-    def _write(self, tstamp, data, *, con):
+    def _write(self, tstamp: datetime, data: dict, *, con: Connection) -> None:
         con.execute(self.insert.values(tstamp=tstamp, data=data))
 
     @contextmanager
-    def __call__(self, request: Request):
+    def __call__(self, request: Request) -> Generator[Callable[[datetime, dict], None]]:
         con = self.engine.connect()
         try:
             yield partial(self._write, con=con)

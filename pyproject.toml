@@ -12,7 +12,6 @@ ignore = ["E501", "E731", "UP030", "UP031", "UP032"]
 "./setup.py" = ["ANN"]
 "./nextgisweb/script.py" = ["ANN"]
 # TODO: Fix issues and remove ignores step by step
-"nextgisweb/audit/*" = ["C4", "ANN"]
 "nextgisweb/auth/*" = ["C4", "ANN"]
 "nextgisweb/basemap/*" = ["C4", "ANN"]
 "nextgisweb/core/*" = ["C4", "ANN"]

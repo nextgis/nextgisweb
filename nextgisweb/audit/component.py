@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class AuditComponent(Component):
     _backends: dict[str, BackendBase] | None = None
 
-    def initialize(self):
+    def initialize(self) -> None:
         from .backend import registry
 
         super().initialize()
@@ -25,7 +25,7 @@ class AuditComponent(Component):
             if self.options[cls.identity + ".enabled"]
         }
 
-    def setup_pyramid(self, config):
+    def setup_pyramid(self, config) -> None:  # noqa: ANN001
         from . import api, view
 
         if self._backends:

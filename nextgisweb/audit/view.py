@@ -11,15 +11,15 @@ from .component import AuditComponent
 
 
 @react_renderer("@nextgisweb/audit/journal")
-def journal(request: Request):
+def journal(request: Request) -> dict:
     request.require_administrator()
     require_backend("dbase")
 
-    return dict(
-        title=gettext("Journal"),
-        maxwidth=True,
-        maxheight=True,
-    )
+    return {
+        "title": gettext("Journal"),
+        "maxwidth": True,
+        "maxheight": True,
+    }
 
 
 class AuditBackendClientSetting(Struct, kw_only=True):
@@ -35,11 +35,11 @@ def cs_backend(comp: AuditComponent, request: Request) -> AuditBackendClientSett
     )
 
 
-def audit_context(request: Request, model, id):
+def audit_context(request: Request, model: str, id: int) -> None:
     request.environ["audit.context"] = (model, id)
 
 
-def setup_pyramid(comp: AuditComponent, config: Configurator):
+def setup_pyramid(comp: AuditComponent, config: Configurator) -> None:
     config.add_request_method(audit_context)
 
     config.add_route(
