@@ -1,6 +1,6 @@
 import os
 import sys
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
@@ -61,7 +61,7 @@ def backup(
             raise RuntimeError("Cannot write uncompressed backup to stdout")
 
         @contextmanager
-        def tgt_context() -> Iterator[Path]:
+        def tgt_context() -> Generator[Path]:
             with TemporaryDirectory(dir=tmp_root) as tmp_dir:
                 tmp_path = Path(tmp_dir)
                 yield tmp_path
@@ -70,7 +70,7 @@ def backup(
     elif no_zip:
 
         @contextmanager
-        def tgt_context() -> Iterator[Path]:
+        def tgt_context() -> Generator[Path]:
             tmp_path = Path(mkdtemp(dir=tmp_root))
             try:
                 yield tmp_path
@@ -83,7 +83,7 @@ def backup(
     else:
 
         @contextmanager
-        def tgt_context() -> Iterator[Path]:
+        def tgt_context() -> Generator[Path]:
             with TemporaryDirectory(dir=tmp_root) as tmp_dir:
                 tmp_path = Path(tmp_dir)
                 yield tmp_path
@@ -129,7 +129,7 @@ def restore(
         del source  # Avoid accidental usage
 
         @contextmanager
-        def src_context() -> Iterator[Path]:
+        def src_context() -> Generator[Path]:
             tmp_root = opts.get("tmpdir", None)
             with TemporaryDirectory(dir=tmp_root) as tmpdir:
                 _decompress(sys.stdin.buffer, tmpdir)
@@ -142,7 +142,7 @@ def restore(
         if psource.is_file() and is_zipfile(psource):
 
             @contextmanager
-            def src_context() -> Iterator[Path]:
+            def src_context() -> Generator[Path]:
                 tmp_root = opts.get("tmpdir", psource.parent)
                 with TemporaryDirectory(dir=tmp_root) as tmpdir:
                     _decompress(psource, tmpdir)
@@ -151,7 +151,7 @@ def restore(
         else:
 
             @contextmanager
-            def src_context() -> Iterator[Path]:
+            def src_context() -> Generator[Path]:
                 yield Path(psource)
 
     with src_context() as src:

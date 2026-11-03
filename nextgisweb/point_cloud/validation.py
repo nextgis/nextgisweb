@@ -32,7 +32,7 @@ def _without_axes(sr: osr.SpatialReference) -> osr.SpatialReference:
 
     try:
         return sr_from_wkt(_AXIS_RE.sub("", sr.ExportToWkt()))
-    except (RuntimeError, SpatialReferenceError):
+    except RuntimeError, SpatialReferenceError:
         return sr
 
 

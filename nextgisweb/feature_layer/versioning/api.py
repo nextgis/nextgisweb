@@ -330,7 +330,7 @@ class VersionCGetResponse(Struct, kw_only=True):
     @classmethod
     def from_generator(
         cls,
-        gen: Generator[VersionCGetItem, None, None],
+        gen: Generator[VersionCGetItem],
         *,
         order: VersionCGetOrder,
         limit: int,

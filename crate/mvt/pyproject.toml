@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "nextgisweb-mvt"
 dynamic = ["version"]
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 
 [tool.maturin]
 module-name = "nextgisweb_mvt"

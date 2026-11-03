@@ -73,7 +73,7 @@ class FeatureLayerTransaction(Base):
     def errors(self) -> list[tuple[int, Any]]:
         return [(sn, error) for sn, error in self.__execute(_sel_errors)]
 
-    def operations(self) -> Generator[tuple[int, Any, Any], None, None]:
+    def operations(self) -> Generator[tuple[int, Any, Any]]:
         yield from ((sn, pl, pr) for sn, pl, pr in self.__execute(_sel_operations))
 
     def write_error(self, seqnum, error: Any):
@@ -82,7 +82,7 @@ class FeatureLayerTransaction(Base):
     def write_result(self, seqnum: int, value: Struct):
         self.__execute(_ins_result, p_seqnum=seqnum, p_value=to_builtins(value))
 
-    def read_results(self) -> Generator[tuple[int, Any], None, None]:
+    def read_results(self) -> Generator[tuple[int, Any]]:
         yield from ((sn, val) for sn, val in self.__execute(_sel_result))
 
     def __execute(self, query, **kwargs):

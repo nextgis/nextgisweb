@@ -128,7 +128,7 @@ class FeatureAttachment(FVersioningExtensionMixin, Base):
         if self.is_image:
             try:
                 image = Image.open(self.fileobj.filename())
-            except (UnidentifiedImageError, DecompressionBombError):
+            except UnidentifiedImageError, DecompressionBombError:
                 pass
             else:
                 if exif := image.getexif():

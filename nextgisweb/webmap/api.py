@@ -244,7 +244,7 @@ class ElementContent(ElementSize):
 
 
 if TYPE_CHECKING:
-    LegendTreeNodeAlias: TypeAlias = "LegendTreeNode"
+    LegendTreeNodeAlias: TypeAlias = "LegendTreeNode"  # noqa: UP040
 else:
     LegendTreeNodeAlias = ForwardRef("LegendTreeNode")
 

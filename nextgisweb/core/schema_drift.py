@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Generator, Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, lru_cache
@@ -259,7 +259,7 @@ def check_table(
 
 
 @contextmanager
-def _baseline_table(table: sa.Table, *, conn: sa.Connection) -> Iterator[str]:
+def _baseline_table(table: sa.Table, *, conn: sa.Connection) -> Generator[str]:
     # Setting schema to "pg_temp" is equivalent of creating a TEMPORARY table
     clone = table.to_metadata(sa.MetaData(), schema="pg_temp")
     conn.execute(CreateTable(clone, include_foreign_key_constraints=[]))

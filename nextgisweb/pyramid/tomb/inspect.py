@@ -19,11 +19,11 @@ class ViewInspector(ViewMeta):
 @dataclass
 class RouteInspector(RouteMeta):
     name: str
-    views: Generator[ViewInspector, None, None]
+    views: Generator[ViewInspector]
 
 
-def iter_routes(introspector) -> Generator[RouteInspector, None, None]:
-    def views(related) -> Generator[ViewInspector, None, None]:
+def iter_routes(introspector) -> Generator[RouteInspector]:
+    def views(related) -> Generator[ViewInspector]:
         for itm in filter(lambda i: i.category_name == "views", related):
             view_meta = itm["view_meta"]
             assert isinstance(view_meta, ViewMeta)

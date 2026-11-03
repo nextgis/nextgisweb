@@ -8,10 +8,8 @@ from dataclasses import dataclass, field
 from functools import cached_property, wraps
 from importlib.metadata import EntryPoint, PackageMetadata, entry_points, metadata
 from pathlib import Path
-from typing import ClassVar, Concatenate, Literal, TypedDict, overload
+from typing import ClassVar, Concatenate, Literal, ReadOnly, TypedDict, overload
 from warnings import warn, warn_explicit
-
-from typing_extensions import ReadOnly
 
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger

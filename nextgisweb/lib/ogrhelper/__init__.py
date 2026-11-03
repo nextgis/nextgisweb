@@ -45,7 +45,7 @@ class AutoCleaningTemporaryDirectory(TemporaryDirectory):
 
 
 @contextmanager
-def ogr_use_exceptions() -> Generator[None, None, None]:
+def ogr_use_exceptions() -> Generator[None]:
     if ogr.GetUseExceptions():
         yield
         return
@@ -118,9 +118,7 @@ def read_dataset(filename: str, **kw: Any) -> gdal.Dataset | None:
 
 def read_layer_features(
     layer: ogr.Layer, geometry_format: str | None = None
-) -> Generator[
-    tuple[int, ogr.Geometry | str | bytearray | None, list[tuple[str, Any]]], None, None
-]:
+) -> Generator[tuple[int, ogr.Geometry | str | bytearray | None, list[tuple[str, Any]]]]:
     geometry_format = "wkt" if geometry_format is None else geometry_format.lower()
     if geometry_format == "raw":
         geom_func = _geometry_copy

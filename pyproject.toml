@@ -1,10 +1,11 @@
 [tool.ruff]
 line-length = 99
+target-version = "py314"
 exclude = ["nextgisweb/raster_layer/validate_cog.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "ANN", "C4", "RUF022"]
-ignore = ["E501", "E731", "UP030", "UP031", "UP032"]
+ignore = ["E501", "E731", "UP030", "UP031", "UP032", "UP037"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/test/*.py" = ["ANN"]

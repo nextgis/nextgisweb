@@ -11,7 +11,6 @@ from typing import (
     Any,
     Literal,
     Protocol,
-    TypeVar,
     Union,
     cast,
     get_args,
@@ -397,9 +396,6 @@ class TSMapping(TSType, kw_only=True):
         return f"Record<{self.ktype.render(module)}, {self.vtype.render(module)}>"
 
 
-T = TypeVar("T")
-
-
 class TSExport:
     name: str | None
     module: str
@@ -436,7 +432,7 @@ def component_tsmodule(component: str, module: str = "type/api") -> str:
     return "/".join(parts)
 
 
-def unique_everseen[T](iterable: Sequence[T]) -> Generator[T, None, None]:
+def unique_everseen[T](iterable: Sequence[T]) -> Generator[T]:
     seen = set()
     for item in iterable:
         if item not in seen:

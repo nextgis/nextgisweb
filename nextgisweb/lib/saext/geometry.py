@@ -42,7 +42,7 @@ def _geometry_from_reflection(*args, **kw):
     if len(args) == 2:
         try:
             return Geometry(str(args[0]).upper(), int(args[1]))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             pass
     return Geometry("GEOMETRY", 0)
 

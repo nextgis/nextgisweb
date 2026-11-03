@@ -9,19 +9,19 @@ install.
 System requirements
 -------------------
 
-- Modern Linux distribution like Ubuntu Linux 24.04:
+- Modern Linux distribution like Ubuntu Linux 26.04:
 
   - We expect that NextGIS Web can be installed on most modern Linux
     distributions. But we run it under LTS-version of Ubuntu Linux, and this
-    instruction was tested on Ubuntu Linux 24.04.
+    instruction was tested on Ubuntu Linux 26.04.
   
   - We don't provide community support for running NextGIS Web on other
     distributions. So if you any installation-related issue, please try to
-    reproduce a problem on Ubuntu Linux 24.04 before you report them.
+    reproduce a problem on Ubuntu Linux 26.04 before you report them.
 
-- Python >= 3.12.
+- Python >= 3.14.
 
-- GDAL >= 3.8.
+- GDAL >= 3.12.
 
 - Node.js 22.x or higher and pnpm package manager via Corepack. We recommend
   using NodeSource package repository.
@@ -40,7 +40,7 @@ System requirements
 
   - PostgreSQL and PostGIS installation is out-of-scope for this instruction.
     But for testing purpose you can use snippet bellow to install PostgreSQL 
-    and PostGIS on Ubuntu Linux 24.04 as ``root`` user:
+    and PostGIS on Ubuntu Linux 26.04 as ``root`` user:
 
     .. code-block:: none
 

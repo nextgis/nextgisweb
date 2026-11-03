@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Annotated, Any, Literal, TypeVar
+from typing import Annotated, Any, Literal
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -263,16 +263,15 @@ FeatureID = Annotated[int, Meta(title="FeatureID")]
 VersionID = Annotated[int, Meta(title="VersionID")]
 
 registry = list()
-S = TypeVar("S")
 
 
-def register_change(cls: S) -> S:
+def register_change[S](cls: S) -> S:
     global registry
     registry.append(cls)
     return cls
 
 
-def auto_description(cls: S) -> S:
+def auto_description[S](cls: S) -> S:
     tinfo = type_info(cls)
     assert isinstance(tinfo, StructType) and isinstance(tinfo.tag, str)
     fscope, operation = tinfo.tag.split(".")

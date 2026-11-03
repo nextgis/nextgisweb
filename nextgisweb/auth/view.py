@@ -181,7 +181,7 @@ def oauth(request: Request):
         state_cookie_name = cookie_name(state_query_param)
         try:
             data = dict(parse_qsl(request.cookies[state_cookie_name]))
-        except (ValueError, KeyError):
+        except ValueError, KeyError:
             raise AuthorizationException(
                 gettext(
                     "The authorization state cookie is either missing or "

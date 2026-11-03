@@ -19,7 +19,7 @@ def validate_package_json(cid: str, package_json: Path):
     return data["name"]
 
 
-def scan_for_nodepkgs(cid: str, cpath: Path) -> Generator[tuple[str, Path], None, None]:
+def scan_for_nodepkgs(cid: str, cpath: Path) -> Generator[tuple[str, Path]]:
     nodepkg = cpath / "nodepkg"
     if not nodepkg.exists():
         return

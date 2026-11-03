@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from inspect import signature
-from typing import Any, Protocol, TypeVar
+from typing import Any, Protocol
 
 from msgspec import Struct, defstruct
 
@@ -12,12 +12,9 @@ from nextgisweb.lib.imptool import module_from_stack
 
 from .tomb import Request
 
-TComp = TypeVar("TComp", bound=Component, contravariant=True)
-TStruct = TypeVar("TStruct", bound=Struct)
 
-
-class _CSCallable(Protocol[TComp]):
-    def __call__(self, comp: TComp, request: Request) -> Any: ...
+class _CSCallable[C: Component](Protocol):
+    def __call__(self, comp: C, request: Request) -> Any: ...
 
 
 registry = defaultdict[str, dict[str, _CSCallable]](dict)
@@ -55,7 +52,7 @@ def struct_type(comp: Component) -> type[Struct] | None:
     )
 
 
-def evaluate(comp: Component, request: Request, *, struct_type: type[TStruct]) -> TStruct:
+def evaluate[S: Struct](comp: Component, request: Request, *, struct_type: type[S]) -> S:
     field_values = dict()
     for name, func in registry[comp.identity].items():
         field_values[name] = func(comp, request)

@@ -11,14 +11,14 @@ from .component import CoreComponent
 
 
 class IsReadyProtocol(ComponentHookProtocol, Protocol):
-    def __call__[C: Component](self, comp: C, /) -> Generator[str, None, None]: ...
+    def __call__[C: Component](self, comp: C, /) -> Generator[str]: ...
 
 
 is_ready_hook = ComponentHook[IsReadyProtocol]("is_ready_hook")
 
 
 @is_ready_hook()
-def is_ready(comp: CoreComponent) -> Generator[str, None, None]:
+def is_ready(comp: CoreComponent) -> Generator[str]:
     while True:
         try:
             sa_url = comp._engine_url(error_on_pwfile=True)

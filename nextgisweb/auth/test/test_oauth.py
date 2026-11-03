@@ -1,5 +1,5 @@
 from contextlib import contextmanager, nullcontext
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from secrets import token_hex, token_urlsafe
 from typing import Any
 from unittest.mock import patch
@@ -455,7 +455,7 @@ def test_bind(local_user, server_response_mock, ngw_webtest_app: WebTestApp):
     sub = "sub_" + token_hex()
 
     def introspection_response():
-        start_tstamp = int(datetime.now(timezone.utc).timestamp())
+        start_tstamp = int(datetime.now(UTC).timestamp())
         return {"exp": start_tstamp + ACCESS_TOKEN_LIFETIME, "sub": sub}
 
     access_token = token_urlsafe()

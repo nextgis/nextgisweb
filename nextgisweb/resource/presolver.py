@@ -158,7 +158,7 @@ def _acl_rules(
     resource: Resource,
     user: User,
     permissions: Iterable[Permission],
-) -> Generator[tuple[Permission, ResourceACLRule], None, None]:
+) -> Generator[tuple[Permission, ResourceACLRule]]:
     for res in tuple(resource.parents) + (resource,):
         rules = filter(
             lambda rule: (

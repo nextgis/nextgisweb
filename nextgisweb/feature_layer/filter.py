@@ -26,7 +26,7 @@ def str_contains_filter(filter_str: str | None) -> bool:
         if data in ({}, []):
             return False
         return True
-    except (json.JSONDecodeError, TypeError):
+    except json.JSONDecodeError, TypeError:
         raise FilterExpressionError()
 
 

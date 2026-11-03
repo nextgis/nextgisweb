@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 __all__ = ["utcnow_naive"]
 
@@ -9,4 +9,4 @@ def utcnow_naive() -> datetime:
     This function serves as a replacement for `datetime.utcnow()`, which was
     deprecated in Python 3.12."""
 
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(UTC).replace(tzinfo=None)

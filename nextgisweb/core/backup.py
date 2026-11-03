@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import re
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Generator, Iterable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from functools import cache
@@ -36,7 +36,7 @@ class IndexFile:
         self.path = path
 
     @contextmanager
-    def writer(self) -> Iterator[Callable[[IndexRecord], None]]:
+    def writer(self) -> Generator[Callable[[IndexRecord], None]]:
         fd: TextIO | None = None
 
         def write(record: IndexRecord) -> None:
@@ -58,10 +58,10 @@ class IndexFile:
                 fd.close()
 
     @contextmanager
-    def reader(self) -> Iterator[Iterator[IndexRecord]]:
+    def reader(self) -> Generator[Generator[IndexRecord]]:
         with self.path.open(newline="\n", encoding="utf-8") as fp:
 
-            def read() -> Iterator[IndexRecord]:
+            def read() -> Generator[IndexRecord]:
                 for line in fp:
                     record = decode(line, type=IndexRecord)
                     assert isinstance(record, IndexRecord)

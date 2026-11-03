@@ -1,8 +1,8 @@
 import os
 import os.path
 import re
+from datetime import UTC, timedelta
 from datetime import datetime as dt
-from datetime import timedelta, timezone
 from pathlib import Path
 
 import transaction
@@ -93,8 +93,7 @@ class FileStorageComponent(Component):
                 stat = os.stat(fullfn)
 
                 if obj is None and (
-                    utcnow_naive()
-                    - dt.fromtimestamp(stat.st_ctime, tz=timezone.utc).replace(tzinfo=None)
+                    utcnow_naive() - dt.fromtimestamp(stat.st_ctime, tz=UTC).replace(tzinfo=None)
                     > delta
                 ):
                     if not dry_run:

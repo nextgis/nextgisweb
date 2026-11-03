@@ -193,7 +193,7 @@ def _collection_post_form(request: Request, *, comp: FileUploadComponent = injec
 def _collection_post_tus(request: Request, *, comp: FileUploadComponent = inject.arg()):
     try:
         upload_length = int(request.headers["Upload-Length"])
-    except (KeyError, ValueError):
+    except KeyError, ValueError:
         raise exc.HTTPBadRequest()
     if upload_length > comp.max_size:
         raise UploadedFileTooLarge()
@@ -284,7 +284,7 @@ def item_patch_tus(fupload: FileUpload, request: Request) -> Annotated[None, Sta
 
     try:
         upload_offset = int(request.headers["Upload-Offset"])
-    except (KeyError, ValueError):
+    except KeyError, ValueError:
         raise exc.HTTPBadRequest()
 
     # Don't upload more than declared file size.
