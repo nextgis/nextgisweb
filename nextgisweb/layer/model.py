@@ -1,4 +1,5 @@
 from nextgisweb.env import gettext
+from nextgisweb.lib.i18n import TrStr
 
 from nextgisweb.spatial_ref_sys import SRSMixin
 
@@ -6,7 +7,7 @@ from nextgisweb.spatial_ref_sys import SRSMixin
 class SpatialLayerMixin(SRSMixin):
     __abstract__ = True
 
-    def get_info(self):
+    def get_info(self) -> tuple[tuple[TrStr, str], ...]:
         result = s() if (s := getattr(super(), "get_info", None)) else ()
         if self.srs is not None:
             result += ((gettext("Spatial reference system"), self.srs.display_name),)

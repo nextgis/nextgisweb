@@ -2,7 +2,7 @@ from msgspec import Struct
 
 from nextgisweb.feature_layer.api import NgwExtent
 from nextgisweb.pyramid.tomb import Configurator, HTTPNotFound, Request
-from nextgisweb.resource import DataScope, resource_factory
+from nextgisweb.resource import DataScope, Resource, resource_factory
 
 from .component import LayerComponent
 from .interface import IBboxLayer
@@ -12,7 +12,7 @@ class Extent(Struct):
     extent: NgwExtent
 
 
-def extent(resource, request: Request) -> Extent:
+def extent(resource: Resource, request: Request) -> Extent:
     """Get resource geographic extent
 
     :returns: Geographic extent of the resource"""
@@ -24,7 +24,7 @@ def extent(resource, request: Request) -> Extent:
     return Extent(extent=impl.extent)
 
 
-def setup_pyramid(comp: LayerComponent, config: Configurator):
+def setup_pyramid(comp: LayerComponent, config: Configurator) -> None:
     config.add_route(
         "layer.extent",
         "/api/resource/{id}/extent",
