@@ -46,10 +46,10 @@ class TSGenerator:
     modules: dict[str, TSModule]
     types: dict[Any, TSType]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.counter = count(0)
-        self.types = dict()
-        self.modules = dict()
+        self.types = {}
+        self.modules = {}
 
     def module(self, name: ModuleName) -> TSModule:
         if (module := self.modules.get(name)) is None:
@@ -57,7 +57,7 @@ class TSGenerator:
             self.modules[name] = module
         return module
 
-    def add(self, tdef: Any, *, export: Export | None = None) -> TSType:
+    def add(self, tdef: Any, *, export: Export | None = None) -> TSType:  # noqa: ANN401
         otype, annotations = disannotate(tdef, supertype=True)
         if (result := self.types.get(otype)) is None:
             result = self.translate(otype)
@@ -80,8 +80,8 @@ class TSGenerator:
 
         return result
 
-    def translate(self, otype: Any) -> TSType:
-        defaults: Any = dict(generator=self, type=otype)
+    def translate(self, otype: Any) -> TSType:  # noqa: ANN401
+        defaults: Any = {"generator": self, "type": otype}
         if supertype := getattr(otype, "__supertype__", None):
             otype = supertype
 
@@ -123,7 +123,7 @@ class TSGenerator:
                 result = TSPrimitive(keyword="unknown", comment=str(otype), **defaults)
         return result
 
-    def register(self, ts: TSType):
+    def register(self, ts: TSType) -> None:
         self.types[ts.type] = ts
 
     def compile(self) -> Sequence[TSModuleCompiled]:
@@ -143,7 +143,7 @@ class TSModule(Struct, kw_only=True, dict=True):
     exported: list[tuple[TSType, TypeName]] = field(default_factory=list)
     code: str | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.unique = next(self.generator.counter)
         ns = self.name.lower()
         ns = re.sub(r"^@nextgisweb/", "", ns)
@@ -160,7 +160,7 @@ class TSModule(Struct, kw_only=True, dict=True):
         declarations = ["export {};"]
         declarations.extend(f"export type {t.name} = {t.inline(self)};" for t in self.declared)
 
-        exports = list()
+        exports = []
         for t, name in self.exported:
             if name == "default":
                 exports.append(f"export default {t.reference(self)};")
@@ -169,7 +169,7 @@ class TSModule(Struct, kw_only=True, dict=True):
 
         imports = sorted(f'import type * as {m.ns} from "{m.name}";' for m in self.imports)
 
-        lines = list()
+        lines = []
         for a in (imports, declarations, exports):
             if len(a) > 0:
                 lines.extend(([""] if (lines and lines[-1] != "") else []) + a)
@@ -196,18 +196,18 @@ class TSType(Struct, kw_only=True, dict=True):
     if TYPE_CHECKING:
         unique: int = POST_INIT
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.unique = next(self.generator.counter)
         self.generator.register(self)
         self.__tstype_init__()
 
-    def __tstype_init__(self):
+    def __tstype_init__(self) -> None:
         pass
 
     def __hash__(self) -> int:
         return hash((id(self.generator), self.unique))
 
-    def add_export(self, value: tuple[ModuleName, TypeName]):
+    def add_export(self, value: tuple[ModuleName, TypeName]) -> None:
         module = self.generator.module(value[0])
         if self.module is None:
             self.module, self.name = module, value[1]
@@ -250,7 +250,7 @@ class TSUnion(TSType, kw_only=True):
         items: tuple[TSType, ...] = POST_INIT
         undefided_excluded: TSType | None = POST_INIT
 
-    def __tstype_init__(self):
+    def __tstype_init__(self) -> None:
         super().__tstype_init__()
         self.items = tuple(self.generator.add(i) for i in unique_everseen(self.args))
         args_defined = tuple(a for a in self.args if (unannotate(a) is not UnsetType))
@@ -279,7 +279,7 @@ class TSEnum(TSType, kw_only=True):
     args: Sequence[str | int | bool]
     auto_export = True
 
-    def inline(self, module) -> str:
+    def inline(self, module: TSModule) -> str:
         return "({})".format(" | ".join(dumps(a) for a in self.args))
 
 
@@ -289,7 +289,7 @@ class TSList(TSType, kw_only=True):
     if TYPE_CHECKING:
         item: TSType = POST_INIT
 
-    def __tstype_init__(self):
+    def __tstype_init__(self) -> None:
         super().__tstype_init__()
         self.item = self.generator.add(self.arg)
 
@@ -303,7 +303,7 @@ class TSTuple(TSType, kw_only=True):
     if TYPE_CHECKING:
         items: tuple[TSType, ...] = POST_INIT
 
-    def __tstype_init__(self):
+    def __tstype_init__(self) -> None:
         super().__tstype_init__()
         self.items = tuple(self.generator.add(a) for a in self.args)
 
@@ -338,9 +338,9 @@ class TSStruct(TSType, kw_only=True):
         tag: tuple[str, str | int] | None = POST_INIT
         array_like: bool = POST_INIT
 
-    def __tstype_init__(self):
+    def __tstype_init__(self) -> None:
         super().__tstype_init__()
-        fields: list[TSStructField] = list()
+        fields: list[TSStructField] = []
         for k, v in struct_fields_encoded(self.cls):
             if all((unannotate(s) is UnsetType) for s in decompose_union(v)):
                 continue
@@ -388,7 +388,7 @@ class TSMapping(TSType, kw_only=True):
         ktype: TSType = POST_INIT
         vtype: TSType = POST_INIT
 
-    def __tstype_init__(self):
+    def __tstype_init__(self) -> None:
         super().__tstype_init__()
         self.ktype, self.vtype = [self.generator.add(a) for a in self.args]
 
@@ -407,7 +407,7 @@ class TSExport:
         component: str | None = None,
         module: str = "type/api",
         depth: int = 0,
-    ):
+    ) -> None:
         self.name = name
         if not module.startswith("@"):
             if component is None:
@@ -416,10 +416,10 @@ class TSExport:
             module = component_tsmodule(component, module)
         self.module = module
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.module, self.name))
 
-    def name_for(self, tdef: Any) -> str:
+    def name_for(self, tdef: Any) -> str:  # noqa: ANN401
         if (name := self.name) is not None:
             return name
         if (name := getattr(tdef, "__name__", None)) is not None:
@@ -440,7 +440,7 @@ def unique_everseen[T](iterable: Sequence[T]) -> Generator[T]:
             yield item
 
 
-def struct_fields_encoded(otype) -> tuple[tuple[str, Any], ...]:
+def struct_fields_encoded(otype: type[Struct]) -> tuple[tuple[str, Any], ...]:
     hints = get_class_annotations(otype)
     return tuple(
         (en, hints[fn])

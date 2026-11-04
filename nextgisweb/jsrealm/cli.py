@@ -24,28 +24,28 @@ from .stylesheet import stylesheet_hook
 from .util import scan_for_nodepkgs
 
 
-def create_tsconfig(npkgs: dict[str, Path], *, debug):
+def create_tsconfig(npkgs: dict[str, Path], *, debug: bool) -> None:
     paths = {"react": ["./node_modules/@types/react"]}
 
-    compiler_options = dict(
-        target="es2017",
-        lib=["dom", "dom.iterable", "es2024"],
-        allowJs=True,
-        skipLibCheck=True,
-        esModuleInterop=True,
-        strict=debug,
-        moduleResolution="bundler",
-        resolveJsonModule=True,
-        isolatedModules=True,
-        noEmit=True,
-        allowSyntheticDefaultImports=True,
-        forceConsistentCasingInFileNames=True,
-        noFallthroughCasesInSwitch=True,
-        types=["node", "mocha"],
-        module="esnext",
-        jsx="react-jsx",
-        paths=paths,
-    )
+    compiler_options = {
+        "target": "es2017",
+        "lib": ["dom", "dom.iterable", "es2024"],
+        "allowJs": True,
+        "skipLibCheck": True,
+        "esModuleInterop": True,
+        "strict": debug,
+        "moduleResolution": "bundler",
+        "resolveJsonModule": True,
+        "isolatedModules": True,
+        "noEmit": True,
+        "allowSyntheticDefaultImports": True,
+        "forceConsistentCasingInFileNames": True,
+        "noFallthroughCasesInSwitch": True,
+        "types": ["node", "mocha"],
+        "module": "esnext",
+        "jsx": "react-jsx",
+        "paths": paths,
+    }
 
     include = ["**/eslint.config.ts"]
 
@@ -54,11 +54,11 @@ def create_tsconfig(npkgs: dict[str, Path], *, debug):
         include.append(f"{pp}/**/*.tsx")
         paths[f"{pn}/*"] = [f"./{pp}/*"]
 
-    tsconfig_json = dict(
-        compilerOptions=compiler_options,
-        include=include,
-        exclude=["node_modules"],
-    )
+    tsconfig_json = {
+        "compilerOptions": compiler_options,
+        "include": include,
+        "exclude": ["node_modules"],
+    }
 
     update_text_file(Path("tsconfig.json"), json.dumps(tsconfig_json, indent=4))
 
@@ -74,7 +74,7 @@ def install(
     core: CoreComponent = inject.arg(),
     pyramid: PyramidComponent = inject.arg(),
     jsrealm: JSRealmComponent = inject.arg(),
-):
+) -> None:
     """Setup JavaScript environment
 
     :param watch: Start `pnpm run watch` after installation
@@ -93,7 +93,7 @@ def install(
     debug = core.options["debug"]
     cwd = Path().resolve()
 
-    cpaths = dict()
+    cpaths = {}
     for cid, cpath in pkginfo._comp_path.items():
         cpath = cpath.resolve().relative_to(cwd)
         if cid not in env.components and debug:
@@ -101,21 +101,16 @@ def install(
             continue
         cpaths[cid] = cpath
 
-    npkgs = {
-        pname: ppath
-        for pname, ppath in chain(
-            *[scan_for_nodepkgs(cid, cpath) for cid, cpath in cpaths.items()]
-        )
-    }
+    npkgs = dict(chain(*[scan_for_nodepkgs(cid, cpath) for cid, cpath in cpaths.items()]))
 
-    package_json: dict[str, dict | str | bool] = dict(private=True)
+    package_json: dict[str, dict | str | bool] = {"private": True}
     package_json["packageManager"] = "pnpm@11.2.2"
-    package_json["engines"] = dict(node=">=22.0.0")
-    package_json["nextgisweb"] = nextgisweb = dict()
+    package_json["engines"] = {"node": ">=22.0.0"}
+    package_json["nextgisweb"] = nextgisweb = {}
 
-    package_json["dependencies"] = {pname: "workspace:*" for pname in sorted(npkgs.keys())}
+    package_json["dependencies"] = dict.fromkeys(sorted(npkgs.keys()), "workspace:*")
 
-    s_env = nextgisweb["env"] = dict()
+    s_env = nextgisweb["env"] = {}
     s_env["packages"] = {
         name: str(pkg._path.relative_to(cwd)) for name, pkg in pkginfo.packages.items()
     }
@@ -123,8 +118,8 @@ def install(
         comp_id: str(pkginfo.comp_path(comp_id).relative_to(cwd)) for comp_id in pkginfo.components
     }
 
-    s_allow_builds = dict()
-    s_overrides = dict()
+    s_allow_builds = {}
+    s_overrides = {}
 
     peer_dependencies = package_json["peerDependencies"] = {}
     for ppath in npkgs.values():
@@ -147,27 +142,27 @@ def install(
                 and (package_dependencies := package_data.get("dependencies"))
                 and package_nextgisweb.get("commonDependencies")
             ):
-                peer_dependencies.update({k: "*" for k in package_dependencies.keys()})
+                peer_dependencies.update(dict.fromkeys(package_dependencies.keys(), "*"))
 
-    def language(lang):
+    def language(lang: str) -> dict:
         # TODO: Rewrite using babel.plural
         # ty: ignore[not-iterable]
         nplurals, plural = PLURALS.get(lang, PLURALS.get(lang.split("-")[0]))
-        return dict(code=lang, nplurals=nplurals, plural=plural)
+        return {"code": lang, "nplurals": nplurals, "plural": plural}
 
     nextgisweb["i18n"] = {
         "languages": [language(lang) for lang in core.locale_available],
         "external": core.options["locale.external_path"],
     }
 
-    s_core = nextgisweb["core"] = dict()
+    s_core = nextgisweb["core"] = {}
     s_core["debug"] = debug
 
     o_pyramid = pyramid.options
-    c_pyramid = nextgisweb["pyramid"] = dict()
-    c_pyramid["compression"] = {algo: True for algo in o_pyramid["compression.algorithms"]}
+    c_pyramid = nextgisweb["pyramid"] = {}
+    c_pyramid["compression"] = dict.fromkeys(o_pyramid["compression.algorithms"], True)
 
-    s_jsrealm = nextgisweb["jsrealm"] = dict()
+    s_jsrealm = nextgisweb["jsrealm"] = {}
     s_jsrealm["tscheck"] = jsrealm.options.get("tscheck", debug)
     s_jsrealm["eslint"] = jsrealm.options.get("eslint", debug)
 
@@ -196,7 +191,7 @@ def install(
 
     s_jsrealm["stylesheets"] = list(chain(func(comp) for comp, func in stylesheet_hook))
 
-    targets = s_jsrealm["targets"] = dict()
+    targets = s_jsrealm["targets"] = {}
     for k in FAMILIES.keys():
         r = o_pyramid[f"uacompat.{k}"]
         if isinstance(r, bool):
@@ -207,7 +202,7 @@ def install(
 
     rsbuild_root = (jsrealm_path / "rsbuild.root.ts").resolve().relative_to(cwd)
 
-    package_json["scripts"] = scripts = dict()
+    package_json["scripts"] = scripts = {}
     scripts["build"] = "rsbuild build --config {}".format(rsbuild_root)
     scripts["start"] = "rsbuild dev --config {}".format(rsbuild_root)
     scripts["watch"] = "rsbuild build --watch --config {}".format(rsbuild_root)
@@ -226,14 +221,10 @@ def install(
     }
 
     if s_allow_builds:
-        pnpm_workspace_json["allowBuilds"] = {
-            package: allowed for package, allowed in s_allow_builds.items()
-        }
+        pnpm_workspace_json["allowBuilds"] = dict(s_allow_builds.items())
 
     if s_overrides:
-        pnpm_workspace_json["overrides"] = {
-            package: version for package, version in s_overrides.items()
-        }
+        pnpm_workspace_json["overrides"] = dict(s_overrides.items())
 
     update_text_file(Path("package.json"), json.dumps(package_json, indent=4))
     update_text_file(

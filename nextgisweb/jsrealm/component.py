@@ -3,7 +3,7 @@ from nextgisweb.lib.config import Option
 
 
 class JSRealmComponent(Component):
-    def setup_pyramid(self, config):
+    def setup_pyramid(self, config) -> None:  # noqa: ANN001
         from . import view
 
         view.setup_pyramid(self, config)

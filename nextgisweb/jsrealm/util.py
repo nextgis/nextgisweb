@@ -6,7 +6,7 @@ from nextgisweb.lib.json import loads
 from nextgisweb.lib.logging import logger
 
 
-def validate_package_json(cid: str, package_json: Path):
+def validate_package_json(cid: str, package_json: Path) -> str:
     data = loads(package_json.read_text())
     assert data["name"].startswith("@nextgisweb/")
     assert data["version"] == "0.0.0"

@@ -11,22 +11,22 @@ JSENTRY = jsentry("@nextgisweb/jsrealm/testentry/runner")
 
 
 @react_renderer("@nextgisweb/jsrealm/testentry")
-def testentry_browse(request: Request):
-    return dict(
-        title="Test entries",
-    )
+def testentry_browse(request: Request) -> dict:
+    return {
+        "title": "Test entries",
+    }
 
 
 @viewargs(renderer="mako")
-def testentry(request: Request, selected: str):
-    return dict(
-        entrypoint=JSENTRY,
-        selected=selected,
-        title=selected,
-    )
+def testentry(request: Request, selected: str) -> dict:
+    return {
+        "entrypoint": JSENTRY,
+        "selected": selected,
+        "title": selected,
+    }
 
 
-def setup_pyramid(comp: JSRealmComponent, config: Configurator):
+def setup_pyramid(comp: JSRealmComponent, config: Configurator) -> None:
     dist_path = Path(comp.options["dist_path"])
     for p in filter(lambda p: p.is_dir(), dist_path.iterdir()):
         pn = p.name
