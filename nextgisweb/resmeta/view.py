@@ -10,5 +10,5 @@ class ResMetaWidget(Widget):
 
 
 @resource_sections("@nextgisweb/resmeta/resource-section", order=80)
-def resource_section(obj, **kwargs):
-    return len(obj.resmeta) > 0
+def resource_section(obj: Resource, **kwargs) -> bool:  # noqa: ANN003
+    return len(obj.resmeta) > 0  # ty: ignore[unresolved-attribute]

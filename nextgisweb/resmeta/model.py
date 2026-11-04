@@ -11,6 +11,10 @@ from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 
 Base.depends_on("resource")
 
+ItemKey = Annotated[str, Meta(max_length=255)]
+ItemValue = str | int | bool | float | None
+ItemsType = dict[ItemKey, ItemValue]
+
 
 class ResourceMetadataItem(Base):
     __tablename__ = "resmeta_item"
@@ -27,7 +31,7 @@ class ResourceMetadataItem(Base):
         backref=orm.backref("resmeta", cascade="all,delete-orphan"),
     )
 
-    def tval(self):
+    def tval(self) -> tuple[str, ItemValue]:
         if self.vinteger is not None:
             return ("number", self.vinteger)
         elif self.vfloat is not None:
@@ -40,34 +44,30 @@ class ResourceMetadataItem(Base):
             return ("null", None)
 
     @property
-    def vtype(self):
+    def vtype(self) -> str:
         return self.tval()[0]
 
     @property
-    def value(self):
+    def value(self) -> ItemValue:
         return self.tval()[1]
 
     @value.setter
-    def value(self, value):
+    def value(self, value: ItemValue) -> None:
         self.vinteger = value if isinstance(value, int) and not isinstance(value, bool) else None
         self.vfloat = value if isinstance(value, float) else None
         self.vtext = value if isinstance(value, str) else None
         self.vboolean = value if isinstance(value, bool) else None
 
 
-ItemKey = Annotated[str, Meta(max_length=255)]
-ItemsType = dict[ItemKey, str | int | bool | float | None]
-
-
 class ItemsAttr(SAttribute):
-    def get(self, srlzr) -> ItemsType:
+    def get(self, srlzr: Serializer) -> ItemsType:
         return {itm.key: itm.value for itm in srlzr.obj.resmeta}
 
-    def set(self, srlzr, value: ItemsType, *, create: bool):
+    def set(self, srlzr: Serializer, value: ItemsType, *, create: bool) -> None:
         odata = srlzr.obj.resmeta
 
         rml = []  # Records to be removed
-        imap = dict()  # Records to be rewritten
+        imap = {}  # Records to be rewritten
 
         for i in odata:
             if i.key in value:
