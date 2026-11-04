@@ -76,6 +76,7 @@ export class DataProvider<I extends FocusTableItem> implements TreeDataProvider<
   private listeners: ((ids: TreeItemIndex[]) => void)[] = [];
 
   cleanupReaction: (() => void) | undefined = undefined;
+  cleanupTreeItems: (() => void) | undefined = undefined;
   cleanupItem = new Map<TreeItemIndex, () => void>();
 
   constructor(props: DataProviderOpts<I>) {
@@ -84,6 +85,13 @@ export class DataProvider<I extends FocusTableItem> implements TreeDataProvider<
   }
 
   startup() {
+    this.treeItems.forEach((item, id) => this.observeTreeItem(id, item));
+    this.cleanupTreeItems = observe(this.treeItems, (change) => {
+      if (change.type !== "add") this.unobserveTreeItem(change.name);
+      if (change.type !== "delete") {
+        this.observeTreeItem(change.name, change.newValue);
+      }
+    });
     this.cleanupReaction = autorun(() => {
       const collected = this.updated.get();
       const updated: TreeItemIndex[] = [];
@@ -99,17 +107,17 @@ export class DataProvider<I extends FocusTableItem> implements TreeDataProvider<
         this.listeners.forEach((i) => i(updated));
       }
 
-      removed.forEach((i) => {
-        this.treeItems.delete(i);
-        this.cleanupItem.get(i)?.();
-        this.cleanupItem.delete(i);
-      });
+      if (removed.length > 0) {
+        runInAction(() => removed.forEach((i) => this.treeItems.delete(i)));
+      }
 
       collected.clear();
     });
   }
 
   teardown() {
+    this.cleanupTreeItems?.();
+    this.cleanupTreeItems = undefined;
     this.cleanupReaction?.();
     this.cleanupReaction = undefined;
     this.cleanupItem.forEach((fn) => fn());
@@ -155,9 +163,12 @@ export class DataProvider<I extends FocusTableItem> implements TreeDataProvider<
   // Helpers
 
   private registerTreeItem(id: TreeItemIndex, item: ProviderTreeItem<I>) {
+    runInAction(() => this.treeItems.set(id, item));
+  }
+
+  private observeTreeItem(id: TreeItemIndex, item: ProviderTreeItem<I>) {
     const children = item.childrenObservable;
-    this.treeItems.set(id, item);
-    if (!children) return;
+    if (!children || this.cleanupItem.has(id)) return;
 
     const itemCleanup = observe(children, (change) => {
       const updated = new Map(this.updated.get());
@@ -179,6 +190,11 @@ export class DataProvider<I extends FocusTableItem> implements TreeDataProvider<
       this.updated.set(updated);
     });
     this.cleanupItem.set(id, itemCleanup);
+  }
+
+  private unobserveTreeItem(id: TreeItemIndex) {
+    this.cleanupItem.get(id)?.();
+    this.cleanupItem.delete(id);
   }
 
   @computed
