@@ -68,7 +68,7 @@ export function PreviewLayer({
   const padding = useMemo(() => [20, 20, 20, 20], []);
   const mapExtent = useMemo(
     () =>
-      extentData
+      extentData?.extent
         ? {
             extent: extentData.extent,
             srs: { id: 4326 },

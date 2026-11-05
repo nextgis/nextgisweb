@@ -31,6 +31,8 @@ export async function getExtentFromLayer({
     cache: true,
     signal,
   });
+  if (!extent) return;
+
   const result = {
     left: extent.minLon,
     right: extent.maxLon,
@@ -112,11 +114,11 @@ export const ExtentRow = observer(
                   getExtentFromLayer({
                     resourceId: id,
                     signal,
-                  }).catch(() => ({}) as ExtentRowValue)
+                  }).catch(() => undefined)
                 )
               );
-              const combined = unionExtents(extents);
-              onChange?.(combined);
+              const valid = extents.filter((e) => e !== undefined);
+              onChange?.(valid.length ? unionExtents(valid) : {});
             } catch {
               onChange?.({});
             }

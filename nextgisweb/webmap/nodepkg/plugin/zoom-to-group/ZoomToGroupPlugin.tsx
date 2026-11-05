@@ -28,7 +28,7 @@ export class ZoomToGroupPlugin extends PluginBase<TreeGroupStore> {
     { signal }: PluginRunOptions
   ): Promise<undefined> {
     try {
-      const extents = await Promise.all(
+      const allExtents = await Promise.all(
         [...new Set(this.getLayers(nodeData).map((item) => item.styleId))].map(
           async (styleId) => {
             const { extent } = await route("layer.extent", {
@@ -39,6 +39,7 @@ export class ZoomToGroupPlugin extends PluginBase<TreeGroupStore> {
         )
       );
 
+      const extents = allExtents.filter((e) => e !== null);
       const [firstExtent, ...restExtents] = extents;
       if (!firstExtent) return;
 

@@ -37,6 +37,7 @@ export class ZoomToLayerPlugin extends PluginBase {
         const { extent } = await route("layer.extent", {
           id: item.styleId,
         }).get({ cache: true, signal });
+        if (!extent) return;
 
         this.display.map.zoomToNgwExtent(extent, {
           displayProjection: this.display.displayProjection,

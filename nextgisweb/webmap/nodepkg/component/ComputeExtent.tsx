@@ -41,9 +41,9 @@ export function ComputeExtent({
         )
       );
 
-      const combined = unionExtents(extents);
-      if (!signal.aborted && combined) {
-        onDone(combined);
+      const valid = extents.filter((e) => e !== undefined);
+      if (!signal.aborted && valid.length) {
+        onDone(unionExtents(valid));
       }
     } catch {
       // ignore

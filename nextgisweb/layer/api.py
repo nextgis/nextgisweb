@@ -9,7 +9,7 @@ from .interface import IBboxLayer
 
 
 class Extent(Struct):
-    extent: NgwExtent
+    extent: NgwExtent | None
 
 
 def extent(resource: Resource, request: Request) -> Extent:
