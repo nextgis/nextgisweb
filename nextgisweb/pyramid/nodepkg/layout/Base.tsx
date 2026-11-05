@@ -212,8 +212,8 @@ export function Base({
   );
 
   return (
-    <InjectionProvider>
-      <StrictMode>
+    <StrictMode>
+      <InjectionProvider>
         <title>{title}</title>
 
         {modalContextHolder}
@@ -236,7 +236,7 @@ export function Base({
             {renderBody}
           </PyramidLayout>
         )}
-      </StrictMode>
-    </InjectionProvider>
+      </InjectionProvider>
+    </StrictMode>
   );
 }
