@@ -82,9 +82,6 @@ export class EditorStore implements IEditorStore<
 
   @action
   update(props: Partial<this>) {
-    if ("storage" in props && !props.storage) {
-      this.mode = "upload";
-    }
     Object.assign(this, props);
     if (
       props.source !== undefined ||

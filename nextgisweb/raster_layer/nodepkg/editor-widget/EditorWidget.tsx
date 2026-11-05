@@ -51,6 +51,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
     const storageField = (readOnly: boolean, allowClear: boolean) => (
       <Lot label={storageLabel}>
         <ResourceSelectRef
+          style={{ width: "100%" }}
           value={storage}
           readOnly={readOnly}
           allowClear={allowClear}
