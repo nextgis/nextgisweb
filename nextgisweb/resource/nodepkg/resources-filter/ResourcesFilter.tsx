@@ -6,7 +6,6 @@ import {
   Button,
   Input,
   Spin,
-  Tooltip,
   Typography,
 } from "@nextgisweb/gui/antd";
 import type { AutoCompleteProps } from "@nextgisweb/gui/antd";
@@ -21,6 +20,8 @@ import { ResourceIcon } from "../icon";
 import SettingsIcon from "@nextgisweb/icon/material/tune";
 
 const MIN_SEARCH_LENGTH = 3;
+
+const advancedSearchUrl = routeURL("resource.search.page");
 
 interface ResourcesFilterProps extends Omit<AutoCompleteProps, "onChange"> {
   onChange?: AutoCompleteProps["onSelect"];
@@ -121,11 +122,9 @@ export function ResourcesFilter({
     }
   };
 
-  const openAdvanced = () => {
-    const base = routeURL("resource.search.page");
-    const url = search ? `${base}?q=${encodeURIComponent(search)}` : base;
-    window.location.href = url;
-  };
+  const advancedSearchHref = showAdvancedSearch
+    ? advancedSearchUrl + (search ? `?q=${encodeURIComponent(search)}` : "")
+    : undefined;
 
   return (
     <>
@@ -150,23 +149,14 @@ export function ResourcesFilter({
           placeholder={gettext("Search resources")}
           suffix={
             showAdvancedSearch ? (
-              <Tooltip title={gettext("Advanced search")}>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<SettingsIcon />}
-                  loading={loading}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    openAdvanced();
-                  }}
-                />
-              </Tooltip>
+              <Button
+                type="text"
+                size="small"
+                icon={<SettingsIcon />}
+                loading={loading}
+                href={advancedSearchHref}
+                title={gettext("Advanced search")}
+              />
             ) : (
               <Spin size="small" spinning={loading} />
             )
