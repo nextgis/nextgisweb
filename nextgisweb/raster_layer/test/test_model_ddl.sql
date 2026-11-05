@@ -28,6 +28,7 @@ COMMENT ON TABLE raster_layer IS 'raster_layer';
 
 CREATE TABLE raster_layer_storage (
     id integer NOT NULL,
+    kind character varying(50) NOT NULL,
     endpoint character varying NOT NULL,
     bucket character varying NOT NULL,
     access_key character varying,

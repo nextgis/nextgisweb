@@ -1,3 +1,4 @@
+import enum
 import glob
 import math
 import os
@@ -23,6 +24,7 @@ from nextgisweb.env import COMP_ID, Base, gettext, gettextf, ngettextf
 from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
+from nextgisweb.lib.saext import Enum as SAEnum
 from nextgisweb.lib.saext import Msgspec
 
 from nextgisweb.core import CoreComponent
@@ -70,6 +72,12 @@ Base.depends_on("resource")
 PYRAMID_TARGET_SIZE = 512
 
 SUPPORTED_DRIVERS = ("GTiff", "PNG", "JPEG")
+
+
+class StorageKind(enum.Enum):
+    s3 = "s3"
+    http = "http"
+    gcp = "gcp"
 
 
 def get_dataset_srs(ds: gdal.Dataset) -> osr.SpatialReference:
@@ -131,6 +139,7 @@ class RasterLayerStorage(Resource):
 
     __scope__ = ConnectionScope
 
+    kind: Mapped[StorageKind] = mapped_column(SAEnum(StorageKind), default=StorageKind.s3)
     endpoint: Mapped[str] = mapped_column(sa.Unicode)
     bucket: Mapped[str] = mapped_column(sa.Unicode)
     access_key: Mapped[str | None] = mapped_column(sa.Unicode)
@@ -143,28 +152,54 @@ class RasterLayerStorage(Resource):
 
     @property
     def public(self) -> bool:
+        if self.kind == StorageKind.http:
+            return True
         return self.access_key is None and self.secret_key is None
 
     def vsi_path(self, filename: str) -> str:
         prefix = (self.prefix.rstrip("/") + "/") if self.prefix else ""
-        return f"/vsis3/{self.bucket}/{prefix}{filename.lstrip('/')}"
+        filename = filename.lstrip("/")
+
+        if self.kind == StorageKind.s3:
+            return f"/vsis3/{self.bucket}/{prefix}{filename}"
+
+        if self.kind == StorageKind.gcp:
+            return f"/vsigs/{self.bucket}/{prefix}{filename}"
+
+        if self.kind == StorageKind.http:
+            base = (self.endpoint or "").rstrip("/")
+            return f"/vsicurl/{base}/{prefix}{filename}"
+
+        raise ValueError(f"Unknown storage kind: {self.kind}")
 
     def vsi_credentials(self) -> dict:
-        parsed = urlparse(self.endpoint)
-        result = {
-            "AWS_S3_ENDPOINT": parsed.netloc,
-            "AWS_HTTPS": "YES" if parsed.scheme == "https" else "NO",
-            "AWS_VIRTUAL_HOSTING": "FALSE",
-        }
-        if self.public:
-            result["AWS_NO_SIGN_REQUEST"] = "YES"
-        else:
-            result["AWS_ACCESS_KEY_ID"] = self.access_key
-            result["AWS_SECRET_ACCESS_KEY"] = self.secret_key
-        return result
+        if self.kind == StorageKind.s3:
+            parsed = urlparse(self.endpoint)
+            result = {
+                "AWS_S3_ENDPOINT": parsed.netloc,
+                "AWS_HTTPS": "YES" if parsed.scheme == "https" else "NO",
+                "AWS_VIRTUAL_HOSTING": "FALSE",
+            }
+            if self.public:
+                result["AWS_NO_SIGN_REQUEST"] = "YES"
+            else:
+                result["AWS_ACCESS_KEY_ID"] = self.access_key
+                result["AWS_SECRET_ACCESS_KEY"] = self.secret_key
+            return result
+
+        if self.kind == StorageKind.gcp:
+            result = {}
+            if self.public:
+                result["GS_NO_SIGN_REQUEST"] = "YES"
+            else:
+                result["GS_ACCESS_KEY_ID"] = self.access_key
+                result["GS_SECRET_ACCESS_KEY"] = self.secret_key
+            return result
+
+        return {}
 
     def register_credentials(self) -> None:
-        """Register S3 credentials as path-specific GDAL options.
+        """Register storage credentials as path-specific GDAL options.
 
         Must be called per-read rather than once globally for two reasons:
         1. Each worker process has its own GDAL state, so credentials set in
@@ -180,10 +215,9 @@ class RasterLayerStorage(Resource):
             gdal.SetPathSpecificOption(path_prefix, key, value)
 
     def configure_gdal(self) -> None:
-        """Register S3 credentials and performance options with GDAL."""
         self.register_credentials()
 
-        # Global performance options recommended for reading COGs from S3.
+        # Global performance options recommended for reading COGs.
         # See https://developmentseed.org/titiler/advanced/performance_tuning/
         gdal.SetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN", "YES")
         gdal.SetConfigOption("GDAL_HTTP_MERGE_CONSECUTIVE_RANGES", "YES")
@@ -196,7 +230,12 @@ class RasterLayerStorage(Resource):
         gdal.SetConfigOption("GDAL_INGESTED_BYTES_AT_OPEN", "32768")
 
 
+class KindColumn(SColumn):
+    ctypes = CRUTypes(str, str, UnsetType)
+
+
 class RasterLayerStorageSerializer(Serializer, resource=RasterLayerStorage):
+    kind = KindColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     endpoint = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     bucket = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     access_key = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -207,7 +246,14 @@ class RasterLayerStorageSerializer(Serializer, resource=RasterLayerStorage):
         super().deserialize()
         ak = self.obj.access_key
         sk = self.obj.secret_key
-        if (ak is None) != (sk is None):
+
+        if self.obj.kind == StorageKind.http and (
+            ak is not None or sk is not None or self.obj.prefix
+        ):
+            raise ValidationError(
+                gettext("Access key, secret key and prefix are not used for HTTP storage.")
+            )
+        elif self.obj.kind in (StorageKind.s3, StorageKind.gcp) and (ak is None) != (sk is None):
             raise ValidationError(
                 gettext(
                     "Access key and secret key must both be set (private bucket) "
@@ -400,7 +446,7 @@ class RasterLayer(SpatialLayerMixin, Resource):
                 ),
             )
 
-        # S3 always uses COG - overviews are built into the file
+        # Storage-backed layers always use COG - overviews are built into the file
         if self.storage is not None:
             cog = True
 
@@ -449,7 +495,7 @@ class RasterLayer(SpatialLayerMixin, Resource):
         cmd.extend(cmd_opts)
 
         if self.storage is not None:
-            ds = self._load_file_s3(cmd)
+            ds = self._load_file_to_storage(cmd)
         else:
             ds = self._load_file_local(cmd)
 
@@ -516,9 +562,14 @@ class RasterLayer(SpatialLayerMixin, Resource):
         assert ds is not None
         return ds
 
-    def _load_file_s3(self, cmd: list) -> gdal.Dataset:
+    def _load_file_to_storage(self, cmd: list) -> gdal.Dataset:
         storage = self.storage
         assert storage is not None
+
+        if storage.kind == StorageKind.http:
+            raise ValidationError(
+                gettext("Uploading files is not supported for this storage type.")
+            )
 
         if storage.public:
             raise ValidationError(
@@ -543,15 +594,15 @@ class RasterLayer(SpatialLayerMixin, Resource):
                 finally:
                     code = gdal.VSIFCloseL(vsi)
                     assert code == 0, "vsi close error"
-        ds = self._s3_open(s3_path)
+        ds = self._storage_open(s3_path)
         assert ds is not None
         return ds
 
-    def _s3_open(self, s3_path: str) -> gdal.Dataset | None:
+    def _storage_open(self, storage_path: str) -> gdal.Dataset | None:
         storage = self.storage
         assert storage is not None
         storage.configure_gdal()
-        return gdal.Open(s3_path, gdalconst.GA_ReadOnly)
+        return gdal.Open(storage_path, gdalconst.GA_ReadOnly)
 
     def load_storage_path(self, path: str):
         """Load metadata from an existing file in the storage without modification.
@@ -562,7 +613,7 @@ class RasterLayer(SpatialLayerMixin, Resource):
         """
         storage = self.storage
         assert storage is not None
-        ds = self._s3_open(storage.vsi_path(path))
+        ds = self._storage_open(storage.vsi_path(path))
         if ds is None:
             raise ValidationError(
                 gettext("Failed to open raster file at the specified storage path.")
@@ -617,7 +668,7 @@ class RasterLayer(SpatialLayerMixin, Resource):
 
         if (storage := self.storage) is not None:
             assert self.storage_filename
-            return self._s3_open(storage.vsi_path(self.storage_filename))
+            return self._storage_open(storage.vsi_path(self.storage_filename))
         elif (fileobj := self.fileobj) is not None:
             fn = RasterLayerComponent.current().workdir_path(fileobj, self.fileobj_pam)
             return gdal.Open(str(fn), gdalconst.GA_ReadOnly)
@@ -803,8 +854,8 @@ class SourceAttr(SAttribute):
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
         from .component import RasterLayerComponent
 
-        use_s3 = srlzr.obj.storage is not None
-        cur_size = 0 if create or use_s3 else estimate_raster_layer_data(srlzr.obj)
+        use_storage = srlzr.obj.storage is not None
+        cur_size = 0 if create or use_storage else estimate_raster_layer_data(srlzr.obj)
 
         cog = srlzr.data.cog
         if cog is UNSET or cog is None:
@@ -815,7 +866,7 @@ class SourceAttr(SAttribute):
             )
         srlzr.obj.load_file(value(), cog=cog)
 
-        if not use_s3:
+        if not use_storage:
             new_size = estimate_raster_layer_data(srlzr.obj)
             CoreComponent.current().reserve_storage(
                 COMP_ID,
@@ -914,7 +965,7 @@ class StorageFilenameAttr(SAttribute):
                 gettext("Storage must be selected before specifying a storage filename.")
             )
         if srlzr.data.source is not UNSET:
-            # Both source and filename provided: store the filename so _load_file_s3 uses it
+            # Both source and filename provided: store the filename so _load_file_to_storage uses it
             # instead of generating a random UUID name.
             srlzr.obj.storage_filename = value
         else:

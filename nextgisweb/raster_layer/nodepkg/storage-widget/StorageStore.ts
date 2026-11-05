@@ -2,13 +2,19 @@ import { computed, observableRef } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { RasterLayerStorageRead } from "@nextgisweb/raster-layer/type/api";
-import type { EditorStore } from "@nextgisweb/resource/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
+import type {
+  EditorStore,
+  EditorStoreOptions,
+} from "@nextgisweb/resource/type";
 
 type StorageFormData = Required<RasterLayerStorageRead> & {
   no_sign_request: boolean;
+  kind: string;
 };
 
 const {
+  kind,
   endpoint,
   bucket,
   access_key,
@@ -22,22 +28,37 @@ const {
   validateIf: (o) => o.validate,
 });
 
-endpoint.validate(validate.string({ minLength: 1 }));
-bucket.validate(validate.string({ minLength: 1 }));
+endpoint.validate((value, o: StorageStore) =>
+  o.kind.value === "gcp"
+    ? [true, undefined]
+    : validate.string({ minLength: 1 })(value ?? "", o)
+);
+bucket.validate((value, o: StorageStore) =>
+  o.kind.value === "http"
+    ? [true, undefined]
+    : validate.string({ minLength: 1 })(value ?? "", o)
+);
 access_key.validate((value, o: StorageStore) =>
-  !o.no_sign_request.value
-    ? validate.string({ minLength: 1 })(value ?? "", o)
-    : [true, undefined]
+  o.kind.value === "http" || o.no_sign_request.value
+    ? [true, undefined]
+    : validate.string({ minLength: 1 })(value ?? "", o)
 );
 secret_key.validate((value, o: StorageStore) =>
-  !o.no_sign_request.value
-    ? validate.string({ minLength: 1 })(value ?? "", o)
-    : [true, undefined]
+  o.kind.value === "http" || o.no_sign_request.value
+    ? [true, undefined]
+    : validate.string({ minLength: 1 })(value ?? "", o)
 );
 
 export class StorageStore implements EditorStore<RasterLayerStorageRead> {
   readonly identity = "raster_layer_storage";
 
+  readonly composite: CompositeStore;
+
+  constructor({ composite }: EditorStoreOptions) {
+    this.composite = composite;
+  }
+
+  readonly kind = kind.init("s3", this);
   readonly endpoint = endpoint.init("", this);
   readonly bucket = bucket.init("", this);
   readonly access_key = access_key.init("", this);
@@ -55,6 +76,7 @@ export class StorageStore implements EditorStore<RasterLayerStorageRead> {
   dump(): RasterLayerStorageRead | undefined {
     if (!this.dirty) return undefined;
     const result: RasterLayerStorageRead = {
+      ...this.kind.jsonPart(),
       ...this.endpoint.jsonPart(),
       ...this.bucket.jsonPart(),
       ...this.prefix.jsonPart(),
