@@ -35,6 +35,7 @@ export interface RequestOptions<
   body?: string;
   global?: boolean;
   signal?: AbortSignal;
+  requestCache?: RequestCache;
   responseType?: RT;
   lunkwill?: LunkwillParam;
   lunkwillReturnUrl?: ReturnUrl;

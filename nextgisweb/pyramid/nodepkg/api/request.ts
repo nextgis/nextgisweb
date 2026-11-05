@@ -189,6 +189,7 @@ export async function request<
   };
   const {
     cache: useCache,
+    requestCache,
     responseType,
     lunkwill,
     query,
@@ -219,7 +220,7 @@ export async function request<
   const makeRequest = async (): Promise<ToReturn<T, RT, ReturnUrl>> => {
     let response: Response;
     try {
-      response = await fetch(url, opt);
+      response = await fetch(url, { ...opt, cache: requestCache });
     } catch (err) {
       if (isAbortError(err)) {
         throw err;

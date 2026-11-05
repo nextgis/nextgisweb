@@ -21,8 +21,8 @@ async function fetchSettings(component: string) {
 
   const result = await route("pyramid.settings").get({
     query: { component: component as any },
-    // NOTE: Caching disabled as an attempt to fix NGW-1920
-    // cache: true,
+    cache: true,
+    requestCache: "no-store",
   });
 
   if (window.ngwSentry) {
