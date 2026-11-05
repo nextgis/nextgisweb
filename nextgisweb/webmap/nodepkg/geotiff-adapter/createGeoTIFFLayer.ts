@@ -256,6 +256,7 @@ export function createGeoTIFFLayerFromSource(
         {
           sources: [{ url }],
           normalize: false,
+          convertToRGB: "auto",
         },
         options
       ),
