@@ -554,7 +554,7 @@ def text_search_match_clause(
     text_col = sa.cast(column, sa.Text)
     match = text_col.like(f"%{value}%") if case_sensitive else text_col.ilike(f"%{value}%")
     if keys_by_field:
-        return sa.or_(column.in_(list(keys_by_field)), match)
+        return sa.or_(text_col.in_(list(keys_by_field)), match)
     return match
 
 
