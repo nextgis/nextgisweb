@@ -11,15 +11,21 @@ export interface CBlocks {
 
 export type CBlockSlot = Exclude<keyof CBlocks, "stub">;
 
-type CBlockPlugin = {
-  [K in keyof CBlocks]: CBlocks[K] extends NonNullable<unknown>
-    ? {
-        slot: K;
-        func: (payload: CBlocks[K]) => ReactElement | false;
-      }
-    : CBlocks[K] extends undefined
-      ? { slot: K; func: () => ReactElement | false }
+type CBlockFunc<T> =
+  T extends NonNullable<unknown>
+    ? (payload: T) => ReactElement | false
+    : T extends undefined
+      ? () => ReactElement | false
       : never;
+
+type CBlockPlugin = {
+  [K in CBlockSlot]: {
+    slot: K;
+    order?: number;
+    func: CBlockFunc<CBlocks[K]>;
+  };
 }[CBlockSlot];
 
-export const registry = pluginRegistry<CBlockPlugin>(MODULE_NAME);
+export const registry = pluginRegistry<CBlockPlugin>(MODULE_NAME, {
+  sortKeyFn: (item) => item.order ?? +Infinity,
+});

@@ -2,6 +2,14 @@ import { matches } from "lodash-es";
 
 import { assert } from "../error";
 
+type SortKeyFn<M extends NonNullable<unknown>> =
+  | ((item: M) => number)
+  | ((item: M) => string);
+
+type RegistryOptions<M extends NonNullable<unknown>> = {
+  sortKeyFn?: SortKeyFn<M>;
+};
+
 type Query<M extends NonNullable<unknown>> = ((i: M) => boolean) | Partial<M>;
 
 export class BaseRegistry<
@@ -10,11 +18,13 @@ export class BaseRegistry<
 > {
   readonly identity: string;
   protected readonly items = new Array<P>();
+  protected readonly sortKeyFn: SortKeyFn<M> | undefined;
   protected _sealed = false;
   protected _skipped = 0;
 
-  constructor(identity: string) {
+  constructor(identity: string, options?: RegistryOptions<M>) {
     this.identity = identity;
+    this.sortKeyFn = options?.sortKeyFn;
   }
 
   protected _register(component: string, fn: () => P): void {
@@ -31,6 +41,16 @@ export class BaseRegistry<
   /** Seal registry to prevent future plugin registrations */
   seal() {
     assert(!this._sealed, `Registry '${this.identity}' has been sealed`);
+
+    const sortKeyFn = this.sortKeyFn;
+    if (sortKeyFn) {
+      this.items.sort((a, b) => {
+        const keyA = sortKeyFn(a as unknown as M);
+        const keyB = sortKeyFn(b as unknown as M);
+        return keyA < keyB ? -1 : keyA > keyB ? 1 : 0;
+      });
+    }
+
     this._sealed = true;
     console.debug(
       `Registry '${this.identity}': ` +
@@ -107,10 +127,12 @@ export class PluginRegistry<
  * @typeParam P Type of plugin
  *
  * @param identity Use {@link MODULE_NAME} global
+ * @param options Registry options
  * @returns PluginRegistry instance
  */
 export function pluginRegistry<P extends NonNullable<unknown>>(
-  identity: string
+  identity: string,
+  options?: RegistryOptions<P>
 ): PluginRegistry<P> {
-  return new PluginRegistry<P>(identity);
+  return new PluginRegistry<P>(identity, options);
 }
