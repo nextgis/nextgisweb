@@ -3,20 +3,21 @@ import { useCallback, useEffect, useMemo } from "react";
 
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
-import { Alert, Button, Select } from "@nextgisweb/gui/antd";
-import type { OptionType } from "@nextgisweb/gui/antd";
+import { Alert, Button } from "@nextgisweb/gui/antd";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
+import { SrsSelectExpandable } from "@nextgisweb/spatial-ref-sys/srs-select-expandable";
+import type { SrsSelectItem } from "@nextgisweb/spatial-ref-sys/srs-select-expandable";
 
 import type { EditorStore, Inspection } from "./EditorStore";
 
 // prettier-ignore
-const [msgSelectDataset, msgSupportedFormats, msgInspect, msgPoints, msgPointFormat, msgSrs, msgFileCrs, msgHeights, msgNoCrs, msgNotRegistered, msgAddToWebGIS, msgCheckAgain] = [
+const [msgSelectDataset, msgSupportedFormats, msgInspect, msgPoints, msgPointFormat, msgSrs, msgFileCrs, msgHeights, msgNoCrs, msgNotRegistered, msgCheckAgain] = [
   gettext("Select a dataset"),
   gettext("Cloud Optimized Point Cloud (COPC) files with point formats 6, 7, and 8 are supported."),
   gettext("Inspecting point cloud"),
@@ -27,7 +28,6 @@ const [msgSelectDataset, msgSupportedFormats, msgInspect, msgPoints, msgPointFor
   gettext("Heights"),
   gettext("The file has no coordinate system info. Select it manually: a wrong choice will misplace the point cloud."),
   gettext("The coordinate system of the file is not registered in NextGIS Web."),
-  gettext("Add to Web GIS"),
   gettext("Check again"),
 ];
 
@@ -117,44 +117,36 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
 
     // Only coordinate systems equivalent to the file one can be selected,
     // as the point cloud is not reprojected
-    const candidateOptions = useMemo<OptionType[] | undefined>(() => {
+    const candidateItems = useMemo<SrsSelectItem[] | undefined>(() => {
       if (!inspection || !crs) return undefined;
       if (inspection.srs_candidates.length) {
         return inspection.srs_candidates.map((srs) => ({
-          value: srs.id,
+          id: srs.id,
           label: srs.display_name,
         }));
       }
       return [
         {
-          value: undefined,
-          disabled: true,
-          label: (
-            <span>
-              {formatCrs(crs.display_name, crs.auth)}{" "}
-              {crs.auth && (
-                <a
-                  href={
-                    routeURL("srs.catalog") +
-                    "?q=" +
-                    encodeURIComponent(crs.auth)
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {msgAddToWebGIS}
-                </a>
-              )}
-            </span>
-          ),
+          label: formatCrs(crs.display_name, crs.auth),
+          code: crs.auth ?? undefined,
         },
       ];
     }, [inspection, crs]);
 
+    const refreshCandidates = useCallback(async () => {
+      if (source) {
+        await inspect(source);
+      } else if (resourceId !== null) {
+        const stored = await route("point_cloud.layer_inspect", resourceId).get(
+          { signal: makeSignal() }
+        );
+        store.setStoredInspection(stored);
+      }
+    }, [source, resourceId, inspect, store, makeSignal]);
+
     const showSrs = !!inspection;
     const notRegistered =
-      !!candidateOptions && !inspection?.srs_candidates.length;
+      !!candidateItems && !inspection?.srs_candidates.length;
 
     return (
       <Area pad>
@@ -177,11 +169,12 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
         )}
         {showSrs && (
           <Lot label={msgSrs}>
-            {candidateOptions ? (
-              <Select<number>
+            {candidateItems ? (
+              <SrsSelectExpandable
                 style={{ width: "100%" }}
                 value={store.srsId ?? undefined}
-                options={candidateOptions}
+                items={candidateItems}
+                refresh={refreshCandidates}
                 onChange={(value) => store.setSrsId(value ?? null)}
               />
             ) : (

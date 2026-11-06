@@ -8,15 +8,30 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import settings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type { SRSCatalogItem } from "@nextgisweb/spatial-ref-sys/type/api";
 
+const { url: catalogUrl } = settings.catalog;
+
 interface CatalogImportProps {
-  url: string | null;
+  url?: string | null;
   id: number;
+  onImported?: (srs: { id: number }) => void;
 }
 
-export function CatalogImport({ url, id }: CatalogImportProps) {
+export function CatalogImport({
+  url: urlProp,
+  id,
+  onImported,
+}: CatalogImportProps) {
   const [status, setStatus] = useState<string | null>(null);
+
+  const url =
+    urlProp !== undefined
+      ? urlProp
+      : catalogUrl
+        ? `${catalogUrl}/srs/${id}`
+        : null;
 
   const { data, isLoading, error } = useRouteGet({
     name: "spatial_ref_sys.catalog.item",
@@ -58,7 +73,11 @@ export function CatalogImport({ url, id }: CatalogImportProps) {
       }>({
         json: { catalog_id: id },
       });
-      window.open(routeURL("srs.edit", resp.id), "_self");
+      if (onImported) {
+        onImported({ id: resp.id });
+      } else {
+        window.open(routeURL("srs.edit", resp.id), "_self");
+      }
     } catch (err) {
       errorModal(err);
     } finally {

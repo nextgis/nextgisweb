@@ -7,11 +7,13 @@ import type { OptionType } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { assert } from "@nextgisweb/jsrealm/error";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController, useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
+import { SrsSelectExpandable } from "@nextgisweb/spatial-ref-sys/srs-select-expandable";
+import type { SrsSelectItem } from "@nextgisweb/spatial-ref-sys/srs-select-expandable";
 import type { WMSConnectionLayer } from "@nextgisweb/wmsclient/type/api";
 
 import type { WmsClientLayerStore } from "./WmsClientLayerStore";
@@ -46,20 +48,22 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
     const { showModal, modalHolder } = useShowModal();
     const { makeSignal } = useAbortController();
 
-    const { data: localSrsList } = useRouteGet("spatial_ref_sys.collection");
+    const { data: localSrsList, refresh: refreshLocalSrsList } = useRouteGet(
+      "spatial_ref_sys.collection"
+    );
     const remoteSrsInitialId = store.remote_srs.initial?.id;
 
-    const srsOptions = useMemo<OptionType[] | undefined>(() => {
+    const srsItems = useMemo<SrsSelectItem[] | undefined>(() => {
       if (wmsSrsCodes === undefined || !localSrsList) return undefined;
 
       if (wmsSrsCodes === null) {
         // Old connection: capcache has no SRS info - show saved value or fall back to EPSG:3857
         const id = remoteSrsInitialId ?? 3857;
         const local = localSrsList.find((s) => s.id === id);
-        return local ? [{ value: local.id, label: local.display_name }] : [];
+        return local ? [{ id: local.id, label: local.display_name }] : [];
       }
 
-      const options: OptionType[] = wmsSrsCodes.flatMap((code) => {
+      const options: SrsSelectItem[] = wmsSrsCodes.flatMap((code) => {
         const match = code.match(/^([A-Z]+):(\d+)$/i);
         if (!match) return [];
         const [, authName, authSrid] = match;
@@ -69,39 +73,21 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
             s.auth_srid === parseInt(authSrid)
         );
         return [
-          {
-            value: local?.id,
-            label: local ? (
-              local.display_name
-            ) : (
-              <span>
-                {code}{" "}
-                <a
-                  href={
-                    routeURL("srs.catalog") + "?q=" + encodeURIComponent(code)
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {gettext("Add to Web GIS")}
-                </a>
-              </span>
-            ),
-            disabled: !local,
-          },
+          local
+            ? { id: local.id, label: local.display_name }
+            : { label: code, code },
         ];
       });
 
       // If the saved SRS is not in the WMS list, prepend it with a warning
       if (
         remoteSrsInitialId !== undefined &&
-        !options.some((o) => o.value === remoteSrsInitialId)
+        !options.some((o) => o.id === remoteSrsInitialId)
       ) {
         const local = localSrsList.find((s) => s.id === remoteSrsInitialId);
         assert(local, "Initial remote SRS not found in local SRS list");
         options.unshift({
-          value: local.id,
+          id: local.id,
           label: `⚠ ${local.display_name}`,
         });
       }
@@ -186,10 +172,11 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
         />
 
         <Lot row label={gettext("Remote SRS")} error={store.remote_srs.error}>
-          <Select
+          <SrsSelectExpandable
             style={{ width: "100%" }}
             value={store.remote_srs.value?.id}
-            options={srsOptions}
+            items={srsItems}
+            refresh={refreshLocalSrsList}
             onChange={(id) => {
               store.remote_srs.value = id !== undefined ? { id } : null;
             }}
