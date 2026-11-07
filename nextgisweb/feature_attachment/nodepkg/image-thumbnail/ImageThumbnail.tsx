@@ -89,8 +89,10 @@ export function ImageThumbnail({
     <Image
       src={thumbUrl}
       width={width}
-      onClick={onClick}
+      alt={attachment.name}
+      title={attachment.description}
       preview={previewProps}
+      onClick={onClick}
     />
   );
 }
