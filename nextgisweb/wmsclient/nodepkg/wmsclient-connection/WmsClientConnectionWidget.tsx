@@ -28,8 +28,9 @@ const capcacheOptions: Option[] = [
 ];
 
 const versionOptions = [
-  { label: "1.1.1", value: "1.1.1" },
-  { label: "1.3.0", value: "1.3.0" },
+  { label: "WMS 1.1.1", value: "1.1.1" },
+  { label: "WMS 1.3.0", value: "1.3.0" },
+  { label: "WMTS 1.0.0", value: "wmts-1.0.0" },
 ];
 
 const msgUrl = gettext("WMS Connection URL");

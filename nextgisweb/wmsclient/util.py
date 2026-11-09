@@ -1,11 +1,24 @@
+from collections.abc import Iterator
+from typing import Literal, overload
+
+from lxml.etree import Element
+
 XLINK_HREF = "{http://www.w3.org/1999/xlink}href"
 
 
-def find_tags(el, tag):
+def find_tags(el: Element, tag: str) -> Iterator[Element]:
     return el.iterchildren(tag="{*}%s" % tag)
 
 
-def find_tag(el, tag, *, must=False):
+@overload
+def find_tag(el: Element, tag: str, *, must: Literal[True]) -> Element: ...
+
+
+@overload
+def find_tag(el: Element, tag: str, *, must: Literal[False] = False) -> Element | None: ...
+
+
+def find_tag(el: Element, tag: str, *, must: bool = False) -> Element | None:
     for child in find_tags(el, tag):
         return child
     if must:

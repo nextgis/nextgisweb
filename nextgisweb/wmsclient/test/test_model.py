@@ -6,12 +6,15 @@ import requests
 import transaction
 
 from nextgisweb.core.exception import ExternalServiceError
+from nextgisweb.resource.test import ResourceAPI
 
 from ..model import WMSConnection, _extract_wms_error
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
+
 
 @pytest.mark.parametrize("insecure", [False, True])
-def test_request_wms_verify(insecure, ngw_resource_defaults):
+def test_request_wms_verify(insecure):
     with transaction.manager:
         conn = WMSConnection(
             url="http://example.com/wms",
@@ -28,7 +31,7 @@ def test_request_wms_verify(insecure, ngw_resource_defaults):
 
 
 @pytest.mark.parametrize("referer", [None, "http://example.com"])
-def test_request_wms_referer(referer, ngw_resource_defaults):
+def test_request_wms_referer(referer):
     with transaction.manager:
         conn = WMSConnection(
             url="http://example.com/wms",
@@ -45,7 +48,7 @@ def test_request_wms_referer(referer, ngw_resource_defaults):
     assert actual is None if referer is None else actual == referer
 
 
-def test_request_wms_request_exception(ngw_resource_defaults):
+def test_request_wms_request_exception():
     with transaction.manager:
         conn = WMSConnection(url="http://example.com/wms", version="1.1.1").persist()
 
@@ -58,7 +61,7 @@ def test_request_wms_request_exception(ngw_resource_defaults):
     assert "ConnectionError" in str(exc_info.value.detail)
 
 
-def test_capcache_query_invalid_xml(ngw_resource_defaults, ngw_txn):
+def test_capcache_query_invalid_xml(ngw_txn):
     conn = WMSConnection(url="http://example.com/wms", version="1.1.1").persist()
 
     response = MagicMock(
@@ -143,3 +146,21 @@ def test_extract_wms_error_empty_attributes():
         """
     ).encode()
     assert _extract_wms_error(doc) == (None, None)
+
+
+@pytest.mark.parametrize(
+    "version_from, version_to, ok",
+    (
+        ("1.1.1", "1.3.0", True),
+        ("1.1.1", "unknown", False),
+        ("wmts-1.0.0", "1.1.1", False),
+        ("1.3.0", "wmts-1.0.0", False),
+    ),
+)
+def test_version_change(version_from, version_to, ok, ngw_auth_administrator):
+    with transaction.manager:
+        conn = WMSConnection(url="http://example.com/wms", version=version_from).persist()
+
+    rapi = ResourceAPI()
+    data = {"wmsclient_connection": {"version": version_to}}
+    rapi.update_request(conn.id, data, status=200 if ok else 422)
