@@ -19,12 +19,12 @@ def heif_init() -> None:
 
 
 def reproject_render(
-    render_fn: Callable[[Extent, Size], Image.Image],
+    render_fn: Callable[[Extent, Size], Image.Image | None],
     extent: Extent,
     size: Size,
     dst_wkt: str,
     src_wkt: str,
-) -> Image.Image:
+) -> Image.Image | None:
     xmin, ymin, xmax, ymax = extent
     width, height = size
 

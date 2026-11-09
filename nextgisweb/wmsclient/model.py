@@ -1,3 +1,4 @@
+import math
 import re
 from datetime import datetime
 from io import BytesIO
@@ -42,7 +43,9 @@ from nextgisweb.resource import (
     SResource,
 )
 from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.wmsclient.wmts import WMTSCapabilities
 
+from . import wmts
 from .util import (
     find_tag,
     get_capability_formats,
@@ -93,6 +96,15 @@ def _wms_error_message(code: str | None, msg: str | None) -> str | None:
 
 
 WMS_VERSIONS = ("1.1.1", "1.3.0")
+WMTS_VERSIONS = ("1.0.0",)
+VERSIONS = WMS_VERSIONS + tuple(f"wmts-{v}" for v in WMTS_VERSIONS)
+
+
+def service_version(version: str) -> tuple[Literal["WMS", "WMTS"], str]:
+    if version.startswith("wmts-"):
+        return "WMTS", version[5:]
+    return "WMS", version
+
 
 url_pattern = re.compile(
     r"^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/?]*)?$",
@@ -109,7 +121,7 @@ class WMSConnection(Resource):
     __scope__ = ConnectionScope
 
     url: Mapped[str] = mapped_column(sa.Unicode)
-    version: Mapped[str] = mapped_column(saext.Enum(*WMS_VERSIONS))
+    version: Mapped[str] = mapped_column(saext.Enum(*VERSIONS))
     username: Mapped[str | None] = mapped_column(sa.Unicode)
     password: Mapped[str | None] = mapped_column(sa.Unicode)
     insecure: Mapped[bool] = mapped_column(sa.Boolean, default=False)
@@ -130,17 +142,19 @@ class WMSConnection(Resource):
             and self.capcache_tstamp is not None
         )
 
-    def request_wms(self, request: str, query=None):
+    def request_wms(self, request: str, query=None) -> requests.Response:
         from .component import WMSClientComponent
 
         capcache = self.capcache_dict
         url = (capcache.get("urls", {}).get(request) if capcache else None) or self.url
         up = urlparse(url, allow_fragments=False)
 
+        service, version = service_version(self.version)
+
         query_main = dict(parse_qsl(up.query))
-        query_main["service"] = "WMS"
+        query_main["service"] = service
         query_main["request"] = request
-        query_main["version"] = self.version
+        query_main["version"] = version
         if query is not None:
             query_main.update(query)
 
@@ -187,28 +201,33 @@ class WMSConnection(Resource):
         self.capcache_tstamp = utcnow_naive()
         self.capcache_xml = response.content
 
+        service = service_version(self.version)[0]
+        version_supported = WMS_VERSIONS if service == "WMS" else WMTS_VERSIONS
+
         version = root.attrib["version"]
-        if version not in WMS_VERSIONS:
-            raise ValidationError(f"WMS version {version} not supported.")
+        if version not in version_supported:
+            raise ValidationError(f"{service} version {version} not supported.")
 
-        el_cap = find_tag(root, "Capability", must=True)
-
-        data = dict()
-        data["formats"] = get_capability_formats(el_cap)
-        data["layers"] = get_capability_layers(el_cap, version=version)
-        data["srs"] = get_capability_srs(el_cap, version=version)
-        data["urls"] = get_capability_urls(el_cap)
-
+        match service:
+            case "WMS":
+                el_cap = find_tag(root, "Capability", must=True)
+                data = dict()
+                data["formats"] = get_capability_formats(el_cap)
+                data["layers"] = get_capability_layers(el_cap, version=version)
+                data["srs"] = get_capability_srs(el_cap, version=version)
+                data["urls"] = get_capability_urls(el_cap)
+            case "WMTS":
+                wmts_capabilities = wmts.read_capabilities(root)
+                data = wmts_capabilities.to_dict()
+            case _:
+                raise NotImplementedError
         self.capcache_json = data
 
     def get_info(self):
-        result = s() if (s := getattr(super(), "get_info", None)) else ()
         if self.capcache_tstamp is not None:
-            result += (
-                (gettext("WMS capabilities"), self.capcache_tstamp),
-                (gettext("Image format"), ", ".join(self.capcache_dict["formats"])),
-            )
-        return result
+            yield gettext("WMS capabilities"), self.capcache_tstamp
+            if service_version(self.version)[0] == "WMS":
+                yield gettext("Image format"), ", ".join(self.capcache_dict["formats"])
 
     def capcache_clear(self):
         self.capcache_xml = None
@@ -236,18 +255,25 @@ class UrlAttr(SColumn):
         return super().set(srlzr, value, create=create)
 
 
-VersionEnum = (
-    str
-    if TYPE_CHECKING
-    else Annotated[
-        make_literal(WMS_VERSIONS),
+if TYPE_CHECKING:
+    VersionEnum = str
+else:
+    VersionEnum = Annotated[
+        make_literal(VERSIONS),
         TSExport("VersionEnum"),
     ]
-)
 
 
 class VersionAttr(SColumn):
     ctypes = CRUTypes(VersionEnum, VersionEnum, VersionEnum)
+
+    def set(self, srlzr: Serializer[WMSConnection], value: VersionEnum, *, create: bool):
+        if not create:
+            service_new = service_version(value)[0]
+            service_old = service_version(srlzr.obj.version)[0]
+            if service_old != service_new:
+                raise ValidationError("Service type can't be changed.")
+        super().set(srlzr, value, create=create)
 
 
 CapCacheEnum = Annotated[
@@ -270,7 +296,29 @@ class CapCache(Struct):
 
 class CapCacheAttr(SAttribute):
     def get(self, srlzr: Serializer) -> CapCache:
-        return srlzr.obj.capcache_dict
+        if service_version(srlzr.obj.version)[0] == "WMS":
+            return srlzr.obj.capcache_dict
+
+        result_layers = []
+        srids = set()
+        result_formats = set()
+        caps = wmts.WMTSCapabilities.from_dict(srlzr.obj.capcache_dict)
+        for layer_id, layer in caps.layers.items():
+            result_formats.update(layer.img_formats)
+            tmx_set = caps.tmx_sets[layer.tmx_set_identifier]
+            srids.add(tmx_set.srid)
+            result_layers.append(
+                WMSConnectionLayer(
+                    id=layer_id,
+                    title=layer.title,
+                    bbox=layer.bbox,
+                )
+            )
+        return CapCache(
+            layers=result_layers,
+            formats=list(result_formats),
+            srs=[f"EPSG:{srid}" for srid in srids],
+        )
 
     def set(self, srlzr: Serializer, value: CapCacheEnum, *, create: bool):
         if value == "query":
@@ -339,7 +387,12 @@ class WMSLayer(SpatialLayerMixin, Resource):
     def render_request(self, srs, cond=None):
         return RenderRequest(self, srs, cond)
 
-    def _wms_get_map(self, extent, size):
+    def _wms_get_map(self, extent, size) -> Image.Image | None:
+        connection = self.connection
+        service, version = service_version(connection.version)
+        if service == "WMTS":
+            return self._wmts_get_tiles(extent, size)
+
         query = dict(
             layers=self.wmslayers,
             styles="",
@@ -350,42 +403,79 @@ class WMSLayer(SpatialLayerMixin, Resource):
             transparent="true",
         )
         query.update(self.vendor_params)
-
-        srs_param = "crs" if self.connection.version == "1.3.0" else "srs"
+        srs_param = "crs" if version == "1.3.0" else "srs"
         query[srs_param] = "EPSG:%d" % self.remote_srs.id
-        response = self.connection.request_wms("GetMap", query)
 
-        if response.status_code == 200:
-            data = BytesIO(response.content)
-            try:
-                img = Image.open(data)
-            except OSError as exc:
-                code, msg = _extract_wms_error(response.content)
-                if (message := _wms_error_message(code, msg)) is not None:
-                    raise ExternalServiceError(
-                        message, data=response_diagnostics(response)
-                    ) from exc
-                raise ExternalServiceError(
-                    gettext("Image processing error."),
-                    detail=gettextf("Response Content-Type is {}.")(
-                        response.headers.get("Content-Type")
-                    ),
-                ) from exc
-            if img.mode != "RGBA":
-                img = img.convert("RGBA")
-            return img
-        elif response.status_code in (204, 404):
-            return None
-        else:
-            code, msg = _extract_wms_error(response.content)
-            if (message := _wms_error_message(code, msg)) is not None:
-                raise ExternalServiceError(message, data=response_diagnostics(response))
-            raise ExternalServiceError(
-                gettextf("The remote server returned an unexpected HTTP status code ({}).")(
-                    response.status_code
-                ),
-                data=response_diagnostics(response),
-            )
+        response = connection.request_wms("GetMap", query)
+        return _handle_image_response(response)
+
+    def _wmts_get_tiles(
+        self, extent: tuple[float, float, float, float], size: tuple[int, int]
+    ) -> Image.Image | None:
+        caps = wmts.WMTSCapabilities.from_dict(self.connection.capcache_dict)
+        layer = caps.layers[self.wmslayers]
+        tmx_set = caps.tmx_sets[layer.tmx_set_identifier]
+        assert self.remote_srs.auth_name == "EPSG" and tmx_set.srid == self.remote_srs.auth_srid
+
+        xmin, ymin, xmax, ymax = extent
+        res = (xmax - xmin) / size[0]  # Consider equal Y/X resolution
+        mpi = 0.00028
+        denom_search = res / mpi
+        denom_search *= 1.001  # It's OK if selected denom will be slightly bigger
+
+        tmx = tmx_set.lookup(denom_search, 2.0)
+        if tmx is None:
+            return
+
+        query = {
+            "layer": self.wmslayers,
+            "style": layer.style_default,
+            "format": self.imgformat,
+            "tilematrixset": layer.tmx_set_identifier,
+            "tilematrix": tmx.identifier,
+        }
+
+        tmx_res = tmx.scale_denom * mpi
+
+        tile_width_m = tmx_res * tmx.tile_width
+        tile_height_m = tmx_res * tmx.tile_height
+
+        min_col = math.floor((xmin - tmx.left) / tile_width_m)
+        max_col = math.floor((xmax - tmx.left) / tile_width_m)
+        min_row = math.floor((tmx.top - ymax) / tile_height_m)
+        max_row = math.floor((tmx.top - ymin) / tile_height_m)
+
+        width = (max_col - min_col + 1) * tmx.tile_width
+        height = (max_row - min_row + 1) * tmx.tile_height
+
+        img = None
+        for col in range(min_col, max_col + 1):
+            for row in range(min_row, max_row + 1):
+                if 0 <= col < tmx.matrix_width and 0 <= row < tmx.matrix_height:
+                    q = dict(tilerow=row, tilecol=col, **query)
+                    response = self.connection.request_wms("GetTile", q)
+                    sub_img = _handle_image_response(response)
+                    if sub_img is not None:
+                        if img is None:
+                            img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+
+                        paste_x = (col - min_col) * tmx.tile_width
+                        paste_y = (row - min_row) * tmx.tile_height
+                        img.paste(sub_img, (paste_x, paste_y))
+        if img is None:
+            return
+
+        crop_xmin = tmx.left + min_col * tile_width_m
+        crop_ymax = tmx.top - min_row * tile_height_m
+
+        crop_left = max(int((xmin - crop_xmin) / tmx_res), 0)
+        crop_top = max(int((crop_ymax - ymax) / tmx_res), 0)
+        crop_right = min(int((xmax - crop_xmin) / tmx_res), width)
+        crop_bottom = min(int((crop_ymax - ymin) / tmx_res), height)
+
+        img = img.crop((crop_left, crop_top, crop_right, crop_bottom))
+        img = img.resize(size)
+        return img
 
     def render_image(self, extent, size):
         if self.remote_srs.id == self.srs.id:
@@ -398,19 +488,23 @@ class WMSLayer(SpatialLayerMixin, Resource):
         if not self.connection.capcache():
             self.connection.capcache_query()
 
-        layers = self.wmslayers.split(",")
+        if service_version(self.connection.version)[0] == "WMTS":
+            caps = WMTSCapabilities.from_dict(self.connection.capcache_dict)
+            bbox = caps.layers[self.wmslayers].bbox
+        else:
+            layers = self.wmslayers.split(",")
 
-        bbox = [180.0, 90.0, -180.0, -90.0]
-        for layer in self.connection.capcache_dict["layers"]:
-            if layer["id"] not in layers:
-                continue
-            if layer.get("bbox") is None:
-                bbox = [-180.0, -90.0, 180.0, 90.0]
-                break
-            bbox[0] = min(layer["bbox"][0], bbox[0])
-            bbox[1] = min(layer["bbox"][1], bbox[1])
-            bbox[2] = max(layer["bbox"][2], bbox[2])
-            bbox[3] = max(layer["bbox"][3], bbox[3])
+            bbox = [180.0, 90.0, -180.0, -90.0]
+            for layer in self.connection.capcache_dict["layers"]:
+                if layer["id"] not in layers:
+                    continue
+                if layer.get("bbox") is None:
+                    bbox = [-180.0, -90.0, 180.0, 90.0]
+                    break
+                bbox[0] = min(layer["bbox"][0], bbox[0])
+                bbox[1] = min(layer["bbox"][1], bbox[1])
+                bbox[2] = max(layer["bbox"][2], bbox[2])
+                bbox[3] = max(layer["bbox"][3], bbox[3])
 
         return dict(
             minLon=bbox[0],
@@ -434,3 +528,35 @@ class WMSLayerSerializer(Serializer, resource=WMSLayer):
     vendor_params = VendorParamsAttr(read=ResourceScope.read, write=ResourceScope.update)
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
     remote_srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
+
+
+def _handle_image_response(response: requests.Response) -> Image.Image | None:
+    if response.status_code == 200:
+        data = BytesIO(response.content)
+        try:
+            img = Image.open(data)
+        except OSError as exc:
+            code, msg = _extract_wms_error(response.content)
+            if (message := _wms_error_message(code, msg)) is not None:
+                raise ExternalServiceError(message, data=response_diagnostics(response)) from exc
+            raise ExternalServiceError(
+                gettext("Image processing error."),
+                detail=gettextf("Response Content-Type is {}.")(
+                    response.headers.get("Content-Type")
+                ),
+            ) from exc
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
+        return img
+    elif response.status_code in (204, 404):
+        return None
+    else:
+        code, msg = _extract_wms_error(response.content)
+        if (message := _wms_error_message(code, msg)) is not None:
+            raise ExternalServiceError(message, data=response_diagnostics(response))
+        raise ExternalServiceError(
+            gettextf("The remote server returned an unexpected HTTP status code ({}).")(
+                response.status_code
+            ),
+            data=response_diagnostics(response),
+        )

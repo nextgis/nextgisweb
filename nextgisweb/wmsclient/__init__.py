@@ -1,8 +1,7 @@
 from .component import WMSClientComponent
-from .model import WMS_VERSIONS, WMSConnection, WMSLayer
+from .model import WMSConnection, WMSLayer
 
 __all__ = [
-    "WMS_VERSIONS",
     "WMSClientComponent",
     "WMSConnection",
     "WMSLayer",
