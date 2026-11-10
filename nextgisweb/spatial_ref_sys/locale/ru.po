@@ -6,22 +6,6 @@ msgstr "Системная СК не может быть удалена."
 msgid "Invalid SRS definition!"
 msgstr "Неверное определение SRS!"
 
-#: api.py:352
-msgid "The remote server returned an unexpected HTTP status code ({})."
-msgstr "Удаленный сервер вернул неожиданный код статуса HTTP ({})."
-
-#: api.py:360
-msgid "Unable to get a response from the remote server."
-msgstr "Не удалось получить ответ от удаленного сервера."
-
-#: api.py:368
-msgid "Failed to parse the JSON response from the remote server."
-msgstr "Не удалось разобрать JSON-ответ от удаленного сервера."
-
-#: api.py:460
-msgid "SRS authority attributes must be defined while importing from the catalog."
-msgstr "Аттрибуты организации СК должны быть указаны при импорте из каталога."
-
 #: api.py:482
 msgid "SRS #{} already exists."
 msgstr "СК #{} уже существует."
@@ -40,10 +24,6 @@ msgstr "Неверное определение OGC WKT!"
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:116
-msgid "Show in catalog"
-msgstr "Показать в каталоге"
-
 #: nodepkg/catalog-browse/CatalogBrowse.tsx:130 nodepkg/srs-widget/SRSWidget.tsx:41
 msgid "Authority and code"
 msgstr "Источник и код"
@@ -57,21 +37,9 @@ msgstr "Импорт"
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:178
-msgid "Latitude"
-msgstr "Широта"
-
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:192
-msgid "Longitude"
-msgstr "Долгота"
-
 #: nodepkg/catalog-import/CatalogImport.tsx:50 nodepkg/srs-widget/SRSWidget.tsx:48
 msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
-
-#: nodepkg/catalog-import/CatalogImport.tsx:98
-msgid "View details"
-msgstr "Подробнее"
 
 #: nodepkg/control-panel-plugin.tsx:39
 msgid "List"

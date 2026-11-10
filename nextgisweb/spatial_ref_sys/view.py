@@ -1,7 +1,5 @@
 from typing import Annotated
 
-from msgspec import Struct
-
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype.param import Path
 
@@ -9,7 +7,7 @@ from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import client_setting
 from nextgisweb.pyramid.tomb import Configurator, Request
 
-from .component import CatalogSource, SpatialRefSysComponent
+from .component import SpatialRefSysComponent
 from .model import SRS, SRSRef
 from .pyramid import srs_factory
 
@@ -57,37 +55,15 @@ def catalog_browse(request: Request):
 def catalog_import(request: Request, catalog_id: Annotated[int, Path(name="id")]):
     request.user.require_permission(SRS.permissions.manage)
 
-    catalog_url = request.env.component(SpatialRefSysComponent).options["catalog.url"]
-    item_url = (catalog_url + "/srs/" + str(catalog_id)) if catalog_url else None
     return dict(
         title=gettext("Spatial reference system") + " #%d" % catalog_id,
-        props=dict(url=item_url, id=catalog_id),
+        props=dict(id=catalog_id),
     )
 
 
 @client_setting("default")
 def cs_default(comp: SpatialRefSysComponent, request: Request) -> SRSRef:
     return SRSRef(id=3857)
-
-
-class SpatialRefSysCatalogClientSetting(Struct, kw_only=True, rename="camel"):
-    source: CatalogSource
-    url: str | None
-    coordinates_search: bool
-
-
-@client_setting("catalog")
-def cs_catalog(
-    comp: SpatialRefSysComponent, request: Request
-) -> SpatialRefSysCatalogClientSetting:
-    source = comp.catalog_source
-    return SpatialRefSysCatalogClientSetting(
-        source=source,
-        url=comp.options["catalog.url"] if source == CatalogSource.REMOTE else None,
-        coordinates_search=comp.options["catalog.coordinates_search"]
-        if source == CatalogSource.REMOTE
-        else False,
-    )
 
 
 def setup_pyramid(comp: SpatialRefSysComponent, config: Configurator):
