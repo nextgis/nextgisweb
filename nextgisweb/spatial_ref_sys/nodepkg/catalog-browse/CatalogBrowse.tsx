@@ -2,30 +2,23 @@ import { useEffect, useMemo, useState } from "react";
 
 import {
   Button,
-  Divider,
   Form,
   Input,
-  InputNumber,
   Space,
   Table,
   Tooltip,
 } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
-import { OpenInNewIcon, SearchIcon } from "@nextgisweb/gui/icon";
+import { SearchIcon } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import InputOutlineIcon from "@nextgisweb/icon/material/input";
 
-const { coordinatesSearch, source, url: catalogUrl } = settings.catalog;
-
 interface Query {
   q?: string;
-  lat?: number;
-  lon?: number;
 }
 
 interface SRSRow extends SRSRead {
@@ -47,30 +40,15 @@ export function CatalogBrowse({
     () =>
       lockedCode ?? new URLSearchParams(window.location.search).get("q") ?? ""
   );
-  const [lon, setLon] = useState<number | null>(null);
-  const [lat, setLat] = useState<number | null>(null);
-
   const [rows, setRows] = useState<SRSRow[]>([]);
-
-  const latLon = useMemo(
-    () => (lon !== null && lat !== null ? [lat, lon] : null),
-    [lat, lon]
-  );
 
   const query = useMemo(() => {
     const q: Query = {};
-    if ((search && search.length > 1) || latLon) {
-      if (search) {
-        q.q = search;
-      }
-      if (latLon) {
-        q.lat = latLon[0];
-        q.lon = latLon[1];
-      }
-      return q;
+    if (search && search.length > 1) {
+      q.q = search;
     }
     return q;
-  }, [search, latLon]);
+  }, [search]);
 
   const { data: srs, isLoading } = useRouteGet<SRSRead[]>({
     name: "spatial_ref_sys.catalog.collection",
@@ -109,22 +87,6 @@ export function CatalogBrowse({
       dataIndex: "display_name",
       key: "display_name",
       sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
-      render: (text, record) => (
-        <>
-          {text}{" "}
-          {source === "remote" && (
-            <Tooltip title={gettext("Show in catalog")}>
-              <a
-                href={catalogUrl + "/srs/" + record.id}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <OpenInNewIcon />
-              </a>
-            </Tooltip>
-          )}
-        </>
-      ),
     },
     {
       title: gettext("Authority and code"),
@@ -166,41 +128,6 @@ export function CatalogBrowse({
           disabled={!!lockedCode}
         />
       </Form.Item>
-      {coordinatesSearch && !lockedCode ? (
-        <>
-          <Form.Item style={{ height: "100%" }}>
-            <Divider type="vertical" />
-          </Form.Item>
-          <Form.Item>
-            <Space.Compact>
-              <InputNumber
-                style={{ maxWidth: "10em" }}
-                placeholder={gettext("Latitude")}
-                value={lat}
-                type="number"
-                onChange={(e) => {
-                  setLat(e);
-                }}
-              />
-              <Space.Addon>°</Space.Addon>
-            </Space.Compact>
-          </Form.Item>
-          <Form.Item>
-            <Space.Compact>
-              <InputNumber
-                style={{ maxWidth: "10em" }}
-                placeholder={gettext("Longitude")}
-                value={lon}
-                type="number"
-                onChange={(e) => {
-                  setLon(e);
-                }}
-              />
-              <Space.Addon>°</Space.Addon>
-            </Space.Compact>
-          </Form.Item>
-        </>
-      ) : null}
     </Form>
   );
 

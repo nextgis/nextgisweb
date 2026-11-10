@@ -12,7 +12,6 @@ CREATE TABLE srs (
     miny double precision,
     maxx double precision,
     maxy double precision,
-    catalog_id integer,
     PRIMARY KEY (id),
     CONSTRAINT srs_id_check CHECK (id > 0 AND id <= 998999),
     CONSTRAINT srs_auth_check CHECK ((
@@ -21,8 +20,7 @@ CREATE TABLE srs (
     OR (
         auth_name IS NOT NULL AND auth_srid IS NOT NULL
     )),
-    CONSTRAINT srs_auth_unique UNIQUE (auth_name, auth_srid),
-    UNIQUE (catalog_id)
+    CONSTRAINT srs_auth_unique UNIQUE (auth_name, auth_srid)
 );
 
 COMMENT ON TABLE srs IS 'spatial_ref_sys';

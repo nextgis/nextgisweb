@@ -63,8 +63,6 @@ class SRS(Base):
     maxx: Mapped[float | None] = mapped_column(sa.Float)
     maxy: Mapped[float | None] = mapped_column(sa.Float)
 
-    catalog_id: Mapped[int | None] = mapped_column(sa.Integer, unique=True)
-
     class permissions:
         view = Permission("view", gettext("Spatial reference systems"), "view")
         manage = Permission("manage", gettext("Spatial reference systems"), "manage")
@@ -186,7 +184,7 @@ class SRS(Base):
 
     @property
     def protected(self):
-        return bool(self.auth_name or self.auth_srid or self.catalog_id)
+        return bool(self.auth_name or self.auth_srid)
 
 
 _sql_after_create = dedent("""

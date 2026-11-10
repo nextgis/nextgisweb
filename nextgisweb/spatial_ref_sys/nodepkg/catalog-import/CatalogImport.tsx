@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { Button, Form, Input } from "@nextgisweb/gui/antd";
+import { Form, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -8,30 +8,15 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type { SRSCatalogItem } from "@nextgisweb/spatial-ref-sys/type/api";
 
-const { url: catalogUrl } = settings.catalog;
-
 interface CatalogImportProps {
-  url?: string | null;
   id: number;
   onImported?: (srs: { id: number }) => void;
 }
 
-export function CatalogImport({
-  url: urlProp,
-  id,
-  onImported,
-}: CatalogImportProps) {
+export function CatalogImport({ id, onImported }: CatalogImportProps) {
   const [status, setStatus] = useState<string | null>(null);
-
-  const url =
-    urlProp !== undefined
-      ? urlProp
-      : catalogUrl
-        ? `${catalogUrl}/srs/${id}`
-        : null;
 
   const { data, isLoading, error } = useRouteGet({
     name: "spatial_ref_sys.catalog.item",
@@ -61,10 +46,6 @@ export function CatalogImport({
     return null;
   }
 
-  const showSrsDetailInfo = () => {
-    window.open(url ?? undefined, "_blank");
-  };
-
   const importSrs = async () => {
     setStatus("importing");
     try {
@@ -87,18 +68,6 @@ export function CatalogImport({
 
   return (
     <FieldsForm fields={fields} initialValues={data}>
-      {url && (
-        <Form.Item>
-          <Button
-            onClick={showSrsDetailInfo}
-            type="link"
-            size="small"
-            style={{ padding: 0 }}
-          >
-            {gettext("View details")}
-          </Button>
-        </Form.Item>
-      )}
       <Form.Item>
         <SaveButton
           onClick={importSrs}

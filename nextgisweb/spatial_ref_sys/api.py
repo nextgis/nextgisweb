@@ -1,24 +1,19 @@
-import json
 from typing import Annotated, Any, Literal
 
-import requests
 from msgspec import UNSET, Meta, Struct, UnsetType
 from pyproj import CRS
 from pyproj.database import query_crs_info
-from requests.exceptions import HTTPError, JSONDecodeError, RequestException
 from sqlalchemy import sql
 
 from nextgisweb.env import DBSession, gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON, EmptyObject, StatusCode
 from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_length
-from nextgisweb.lib.logging import logger
-from nextgisweb.lib.reqext import response_diagnostics
 
-from nextgisweb.core.exception import ExternalServiceError, ValidationError
+from nextgisweb.core.exception import ValidationError
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.pyramid.tomb import Configurator, Request
 
-from .component import CatalogSource, SpatialRefSysComponent
+from .component import SpatialRefSysComponent
 from .model import SRS, WKT_EPSG_4326, SRSRef
 from .pyramid import SRSID, srs_factory
 from .util import SRSFormat, convert_to_wkt
@@ -29,7 +24,6 @@ class CatalogEntry(Struct, kw_only=True):
     wkt: str
     auth_name: str
     auth_srid: int
-    catalog_id: int | None = None
 
 
 def proj_catalog_search(q: str, limit: int = 100) -> list:
@@ -86,7 +80,6 @@ class SRSRead(Struct, kw_only=True):
     auth_name: Annotated[str | None, AuthNameMeta]
     auth_srid: Annotated[int | None, AuthSRIDMeta]
     wkt: SRSWKT
-    catalog_id: Annotated[CatalogID | None, CatalogIDMeta]
     system: SRSSystem
     protected: SRSProtected
     geographic: SRSGeographic
@@ -104,7 +97,6 @@ def serialize(obj: SRS) -> SRSRead:
         auth_name=obj.auth_name,
         auth_srid=obj.auth_srid,
         wkt=obj.wkt,
-        catalog_id=obj.catalog_id,
         system=obj.system,
         protected=obj.protected,
         geographic=obj.is_geographic,
@@ -333,92 +325,25 @@ QueryStr = Annotated[
     Meta(description="Query for name or code based search", examples=["UTM Zone 42N", "4326"]),
 ]
 
-QueryLat = Annotated[float | None, Meta(description="Latitude", examples=[27.9881])]
-QueryLon = Annotated[float | None, Meta(description="Longitude", examples=[86.9250])]
-
-
-def _remote_catalog_get(url: str, params: dict | None = None, *, timeout: float) -> Any:
-    """GET a JSON document from the remote catalog
-
-    Translates request/response failures into ExternalServiceError."""
-    try:
-        res = requests.get(url, params, timeout=timeout)
-        # raise_for_status() is the only call above that can raise
-        # HTTPError; requests.get() itself only raises other
-        # RequestException subclasses (connection errors, timeouts...).
-        res.raise_for_status()
-    except HTTPError as exc:
-        raise ExternalServiceError(
-            gettextf("The remote server returned an unexpected HTTP status code ({}).")(
-                res.status_code
-            ),
-            data=response_diagnostics(res),
-        ) from exc
-    except RequestException as exc:
-        logger.warning("External service request failed: %s: %s", type(exc).__name__, exc)
-        raise ExternalServiceError(
-            gettext("Unable to get a response from the remote server."),
-            detail=f"{type(exc).__name__}.",
-        ) from exc
-
-    try:
-        return res.json()
-    except JSONDecodeError as exc:
-        raise ExternalServiceError(
-            gettext("Failed to parse the JSON response from the remote server."),
-            data=response_diagnostics(res),
-        ) from exc
-
 
 def catalog_collection(
     request: Request,
     *,
     q: QueryStr = None,
-    lat: QueryLat = None,
-    lon: QueryLon = None,
 ) -> AsJSON[list[SRSCatalogRecord]]:
     """Search SRS in catalog
 
     :returns: List of matching spatial reference systems from the catalog"""
     request.require_administrator()
 
-    comp = request.env.component(SpatialRefSysComponent)
-
-    if comp.catalog_source == CatalogSource.PROJ:
-        return [
-            SRSCatalogRecord(
-                id=int(r.code),
-                display_name=r.name,
-                auth_name=r.auth_name,
-                auth_srid=int(r.code),
-            )
-            for r in proj_catalog_search(q or "")
-        ]
-
-    query = dict()
-
-    if q is not None:
-        query["q"] = q
-
-    if comp.options["catalog.coordinates_search"]:
-        if lat is not None and lon is not None:
-            query["intersects"] = json.dumps(
-                dict(type="Point", coordinates=(lon, lat)),
-            )
-
-    catalog_url = comp.options["catalog.url"]
-    url = catalog_url + "/api/v1/spatial_ref_sys/"
-    timeout = comp.options["catalog.timeout"].total_seconds()
-    catalog_data = _remote_catalog_get(url, query, timeout=timeout)
-
     return [
         SRSCatalogRecord(
-            id=srs["id"],
-            display_name=srs["display_name"],
-            auth_name=srs["auth_name"],
-            auth_srid=srs["auth_srid"],
+            id=int(r.code),
+            display_name=r.name,
+            auth_name=r.auth_name,
+            auth_srid=int(r.code),
         )
-        for srs in catalog_data
+        for r in proj_catalog_search(q or "")
     ]
 
 
@@ -428,11 +353,7 @@ def catalog_item(request: Request, id: Annotated[CatalogID, CatalogIDMeta]) -> S
     :returns: Spatial reference system details from the catalog"""
     request.require_administrator()
 
-    entry = (
-        proj_catalog_item(id)
-        if request.env.component(SpatialRefSysComponent).catalog_source == CatalogSource.PROJ
-        else remote_catalog_item(id)
-    )
+    entry = proj_catalog_item(id)
     return SRSCatalogItem(display_name=entry.display_name, wkt=entry.wkt)
 
 
@@ -450,32 +371,20 @@ def catalog_import(request: Request, *, body: SRSCatalogImportBody) -> SRSCatalo
     :returns: Imported spatial reference system"""
     request.require_administrator()
 
-    entry = (
-        proj_catalog_item(int(body.catalog_id))
-        if request.env.component(SpatialRefSysComponent).catalog_source == CatalogSource.PROJ
-        else remote_catalog_item(int(body.catalog_id))
-    )
-
-    if entry.auth_name is None or entry.auth_srid is None:
-        msg = gettext("SRS authority attributes must be defined while importing from the catalog.")
-        raise ValidationError(msg)
+    entry = proj_catalog_item(int(body.catalog_id))
 
     obj = SRS(
         display_name=entry.display_name,
         wkt=entry.wkt,
         auth_name=entry.auth_name,
         auth_srid=entry.auth_srid,
-        catalog_id=entry.catalog_id,
     )
+    obj.id = entry.auth_srid
 
     conflict_filter = [
         sql.and_(SRS.auth_name == entry.auth_name, SRS.auth_srid == entry.auth_srid),
+        SRS.id == entry.auth_srid,
     ]
-    if entry.catalog_id is not None:
-        conflict_filter.append(SRS.catalog_id == entry.catalog_id)
-    if entry.auth_srid is not None:
-        obj.id = entry.auth_srid
-        conflict_filter.append(SRS.id == entry.auth_srid)
 
     conflict = SRS.filter(sql.or_(*conflict_filter)).first()
     if conflict:
@@ -485,21 +394,6 @@ def catalog_import(request: Request, *, body: SRSCatalogImportBody) -> SRSCatalo
     DBSession.flush()
 
     return SRSCatalogImportResponse(id=obj.id)
-
-
-def remote_catalog_item(catalog_id: int) -> CatalogEntry:
-    catalog_url = SpatialRefSysComponent.current().options["catalog.url"]
-    url = catalog_url + "/api/v1/spatial_ref_sys/" + str(catalog_id)
-    timeout = SpatialRefSysComponent.current().options["catalog.timeout"].total_seconds()
-    srs = _remote_catalog_get(url, timeout=timeout)
-
-    return CatalogEntry(
-        display_name=srs["display_name"],
-        wkt=srs["wkt"],
-        auth_name=srs["auth_name"],
-        auth_srid=srs["auth_srid"],
-        catalog_id=srs["id"],
-    )
 
 
 def setup_pyramid(comp: SpatialRefSysComponent, config: Configurator):
