@@ -106,28 +106,7 @@ class PyramidComponent(Component):
             self.options["lunkwill.enabled"] = lunkwill_rpc
 
         if self.options["lunkwill.enabled"]:
-            if self.options["lunkwill.proxy"]:
-                for optk, optt, optd in (("host", str, "127.0.0.1"), ("port", int, 8042)):
-                    optn = f"lunkwill.{optk}"
-                    if self.options[optn] is not None:
-                        continue
-                    opte = f"LUNKWILL_{optk.upper()}"
-                    if optv := getenv(opte):
-                        logger.debug("Using %s = %s (from %s)", optn, optv, opte)
-                        self.options[optn] = optt(optv)
-                    else:
-                        logger.debug("Using %s = %s (default)", optn, str(optd))
-                        self.options[optn] = optd
-                logger.debug(
-                    "Lunkwill extension proxy to %s:%d",
-                    self.options["lunkwill.host"],
-                    self.options["lunkwill.port"],
-                )
-                if self.options["lunkwill.hmux"]:
-                    raise NotImplementedError("Lunkwill hmux requires external interception mode")
-
-            else:
-                logger.debug("Lunkwill extension with external interception")
+            logger.debug("Lunkwill extension with external interception")
 
             if uwsgi is None:
                 raise RuntimeError("Lunkwill requires uWSGI stack loaded")
@@ -192,10 +171,7 @@ class PyramidComponent(Component):
             "directive for ngx_http_proxy module for details.")),
 
         Option("lunkwill.enabled", bool, default=None),
-        Option("lunkwill.proxy", bool, default=True),
         Option("lunkwill.hmux", bool, default=False),
-        Option("lunkwill.host", str, default=None),
-        Option("lunkwill.port", int, default=None),
 
         Option("compression.algorithms", list, default=['br', 'gzip']),
     )) + uacompat.option_annotations
