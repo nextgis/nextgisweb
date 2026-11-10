@@ -12,15 +12,14 @@ const MapLoadingIndicatorControl = observer((props: MapControlProps) => {
 
   return (
     mapStore.isLoading && (
-      <MapControl {...props}>
-        <div
-          className="ol-unselectable"
-          style={{
-            paddingInline: "5px",
-          }}
-        >
-          <Spin />
-        </div>
+      <MapControl
+        {...props}
+        className="ol-unselectable"
+        style={{
+          paddingInline: "5px",
+        }}
+      >
+        <Spin size="small" />
       </MapControl>
     )
   );
