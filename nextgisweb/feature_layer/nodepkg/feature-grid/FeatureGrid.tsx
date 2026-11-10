@@ -2,7 +2,7 @@ import { isEqual } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 
-import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Empty } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
@@ -98,24 +98,22 @@ export const FeatureGrid = observer(
     return (
       <div className="ngw-feature-layer-feature-grid">
         <FeatureGridActions store={store} editorProps={editorProps}>
-          <Tooltip title={msgRefreshTitle}>
-            <Button
-              type="text"
-              icon={<RefreshIcon />}
-              onClick={bumpVersion}
-              size={size}
-            />
-          </Tooltip>
-          <Tooltip title={msgSettingsTitle}>
-            <Button
-              type="text"
-              icon={<TuneIcon />}
-              onClick={() => {
-                store.setSettingsOpen(!store.settingsOpen);
-              }}
-              size={size}
-            />
-          </Tooltip>
+          <Button
+            title={msgRefreshTitle}
+            type="text"
+            icon={<RefreshIcon />}
+            onClick={bumpVersion}
+            size={size}
+          />
+          <Button
+            title={msgSettingsTitle}
+            type="text"
+            icon={<TuneIcon />}
+            onClick={() => {
+              store.setSettingsOpen(!store.settingsOpen);
+            }}
+            size={size}
+          />
         </FeatureGridActions>
 
         <FeatureTable

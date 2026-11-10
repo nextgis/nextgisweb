@@ -8,7 +8,7 @@ import type {
   ActionToolbarAction,
   CreateButtonActionProps,
 } from "@nextgisweb/gui/action-toolbar";
-import { Button, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Input, Space } from "@nextgisweb/gui/antd";
 import { useConfirm } from "@nextgisweb/gui/hook/useConfirm";
 import {
   AddIcon,
@@ -161,28 +161,27 @@ export const FeatureGridActions = observer(
     const defActions: ActionToolbarAction<ActionProps>[] = [
       (props: CreateButtonActionProps) => (
         <Space.Compact key="feature-item-open">
-          <Tooltip title={!props.isFit && msgOpenTitle}>
-            <Button
-              disabled={!selectedIds.length}
-              size={size}
-              onClick={onOpenClick}
-            >
-              {props.isFit && msgOpenTitle}
-            </Button>
-          </Tooltip>
+          <Button
+            title={props.isFit ? undefined : msgOpenTitle}
+            disabled={!selectedIds.length}
+            size={size}
+            onClick={onOpenClick}
+          >
+            {props.isFit && msgOpenTitle}
+          </Button>
 
-          <Tooltip title={msgOpenOnNewPage} key="open-new-page">
-            <Button
-              disabled={!selectedIds.length}
-              size={size}
-              onClick={() => {
-                if (selectedIds.length) {
-                  goTo("feature_layer.feature.show");
-                }
-              }}
-              icon={<OpenInNewIcon />}
-            />
-          </Tooltip>
+          <Button
+            title={msgOpenOnNewPage}
+            key="open-new-page"
+            disabled={!selectedIds.length}
+            size={size}
+            onClick={() => {
+              if (selectedIds.length) {
+                goTo("feature_layer.feature.show");
+              }
+            }}
+            icon={<OpenInNewIcon />}
+          />
         </Space.Compact>
       ),
     ];
@@ -193,62 +192,60 @@ export const FeatureGridActions = observer(
           (props: CreateButtonActionProps) => (
             <Space.Compact key="feature-item-edit">
               {canCreate && (
-                <Tooltip title={!props.isFit && msgCreate}>
-                  <Button
-                    size={size}
-                    icon={<AddIcon />}
-                    onClick={() => {
-                      showModal(FeatureEditorModalLazy, {
-                        editorOptions: {
-                          resourceId: id,
-                          onSave,
-                          ...(editorProps ?? {}),
-                        },
-                      });
-                    }}
-                  >
-                    {props.isFit && msgCreate}
-                  </Button>
-                </Tooltip>
-              )}
-              <Tooltip title={!props.isFit && msgEditTitle}>
                 <Button
-                  disabled={!selectedIds.length}
+                  title={props.isFit ? undefined : msgCreate}
                   size={size}
-                  icon={<EditIcon />}
+                  icon={<AddIcon />}
                   onClick={() => {
-                    if (selectedIds.length) {
-                      const featureId = selectedIds[0];
-                      showModal(FeatureEditorModalLazy, {
-                        editorOptions: {
-                          featureId,
-                          resourceId: id,
-                          onSave: (e) => {
-                            if (onSave) {
-                              onSave(e);
-                            }
-                            store.bumpVersion();
-                          },
-                          ...(editorProps ?? {}),
-                        },
-                      });
-                    }
+                    showModal(FeatureEditorModalLazy, {
+                      editorOptions: {
+                        resourceId: id,
+                        onSave,
+                        ...(editorProps ?? {}),
+                      },
+                    });
                   }}
                 >
-                  {props.isFit && msgEditTitle}
+                  {props.isFit && msgCreate}
                 </Button>
-              </Tooltip>
+              )}
+              <Button
+                title={props.isFit ? undefined : msgEditTitle}
+                disabled={!selectedIds.length}
+                size={size}
+                icon={<EditIcon />}
+                onClick={() => {
+                  if (selectedIds.length) {
+                    const featureId = selectedIds[0];
+                    showModal(FeatureEditorModalLazy, {
+                      editorOptions: {
+                        featureId,
+                        resourceId: id,
+                        onSave: (e) => {
+                          if (onSave) {
+                            onSave(e);
+                          }
+                          store.bumpVersion();
+                        },
+                        ...(editorProps ?? {}),
+                      },
+                    });
+                  }
+                }}
+              >
+                {props.isFit && msgEditTitle}
+              </Button>
               {editOnNewPage && (
-                <Tooltip title={msgEditOnNewPage} key="leftButton">
-                  <Button
-                    disabled={!selectedIds.length}
-                    size={size}
-                    onClick={() => {
-                      goTo("feature_layer.feature.update");
-                    }}
-                    icon={<OpenInNewIcon />}
-                  />
-                </Tooltip>
+                <Button
+                  title={msgEditOnNewPage}
+                  key="leftButton"
+                  disabled={!selectedIds.length}
+                  size={size}
+                  onClick={() => {
+                    goTo("feature_layer.feature.update");
+                  }}
+                  icon={<OpenInNewIcon />}
+                />
               )}
             </Space.Compact>
           ),
@@ -271,14 +268,13 @@ export const FeatureGridActions = observer(
       resourceData?.resource?.interfaces?.includes("IFilterableFeatureLayer")
     ) {
       advancedButton = (
-        <Tooltip title={msgFilterTitle}>
-          <Button
-            icon={<FilterAltIcon />}
-            onClick={handleAdvancedFilterClick}
-            size={size}
-            type={filterExpression ? "primary" : "default"}
-          />
-        </Tooltip>
+        <Button
+          title={msgFilterTitle}
+          icon={<FilterAltIcon />}
+          onClick={handleAdvancedFilterClick}
+          size={size}
+          type={filterExpression ? "primary" : "default"}
+        />
       );
     }
 

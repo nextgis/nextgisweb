@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 
-import { Button, Tooltip } from "@nextgisweb/gui/antd";
+import { Button } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
@@ -72,16 +72,15 @@ const FilteredCountExpanded = observer(
     const tooltipText = displayText || gettext("Feature count");
 
     return (
-      <Tooltip title={tooltipText}>
-        <Button
-          type="default"
-          size={size}
-          icon={<TagIcon />}
-          onClick={handleToggle}
-        >
-          {displayText}
-        </Button>
-      </Tooltip>
+      <Button
+        title={tooltipText}
+        type="default"
+        size={size}
+        icon={<TagIcon />}
+        onClick={handleToggle}
+      >
+        {displayText}
+      </Button>
     );
   }
 );
@@ -103,14 +102,13 @@ const FilteredCount = observer(({ store }: FilteredCountProps) => {
 
   if (!expanded) {
     return (
-      <Tooltip title={gettext("Feature count")}>
-        <Button
-          type="default"
-          size={size}
-          icon={<TagIcon />}
-          onClick={handleToggle}
-        />
-      </Tooltip>
+      <Button
+        title={gettext("Feature count")}
+        type="default"
+        size={size}
+        icon={<TagIcon />}
+        onClick={handleToggle}
+      />
     );
   }
 
