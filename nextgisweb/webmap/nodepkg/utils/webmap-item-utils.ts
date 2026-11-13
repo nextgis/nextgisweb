@@ -156,6 +156,7 @@ export async function styleToWebmapItem({
     "@nextgisweb/webmap/plugin/layer-remove": true,
     "@nextgisweb/webmap/plugin/style-resource-editor": true,
     "@nextgisweb/webmap/plugin/layer-resource-editor": true,
+    "@nextgisweb/webmap/plugin/layer-photo": true,
   };
 
   const parentId = style.parent.id;

@@ -9,6 +9,7 @@ from . import (
     layer_identifiable,
     layer_info,
     layer_opacity,
+    layer_photo,
     layer_properties,
     layer_remove,
     layer_resource_editor,
