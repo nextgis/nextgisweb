@@ -1,0 +1,43 @@
+.ngw-webmap-photo-panel {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+
+  > .strip {
+    display: flex;
+    flex-grow: 1;
+    gap: 8px;
+    padding: 8px;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-gutter: stable;
+  }
+
+  > .loading {
+    position: absolute;
+    inset: 0;
+    background-color: var(--divider-color);
+  }
+
+  > .placeholder {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    inset: 0;
+    background-color: var(--divider-color);
+    padding: 16px;
+    color: var(--text-secondary);
+    text-align: center;
+
+    > svg.icon {
+      color: var(--icon-color);
+      font-size: 48px;
+    }
+  }
+}

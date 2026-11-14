@@ -14,10 +14,10 @@ export class PhotoStore {
     topic.subscribe(
       "feature.updated",
       ({ resourceId }: { resourceId: number }) =>
-        this.getLayer(resourceId).check()
+        this.getLayer(resourceId).refresh()
     );
     topic.subscribe("/webmap/feature-table/refresh", (resourceId: number) =>
-      this.getLayer(resourceId).check()
+      this.getLayer(resourceId).refresh()
     );
   }
 
