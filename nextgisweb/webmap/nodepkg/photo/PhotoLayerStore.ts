@@ -4,7 +4,7 @@ import type { FeatureAttachment } from "@nextgisweb/feature-attachment/type";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { route } from "@nextgisweb/pyramid/api";
 
-export interface PhotoId {
+export interface Photo {
   featureId: number;
   attachmentId: number;
 }
@@ -12,54 +12,90 @@ export interface PhotoId {
 export class PhotoLayerStore {
   readonly layerId: number;
 
-  @observableRef accessor photos: PhotoId[] = [];
-  @observableRef accessor hasPhotos: boolean;
+  @observableRef accessor visiblePhotos: Photo[] | undefined = undefined;
+  @observableRef accessor layerHasPhotos: boolean;
+
   @observableRef accessor isLoading = false;
   @observableRef accessor error: unknown = undefined;
 
-  constructor(layerId: number, hasPhotos: boolean) {
+  private loadController?: AbortController;
+  private checkController?: AbortController;
+
+  constructor({
+    layerId,
+    hasInitialPhotos,
+  }: {
+    layerId: number;
+    hasInitialPhotos: boolean;
+  }) {
     this.layerId = layerId;
-    this.hasPhotos = hasPhotos;
+    this.layerHasPhotos = hasInitialPhotos;
   }
 
-  async load(signal?: AbortSignal) {
+  async load() {
+    this.loadController?.abort();
+    const ctrl = new AbortController();
+    this.loadController = ctrl;
+    const { signal } = ctrl;
+
     this.setLoading(true);
     try {
       const photos = await this.fetchPhotos(signal);
-      if (signal?.aborted) return;
-      this.setPhotos(photos ?? []);
+      if (signal.aborted) return;
+      this.setVisiblePhotos(photos ?? []);
     } catch (err) {
-      if (signal?.aborted) return;
+      if (signal.aborted) return;
       this.setError(err);
-      throw err;
     } finally {
-      this.setLoading(false);
+      if (this.loadController === ctrl) {
+        this.loadController = undefined;
+        this.setLoading(false);
+      }
     }
   }
 
-  async check(signal?: AbortSignal) {
+  abortLoad() {
+    if (!this.loadController) return;
+    this.loadController.abort();
+    this.loadController = undefined;
+    this.setLoading(false);
+  }
+
+  async check() {
+    this.checkController?.abort();
+    const ctrl = new AbortController();
+    this.checkController = ctrl;
+    const { signal } = ctrl;
+
     let found = false;
     try {
       await this.fetchPhotos(signal, () => {
         found = true;
       });
-    } catch (err) {
-      if (signal?.aborted) return;
-      throw err;
+    } catch {
+      return;
+    } finally {
+      if (this.checkController === ctrl) {
+        this.checkController = undefined;
+      }
     }
-    if (signal?.aborted) return;
-    this.setHasPhotos(found);
+    if (signal.aborted) return;
+    this.setLayerHasPhotos(found);
+  }
+
+  abortCheck() {
+    this.checkController?.abort();
+    this.checkController = undefined;
   }
 
   @action
-  private setPhotos(photos: PhotoId[]) {
-    this.photos = photos;
-    this.hasPhotos = photos.length > 0;
+  private setVisiblePhotos(photos: Photo[]) {
+    this.visiblePhotos = photos;
   }
 
   @action
-  private setHasPhotos(value: boolean) {
-    this.hasPhotos = value;
+  private setLayerHasPhotos(value: boolean) {
+    this.layerHasPhotos = value;
   }
 
   @action
@@ -82,7 +118,7 @@ export class PhotoLayerStore {
       signal,
     });
 
-    const photos: PhotoId[] = [];
+    const photos: Photo[] = [];
     for (const feature of features) {
       const attachments = feature.extensions.attachment as
         | FeatureAttachment[]
