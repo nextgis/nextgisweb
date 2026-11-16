@@ -7,19 +7,23 @@
 
   > .strip {
     display: flex;
-    flex-grow: 1;
+    flex: 1 1 0;
     gap: 8px;
     padding: 8px;
     min-height: 0;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-gutter: stable;
+
+    > .ngw-webmap-photo-item {
+      flex: none;
+      height: 100%;
+    }
   }
 
   > .loading {
     position: absolute;
     inset: 0;
-    background-color: var(--divider-color);
   }
 
   > .placeholder {
@@ -38,6 +42,42 @@
     > svg.icon {
       color: var(--icon-color);
       font-size: 48px;
+    }
+  }
+}
+
+.ngw-webmap-photo-item {
+  position: relative;
+  border: 1px solid var(--divider-color);
+  border-radius: 1em;
+  background-color: var(--divider-color);
+  aspect-ratio: 1;
+  overflow: hidden;
+
+  .placeholder {
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    inset: 0;
+
+    > svg.icon {
+      color: var(--icon-color);
+      font-size: 32px;
+    }
+  }
+
+  .ant-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+
+    > .ant-image-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      color: transparent;
     }
   }
 }

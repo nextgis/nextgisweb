@@ -6,7 +6,7 @@ import { route } from "@nextgisweb/pyramid/api";
 
 export interface Photo {
   featureId: number;
-  attachmentId: number;
+  attachment: FeatureAttachment;
 }
 
 export class PhotoLayerStore {
@@ -152,7 +152,7 @@ export class PhotoLayerStore {
           onPhotoNoticed();
           return;
         }
-        photos.push({ featureId: feature.id, attachmentId: attachment.id });
+        photos.push({ featureId: feature.id, attachment });
       }
     }
     return photos;

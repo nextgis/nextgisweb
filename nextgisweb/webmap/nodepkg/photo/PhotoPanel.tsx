@@ -7,6 +7,7 @@ import { CentralLoading } from "@nextgisweb/gui/component";
 import { ErrorIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { PhotoItem } from "./PhotoItem";
 import type { PhotoLayerStore } from "./PhotoLayerStore";
 
 import PhotoIcon from "@nextgisweb/icon/material/photo";
@@ -32,7 +33,7 @@ const placeholders = {
 
 export const PhotoPanel = observer(
   ({ store, className, style }: PhotoPanelProps) => {
-    const { visiblePhotos, error } = store;
+    const { visiblePhotos, error, layerId } = store;
 
     useEffect(() => {
       store.activate();
@@ -60,7 +61,15 @@ export const PhotoPanel = observer(
             <CentralLoading />
           </div>
         ) : (
-          <div className="strip" />
+          <div className="strip">
+            {visiblePhotos.map((p) => (
+              <PhotoItem
+                key={`${p.featureId}-${p.attachment.id}`}
+                layerId={layerId}
+                photo={p}
+              />
+            ))}
+          </div>
         )}
       </div>
     );
