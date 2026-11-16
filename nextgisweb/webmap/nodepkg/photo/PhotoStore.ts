@@ -13,20 +13,20 @@ export class PhotoStore {
   constructor() {
     topic.subscribe(
       "feature.updated",
-      ({ resourceId }: { resourceId: number }) =>
-        this.getLayer(resourceId).refresh()
+      ({ resourceId, featureId }: { resourceId: number; featureId: number }) =>
+        this.getLayer(resourceId).updateFeature(featureId)
     );
     topic.subscribe("/webmap/feature-table/refresh", (resourceId: number) =>
-      this.getLayer(resourceId).refresh()
+      this.getLayer(resourceId).load()
     );
   }
 
   @action
-  getLayer(layerId: number, hasInitialPhotos = false): PhotoLayerStore {
+  getLayer(layerId: number): PhotoLayerStore {
     const store = this.layerStores.get(layerId);
     if (store) return store;
 
-    const newStore = new PhotoLayerStore({ layerId, hasInitialPhotos });
+    const newStore = new PhotoLayerStore({ layerId });
     this.layerStores.set(layerId, newStore);
     return newStore;
   }

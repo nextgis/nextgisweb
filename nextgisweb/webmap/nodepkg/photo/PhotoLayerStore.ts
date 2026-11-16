@@ -1,50 +1,69 @@
-import { action, observableRef } from "mobx";
+import { action, computed, observableRef } from "mobx";
 
 import type { FeatureAttachment } from "@nextgisweb/feature-attachment/type";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { route } from "@nextgisweb/pyramid/api";
+import { ServerResponseError } from "@nextgisweb/pyramid/api/error";
 
 export interface Photo {
   featureId: number;
   attachment: FeatureAttachment;
 }
 
+function featurePhotos(feature: FeatureItem): Photo[] {
+  const attachments = feature.extensions.attachment as
+    | FeatureAttachment[]
+    | null;
+  if (!attachments) return [];
+  return attachments
+    .filter((attachment) => attachment.is_image)
+    .map((attachment) => ({ featureId: feature.id, attachment }));
+}
+
 export class PhotoLayerStore {
   readonly layerId: number;
 
-  @observableRef accessor visiblePhotos: Photo[] | undefined = undefined;
-  @observableRef accessor layerHasPhotos: boolean;
+  @observableRef accessor photos: Photo[] | undefined = undefined;
 
   @observableRef accessor isLoading = false;
   @observableRef accessor error: unknown = undefined;
 
   private loadController?: AbortController;
-  private checkController?: AbortController;
+  private featureControllers = new Map<number, AbortController>();
   private activeCount = 0;
 
-  constructor({
-    layerId,
-    hasInitialPhotos,
-  }: {
-    layerId: number;
-    hasInitialPhotos: boolean;
-  }) {
+  constructor({ layerId }: { layerId: number }) {
     this.layerId = layerId;
-    this.layerHasPhotos = hasInitialPhotos;
+  }
+
+  @computed
+  get layerHasPhotos(): boolean | undefined {
+    return this.photos ? this.photos.length > 0 : undefined;
+  }
+
+  @computed
+  get visiblePhotos(): Photo[] | undefined {
+    return this.photos;
   }
 
   async load() {
     this.loadController?.abort();
+    this.abortFeatureUpdates();
     const ctrl = new AbortController();
     this.loadController = ctrl;
     const { signal } = ctrl;
 
     this.setLoading(true);
     try {
-      const photos = await this.fetchPhotos(signal);
+      const features = await route(
+        "feature_layer.feature.collection",
+        this.layerId
+      ).get<FeatureItem[]>({
+        query: { geom: false, fields: [], extensions: ["attachment"] },
+        signal,
+      });
       if (signal.aborted) return;
-      this.setVisiblePhotos(photos ?? []);
-      this.setLayerHasPhotos(!!photos?.length);
+      this.setPhotos(features.flatMap(featurePhotos));
     } catch (err) {
       if (signal.aborted) return;
       this.setError(err);
@@ -63,9 +82,44 @@ export class PhotoLayerStore {
     this.setLoading(false);
   }
 
+  async updateFeature(featureId: number) {
+    if (!this.photos || this.loadController) {
+      this.load();
+      return;
+    }
+
+    this.featureControllers.get(featureId)?.abort();
+    const ctrl = new AbortController();
+    this.featureControllers.set(featureId, ctrl);
+    const { signal } = ctrl;
+
+    try {
+      const feature = await route("feature_layer.feature.item", {
+        id: this.layerId,
+        fid: featureId,
+      }).get<FeatureItem>({
+        query: { geom: false, fields: [], extensions: ["attachment"] },
+        signal,
+      });
+      if (signal.aborted) return;
+      this.replaceFeaturePhotos(featureId, featurePhotos(feature));
+    } catch (err) {
+      if (signal.aborted) return;
+      if (err instanceof ServerResponseError && err.status_code === 404) {
+        this.replaceFeaturePhotos(featureId, []);
+      } else {
+        this.load();
+      }
+    } finally {
+      if (this.featureControllers.get(featureId) === ctrl) {
+        this.featureControllers.delete(featureId);
+      }
+    }
+  }
+
   activate() {
     this.activeCount++;
-    this.load();
+    if (!this.photos) this.load();
   }
 
   deactivate() {
@@ -73,51 +127,23 @@ export class PhotoLayerStore {
     if (this.activeCount === 0) this.abortLoad();
   }
 
-  refresh() {
-    if (this.activeCount > 0) {
-      this.abortCheck();
-      this.load();
-    } else {
-      this.check();
-    }
-  }
-
-  async check() {
-    this.checkController?.abort();
-    const ctrl = new AbortController();
-    this.checkController = ctrl;
-    const { signal } = ctrl;
-
-    let found = false;
-    try {
-      await this.fetchPhotos(signal, () => {
-        found = true;
-      });
-    } catch {
-      if (!signal.aborted) this.setLayerHasPhotos(false);
-      return;
-    } finally {
-      if (this.checkController === ctrl) {
-        this.checkController = undefined;
-      }
-    }
-    if (signal.aborted) return;
-    this.setLayerHasPhotos(found);
-  }
-
-  abortCheck() {
-    this.checkController?.abort();
-    this.checkController = undefined;
+  private abortFeatureUpdates() {
+    this.featureControllers.forEach((ctrl) => ctrl.abort());
+    this.featureControllers.clear();
   }
 
   @action
-  private setVisiblePhotos(photos: Photo[]) {
-    this.visiblePhotos = photos;
+  private replaceFeaturePhotos(featureId: number, featurePhotos: Photo[]) {
+    if (!this.photos) return;
+    const rest = this.photos.filter((p) => p.featureId !== featureId);
+    const index = rest.findIndex((p) => p.featureId > featureId);
+    const at = index === -1 ? rest.length : index;
+    this.photos = [...rest.slice(0, at), ...featurePhotos, ...rest.slice(at)];
   }
 
   @action
-  private setLayerHasPhotos(value: boolean) {
-    this.layerHasPhotos = value;
+  private setPhotos(photos: Photo[]) {
+    this.photos = photos;
   }
 
   @action
@@ -129,32 +155,5 @@ export class PhotoLayerStore {
   @action
   private setError(err: unknown) {
     this.error = err;
-  }
-
-  private async fetchPhotos(signal?: AbortSignal, onPhotoNoticed?: () => void) {
-    const features = await route(
-      "feature_layer.feature.collection",
-      this.layerId
-    ).get<FeatureItem[]>({
-      query: { geom: false, fields: [], extensions: ["attachment"] },
-      signal,
-    });
-
-    const photos: Photo[] = [];
-    for (const feature of features) {
-      const attachments = feature.extensions.attachment as
-        | FeatureAttachment[]
-        | null;
-      if (!attachments) continue;
-      for (const attachment of attachments) {
-        if (!attachment.is_image) continue;
-        if (onPhotoNoticed) {
-          onPhotoNoticed();
-          return;
-        }
-        photos.push({ featureId: feature.id, attachment });
-      }
-    }
-    return photos;
   }
 }

@@ -48,10 +48,7 @@ export class LayerPhotoPlugin extends PluginBase {
 
   private openPhotoPanel(item: TreeLayerStore) {
     if (!item.isLayer()) return;
-    const store = this.photoStore.getLayer(
-      item.layerId,
-      this.getConfig(item).has_photos
-    );
+    const store = this.photoStore.getLayer(item.layerId);
     this.display.tabsManager.addTab<WebMapPhotoTabProps>({
       key: `${item.layerId}:ph`,
       label: `${gettext("Photos of")} ${item.label}`,
