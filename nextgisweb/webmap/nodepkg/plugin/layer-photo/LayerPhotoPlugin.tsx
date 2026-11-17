@@ -1,6 +1,6 @@
 import { lazy } from "react";
 
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { PhotoStore } from "@nextgisweb/webmap/photo/PhotoStore";
 import type {
@@ -21,6 +21,8 @@ import PhotoIcon from "@nextgisweb/icon/material/photo";
 const webmapPhotoTabLazy = lazy(
   () => import("@nextgisweb/webmap/webmap-photo-tab")
 );
+
+const msgPhotosOf = gettextf("Photos of {}");
 
 interface LayerPhotoPluginConfig {
   has_photos: boolean;
@@ -77,7 +79,7 @@ export class LayerPhotoPlugin extends PluginBase {
     const store = this.getLayerStore(item.layerId, item);
     this.display.tabsManager.addTab<WebMapPhotoTabProps>({
       key: `${item.layerId}:ph`,
-      label: `${gettext("Photos of")} ${item.label}`,
+      label: msgPhotosOf(item.label),
       component: webmapPhotoTabLazy,
       props: { store },
     });

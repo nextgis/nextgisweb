@@ -6,11 +6,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: api.py:490
+#: api.py:491
 msgid "Unknown panorama provider '{}'."
 msgstr "Неизвестный провайдер панорам '{}'."
 
-#: api.py:492
+#: api.py:493
 msgid "API key for panorama provider '{}' is required."
 msgstr "Для провайдера панорам '{}' API ключ обязателен."
 
@@ -307,12 +307,12 @@ msgid "Current zoom level"
 msgstr "Текущий зум"
 
 #: nodepkg/map-component/control/ZoomControl.tsx:81
-#: nodepkg/map-component/tool/ToolZoom.tsx:21 nodepkg/map-controls/map-tools.ts:23
+#: nodepkg/map-component/tool/ToolZoom.tsx:21 nodepkg/map-controls/map-tools.ts:30
 msgid "Zoom in"
 msgstr "Приблизить"
 
 #: nodepkg/map-component/control/ZoomControl.tsx:82
-#: nodepkg/map-component/tool/ToolZoom.tsx:21 nodepkg/map-controls/map-tools.ts:38
+#: nodepkg/map-component/tool/ToolZoom.tsx:21 nodepkg/map-controls/map-tools.ts:45
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
@@ -321,26 +321,26 @@ msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:71
-#: nodepkg/map-controls/map-tools.ts:68
+#: nodepkg/map-controls/map-tools.ts:75
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:72
-#: nodepkg/map-controls/map-tools.ts:83
+#: nodepkg/map-controls/map-tools.ts:90
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:24
-#: nodepkg/map-controls/map-tools.ts:74
+#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:29
+#: nodepkg/map-controls/map-tools.ts:111 nodepkg/settings/SettingsForm.tsx:272
 msgid "Search panorama"
 msgstr "Поиск панорам"
 
-#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:25
+#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:30
 #: nodepkg/panorama/PanoramaViewer.tsx:28
 msgid "No panorama available at this location"
 msgstr "В указанной точке панорамы не найдены"
 
-#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:26
+#: nodepkg/map-component/tool/ToolPanorama/ToolPanorama.tsx:31
 #: nodepkg/panorama/PanoramaViewer.tsx:32
 msgid ""
 "The panorama service is currently unavailable. Please try again at a later "
@@ -378,7 +378,7 @@ msgid "Layer is not visible"
 msgstr "Слой не включен"
 
 #: nodepkg/map-component/tool/ToolSwipe/ToolSwipe.tsx:50
-#: nodepkg/map-controls/map-tools.ts:53
+#: nodepkg/map-controls/map-tools.ts:60
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
@@ -416,12 +416,12 @@ msgid "Locate me"
 msgstr "Определить мое местоположение"
 
 #: nodepkg/map-controls/map-controls.ts:154
-#: nodepkg/map-controls/map-controls.ts:159 nodepkg/settings/SettingsForm.tsx:90
+#: nodepkg/map-controls/map-controls.ts:159 nodepkg/settings/SettingsForm.tsx:119
 #: option/base.py:39
 msgid "Identification"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/map-tools.ts:99
+#: nodepkg/map-controls/map-tools.ts:127
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
 
@@ -900,13 +900,21 @@ msgstr "Предпросмотр"
 msgid "Share"
 msgstr "Поделиться"
 
-#: nodepkg/panorama/provider/plugin.ts:9
+#: nodepkg/panorama/provider/plugin.ts:16
 msgid "Google Street View"
 msgstr "Google Street View"
 
-#: nodepkg/panorama/provider/plugin.ts:20
+#: nodepkg/panorama/provider/plugin.ts:27
 msgid "Yandex Panorama"
 msgstr "Яндекс Панорама"
+
+#: nodepkg/photo/PhotoPanel.tsx:35
+msgid "No photos to display"
+msgstr "Нет фотографий для отображения"
+
+#: nodepkg/photo/PhotoPanel.tsx:39
+msgid "Failed to load photos"
+msgstr "Не удалось загрузить фотографии"
 
 #: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:20
 msgid "Feature table"
@@ -1016,6 +1024,14 @@ msgstr "Введите координаты"
 msgid "Export"
 msgstr "Экспорт"
 
+#: nodepkg/plugin/layer-photo/LayerPhotoPlugin.tsx:54
+msgid "Watch photos"
+msgstr "Смотреть фотографии"
+
+#: nodepkg/plugin/layer-photo/LayerPhotoPlugin.tsx:80
+msgid "Photos of {}"
+msgstr "Фотографии слоя {}"
+
 #: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:18
 msgid "Layer properties"
 msgstr "Свойства слоя"
@@ -1032,7 +1048,7 @@ msgstr "Редактировать слой"
 msgid "Edit style"
 msgstr "Редактировать стиль"
 
-#: nodepkg/plugin/zoom-to-group/ZoomToGroupPlugin.tsx:66
+#: nodepkg/plugin/zoom-to-group/ZoomToGroupPlugin.tsx:67
 msgid "Zoom to group"
 msgstr "Увеличить до группы"
 
@@ -1219,11 +1235,6 @@ msgstr "Неверные значения. Например, ru или gb,de"
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
-#: nodepkg/settings/SettingsForm.tsx:272
-#: nodepkg/webmap-panorama-tab/WebMapPanoramaStore.ts:67 view.py:163
-msgid "Panorama"
-msgstr "Панорама"
-
 #: nodepkg/settings/SettingsForm.tsx:287
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:187
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:62
@@ -1370,12 +1381,37 @@ msgid "ac"
 msgstr "акр"
 
 #: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:29
+#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:18
 msgid "Go to"
 msgstr "Перейти"
 
 #: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:183
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
+
+#: nodepkg/webmap-panorama-tab/WebMapPanorama.tsx:28 view.py:163
+msgid "Panorama"
+msgstr "Панорама"
+
+#: nodepkg/webmap-photo-tab/WebMapPanorama.tsx:17
+msgid "Failed to filter photos by map extent"
+msgstr "Не удалось отфильтровать фотографии по охвату карты"
+
+#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:15
+msgid "View"
+msgstr "Просмотр"
+
+#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:16
+msgid "Selection"
+msgstr "Выбор"
+
+#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:17
+msgid "Open"
+msgstr "Открыть"
+
+#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:19
+msgid "Show only photos in the current map extent"
+msgstr "Показывать только фотографии в текущем охвате карты"
 
 #: nodepkg/webmap-tabs/WebMapTabs.tsx:16
 msgid "Loading"
