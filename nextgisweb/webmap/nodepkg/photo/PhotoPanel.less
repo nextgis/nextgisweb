@@ -13,12 +13,37 @@
     min-height: 0;
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-gutter: stable;
 
     > .ngw-webmap-photo-item {
       flex: none;
       height: 100%;
     }
+  }
+
+  &::before,
+  &::after {
+    position: absolute;
+    opacity: 0;
+    z-index: 2;
+    inset-block: 0;
+    width: 24px;
+    pointer-events: none;
+    content: "";
+  }
+
+  &::before {
+    inset-inline-start: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.18), transparent);
+  }
+
+  &::after {
+    inset-inline-end: 0;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.18), transparent);
+  }
+
+  &.shadow-start::before,
+  &.shadow-end::after {
+    opacity: 1;
   }
 
   > .loading {
@@ -34,7 +59,6 @@
     align-items: center;
     gap: 12px;
     inset: 0;
-    background-color: var(--divider-color);
     padding: 16px;
     color: var(--text-secondary);
     text-align: center;
@@ -49,7 +73,7 @@
 .ngw-webmap-photo-item {
   position: relative;
   border: 1px solid var(--divider-color);
-  border-radius: 1em;
+  border-radius: 10px;
   background-color: var(--divider-color);
   aspect-ratio: 1;
   overflow: hidden;
@@ -79,5 +103,24 @@
       object-fit: contain;
       color: transparent;
     }
+  }
+
+  &.selectable {
+    cursor: pointer;
+
+    .ant-image-cover,
+    .ant-image-mask {
+      display: none;
+    }
+  }
+
+  &.selected::after {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    border: 2px solid var(--ant-color-primary);
+    border-radius: inherit;
+    pointer-events: none;
+    content: "";
   }
 }

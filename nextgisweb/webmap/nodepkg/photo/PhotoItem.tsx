@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import classNames from "classnames";
+import { useCallback, useMemo, useState } from "react";
 
 import { AttachmentPreviewGroup } from "@nextgisweb/feature-attachment/image-thumbnail/component/AttachmentPreviewGroup";
 import { Image } from "@nextgisweb/gui/antd";
@@ -14,9 +15,22 @@ const PHOTO_SIZE = 480;
 export interface PhotoItemProps {
   layerId: number;
   photo: Photo;
+  selectable: boolean;
+  selected: boolean;
+  onSelect: () => void;
+  previewOpen: boolean;
+  onPreviewOpenChange: (open: boolean) => void;
 }
 
-export function PhotoItem({ layerId, photo }: PhotoItemProps) {
+export function PhotoItem({
+  layerId,
+  photo,
+  selectable = false,
+  selected,
+  onSelect,
+  previewOpen,
+  onPreviewOpenChange,
+}: PhotoItemProps) {
   const { featureId, attachment } = photo;
   const [status, setStatus] = useState<"loading" | "loaded" | "error">(
     "loading"
@@ -38,8 +52,24 @@ export function PhotoItem({ layerId, photo }: PhotoItemProps) {
 
   const attachments = useMemo(() => [attachment], [attachment]);
 
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open && selectable) return;
+      onPreviewOpenChange(open);
+    },
+    [onPreviewOpenChange, selectable]
+  );
+
   return (
-    <div className="ngw-webmap-photo-item" onLoad={() => setStatus("loaded")}>
+    <div
+      className={classNames("ngw-webmap-photo-item", { selectable, selected })}
+      onLoad={() => setStatus("loaded")}
+      onClick={(event) => {
+        if (!selectable) return;
+        if (!event.currentTarget.contains(event.target as Node)) return;
+        onSelect();
+      }}
+    >
       {status !== "loaded" && (
         <div className="placeholder">
           {status === "error" ? <ErrorIcon /> : <PhotoIcon />}
@@ -50,6 +80,8 @@ export function PhotoItem({ layerId, photo }: PhotoItemProps) {
           attachments={attachments}
           resourceId={layerId}
           featureId={featureId}
+          open={previewOpen}
+          onOpenChange={handleOpenChange}
         >
           <Image
             src={src}

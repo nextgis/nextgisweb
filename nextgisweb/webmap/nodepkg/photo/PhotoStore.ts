@@ -1,8 +1,7 @@
 import { action, observable, observableRef } from "mobx";
 
-import topic from "@nextgisweb/webmap/compat/topic";
-
 import { PhotoLayerStore } from "./PhotoLayerStore";
+import type { PhotoLayerStoreOptions } from "./PhotoLayerStore";
 
 export class PhotoStore {
   @observableRef accessor layerStores = observable.map<
@@ -10,24 +9,13 @@ export class PhotoStore {
     PhotoLayerStore
   >();
 
-  constructor() {
-    topic.subscribe(
-      "feature.updated",
-      ({ resourceId, featureId }: { resourceId: number; featureId: number }) =>
-        this.getLayer(resourceId).updateFeature(featureId)
-    );
-    topic.subscribe("/webmap/feature-table/refresh", (resourceId: number) =>
-      this.getLayer(resourceId).load()
-    );
-  }
-
   @action
-  getLayer(layerId: number): PhotoLayerStore {
-    const store = this.layerStores.get(layerId);
+  getLayer(options: PhotoLayerStoreOptions): PhotoLayerStore {
+    const store = this.layerStores.get(options.layerId);
     if (store) return store;
 
-    const newStore = new PhotoLayerStore({ layerId });
-    this.layerStores.set(layerId, newStore);
+    const newStore = new PhotoLayerStore(options);
+    this.layerStores.set(options.layerId, newStore);
     return newStore;
   }
 }

@@ -41,6 +41,8 @@ interface AttachmentPreviewGroupProps extends PreviewGroupProps {
   featureId: number | null;
   resourceId: number;
   children?: ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const PhotospherePreview = lazy(() => import("../../photosphere-preview"));
@@ -80,9 +82,20 @@ export function AttachmentPreviewGroup({
   resourceId,
   featureId,
   children,
+  open: openProp,
+  onOpenChange,
   ...previewGroupProps
 }: AttachmentPreviewGroupProps) {
-  const [open, setOpen] = useState(false);
+  const [innerOpen, setInnerOpen] = useState(false);
+  const open = openProp ?? innerOpen;
+
+  const handleOpenChange = useCallback(
+    (value: boolean) => {
+      setInnerOpen(value);
+      onOpenChange?.(value);
+    },
+    [onOpenChange]
+  );
   const [current, setCurrent] = useState(0);
   const [panoramaStore] = useState(() => new PanoramaStore());
 
@@ -281,9 +294,10 @@ export function AttachmentPreviewGroup({
         );
       },
 
-      onOpenChange: setOpen,
+      onOpenChange: handleOpenChange,
     };
   }, [
+    handleOpenChange,
     onDownload,
     panoramaMode,
     previewImages,
@@ -296,10 +310,11 @@ export function AttachmentPreviewGroup({
   const previewProps = useMemo<PreviewProps>(
     () => ({
       ...previewCallbacks,
+      ...(openProp !== undefined ? { open: openProp } : {}),
       current,
       onChange: setCurrent,
     }),
-    [previewCallbacks, current]
+    [previewCallbacks, openProp, current]
   );
 
   return (
