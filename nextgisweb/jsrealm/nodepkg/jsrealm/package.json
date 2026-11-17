@@ -69,6 +69,8 @@
     "unrs-resolver": true
   },
   "overrides": {
-    "core-js-compat": "3.48.0"
+    "core-js-compat": "3.48.0",
+    "@rspack/core": "2.3.1",
+    "@rsbuild/core": "2.3.1"
   }
 }
