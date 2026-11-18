@@ -1,3 +1,4 @@
+import { useVirtualizer } from "@tanstack/react-virtual";
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { PhotoItem } from "./PhotoItem";
 import type { Photo, PhotoLayerStore } from "./PhotoLayerStore";
+import { useContentHeight } from "./hook/useContentHeight";
 import { useScrollEdges } from "./hook/useScrollEdges";
 import { useWheelHorizontalScroll } from "./hook/useWheelHorizontalScroll";
 import { getPhotoKey } from "./util/getPhotoKey";
@@ -28,6 +30,8 @@ export interface PhotoPanelProps {
   className?: string;
   style?: CSSProperties;
 }
+
+const STRIP_GAP = 8;
 
 const placeholders = {
   empty: {
@@ -58,6 +62,23 @@ export const PhotoPanel = observer(
     const [strip, setStrip] = useState<HTMLDivElement | null>(null);
     useWheelHorizontalScroll(strip);
     const edges = useScrollEdges(strip, visiblePhotos);
+    const itemSize = useContentHeight(strip);
+
+    const virtualizer = useVirtualizer({
+      horizontal: true,
+      count: visiblePhotos?.length ?? 0,
+      getScrollElement: () => strip,
+      estimateSize: () => itemSize,
+      getItemKey: (index) => getPhotoKey(visiblePhotos![index]),
+      gap: STRIP_GAP,
+      paddingStart: STRIP_GAP,
+      paddingEnd: STRIP_GAP,
+      overscan: 3,
+    });
+
+    useEffect(() => {
+      virtualizer.measure();
+    }, [virtualizer, itemSize]);
 
     const [innerPreviewKey, setInnerPreviewKey] = useState<string>();
     const controlled = onPreviewChange !== undefined;
@@ -94,23 +115,34 @@ export const PhotoPanel = observer(
           </div>
         ) : (
           <div ref={setStrip} className="strip">
-            {visiblePhotos.map((p) => {
-              const key = getPhotoKey(p);
-              return (
-                <PhotoItem
-                  key={key}
-                  layerId={layerId}
-                  photo={p}
-                  selectable={selectable}
-                  selected={key === selectedKey}
-                  onSelect={() => onSelect(p)}
-                  previewOpen={previewOpenKey === key}
-                  onPreviewOpenChange={(open) =>
-                    setPreviewOpenKey(open ? key : undefined)
-                  }
-                />
-              );
-            })}
+            <div
+              className="track"
+              style={{ width: virtualizer.getTotalSize() }}
+            >
+              {virtualizer.getVirtualItems().map((v) => {
+                const p = visiblePhotos[v.index];
+                const key = v.key as string;
+                return (
+                  <div
+                    key={key}
+                    className="cell"
+                    style={{ left: v.start, width: v.size }}
+                  >
+                    <PhotoItem
+                      layerId={layerId}
+                      photo={p}
+                      selectable={selectable}
+                      selected={key === selectedKey}
+                      onSelect={() => onSelect(p)}
+                      previewOpen={previewOpenKey === key}
+                      onPreviewOpenChange={(open) =>
+                        setPreviewOpenKey(open ? key : undefined)
+                      }
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
