@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { errorModal, isAbortError } from "@nextgisweb/gui/error";
+import { errorModal } from "@nextgisweb/gui/error/ErrorModal";
+import { isAbortError } from "@nextgisweb/gui/error/util";
 import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 
 import type {

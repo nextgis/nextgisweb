@@ -1,5 +1,5 @@
-import { InputNumber } from "@nextgisweb/gui/antd";
-import type { InputNumberProps } from "@nextgisweb/gui/antd";
+import { InputNumber } from "antd";
+import type { InputNumberProps } from "antd";
 
 export type InputBigIntegerProps = Omit<InputNumberProps<string>, "stringMode">;
 

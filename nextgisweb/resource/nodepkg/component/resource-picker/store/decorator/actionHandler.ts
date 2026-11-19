@@ -1,4 +1,5 @@
-import { extractError, isAbortError } from "@nextgisweb/gui/error";
+import { extractError } from "@nextgisweb/gui/error/extractError";
+import { isAbortError } from "@nextgisweb/gui/error/util";
 
 import type { ResourcePickerStore } from "../ResourcePickerStore";
 

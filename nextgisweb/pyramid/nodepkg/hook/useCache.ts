@@ -1,6 +1,6 @@
 import { useMemo, useReducer } from "react";
 
-import { isAbortError } from "@nextgisweb/gui/error";
+import { isAbortError } from "@nextgisweb/gui/error/util";
 import { arraySequenceIndexer } from "@nextgisweb/gui/util";
 
 import { useAbortController } from "./useAbortController";

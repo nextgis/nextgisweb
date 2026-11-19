@@ -1,4 +1,4 @@
-import { isAbortError } from "@nextgisweb/gui/error";
+import { isAbortError } from "@nextgisweb/gui/error/util";
 import type { ErrorResponse } from "@nextgisweb/pyramid/type/api";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 

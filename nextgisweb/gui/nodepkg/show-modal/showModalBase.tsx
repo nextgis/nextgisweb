@@ -2,7 +2,7 @@ import { Suspense, useEffect, useRef } from "react";
 import type { ReactElement } from "react";
 
 import type { ModalProps } from "@nextgisweb/gui/antd";
-import { layoutStore } from "@nextgisweb/pyramid/layout";
+import { layoutStore } from "@nextgisweb/pyramid/layout/store";
 
 import type { ModalStore } from "./ModalStore";
 

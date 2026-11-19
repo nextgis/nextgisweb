@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import type { ModalStore } from "@nextgisweb/gui/show-modal/ModalStore";
 
-import { showResourcePicker as showResourcePickerOriginal } from "..";
+import { showResourcePicker as showResourcePickerOriginal } from "../showResourcePicker";
 import type { ResourcePickerModalProps, SelectValue } from "../type";
 
 export interface ResourcePickerHookProps {

@@ -1,4 +1,7 @@
-import { BaseAPIError, ServerResponseError } from "@nextgisweb/pyramid/api";
+import {
+  BaseAPIError,
+  ServerResponseError,
+} from "@nextgisweb/pyramid/api/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ErrorContact } from "@nextgisweb/pyramid/type/api";
 

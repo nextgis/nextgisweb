@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
 import { Skeleton, Space } from "@nextgisweb/gui/antd";
-import { Breadcrumbs } from "@nextgisweb/gui/component";
+import { Breadcrumbs } from "@nextgisweb/gui/component/Breadcrumbs";
 import type { BreadcrumbItem } from "@nextgisweb/gui/component/Breadcrumbs";
 
 import type { ResourcePickerBreadcrumbProps } from "./type";

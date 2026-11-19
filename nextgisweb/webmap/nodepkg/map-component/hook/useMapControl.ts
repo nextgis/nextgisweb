@@ -3,8 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { TargetPosition } from "@nextgisweb/webmap/control-container/ControlContainer";
 
 import { useMapContext } from "../context/useMapContext";
-import { useMapControlContext } from "../control";
-import type { ControlOptions } from "../control";
+import { useMapControlContext } from "../control/MapControlContext";
+import type { ControlOptions } from "../control/MapControlContext";
 
 const DEFAULT_POSITION: TargetPosition = "top-left";
 

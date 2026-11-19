@@ -1,6 +1,6 @@
 import type { PyramidSettingsResponse } from "@nextgisweb/pyramid/type/api";
 
-import { route } from "./api";
+import { route } from "./api/route";
 
 type CSTypedComponent = PyramidSettingsResponse["component"];
 

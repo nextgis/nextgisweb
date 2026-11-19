@@ -1,37 +1,19 @@
-import { createContext, use, useEffect } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
 import { updateControlAppearance } from "@nextgisweb/webmap/control-container/updateControlAppearance";
 
-import type {
-  CreateControlOptions,
-  TargetPosition,
-} from "../../control-container/ControlContainer";
 import { useMapControl } from "../hook/useMapControl";
 
-export type ControlProps<P = unknown> = P & {
-  position?: TargetPosition;
-  order?: number;
-  id?: string;
-};
+import { MapControlContext } from "./MapControlContext";
+import type { MapControlProps } from "./MapControlContext";
 
-export type ControlOptions = CreateControlOptions &
-  ControlProps<{
-    style?: CSSProperties;
-    className?: string;
-    targetStyle?: CSSProperties;
-  }>;
-
-export interface MapControlProps extends ControlOptions {
-  children?: ReactNode;
-}
-
-export const MapControlContext = createContext<MapControlProps | null>(null);
-MapControlContext.displayName = "MapControlContext";
-export function useMapControlContext() {
-  return use(MapControlContext);
-}
+export { MapControlContext, useMapControlContext } from "./MapControlContext";
+export type {
+  ControlProps,
+  ControlOptions,
+  MapControlProps,
+} from "./MapControlContext";
 
 export function MapControl({ children, ...props }: MapControlProps) {
   const { margin, bar, style, className, element } = useMapControl({

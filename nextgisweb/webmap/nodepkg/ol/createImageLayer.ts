@@ -2,7 +2,7 @@ import ImageLayer from "ol/layer/Image";
 import ImageWMS from "ol/source/ImageWMS";
 import { getUid } from "ol/util";
 
-import { isAbortError } from "@nextgisweb/gui/error";
+import { isAbortError } from "@nextgisweb/gui/error/util";
 import {
   imageQueue,
   tileLoadFunction,

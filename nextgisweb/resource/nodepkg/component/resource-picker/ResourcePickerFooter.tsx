@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Badge, Button, Col, Input, Row, Space } from "@nextgisweb/gui/antd";
 import type { InputRef } from "@nextgisweb/gui/antd";
-import { errorModal } from "@nextgisweb/gui/error";
+import { errorModal } from "@nextgisweb/gui/error/ErrorModal";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 

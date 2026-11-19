@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@nextgisweb/gui/antd";
 import type { AutoCompleteProps } from "@nextgisweb/gui/antd";
-import { AutoCompleteHoneypot } from "@nextgisweb/gui/component";
+import { AutoCompleteHoneypot } from "@nextgisweb/gui/component/AutoCompleteHoneypot";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";

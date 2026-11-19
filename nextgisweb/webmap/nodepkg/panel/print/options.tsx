@@ -3,8 +3,6 @@ import { PRINT_SCALES } from "@nextgisweb/webmap/print-map/utils";
 
 import type { PrintMapSettings } from "../../print-map/type";
 
-import { formatScaleNumber } from "./util";
-
 import {
   FileImageOutlined,
   FileJpgOutlined,
@@ -49,6 +47,10 @@ function addPageFormat(label: string, width: number, height: number) {
 addPageFormat("A4", 210, 297);
 addPageFormat("A3", 297, 420);
 pageFormats.push({ value: "custom", label: gettext("Custom size") });
+
+export function formatScaleNumber(scale: number): string {
+  return new Intl.NumberFormat("ru-RU").format(scale);
+}
 
 export const scaleToLabel = (scale: number) => {
   return `1 : ${formatScaleNumber(scale)}`;

@@ -1,4 +1,4 @@
-import { ContentCard } from "../component";
+import { ContentCard } from "../component/content-card/ContentCard";
 
 import { ErrorWidget } from "./ErrorWidget";
 import type { ErrorInfo } from "./extractError";

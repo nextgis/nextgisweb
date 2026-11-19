@@ -1,7 +1,6 @@
+import { InputNumber } from "antd";
+import type { InputNumberProps } from "antd";
 import { clamp } from "lodash-es";
-
-import { InputNumber } from "@nextgisweb/gui/antd";
-import type { InputNumberProps } from "@nextgisweb/gui/antd";
 
 export type InputIntegerProps = Omit<InputNumberProps<number>, "formatter">;
 
