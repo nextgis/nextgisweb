@@ -38,7 +38,7 @@ export type JSRealmConfig = {
     entries: [string, string][];
     icons: [string, ...(string | undefined)[]][];
     stylesheets: string[];
-    targets: unknown;
+    targets: Record<string, number>;
     tscheck?: boolean;
     [key: string]: unknown;
   };

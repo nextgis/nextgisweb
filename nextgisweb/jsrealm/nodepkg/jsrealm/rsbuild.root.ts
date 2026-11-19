@@ -5,6 +5,7 @@ import type { EnvironmentConfig, RsbuildConfig } from "@rsbuild/core";
 import { pluginEslint } from "@rsbuild/plugin-eslint";
 
 import config from "./config";
+import { isDevServer } from "./rsbuild.common";
 
 const require = createRequire(import.meta.url);
 
@@ -29,8 +30,16 @@ export default defineConfig(async (): Promise<RsbuildConfig> => {
   const envNames = Object.keys(environments).join("|");
   const noProxyRE = new RegExp(`^/(static/dev/(${envNames})|_rspack)/`);
 
+  const browserslist = Object.entries(config.jsrealm.targets).map(
+    ([browser, version]) => `${browser} >= ${version}`
+  );
+
   return {
     mode: config.debug ? "development" : "production",
+    output: {
+      polyfill: isDevServer ? "off" : "entry",
+      overrideBrowserslist: browserslist.length ? browserslist : undefined,
+    },
     environments,
     server: {
       host: "0.0.0.0",

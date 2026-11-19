@@ -11,6 +11,8 @@ import type { Plugin } from "postcss";
 
 import config from "./config";
 
+export const isDevServer = process.argv.includes("dev");
+
 export const commonDev: (name: string) => DevConfig = (name) => ({
   assetPrefix: `/static/dev/${name}/`,
 });
