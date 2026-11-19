@@ -106,17 +106,11 @@ export function DiagnosticsWidget({ data }: { data: CheckBody }) {
 
   return (
     <div className="ngw-postgis-diagnostics-widget">
-      {(() => {
-        if (status === "loading") {
-          return (
-            <Skeleton title={false} paragraph={{ rows: 4, width: "100%" }} />
-          );
-        } else if (result) {
-          return result.checks.map((props, idx) => (
-            <Check key={idx} {...props} />
-          ));
-        }
-      })()}
+      {status === "loading" ? (
+        <Skeleton title={false} paragraph={{ rows: 4, width: "100%" }} />
+      ) : (
+        result?.checks.map((props, idx) => <Check key={idx} {...props} />)
+      )}
     </div>
   );
 }
