@@ -1,7 +1,6 @@
 import { createRequire } from "node:module";
 import path from "node:path";
 
-import type { TransformOptions } from "@babel/core";
 import { rspack } from "@rsbuild/core";
 import type { EnvironmentConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
@@ -17,22 +16,14 @@ import {
   createCompressionPlugins,
   createFontWeightFixPostcssPlugin,
   createNgwLessPlugin,
+  isDevServer,
 } from "./rsbuild.common";
 
-export const isDevServer = process.argv.includes("dev");
 const require = createRequire(import.meta.url);
-
-const babelOptions = config.debug
-  ? undefined
-  : (require("./babelrc.cjs") as TransformOptions);
 
 const iconUtil = require("./icon/util.cjs") as {
   symbolId: (filename: string) => string | undefined;
 };
-
-const babelLoaders = babelOptions
-  ? [{ loader: "babel-loader", options: babelOptions }]
-  : [];
 
 function svgSymbolId(filename: string): string {
   return (
@@ -116,7 +107,6 @@ export default {
             : /node_modules\/(core-js|react|react-dom)|\.min\.js$/,
           resolve: { fullySpecified: false },
           use: [
-            ...babelLoaders,
             require.resolve("./module-info-loader.cjs"),
             require.resolve("./icon-loader.cjs"),
           ],
@@ -126,7 +116,6 @@ export default {
           test: /\.svg$/i,
           type: "javascript/auto",
           use: [
-            ...babelLoaders,
             require.resolve("./svg-icon-loader.cjs"),
             {
               loader: "rspack-plugin-svg-sprite/loader",
@@ -140,7 +129,7 @@ export default {
 
         {
           test: /\.po$/,
-          use: [...babelLoaders, require.resolve("./i18n/loader.cjs")],
+          use: [require.resolve("./i18n/loader.cjs")],
         },
       ]);
 
@@ -166,7 +155,7 @@ export default {
         : {
             ...rspackConfig.optimization,
             splitChunks: {
-              chunks: "all",
+              chunks: "async",
               minSize: 0,
             },
           };
