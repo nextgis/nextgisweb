@@ -7,7 +7,7 @@ import { fetchFeaturesItems } from "@nextgisweb/feature-layer/feature-grid/api/f
 import type { Display } from "@nextgisweb/webmap/display";
 import type { PhotoLayerStore } from "@nextgisweb/webmap/photo/PhotoLayerStore";
 
-import type { ExtentFilterState } from "../type";
+export type ExtentFilterStatus = "off" | "loading" | "on";
 
 const wkt = new WKT();
 
@@ -23,12 +23,14 @@ export function useExtentFilter({
   onError,
 }: UseExtentFilterOptions) {
   const { layerId } = store;
-  const [status, setStatus] = useState<ExtentFilterState>("off");
+  const [status, setStatus] = useState<ExtentFilterStatus>("off");
   const [featureIds, setFeatureIds] = useState<Set<number>>();
   const intersects = useRef<string>(undefined);
   const controller = useRef<AbortController>(undefined);
   const ignoreNextMove = useRef(false);
   const enabled = status !== "off";
+  const enabledRef = useRef(enabled);
+  enabledRef.current = enabled;
 
   const queryFeatureIds = useCallback(
     async (geom: string) => {
@@ -115,13 +117,16 @@ export function useExtentFilter({
     }
   };
 
-  const moveKeepingFilter = (move: () => void) => {
-    const before = display.map.getExtent();
-    move();
-    if (enabled) {
-      ignoreNextMove.current = !extentEquals(before, display.map.getExtent());
-    }
-  };
+  const moveKeepingFilter = useCallback(
+    (move: () => void) => {
+      const before = display.map.getExtent();
+      move();
+      if (enabledRef.current) {
+        ignoreNextMove.current = !extentEquals(before, display.map.getExtent());
+      }
+    },
+    [display]
+  );
 
   return { status, featureIds, toggle, clear, moveKeepingFilter };
 }

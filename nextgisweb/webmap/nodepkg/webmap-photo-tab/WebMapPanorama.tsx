@@ -3,7 +3,10 @@ import { useEffect, useMemo } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { PhotoLayerStore } from "@nextgisweb/webmap/photo/PhotoLayerStore";
+import type {
+  Photo,
+  PhotoLayerStore,
+} from "@nextgisweb/webmap/photo/PhotoLayerStore";
 
 import { useDisplayContext } from "../display/context";
 import { PhotoPanel } from "../photo/PhotoPanel";
@@ -30,65 +33,61 @@ export const WebMapPanorama = observer(({ store }: WebMapPanoramaProps) => {
     display,
     onError: () => messageApi.error(msgExtentFilterFailed),
   });
-  const { clear: clearExtentFilter } = extentFilter;
 
   const { photos } = store;
-  const { featureIds } = extentFilter;
-  const visiblePhotos = useMemo(
-    () =>
-      photos && featureIds
-        ? photos.filter((p) => featureIds.has(p.featureId))
-        : photos,
-    [photos, featureIds]
-  );
+  const { featureIds, moveKeepingFilter } = extentFilter;
+  const { visiblePhotos, excludePhotos } = useMemo(() => {
+    if (!photos || !featureIds) {
+      return { visiblePhotos: photos, excludePhotos: undefined };
+    }
+    const visible: Photo[] = [];
+    const excluded: Photo[] = [];
+    for (const p of photos) {
+      (featureIds.has(p.featureId) ? visible : excluded).push(p);
+    }
+    return { visiblePhotos: visible, excludePhotos: excluded };
+  }, [photos, featureIds]);
 
-  const selection = usePhotoSelection(visiblePhotos, clearExtentFilter);
+  const selection = usePhotoSelection(visiblePhotos);
 
-  const selectedFeatureId = selection.selected?.featureId;
-  const { moveKeepingFilter } = extentFilter;
+  const selectedFeatureId = selection.selectedPhoto?.featureId;
 
   useEffect(() => {
-    if (selection.selectedKey === undefined) return;
+    if (selectedFeatureId === undefined) return;
+    let cancelled = false;
+    display.highlighter
+      .highlightById(selectedFeatureId, layerId)
+      .then(({ geom }) => {
+        if (cancelled) return;
+        moveKeepingFilter(() => display.map.panToGeom(geom));
+      })
+      .catch(() => {});
     return () => {
+      cancelled = true;
       display.highlighter.unhighlight(
         (e) => e.layerId === layerId && e.featureId === selectedFeatureId
       );
     };
-  }, [display, layerId, selection.selectedKey, selectedFeatureId]);
-
-  const goTo = async () => {
-    if (selectedFeatureId === undefined) return;
-    try {
-      const { geom } = await display.highlighter.highlightById(
-        selectedFeatureId,
-        layerId
-      );
-      moveKeepingFilter(() => display.map.panToGeom(geom));
-    } catch {
-      return;
-    }
-  };
+  }, [
+    display.highlighter,
+    display.map,
+    layerId,
+    moveKeepingFilter,
+    selectedFeatureId,
+  ]);
 
   return (
     <div className="ngw-webmap-panorama">
       {contextHolder}
       <WebMapPhotoToolbar
-        mode={selection.mode}
-        hasSelection={!!selection.selected}
-        extentFilter={extentFilter.status}
-        onModeChange={selection.changeMode}
-        onOpen={selection.openSelected}
-        onGoTo={goTo}
+        extentFilterStatus={extentFilter.status}
         onExtentFilterToggle={extentFilter.toggle}
       />
       <PhotoPanel
         store={store}
-        photos={visiblePhotos}
-        selectable={selection.selectable}
-        selectedKey={selection.selectedKey}
-        onSelect={selection.select}
-        previewKey={selection.previewKey}
-        onPreviewChange={selection.setPreviewKey}
+        excludePhotos={excludePhotos}
+        selectedKey={selection.selectedPhoto && selection.selectedKey}
+        onSelectPhoto={selection.select}
       />
     </div>
   );

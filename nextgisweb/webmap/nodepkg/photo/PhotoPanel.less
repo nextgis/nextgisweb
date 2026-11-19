@@ -18,7 +18,7 @@
 
       > .cell {
         position: absolute;
-        inset-block: 0;
+        inset-block-start: 0;
 
         > .ngw-webmap-photo-item {
           width: 100%;
@@ -80,11 +80,54 @@
 
 .ngw-webmap-photo-item {
   position: relative;
-  border: 1px solid var(--divider-color);
+  cursor: pointer;
   border-radius: 10px;
   background-color: var(--divider-color);
   aspect-ratio: 1;
   overflow: hidden;
+
+  &::before {
+    position: absolute;
+    z-index: 4;
+    inset: 0;
+    border: 1px solid var(--divider-color);
+    border-radius: inherit;
+    pointer-events: none;
+    content: "";
+  }
+
+  .ant-image-cover,
+  .ant-image-mask {
+    display: none;
+  }
+
+  > .open {
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    z-index: 3;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    cursor: pointer;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.45);
+    padding: 0 0 calc(35% / 3) calc(35% / 3);
+    width: 35%;
+    height: 35%;
+    color: #fff;
+    font-size: 18px;
+
+    &:hover {
+      background-color: var(--ant-color-primary);
+    }
+  }
+
+  &:hover > .open {
+    opacity: 1;
+  }
 
   .placeholder {
     display: flex;
@@ -113,18 +156,9 @@
     }
   }
 
-  &.selectable {
-    cursor: pointer;
-
-    .ant-image-cover,
-    .ant-image-mask {
-      display: none;
-    }
-  }
-
   &.selected::after {
     position: absolute;
-    z-index: 1;
+    z-index: 4;
     inset: 0;
     border: 2px solid var(--ant-color-primary);
     border-radius: inherit;

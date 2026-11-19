@@ -6,8 +6,13 @@ export function useContentHeight(element: HTMLElement | null) {
   useEffect(() => {
     if (!element) return;
 
-    const observer = new ResizeObserver(([entry]) => {
-      setHeight(entry.contentRect.height);
+    const observer = new ResizeObserver(() => {
+      const { paddingTop, paddingBottom } = getComputedStyle(element);
+      setHeight(
+        element.offsetHeight -
+          parseFloat(paddingTop) -
+          parseFloat(paddingBottom)
+      );
     });
     observer.observe(element);
     return () => observer.disconnect();

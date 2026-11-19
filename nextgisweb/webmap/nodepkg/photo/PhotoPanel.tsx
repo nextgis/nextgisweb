@@ -1,7 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 
 import { CentralLoading } from "@nextgisweb/gui/component";
@@ -21,17 +21,15 @@ import "./PhotoPanel.less";
 
 export interface PhotoPanelProps {
   store: PhotoLayerStore;
-  selectable: boolean;
   selectedKey: string | undefined;
-  onSelect: (photo: Photo) => void;
-  photos?: Photo[];
-  previewKey?: string;
-  onPreviewChange?: (key: string | undefined) => void;
+  onSelectPhoto: (photo: Photo) => void;
+  excludePhotos?: Photo[];
   className?: string;
   style?: CSSProperties;
 }
 
 const STRIP_GAP = 8;
+const SCROLLBAR_RESERVE = 24;
 
 const placeholders = {
   empty: {
@@ -47,22 +45,23 @@ const placeholders = {
 export const PhotoPanel = observer(
   ({
     store,
-    selectable = false,
     selectedKey,
-    onSelect,
-    photos,
-    previewKey,
-    onPreviewChange,
+    onSelectPhoto,
+    excludePhotos,
     className,
     style,
   }: PhotoPanelProps) => {
     const { error, layerId } = store;
-    const visiblePhotos = photos ?? store.photos;
+    const visiblePhotos = useMemo(() => {
+      if (!excludePhotos?.length) return store.photos;
+      const excluded = new Set(excludePhotos);
+      return store.photos?.filter((p) => !excluded.has(p));
+    }, [excludePhotos, store.photos]);
 
     const [strip, setStrip] = useState<HTMLDivElement | null>(null);
     useWheelHorizontalScroll(strip);
     const edges = useScrollEdges(strip, visiblePhotos);
-    const itemSize = useContentHeight(strip);
+    const itemSize = Math.max(0, useContentHeight(strip) - SCROLLBAR_RESERVE);
 
     const virtualizer = useVirtualizer({
       horizontal: true,
@@ -80,10 +79,7 @@ export const PhotoPanel = observer(
       virtualizer.measure();
     }, [virtualizer, itemSize]);
 
-    const [innerPreviewKey, setInnerPreviewKey] = useState<string>();
-    const controlled = onPreviewChange !== undefined;
-    const previewOpenKey = controlled ? previewKey : innerPreviewKey;
-    const setPreviewOpenKey = controlled ? onPreviewChange : setInnerPreviewKey;
+    const [previewKey, setPreviewKey] = useState<string>();
 
     useEffect(() => {
       store.activate();
@@ -126,17 +122,16 @@ export const PhotoPanel = observer(
                   <div
                     key={key}
                     className="cell"
-                    style={{ left: v.start, width: v.size }}
+                    style={{ left: v.start, width: v.size, height: v.size }}
                   >
                     <PhotoItem
                       layerId={layerId}
                       photo={p}
-                      selectable={selectable}
                       selected={key === selectedKey}
-                      onSelect={() => onSelect(p)}
-                      previewOpen={previewOpenKey === key}
+                      onSelect={() => onSelectPhoto(p)}
+                      previewOpen={previewKey === key}
                       onPreviewOpenChange={(open) =>
-                        setPreviewOpenKey(open ? key : undefined)
+                        setPreviewKey(open ? key : undefined)
                       }
                     />
                   </div>

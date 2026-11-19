@@ -5,17 +5,20 @@ import { AttachmentPreviewGroup } from "@nextgisweb/feature-attachment/image-thu
 import { Image } from "@nextgisweb/gui/antd";
 import { ErrorIcon } from "@nextgisweb/gui/icon";
 import { route } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { Photo } from "./PhotoLayerStore";
 
+import OpenIcon from "@nextgisweb/icon/material/open_in_new";
 import PhotoIcon from "@nextgisweb/icon/material/photo";
 
 const PHOTO_SIZE = 480;
 
+const msgOpen = gettext("Open");
+
 export interface PhotoItemProps {
   layerId: number;
   photo: Photo;
-  selectable: boolean;
   selected: boolean;
   onSelect: () => void;
   previewOpen: boolean;
@@ -25,7 +28,6 @@ export interface PhotoItemProps {
 export function PhotoItem({
   layerId,
   photo,
-  selectable = false,
   selected,
   onSelect,
   previewOpen,
@@ -54,18 +56,16 @@ export function PhotoItem({
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
-      if (open && selectable) return;
+      if (open) return;
       onPreviewOpenChange(open);
     },
-    [onPreviewOpenChange, selectable]
+    [onPreviewOpenChange]
   );
 
   return (
     <div
-      className={classNames("ngw-webmap-photo-item", { selectable, selected })}
-      onLoad={() => setStatus("loaded")}
+      className={classNames("ngw-webmap-photo-item", { selected })}
       onClick={(event) => {
-        if (!selectable) return;
         if (!event.currentTarget.contains(event.target as Node)) return;
         onSelect();
       }}
@@ -90,9 +90,24 @@ export function PhotoItem({
             loading="lazy"
             draggable={false}
             preview={{ src: previewSrc }}
+            onLoad={() => setStatus("loaded")}
             onError={() => setStatus("error")}
           />
         </AttachmentPreviewGroup>
+      )}
+      {status === "loaded" && (
+        <button
+          type="button"
+          className="open"
+          title={msgOpen}
+          aria-label={msgOpen}
+          onClick={(event) => {
+            event.stopPropagation();
+            onPreviewOpenChange(true);
+          }}
+        >
+          <OpenIcon />
+        </button>
       )}
     </div>
   );
