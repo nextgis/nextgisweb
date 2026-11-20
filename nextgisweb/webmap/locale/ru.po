@@ -825,6 +825,7 @@ msgid "Select panels"
 msgstr "Выберите панели"
 
 #: nodepkg/panel/share/SharePanel.tsx:120
+#: nodepkg/webmap-photo-tab/sort/SortTool.tsx:23
 msgid "None"
 msgstr "Нет"
 
@@ -908,11 +909,15 @@ msgstr "Google Street View"
 msgid "Yandex Panorama"
 msgstr "Яндекс Панорама"
 
-#: nodepkg/photo/PhotoPanel.tsx:35
+#: nodepkg/photo/PhotoItem.tsx:17
+msgid "Open"
+msgstr "Открыть"
+
+#: nodepkg/photo/PhotoPanel.tsx:36
 msgid "No photos to display"
 msgstr "Нет фотографий для отображения"
 
-#: nodepkg/photo/PhotoPanel.tsx:39
+#: nodepkg/photo/PhotoPanel.tsx:40
 msgid "Failed to load photos"
 msgstr "Не удалось загрузить фотографии"
 
@@ -1024,13 +1029,13 @@ msgstr "Введите координаты"
 msgid "Export"
 msgstr "Экспорт"
 
-#: nodepkg/plugin/layer-photo/LayerPhotoPlugin.tsx:54
-msgid "Watch photos"
-msgstr "Смотреть фотографии"
-
-#: nodepkg/plugin/layer-photo/LayerPhotoPlugin.tsx:80
+#: nodepkg/plugin/layer-photo/LayerPhotoPlugin.tsx:25
 msgid "Photos of {}"
 msgstr "Фотографии слоя {}"
+
+#: nodepkg/plugin/layer-photo/LayerPhotoPlugin.tsx:56
+msgid "Watch photos"
+msgstr "Смотреть фотографии"
 
 #: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:18
 msgid "Layer properties"
@@ -1381,7 +1386,6 @@ msgid "ac"
 msgstr "акр"
 
 #: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:29
-#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:18
 msgid "Go to"
 msgstr "Перейти"
 
@@ -1393,25 +1397,29 @@ msgstr "Выбранный объект не имеет геометрии"
 msgid "Panorama"
 msgstr "Панорама"
 
-#: nodepkg/webmap-photo-tab/WebMapPanorama.tsx:17
+#: nodepkg/webmap-photo-tab/extent-filter/ExtentFilterTool.tsx:17
+msgid "Leave visible"
+msgstr "Оставить видимые"
+
+#: nodepkg/webmap-photo-tab/extent-filter/ExtentFilterTool.tsx:18
 msgid "Failed to filter photos by map extent"
 msgstr "Не удалось отфильтровать фотографии по охвату карты"
 
-#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:15
-msgid "View"
-msgstr "Просмотр"
+#: nodepkg/webmap-photo-tab/sort/SortTool.tsx:19
+msgid "Sort"
+msgstr "Сортировка"
 
-#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:16
-msgid "Selection"
-msgstr "Выбор"
+#: nodepkg/webmap-photo-tab/sort/SortTool.tsx:20
+msgid "Failed to sort photos by location"
+msgstr "Не удалось отсортировать фотографии по местоположению"
 
-#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:17
-msgid "Open"
-msgstr "Открыть"
+#: nodepkg/webmap-photo-tab/sort/SortTool.tsx:24
+msgid "West to east"
+msgstr "С запада на восток"
 
-#: nodepkg/webmap-photo-tab/WebMapPhotoToolbar.tsx:19
-msgid "Show only photos in the current map extent"
-msgstr "Показывать только фотографии в текущем охвате карты"
+#: nodepkg/webmap-photo-tab/sort/SortTool.tsx:25
+msgid "North to south"
+msgstr "С севера на юг"
 
 #: nodepkg/webmap-tabs/WebMapTabs.tsx:16
 msgid "Loading"
@@ -1456,3 +1464,12 @@ msgstr "Просмотр встроенной веб-карты"
 #: view.py:125
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
+
+#~ msgid "View"
+#~ msgstr "Просмотр"
+
+#~ msgid "Selection"
+#~ msgstr "Выбор"
+
+#~ msgid "Show only photos in the current map extent"
+#~ msgstr "Показывать только фотографии в текущем охвате карты"

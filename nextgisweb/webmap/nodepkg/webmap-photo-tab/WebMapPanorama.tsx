@@ -1,13 +1,16 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import type { PhotoLayerStore } from "@nextgisweb/webmap/photo/PhotoLayerStore";
+import type {
+  Photo,
+  PhotoLayerStore,
+} from "@nextgisweb/webmap/photo/PhotoLayerStore";
 
 import { useDisplayContext } from "../display/context";
 import { PhotoPanel } from "../photo/PhotoPanel";
+import { getPhotoKey } from "../photo/util/getPhotoKey";
 
-import { usePhotoSelection } from "./hook/usePhotoSelection";
 import { registry } from "./registry";
 
 import "./WebMapPanorama.less";
@@ -23,9 +26,18 @@ export const WebMapPanorama = observer(({ store }: WebMapPanoramaProps) => {
   const { display } = useDisplayContext();
   const programmaticExtent = useRef<number[]>(undefined);
 
-  const selection = usePhotoSelection(store.visiblePhotos);
+  const [selectedKey, setSelectedKey] = useState<string>();
 
-  const selectedFeatureId = selection.selectedPhoto?.featureId;
+  const selectedPhoto = selectedKey
+    ? store.visiblePhotos?.find((p) => getPhotoKey(p) === selectedKey)
+    : undefined;
+
+  const select = useCallback((photo: Photo) => {
+    const key = getPhotoKey(photo);
+    setSelectedKey((prev) => (prev === key ? undefined : key));
+  }, []);
+
+  const selectedFeatureId = selectedPhoto?.featureId;
 
   useEffect(() => {
     if (selectedFeatureId === undefined) return;
@@ -62,8 +74,8 @@ export const WebMapPanorama = observer(({ store }: WebMapPanoramaProps) => {
       />
       <PhotoPanel
         store={store}
-        selectedKey={selection.selectedPhoto && selection.selectedKey}
-        onSelectPhoto={selection.select}
+        selectedKey={selectedPhoto && selectedKey}
+        onSelectPhoto={select}
       />
     </div>
   );

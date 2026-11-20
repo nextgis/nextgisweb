@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { Button, Tooltip, message } from "@nextgisweb/gui/antd";
+import { Button, message } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
   Photo,
@@ -8,12 +8,13 @@ import type {
 } from "@nextgisweb/webmap/photo/PhotoLayerStore";
 import { usePhotoTransform } from "@nextgisweb/webmap/photo/hook/usePhotoTransform";
 
-import { useExtentFilter } from "../hook/useExtentFilter";
 import type { PhotoToolPluginProps } from "../registry";
+
+import { useExtentFilter } from "./useExtentFilter";
 
 import ExtentIcon from "@nextgisweb/icon/material/crop_free/outline";
 
-const msgExtentFilter = gettext("Show only photos in the current map extent");
+const msgLeaveVisible = gettext("Leave visible");
 const msgExtentFilterFailed = gettext("Failed to filter photos by map extent");
 
 export default function ExtentFilterTool({
@@ -41,15 +42,16 @@ export default function ExtentFilterTool({
   return (
     <>
       {contextHolder}
-      <Tooltip title={msgExtentFilter}>
-        <Button
-          size="small"
-          type={status !== "off" ? "primary" : "default"}
-          loading={status === "loading"}
-          icon={<ExtentIcon />}
-          onClick={toggle}
-        />
-      </Tooltip>
+      <Button
+        size="small"
+        type={status !== "off" ? "primary" : "default"}
+        icon={<ExtentIcon />}
+        iconPlacement="end"
+        loading={status === "loading"}
+        onClick={toggle}
+      >
+        {msgLeaveVisible}
+      </Button>
     </>
   );
 }
