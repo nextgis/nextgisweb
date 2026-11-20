@@ -1,7 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 import { CentralLoading } from "@nextgisweb/gui/component";
@@ -23,7 +23,6 @@ export interface PhotoPanelProps {
   store: PhotoLayerStore;
   selectedKey: string | undefined;
   onSelectPhoto: (photo: Photo) => void;
-  excludePhotos?: Photo[];
   className?: string;
   style?: CSSProperties;
 }
@@ -47,16 +46,10 @@ export const PhotoPanel = observer(
     store,
     selectedKey,
     onSelectPhoto,
-    excludePhotos,
     className,
     style,
   }: PhotoPanelProps) => {
-    const { error, layerId } = store;
-    const visiblePhotos = useMemo(() => {
-      if (!excludePhotos?.length) return store.photos;
-      const excluded = new Set(excludePhotos);
-      return store.photos?.filter((p) => !excluded.has(p));
-    }, [excludePhotos, store.photos]);
+    const { error, layerId, visiblePhotos } = store;
 
     const [strip, setStrip] = useState<HTMLDivElement | null>(null);
     useWheelHorizontalScroll(strip);

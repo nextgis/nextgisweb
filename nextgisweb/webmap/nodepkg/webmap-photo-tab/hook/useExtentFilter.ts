@@ -14,12 +14,14 @@ const wkt = new WKT();
 interface UseExtentFilterOptions {
   store: PhotoLayerStore;
   display: Display;
+  programmaticExtent: { current: number[] | undefined };
   onError: () => void;
 }
 
 export function useExtentFilter({
   store,
   display,
+  programmaticExtent,
   onError,
 }: UseExtentFilterOptions) {
   const { layerId } = store;
@@ -27,10 +29,7 @@ export function useExtentFilter({
   const [featureIds, setFeatureIds] = useState<Set<number>>();
   const intersects = useRef<string>(undefined);
   const controller = useRef<AbortController>(undefined);
-  const ignoreNextMove = useRef(false);
   const enabled = status !== "off";
-  const enabledRef = useRef(enabled);
-  enabledRef.current = enabled;
 
   const queryFeatureIds = useCallback(
     async (geom: string) => {
@@ -60,7 +59,6 @@ export function useExtentFilter({
   const clear = useCallback(() => {
     controller.current?.abort();
     intersects.current = undefined;
-    ignoreNextMove.current = false;
     setFeatureIds(undefined);
     setStatus("off");
   }, []);
@@ -70,13 +68,11 @@ export function useExtentFilter({
   useEffect(() => {
     if (!enabled) return;
     return display.map.adapter.subscribeMoveEnd(() => {
-      if (ignoreNextMove.current) {
-        ignoreNextMove.current = false;
-        return;
-      }
+      const kept = programmaticExtent.current;
+      if (kept && extentEquals(kept, display.map.getExtent())) return;
       clear();
     });
-  }, [display, enabled, clear]);
+  }, [display, enabled, clear, programmaticExtent]);
 
   useEffect(
     () =>
@@ -117,16 +113,5 @@ export function useExtentFilter({
     }
   };
 
-  const moveKeepingFilter = useCallback(
-    (move: () => void) => {
-      const before = display.map.getExtent();
-      move();
-      if (enabledRef.current) {
-        ignoreNextMove.current = !extentEquals(before, display.map.getExtent());
-      }
-    },
-    [display]
-  );
-
-  return { status, featureIds, toggle, clear, moveKeepingFilter };
+  return { status, featureIds, toggle, clear };
 }

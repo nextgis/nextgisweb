@@ -12,6 +12,8 @@ export interface Photo {
   attachment: FeatureAttachment;
 }
 
+export type PhotoTransform = (photos: Photo[]) => Photo[];
+
 export interface PhotoLayerStoreOptions {
   layerId: number;
   hasPhotos?: boolean;
@@ -24,6 +26,8 @@ export class PhotoLayerStore {
   @observableRef accessor knownHasPhotos: boolean | undefined = undefined;
   @observableRef accessor isLoading = false;
   @observableRef accessor error: unknown = undefined;
+  @observableRef accessor transforms: ReadonlyMap<string, PhotoTransform> =
+    new Map();
 
   private loadController?: AbortController;
   private featureUpdateListeners = new Set<(featureId?: number) => void>();
@@ -38,6 +42,28 @@ export class PhotoLayerStore {
   @computed
   get hasPhotos(): boolean | undefined {
     return this.photos ? this.photos.length > 0 : this.knownHasPhotos;
+  }
+
+  @computed
+  get visiblePhotos(): Photo[] | undefined {
+    const { photos } = this;
+    if (!photos) return undefined;
+    let result = photos;
+    for (const transform of this.transforms.values()) {
+      result = transform(result);
+    }
+    return result;
+  }
+
+  @action
+  setTransform(key: string, transform: PhotoTransform | undefined) {
+    const next = new Map(this.transforms);
+    if (transform) {
+      next.set(key, transform);
+    } else {
+      next.delete(key);
+    }
+    this.transforms = next;
   }
 
   async load() {
