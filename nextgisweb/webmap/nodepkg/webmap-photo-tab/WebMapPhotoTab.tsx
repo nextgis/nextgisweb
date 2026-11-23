@@ -1,11 +1,11 @@
 import type { PhotoLayerStore } from "@nextgisweb/webmap/photo/PhotoLayerStore";
 
-import { WebMapPanorama } from "./WebMapPanorama";
+import { WebMapPhoto } from "./WebMapPhoto";
 
 export interface WebMapPhotoTabProps {
   store: PhotoLayerStore;
 }
 
 export function WebMapPhotoTab({ store }: WebMapPhotoTabProps) {
-  return <WebMapPanorama store={store} />;
+  return <WebMapPhoto store={store} />;
 }

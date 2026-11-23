@@ -13,15 +13,15 @@ import { getPhotoKey } from "../photo/util/getPhotoKey";
 
 import { registry } from "./registry";
 
-import "./WebMapPanorama.less";
+import "./WebMapPhoto.less";
 
 const plugins = registry.queryAll();
 
-export interface WebMapPanoramaProps {
+export interface WebMapPhotoProps {
   store: PhotoLayerStore;
 }
 
-export const WebMapPanorama = observer(({ store }: WebMapPanoramaProps) => {
+export const WebMapPhoto = observer(({ store }: WebMapPhotoProps) => {
   const { layerId } = store;
   const { display } = useDisplayContext();
   const programmaticExtent = useRef<number[]>(undefined);
@@ -59,7 +59,7 @@ export const WebMapPanorama = observer(({ store }: WebMapPanoramaProps) => {
   }, [display.highlighter, display.map, layerId, selectedFeatureId]);
 
   return (
-    <div className="ngw-webmap-panorama">
+    <div className="ngw-webmap-photo">
       <ActionToolbar
         size="small"
         actions={plugins.map(({ key, component: Tool }) => (
@@ -81,4 +81,4 @@ export const WebMapPanorama = observer(({ store }: WebMapPanoramaProps) => {
   );
 });
 
-WebMapPanorama.displayName = "WebMapPanorama";
+WebMapPhoto.displayName = "WebMapPhoto";
