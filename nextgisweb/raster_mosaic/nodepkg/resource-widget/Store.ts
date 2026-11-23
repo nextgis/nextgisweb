@@ -55,10 +55,11 @@ export class Store implements EditorStore<
   }
 
   dump() {
-    if (!this.dirty) return undefined;
     const result: RasterMosaicUpdate | RasterMosaicCreate = {};
     if (this.composite.operation === "create") {
       result.srs = srsSettings.default;
+    } else if (!this.dirty) {
+      return undefined;
     }
 
     result.items = (this.items || []).map(
