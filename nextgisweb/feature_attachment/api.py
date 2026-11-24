@@ -157,7 +157,7 @@ def idelete(resource, request: Request, fid: FeatureID, aid: AttachmentID) -> JS
     """Delete feature attachment
 
     :returns: Feature attachment deleted successfully"""
-    request.resource_permission(DataScope.read)
+    request.resource_permission(DataScope.write)
 
     obj = attachment_or_not_found(resource, fid, aid)
     with resource.feature_transaction(request):
