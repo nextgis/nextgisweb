@@ -30,6 +30,7 @@ export {
   InputNumber,
   Layout,
   List,
+  Listy,
   Mentions,
   Menu,
   Modal,

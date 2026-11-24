@@ -32,7 +32,7 @@ export const BasemapSelector = observer(({ map }: BasemapSelectorProps) => {
       onChange={switchBasemap}
       style={{ width: "100%" }}
       variant="borderless"
-      suffixIcon={<UpOutlined style={{ pointerEvents: "none" }} />}
+      suffix={<UpOutlined style={{ pointerEvents: "none" }} />}
     />
   );
 });

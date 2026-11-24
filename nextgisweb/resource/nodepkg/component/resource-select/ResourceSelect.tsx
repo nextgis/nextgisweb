@@ -92,7 +92,7 @@ export function ResourceSelect<V extends number = number>({
         open={open}
         value={value}
         loading={resourceLoading}
-        suffixIcon={readOnly ? null : undefined}
+        suffix={readOnly ? null : undefined}
         popupRender={() => <></>}
         allowClear={!readOnly && allowClear}
         style={{

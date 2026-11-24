@@ -182,7 +182,7 @@ export const CoordinatesSwitcher = ({
         value={selectedSrsId}
         onChange={changeCoordinate}
         popupMatchSelectWidth={false}
-        suffixIcon={<UpOutlined style={{ pointerEvents: "none" }} />}
+        suffix={<UpOutlined style={{ pointerEvents: "none" }} />}
       />
       <Tooltip title={gettext("Copy identification point coordinates")}>
         <CopyToClipboardButton
