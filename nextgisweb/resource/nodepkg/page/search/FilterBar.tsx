@@ -29,6 +29,9 @@ const clsSelectOptions = sortBy(
   ["order", "label"]
 ) satisfies SelectProps["options"];
 
+const clsFilterOption = (input: string, option?: { label: string }) =>
+  !!option?.label.toLowerCase().includes(input.toLowerCase());
+
 export const FilterBar = observer<{ store: ResourceSearchStore }>(
   ({ store }) => {
     const { makeSignal } = useAbortController();
@@ -71,6 +74,7 @@ export const FilterBar = observer<{ store: ResourceSearchStore }>(
           options={clsSelectOptions}
           value={store.clsIn}
           maxTagCount="responsive"
+          showSearch={{ filterOption: clsFilterOption }}
           onChange={(values) => store.setTypes(values as ResourceCls[])}
         />
         <Select
