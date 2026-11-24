@@ -8,6 +8,7 @@ from ..where import (
     DEFAULT_WHERE_FUNCTIONS,
     DEFAULT_WHERE_OPERATORS,
     MAX_WHERE_LENGTH,
+    validate_where_cached,
     validate_where_expression,
 )
 
@@ -172,3 +173,35 @@ def test_too_long():
     expression = "src.a = " + "1" * MAX_WHERE_LENGTH
     with pytest.raises(ValidationError, match="too long"):
         validate_where_expression(expression, DEFAULT_WHERE_FUNCTIONS)
+
+
+def test_cached_validation():
+    validate_where_cached.cache_clear()
+    expression = "src.a = 1"
+
+    first = validate_where_cached(expression, DEFAULT_WHERE_FUNCTIONS, DEFAULT_WHERE_OPERATORS)
+    second = validate_where_cached(expression, DEFAULT_WHERE_FUNCTIONS, DEFAULT_WHERE_OPERATORS)
+    assert first is second
+    assert validate_where_cached.cache_info().hits >= 1
+
+    # A different allowlist must not reuse the cached result.
+    with_extra_function = validate_where_cached(
+        expression, (*DEFAULT_WHERE_FUNCTIONS, "my_func"), DEFAULT_WHERE_OPERATORS
+    )
+    assert with_extra_function is not first
+
+    # A cached failure must not hide a name that has since been allowed.
+    with pytest.raises(ValidationError, match="Function 'my_func' is not allowed"):
+        validate_where_cached(
+            "my_func(src.a) = 1", DEFAULT_WHERE_FUNCTIONS, DEFAULT_WHERE_OPERATORS
+        )
+    allowed = validate_where_cached(
+        "my_func(src.a) = 1",
+        (*DEFAULT_WHERE_FUNCTIONS, "my_func"),
+        DEFAULT_WHERE_OPERATORS,
+    )
+    assert allowed.functions == ("my_func",)
+
+    # The expression itself is part of the cache key as well.
+    other = validate_where_cached("src.b = 1", DEFAULT_WHERE_FUNCTIONS, DEFAULT_WHERE_OPERATORS)
+    assert other is not first

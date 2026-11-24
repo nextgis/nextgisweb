@@ -411,10 +411,6 @@ msgid "PostGIS diagnostics"
 msgstr "Диагностика PostGIS"
 
 #: model.py
-msgid "WHERE expression uses functions that are not allowed: %(functions)s"
-msgstr "Выражение WHERE использует недопустимые функции: %(functions)s"
-
-#: model.py
 msgid "WHERE function name must be a string!"
 msgstr "Имя функции WHERE должно быть строкой!"
 
@@ -423,24 +419,12 @@ msgid "Invalid WHERE function name: %(name)s"
 msgstr "Недопустимое имя функции WHERE: %(name)s"
 
 #: model.py
-msgid "Cannot remove WHERE functions used by layers: %(functions)s"
-msgstr "Невозможно удалить функции WHERE, используемые слоями: %(functions)s"
-
-#: model.py
-msgid "WHERE expression uses operators that are not allowed: %(operators)s"
-msgstr "Выражение WHERE использует недопустимые операторы: %(operators)s"
-
-#: model.py
 msgid "WHERE operator name must be a string!"
 msgstr "Имя оператора WHERE должно быть строкой!"
 
 #: model.py
 msgid "Invalid WHERE operator name: %(name)s"
 msgstr "Недопустимое имя оператора WHERE: %(name)s"
-
-#: model.py
-msgid "Cannot remove WHERE operators used by layers: %(operators)s"
-msgstr "Невозможно удалить операторы WHERE, используемые слоями: %(operators)s"
 
 #: nodepkg/connection-widget/ConnectionWidget.tsx
 msgid "Additional WHERE functions"

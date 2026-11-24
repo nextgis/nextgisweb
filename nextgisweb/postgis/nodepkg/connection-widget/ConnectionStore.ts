@@ -4,6 +4,13 @@ import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { PostgisConnectionRead } from "@nextgisweb/postgis/type/api";
 import type { EditorStore } from "@nextgisweb/resource/type";
 
+type ConnectionValue = Required<
+  Omit<PostgisConnectionRead, "where_allowlist">
+> & {
+  where_functions: string[];
+  where_operators: string[];
+};
+
 const {
   hostname,
   port,
@@ -17,7 +24,7 @@ const {
   $load: load,
   $error: error,
   $dirty: dirty,
-} = mapper<ConnectionStore, Required<PostgisConnectionRead>>({
+} = mapper<ConnectionStore, ConnectionValue>({
   validateIf: (o) => o.validate,
 });
 
@@ -43,7 +50,12 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
 
   @action
   load(value: PostgisConnectionRead) {
-    load(this, value);
+    const { where_allowlist: allowlist, ...rest } = value;
+    load(this, {
+      ...rest,
+      where_functions: allowlist?.functions ?? [],
+      where_operators: allowlist?.operators ?? [],
+    });
   }
 
   dump(): PostgisConnectionRead | undefined {
@@ -56,8 +68,10 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
       ...this.password.jsonPart(),
       ...this.database.jsonPart(),
       ...this.user_context.jsonPart(),
-      ...this.whereFunctions.jsonPart(),
-      ...this.whereOperators.jsonPart(),
+      where_allowlist: {
+        functions: this.whereFunctions.value,
+        operators: this.whereOperators.value,
+      },
     };
   }
 

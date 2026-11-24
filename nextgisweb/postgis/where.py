@@ -1,7 +1,9 @@
 import re
 from collections.abc import Iterable, Iterator
+from functools import lru_cache
 from typing import NamedTuple
 
+from msgspec import Struct, field
 from pglast import Error as PgError
 from pglast import ast, enums, parse_sql, scan
 
@@ -10,9 +12,17 @@ from nextgisweb.env import gettextf
 from nextgisweb.core.exception import ValidationError
 
 MAX_WHERE_LENGTH = 4096
+WHERE_VALIDATION_CACHE_SIZE = 256
 
 WHERE_FUNCTION_NAME_RE = re.compile(r"[a-z_][a-z0-9_]*")
 WHERE_OPERATOR_NAME_RE = re.compile(r"[~!@#$%^&*+=`<>?|/-]+")
+
+
+class WhereAllowlist(Struct, kw_only=True, forbid_unknown_fields=True):
+    """Names allowed in addition to the built-in defaults."""
+
+    functions: list[str] | None = field(default_factory=list)
+    operators: list[str] | None = field(default_factory=list)
 
 
 class ValidatedWhere(NamedTuple):
@@ -355,3 +365,32 @@ def validate_where_expression(
         tuple(sorted(used_functions)),
         tuple(sorted(used_operators)),
     )
+
+
+@lru_cache(maxsize=WHERE_VALIDATION_CACHE_SIZE)
+def _validate_where_cached(
+    expression: str, functions: tuple[str, ...], operators: tuple[str, ...]
+) -> ValidatedWhere:
+    return validate_where_expression(expression, functions, operators)
+
+
+def validate_where_cached(
+    expression: str,
+    allowed_functions: Iterable[str],
+    allowed_operators: Iterable[str],
+) -> ValidatedWhere:
+    """Validate a stored expression at query time, caching the result in the worker.
+
+    The cache key includes the expression and the full contents of both
+    allowlists. A changed allowlist or expression therefore cannot return a
+    stale result, and no cross-transaction state is stored on the layer.
+    """
+    return _validate_where_cached(
+        expression.strip(),
+        tuple(sorted(set(name.lower() for name in allowed_functions))),
+        tuple(sorted(set(name.upper() for name in allowed_operators))),
+    )
+
+
+validate_where_cached.cache_info = _validate_where_cached.cache_info
+validate_where_cached.cache_clear = _validate_where_cached.cache_clear

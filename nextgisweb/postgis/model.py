@@ -16,7 +16,7 @@ from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Mapped, mapped_column
 from zope.interface import implementer
 
-from nextgisweb.env import Base, DBSession, gettext
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
@@ -65,6 +65,9 @@ from .where import (
     DEFAULT_WHERE_OPERATORS,
     WHERE_FUNCTION_NAME_RE,
     WHERE_OPERATOR_NAME_RE,
+    ValidatedWhere,
+    WhereAllowlist,
+    validate_where_cached,
     validate_where_expression,
 )
 
@@ -116,12 +119,11 @@ class DBConnection:
 
 
 def _where_clause(layer) -> sa.ColumnElement[bool] | None:
-    expression = layer.where_expression
-    if expression is None:
+    validated = layer.validate_where()
+    if validated is None:
         return None
 
-    layer.validate_where()
-    return sa.literal_column(f"({expression})", type_=sa.Boolean)
+    return sa.literal_column(f"({validated.expression})", type_=sa.Boolean)
 
 
 def calculate_extent(layer, where=None, geomcol=None):
@@ -204,8 +206,7 @@ class PostgisConnection(Resource):
     port: Mapped[int | None] = mapped_column(sa.Integer)
     sslmode: Mapped[SSLMode | None] = mapped_column(saext.Enum(SSLMode))
     user_context: Mapped[bool] = mapped_column(sa.Boolean, default=False)
-    where_functions: Mapped[list[str] | None] = mapped_column(JSONB, default=list)
-    where_operators: Mapped[list[str] | None] = mapped_column(JSONB, default=list)
+    where_allowlist: Mapped[dict[str, list[str]] | None] = mapped_column(JSONB, default=dict)
 
     @classmethod
     def check_parent(cls, parent):
@@ -299,74 +300,49 @@ class SSLModeAttr(SColumn):
     ctypes = CRUTypes(SSLMode | None, SSLMode | None, SSLMode | None)
 
 
-class WhereNamesAttr(SAttribute):
-    ctypes = CRUTypes(list[str] | None, list[str], list[str] | None)
-
-    field: ClassVar[str]
-    defaults: ClassVar[frozenset[str]]
-    pattern: ClassVar[re.Pattern[str]]
-    lowercase: ClassVar[bool]
-    msg_not_string: ClassVar[str]
-    msg_invalid_name: ClassVar[str]
-    msg_removed: ClassVar[str]
-    removed_key: ClassVar[str]
-
-    @classmethod
-    def _normalize(cls, value: list[str] | None) -> list[str]:
-        result: set[str] = set()
-        for item in value or ():
-            if not isinstance(item, str):
-                raise ValidationError(gettext(cls.msg_not_string))
-            name = item.strip().lower() if cls.lowercase else item.strip().upper()
-            if not name:
-                continue
-            if not cls.pattern.fullmatch(name):
-                raise ValidationError(gettext(cls.msg_invalid_name) % dict(name=item))
-            result.add(name)
-        return sorted(result)
-
-    def set(self, srlzr: Serializer, value: list[str] | None, *, create: bool):
-        value = self._normalize(value)
-
-        if not create:
-            column = getattr(PostgisLayer, self.field)
-            stmt = (
-                select(column)
-                .where(PostgisLayer.connection_id == srlzr.obj.id)
-                .where(column.isnot(None))
-            )
-            used: set[str] = set()
-            for names in DBSession.execute(stmt).scalars():
-                used.update(names or ())
-            used -= self.defaults
-            if removed := sorted(used - set(value)):
+def _normalize_where_names(
+    value: list[str] | None,
+    pattern: re.Pattern[str],
+    lowercase: bool,
+    is_function: bool,
+) -> list[str]:
+    result: set[str] = set()
+    for item in value or ():
+        if not isinstance(item, str):
+            if is_function:
+                raise ValidationError(gettext("WHERE function name must be a string!"))
+            raise ValidationError(gettext("WHERE operator name must be a string!"))
+        name = item.strip().lower() if lowercase else item.strip().upper()
+        if not name:
+            continue
+        if not pattern.fullmatch(name):
+            if is_function:
                 raise ValidationError(
-                    gettext(self.msg_removed) % {self.removed_key: ", ".join(removed)}
+                    gettext("Invalid WHERE function name: %(name)s") % dict(name=item)
                 )
-
-        setattr(srlzr.obj, self.field, value)
-
-
-class WhereFunctionsAttr(WhereNamesAttr):
-    field = "where_functions"
-    defaults = DEFAULT_WHERE_FUNCTIONS
-    pattern = WHERE_FUNCTION_NAME_RE
-    lowercase = True
-    msg_not_string = "WHERE function name must be a string!"
-    msg_invalid_name = "Invalid WHERE function name: %(name)s"
-    msg_removed = "Cannot remove WHERE functions used by layers: %(functions)s"
-    removed_key = "functions"
+            raise ValidationError(
+                gettext("Invalid WHERE operator name: %(name)s") % dict(name=item)
+            )
+        result.add(name)
+    return sorted(result)
 
 
-class WhereOperatorsAttr(WhereNamesAttr):
-    field = "where_operators"
-    defaults = DEFAULT_WHERE_OPERATORS
-    pattern = WHERE_OPERATOR_NAME_RE
-    lowercase = False
-    msg_not_string = "WHERE operator name must be a string!"
-    msg_invalid_name = "Invalid WHERE operator name: %(name)s"
-    msg_removed = "Cannot remove WHERE operators used by layers: %(operators)s"
-    removed_key = "operators"
+class WhereAllowlistAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> WhereAllowlist:
+        value = srlzr.obj.where_allowlist or {}
+        return WhereAllowlist(
+            functions=list(value.get("functions") or []),
+            operators=list(value.get("operators") or []),
+        )
+
+    def set(self, srlzr: Serializer, value: WhereAllowlist | None, *, create: bool):
+        value = value or WhereAllowlist()
+        srlzr.obj.where_allowlist = dict(
+            functions=_normalize_where_names(value.functions, WHERE_FUNCTION_NAME_RE, True, True),
+            operators=_normalize_where_names(
+                value.operators, WHERE_OPERATOR_NAME_RE, False, False
+            ),
+        )
 
 
 class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
@@ -377,8 +353,7 @@ class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     database = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     user_context = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
-    where_functions = WhereFunctionsAttr(read=ConnectionScope.read, write=ConnectionScope.write)
-    where_operators = WhereOperatorsAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    where_allowlist = WhereAllowlistAttr(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 class PostgisLayerField(LayerField):
@@ -405,8 +380,6 @@ class PostgisLayer(FeatureLayerWritableMixin, Resource):
     column_geom: Mapped[str] = mapped_column(sa.Unicode)
     geometry_srid: Mapped[int] = mapped_column(sa.Integer)
     where_expression: Mapped[str | None] = mapped_column(sa.Text)
-    where_functions: Mapped[list[str] | None] = mapped_column(JSONB)
-    where_operators: Mapped[list[str] | None] = mapped_column(JSONB)
 
     __field_class__ = PostgisLayerField
 
@@ -420,36 +393,37 @@ class PostgisLayer(FeatureLayerWritableMixin, Resource):
         return isinstance(parent, ResourceGroup)
 
     def allowed_where_functions(self) -> frozenset[str]:
-        extra = self.connection.where_functions if self.connection is not None else ()
+        extra = (
+            (self.connection.where_allowlist or {}).get("functions")
+            if self.connection is not None
+            else None
+        )
         return DEFAULT_WHERE_FUNCTIONS | frozenset(extra or ())
 
     def allowed_where_operators(self) -> frozenset[str]:
-        extra = self.connection.where_operators if self.connection is not None else ()
+        extra = (
+            (self.connection.where_allowlist or {}).get("operators")
+            if self.connection is not None
+            else None
+        )
         return DEFAULT_WHERE_OPERATORS | frozenset(extra or ())
 
-    def validate_where(self):
-        """Check the stored WHERE against the current connection's allowlists.
+    def validate_where(self) -> ValidatedWhere | None:
+        """Validate the stored WHERE against the connection's current allowlist.
 
-        Re-run after a connection change, since SResource can replace the
-        connection without going through WhereExpressionAttr.set().
+        Called on every feature query, so neither the expression nor the
+        allowlist is duplicated on the layer. The worker-local cache is keyed by
+        both, making a changed allowlist visible immediately.
         """
-        missing_functions = sorted(
-            set(self.where_functions or ()) - self.allowed_where_functions()
-        )
-        if missing_functions:
-            raise ValidationError(
-                gettext("WHERE expression uses functions that are not allowed: %(functions)s")
-                % dict(functions=", ".join(missing_functions))
-            )
+        expression = self.where_expression
+        if expression is None:
+            return None
 
-        missing_operators = sorted(
-            set(self.where_operators or ()) - self.allowed_where_operators()
+        return validate_where_cached(
+            expression,
+            self.allowed_where_functions(),
+            self.allowed_where_operators(),
         )
-        if missing_operators:
-            raise ValidationError(
-                gettext("WHERE expression uses operators that are not allowed: %(operators)s")
-                % dict(operators=", ".join(missing_operators))
-            )
 
     @contextmanager
     def connect(self, tx=False, *, user: User | None = None):
@@ -777,8 +751,6 @@ class WhereExpressionAttr(SAttribute):
         value = value.strip() if value is not None else None
         if not value:
             srlzr.obj.where_expression = None
-            srlzr.obj.where_functions = None
-            srlzr.obj.where_operators = None
             return
 
         validated = validate_where_expression(
@@ -787,8 +759,6 @@ class WhereExpressionAttr(SAttribute):
             srlzr.obj.allowed_where_operators(),
         )
         srlzr.obj.where_expression = validated.expression
-        srlzr.obj.where_functions = list(validated.functions) or None
-        srlzr.obj.where_operators = list(validated.operators) or None
 
 
 class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
@@ -803,16 +773,6 @@ class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     where_expression = WhereExpressionAttr(read=ResourceScope.read, write=ResourceScope.update)
 
     fields = FieldsAttr(read=None, write=ResourceScope.update)
-
-    def deserialize(self):
-        super().deserialize()
-        # SResource may replace the connection without re-running
-        # WhereExpressionAttr.set(), so recheck the stored WHERE here.
-        try:
-            self.obj.validate_where()
-        except ValidationError as exc:
-            exc.data["attribute"] = "where_expression"
-            raise
 
 
 @implementer(

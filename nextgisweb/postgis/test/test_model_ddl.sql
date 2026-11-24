@@ -20,8 +20,7 @@ CREATE TABLE postgis_connection (
     port integer,
     sslmode character varying(50),
     user_context boolean NOT NULL,
-    where_functions jsonb,
-    where_operators jsonb,
+    where_allowlist jsonb,
     PRIMARY KEY (id),
     FOREIGN KEY (id) REFERENCES resource (id)
 );
@@ -39,8 +38,6 @@ CREATE TABLE postgis_layer (
     column_geom character varying NOT NULL,
     geometry_srid integer NOT NULL,
     where_expression text,
-    where_functions jsonb,
-    where_operators jsonb,
     srs_id integer NOT NULL,
     geometry_type character varying(50) NOT NULL,
     feature_label_field_id integer,
