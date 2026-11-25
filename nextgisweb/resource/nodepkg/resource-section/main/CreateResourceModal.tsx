@@ -1,9 +1,10 @@
 import { sortBy } from "lodash-es";
 import { useMemo, useRef, useState } from "react";
 
-import { Button, InputValue, Modal } from "@nextgisweb/gui/antd";
+import { Button, Flex, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
 import type { InputRef, ModalProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
+import { useContainerWidth } from "@nextgisweb/gui/hook/useContainerWidth";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
@@ -42,6 +43,8 @@ export default function CreateResourceModal({
   const [search, setSearch] = useState("");
 
   const searchRef = useRef<InputRef>(null);
+  const [content, setContent] = useState<HTMLElement | null>(null);
+  const compact = useContainerWidth(content) < 660;
 
   const [resData, catData] = useMemo(() => {
     const outCat: Record<string, BlueprintCategory> = {
@@ -89,6 +92,18 @@ export default function CreateResourceModal({
     "color-primary-bg": "colorPrimaryBg",
   });
 
+  const searchInput = (
+    <InputValue
+      ref={searchRef}
+      value={search}
+      onChange={setSearch}
+      placeholder={msgSearchPlaceholder}
+      type="search"
+      allowClear
+      style={compact ? { flex: "1 1 10rem", minWidth: 0 } : undefined}
+    />
+  );
+
   return (
     <Modal
       classNames={{ container: "ngw-resource-create-resource-modal" }}
@@ -96,16 +111,7 @@ export default function CreateResourceModal({
       title={
         <>
           <div className="title">{msgCreateResource}</div>
-          <div className="search">
-            <InputValue
-              ref={searchRef}
-              value={search}
-              onChange={setSearch}
-              placeholder={msgSearchPlaceholder}
-              type="search"
-              allowClear
-            />
-          </div>
+          {!compact && <div className="search">{searchInput}</div>}
         </>
       }
       afterOpenChange={(open) => {
@@ -119,26 +125,66 @@ export default function CreateResourceModal({
       centered
       {...props}
     >
-      <div className="categories">
-        {catData.map((i) => (
-          <div
-            key={i.identity}
-            className={i.identity === curCatIdentity ? "selected" : undefined}
-            onClick={() => setCurCatIdentity(i.identity)}
-          >
-            {i.label}
+      <Flex
+        ref={setContent}
+        className="picker-content"
+        gap="1rem"
+        vertical={compact}
+      >
+        {compact ? (
+          <Flex gap="small" wrap>
+            <Select
+              aria-label={gettext("Category")}
+              value={curCatIdentity}
+              options={catData.map(({ identity, label }) => ({
+                value: identity,
+                label,
+              }))}
+              onChange={setCurCatIdentity}
+              style={{ flex: "1 1 10rem", minWidth: 0 }}
+            />
+            {searchInput}
+          </Flex>
+        ) : (
+          <div className="categories">
+            {catData.map((i) => (
+              <div
+                key={i.identity}
+                className={
+                  i.identity === curCatIdentity ? "selected" : undefined
+                }
+                onClick={() => setCurCatIdentity(i.identity)}
+              >
+                {i.label}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="resources">
-        <div className="grid">
-          {resSelCat.map((i) => (
-            <Button key={i.key} href={i.url} icon={i.icon} size="large">
-              {i.label}
-            </Button>
-          ))}
+        )}
+        <div
+          className="resources"
+          style={
+            compact ? { maxHeight: "50dvh", paddingInlineEnd: 0 } : undefined
+          }
+        >
+          <div
+            className="grid"
+            style={
+              compact
+                ? {
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(min(100%, 11rem), 1fr))",
+                  }
+                : undefined
+            }
+          >
+            {resSelCat.map((i) => (
+              <Button key={i.key} href={i.url} icon={i.icon} size="large">
+                {i.label}
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
+      </Flex>
     </Modal>
   );
 }

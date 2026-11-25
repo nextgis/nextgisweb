@@ -94,7 +94,7 @@ export const SettingsForm: FC<SettingsFormProps> = ({
       layout="vertical"
     >
       <Row>
-        <Col span={8}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item>
             <Space orientation="horizontal">
               <Form.Item noStyle name="hide_nav_menu" valuePropName="checked">
@@ -105,8 +105,8 @@ export const SettingsForm: FC<SettingsFormProps> = ({
           </Form.Item>
         </Col>
       </Row>
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
+      <Row gutter={16}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item name="legend_symbols" label={msgLegendSymbolsLabel}>
             <LegendSymbolsSelect
               style={INPUT_DEFAULT_WIDTH}
@@ -118,8 +118,8 @@ export const SettingsForm: FC<SettingsFormProps> = ({
 
       <Title level={4}>{gettext("Identification")}</Title>
 
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
+      <Row gutter={16}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item>
             <Space orientation="horizontal">
               <Form.Item
@@ -133,7 +133,7 @@ export const SettingsForm: FC<SettingsFormProps> = ({
             </Space>
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item>
             <Space orientation="horizontal">
               <Form.Item
@@ -149,8 +149,8 @@ export const SettingsForm: FC<SettingsFormProps> = ({
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
+      <Row gutter={16}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item
             name="identify_radius"
             label={gettext("Radius, px")}
@@ -167,25 +167,25 @@ export const SettingsForm: FC<SettingsFormProps> = ({
 
       <Title level={4}>{gettext("Measurement")}</Title>
 
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
+      <Row gutter={16}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item name="units_length" label={gettext("Length units")}>
             <Select options={UnitsLengthOptions} style={INPUT_DEFAULT_WIDTH} />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item name="units_area" label={gettext("Area units")}>
             <Select options={UnitsAreaOptions} style={INPUT_DEFAULT_WIDTH} />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item name="degree_format" label={gettext("Degree format")}>
             <Select options={DegreeFormatOptions} style={INPUT_DEFAULT_WIDTH} />
           </Form.Item>
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]}>
+      <Row gutter={16}>
         <Col span={24}>
           <Form.Item name="measurement_srid" label={gettext("Measurement SRS")}>
             <Select options={srsOptions} style={INPUT_DEFAULT_WIDTH} />
@@ -195,8 +195,8 @@ export const SettingsForm: FC<SettingsFormProps> = ({
 
       <Title level={4}>{gettext("Address search")}</Title>
 
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
+      <Row gutter={16}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item>
             <Space orientation="horizontal">
               <Form.Item
@@ -210,7 +210,7 @@ export const SettingsForm: FC<SettingsFormProps> = ({
             </Space>
           </Form.Item>
         </Col>
-        <Col span={16}>
+        <Col xs={24} sm={12} md={16}>
           <Form.Item>
             <Space orientation="horizontal">
               <Form.Item
@@ -226,8 +226,8 @@ export const SettingsForm: FC<SettingsFormProps> = ({
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
+      <Row gutter={16}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item name="address_geocoder" label={gettext("Provider")}>
             <Select
               options={AddressGeocoderOptions}
@@ -235,7 +235,7 @@ export const SettingsForm: FC<SettingsFormProps> = ({
             />
           </Form.Item>
         </Col>
-        <Col span={16}>
+        <Col xs={24} sm={12} md={16}>
           {geocoder === "nominatim" ? (
             <Form.Item
               name="nominatim_countrycodes"

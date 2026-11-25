@@ -66,7 +66,6 @@ def login(request: Request):
         props=dict(reloadAfterLogin=False),
         layout_mode="headerOnly",
         title=gettext("Sign in to Web GIS"),
-        adaptive=True,
         hide_resource_filter=True,
     )
 
@@ -319,7 +318,6 @@ def forbidden_error_handler(*, request: Request, exc: UserException, **kwargs):
                     props=dict(
                         reloadAfterLogin=True,
                     ),
-                    adaptive=True,
                     hide_resource_filter=True,
                 ),
                 request=request,

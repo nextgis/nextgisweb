@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { StrictMode, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
-import { Modal, Spin, useToken } from "@nextgisweb/gui/antd";
+import { Grid, Modal, Spin, useToken } from "@nextgisweb/gui/antd";
 import { Breadcrumbs } from "@nextgisweb/gui/component/Breadcrumbs";
 import type { BreadcrumbItem } from "@nextgisweb/gui/component/Breadcrumbs";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
@@ -76,6 +76,25 @@ function PyramidLayout({
   dynMenuItems,
   hideResourceFilter = false,
 }: PyramidLayoutProps) {
+  const screens = Grid.useBreakpoint();
+  const collapseSidebar = !screens.lg && !hideMenu;
+  const sidebar =
+    layoutMode !== "headerOnly" &&
+    (dynMenuResourceId !== undefined ? (
+      <>
+        <Attrmenu resourceId={dynMenuResourceId} />
+        <CBlock slot="pyramid.sidebar" />
+      </>
+    ) : (
+      dynMenuItems &&
+      dynMenuItems.length > 0 && (
+        <>
+          <Dynmenu items={dynMenuItems} />
+          <CBlock slot="pyramid.sidebar" />
+        </>
+      )
+    ));
+
   return (
     <div
       className={classNames("ngw-pyramid-layout", {
@@ -89,6 +108,7 @@ function PyramidLayout({
         header={header}
         hideResourceFilter={hideResourceFilter}
         hideMenu={hideMenu}
+        sidebar={collapseSidebar ? sidebar : undefined}
       />
 
       {layoutMode === "headerOnly" ? (
@@ -119,19 +139,8 @@ function PyramidLayout({
             </div>
           </div>
 
-          {dynMenuResourceId !== undefined ? (
-            <div className="ngw-pyramid-layout-sidebar">
-              <Attrmenu resourceId={dynMenuResourceId} />
-              <CBlock slot="pyramid.sidebar" />
-            </div>
-          ) : (
-            dynMenuItems &&
-            dynMenuItems.length > 0 && (
-              <div className="ngw-pyramid-layout-sidebar">
-                <Dynmenu items={dynMenuItems} />
-                <CBlock slot="pyramid.sidebar" />
-              </div>
-            )
+          {!collapseSidebar && sidebar && (
+            <div className="ngw-pyramid-layout-sidebar">{sidebar}</div>
           )}
         </div>
       )}

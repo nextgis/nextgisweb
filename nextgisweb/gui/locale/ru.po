@@ -60,7 +60,7 @@ msgstr "Ложь"
 msgid "Not set"
 msgstr "Не установлен"
 
-#: nodepkg/component/SaveButton.tsx:19 nodepkg/model-form/ModelForm.tsx:52
+#: nodepkg/component/SaveButton.tsx:16 nodepkg/model-form/ModelForm.tsx:54
 msgid "Save"
 msgstr "Сохранить"
 
@@ -72,55 +72,99 @@ msgstr "Ещё"
 msgid "Less"
 msgstr "Свернуть"
 
-#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:150
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:151
 msgid "Close"
 msgstr "Закрыть"
 
-#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:159
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:160
 msgid "Apply"
 msgstr "Применить"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:62
+#: nodepkg/component/extent-row/ExtentRow.tsx:68
 msgid "Left"
 msgstr "Лево"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:63
+#: nodepkg/component/extent-row/ExtentRow.tsx:68
+msgctxt "extent_box"
+msgid "L"
+msgstr "Л"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:69
 msgid "Bottom"
 msgstr "Низ"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:64
+#: nodepkg/component/extent-row/ExtentRow.tsx:69
+msgctxt "extent_box"
+msgid "B"
+msgstr "Н"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:70
 msgid "Right"
 msgstr "Право"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:65
+#: nodepkg/component/extent-row/ExtentRow.tsx:70
+msgctxt "extent_box"
+msgid "R"
+msgstr "П"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:71
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:68
+#: nodepkg/component/extent-row/ExtentRow.tsx:71
+msgctxt "extent_box"
+msgid "T"
+msgstr "В"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:74
 msgid "West"
 msgstr "Запад"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:69
+#: nodepkg/component/extent-row/ExtentRow.tsx:74
+msgctxt "extent_geo"
+msgid "W"
+msgstr "З"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:75
 msgid "South"
 msgstr "Юг"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:70
+#: nodepkg/component/extent-row/ExtentRow.tsx:75
+msgctxt "extent_geo"
+msgid "S"
+msgstr "Ю"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:76
 msgid "East"
 msgstr "Восток"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:71
+#: nodepkg/component/extent-row/ExtentRow.tsx:76
+msgctxt "extent_geo"
+msgid "E"
+msgstr "В"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:77
 msgid "North"
 msgstr "Север"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:137
+#: nodepkg/component/extent-row/ExtentRow.tsx:77
+msgctxt "extent_geo"
+msgid "N"
+msgstr "С"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:115
 msgid "From layers"
 msgstr "Из слоев"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:163
+#: nodepkg/component/extent-row/ExtentRow.tsx:116
+msgid "Coordinates"
+msgstr "Координаты"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:224
 msgid "Edit on map"
 msgstr "Редактировать на карте"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:168
+#: nodepkg/component/extent-row/ExtentRow.tsx:229
 msgid "Clean"
 msgstr "Очистить"
 
@@ -244,15 +288,15 @@ msgstr "Нет"
 msgid "Backslash"
 msgstr "Обратная косая черта"
 
-#: nodepkg/edi-table/EdiTableKeyValue.tsx:11
+#: nodepkg/edi-table/EdiTableKeyValue.tsx:17
 msgid "Type here to add a new item..."
 msgstr "Введите новый ключ здесь..."
 
-#: nodepkg/edi-table/EdiTableKeyValue.tsx:42
+#: nodepkg/edi-table/EdiTableKeyValue.tsx:48
 msgid "Key required"
 msgstr "Требуется ключ"
 
-#: nodepkg/edi-table/EdiTableKeyValue.tsx:48
+#: nodepkg/edi-table/EdiTableKeyValue.tsx:54
 msgid "Key not unique"
 msgstr "Ключ не уникален"
 
@@ -262,7 +306,7 @@ msgstr "Клонировать"
 
 #: nodepkg/edi-table/RowAction.tsx:76 nodepkg/focus-table/action.tsx:27
 #: nodepkg/hook/useConfirm.tsx:54 nodepkg/model-browse/ModelBrowse.tsx:276
-#: nodepkg/model-browse/ModelBrowse.tsx:343 nodepkg/model-form/ModelForm.tsx:53
+#: nodepkg/model-browse/ModelBrowse.tsx:343 nodepkg/model-form/ModelForm.tsx:55
 msgid "Delete"
 msgstr "Удалить"
 
@@ -286,11 +330,11 @@ msgstr "OK"
 msgid "Back to home"
 msgstr "На главную"
 
-#: nodepkg/error/extractError.ts:5
+#: nodepkg/error/extractError.ts:8
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
-#: nodepkg/error/extractError.ts:6
+#: nodepkg/error/extractError.ts:9
 msgid "Error"
 msgstr "Ошибка"
 
@@ -326,7 +370,7 @@ msgstr "Пожалуйста, подтвердите удаление."
 msgid "Failed to delete."
 msgstr "Не удалось удалить."
 
-#: nodepkg/model-browse/ModelBrowse.tsx:130 nodepkg/model-form/ModelForm.tsx:76
+#: nodepkg/model-browse/ModelBrowse.tsx:130 nodepkg/model-form/ModelForm.tsx:81
 msgid "Confirmation"
 msgstr "Подтверждение"
 
@@ -362,11 +406,11 @@ msgstr "Просмотр"
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:319 nodepkg/model-form/ModelForm.tsx:51
+#: nodepkg/model-browse/ModelBrowse.tsx:319 nodepkg/model-form/ModelForm.tsx:53
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/model-form/ModelForm.tsx:121
+#: nodepkg/model-form/ModelForm.tsx:126
 msgid "Fix the form errors first"
 msgstr "Необходимо исправить ошибки в форме"
 
@@ -378,10 +422,10 @@ msgstr "Логотип сохранен. Для просмотра измене�
 msgid "Operation in progress"
 msgstr "Выполняется операция"
 
-#: nodepkg/single-setting-form/SingleSettingForm.tsx:24
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:21
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/single-setting-form/SingleSettingForm.tsx:25
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:22
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."

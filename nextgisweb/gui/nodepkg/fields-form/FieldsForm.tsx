@@ -48,7 +48,7 @@ export function FieldsForm<
     initialValues,
     autoComplete: "off",
     labelCol: { span: 5 },
-    labelAlign: "left",
+    labelAlign: "start",
     ...formProps,
     ...(onChange && { onFieldsChange }),
   };
