@@ -52,7 +52,10 @@ export function PhotoItem({
     };
   }, [layerId, featureId, attachment.id]);
 
-  const attachments = useMemo(() => [attachment], [attachment]);
+  const attachments = useMemo(
+    () => [{ ...attachment, description: attachment.name }],
+    [attachment]
+  );
 
   const handleOpenChange = useCallback(
     (open: boolean) => {

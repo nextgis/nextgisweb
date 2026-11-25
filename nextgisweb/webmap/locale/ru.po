@@ -1464,12 +1464,3 @@ msgstr "Просмотр встроенной веб-карты"
 #: view.py:125
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
-
-#~ msgid "View"
-#~ msgstr "Просмотр"
-
-#~ msgid "Selection"
-#~ msgstr "Выбор"
-
-#~ msgid "Show only photos in the current map extent"
-#~ msgstr "Показывать только фотографии в текущем охвате карты"
