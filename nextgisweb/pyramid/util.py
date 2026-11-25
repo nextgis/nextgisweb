@@ -8,14 +8,14 @@ from functools import cache
 from pathlib import Path
 from threading import Thread
 from time import sleep
-from typing import Any, Literal
+from typing import Any, ClassVar, Literal
 
 from babel import Locale
 from babel.core import UnknownLocaleError
 
 from nextgisweb.lib.logging import logger
 
-from .tomb import Request
+from .tomb import HTTPBadRequest, Request
 
 
 def viewargs[T](
@@ -33,7 +33,15 @@ def viewargs[T](
     return wrap
 
 
+def _static_path_re() -> re.Pattern:
+    char = r"[a-zA-Z0-9_@+~-]"
+    comp = rf"{char}+(?:\.{char}+)*"
+    return re.compile(rf"^{comp}(?:/{comp})*$")
+
+
 class StaticMap:
+    _path_re: ClassVar[re.Pattern] = _static_path_re()
+
     def __init__(self):
         def node():
             res = defaultdict(node)
@@ -42,13 +50,16 @@ class StaticMap:
 
         self.data = node()
 
-    def add(self, uri, path):
+    def add(self, uri: str, path: Path) -> None:
         n = self.data
         for p in uri.split("/"):
             n = n[p]
         n[None] = path
 
-    def lookup(self, subpath) -> Path:
+    def lookup(self, subpath: str) -> Path:
+        if not self._path_re.match(subpath):
+            raise ValueError
+
         n = self.data
         u = subpath.split("/")
         while True:
@@ -60,7 +71,7 @@ class StaticMap:
                 n = n[h]
             else:
                 if p := n[None]:
-                    return p / h / "/".join(u)
+                    return p.joinpath(h, *u)
                 else:
                     raise KeyError
 
@@ -81,6 +92,8 @@ class StaticSourcePredicate:
 
         try:
             path = static_map.lookup(subpath)
+        except ValueError:
+            raise HTTPBadRequest
         except KeyError:
             return False
         else:
