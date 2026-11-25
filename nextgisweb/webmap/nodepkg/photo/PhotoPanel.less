@@ -7,7 +7,6 @@
 
   > .strip {
     flex: 1 1 0;
-    padding: 8px 0;
     min-height: 0;
     overflow-x: auto;
     overflow-y: hidden;
@@ -33,7 +32,8 @@
     position: absolute;
     opacity: 0;
     z-index: 2;
-    inset-block: 0;
+    inset-block-end: var(--scrollbar-reserve, 0px);
+    inset-block-start: 0;
     width: 24px;
     pointer-events: none;
     content: "";

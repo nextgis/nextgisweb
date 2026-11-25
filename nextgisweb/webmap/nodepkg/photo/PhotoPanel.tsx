@@ -91,7 +91,12 @@ export const PhotoPanel = observer(
           "shadow-start": edges.start,
           "shadow-end": edges.end,
         })}
-        style={style}
+        style={
+          {
+            ...style,
+            "--scrollbar-reserve": `${SCROLLBAR_RESERVE}px`,
+          } as CSSProperties
+        }
       >
         {placeholder ? (
           <div className="placeholder">
