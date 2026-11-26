@@ -2,6 +2,7 @@ from osgeo import gdal, osr
 
 __all__ = [
     "SpatialReferenceError",
+    "osr_use_exceptions",
     "sr_from_epsg",
     "sr_from_wkt",
     "traditional_axis_mapping",

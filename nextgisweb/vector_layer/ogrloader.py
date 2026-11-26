@@ -12,6 +12,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.json import dumps, loads
 from nextgisweb.lib.ogrhelper import FIELD_GETTER, cohere_bytearray
+from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
@@ -465,11 +466,19 @@ class OGRLoader:
                 )
 
             target_osr = srs.to_osr()
-            transform = (
-                osr.CoordinateTransformation(source_osr, target_osr)
-                if not source_osr.IsSame(target_osr)
-                else None
-            )
+            if not source_osr.IsSame(target_osr):
+                with osr.ExceptionMgr(useExceptions=True):
+                    try:
+                        transform = osr.CoordinateTransformation(source_osr, target_osr)
+                    except UnicodeDecodeError:
+                        # Workaround for broken encoding in WKT
+                        osr_wkt = source_osr.ExportToWkt()
+                        assert isinstance(osr_wkt, bytes)
+                        osr_wkt_fixed = osr_wkt.decode("utf-8", "replace")
+                        source_osr = sr_from_wkt(osr_wkt_fixed)
+                        transform = osr.CoordinateTransformation(source_osr, target_osr)
+            else:
+                transform = None
             wkb_type = GEOM_TYPE_2_WKB_TYPE[self.geometry_type]
 
         fields = list[tuple[int, str, str, Callable[[ogr.Feature], Any], int]]()

@@ -220,6 +220,11 @@ CREATE_TEST_PARAMS = (
         {"fix_errors": "LOSSY"},
         {"fields": ("поле_", "поле__1"), "feature_count": 1},
     ),
+    (
+        "proj-encoding.zip",
+        {},
+        {"feature_count": 1},
+    ),
 )
 
 
