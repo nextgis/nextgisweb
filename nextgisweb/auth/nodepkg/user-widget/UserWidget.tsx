@@ -67,6 +67,12 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
         rules: [KeynameRule],
         formItem: <Input />,
       },
+      {
+        name: "oauth_subject",
+        label: oauth.name,
+        formItem: <Input disabled />,
+        included: oauth.enabled && !isNewUser,
+      },
       ...(showFullColumns
         ? [
             {
@@ -83,16 +89,9 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
                   placeholder={gettext("Enter new password here")}
                 />
               ),
-              required: true,
             },
           ]
         : []),
-      {
-        name: "oauth_subject",
-        label: oauth.name,
-        formItem: <Input disabled />,
-        included: oauth.enabled && !isNewUser,
-      },
       {
         name: "alink",
         label: gettext("Authorization link"),

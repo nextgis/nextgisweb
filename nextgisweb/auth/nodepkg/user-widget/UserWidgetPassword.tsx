@@ -1,24 +1,24 @@
 import { useMemo, useState } from "react";
 import type { ChangeEvent, ComponentProps } from "react";
 
-import { Input, Select, Space } from "@nextgisweb/gui/antd";
-import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
+import { Flex, Input, Select } from "@nextgisweb/gui/antd";
+import { pgettext, pgettextf } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
 
 const modes = [
   {
-    label: gettext("Keep existing"),
+    label: pgettext("password_mode", "Keep existing"),
     value: "keep",
   },
   {
-    label: gettext("Assign new"),
+    label: pgettext("password_mode", "Assign new"),
     value: "assign",
   },
   {
     label: oauth.enabled
-      ? gettextf("{name} only")({ name: oauth.name })
-      : gettext("Turn off"),
+      ? pgettextf("password_mode", "{name} only")({ name: oauth.name })
+      : pgettext("password_mode", "Turn off"),
     value: "turn_off",
   },
 ];
@@ -68,11 +68,16 @@ export const UserWidgetPassword = ({
   }, [value]);
 
   return (
-    <Space.Compact style={{ display: "flex", width: "100%" }}>
+    <Flex gap="medium" align="center">
       <Select
-        onChange={onModeChange}
+        style={
+          mode === "assign"
+            ? { flexGrow: "0", flexShrink: "0", width: "20em" }
+            : undefined
+        }
         popupMatchSelectWidth={false}
         value={mode}
+        onChange={onModeChange}
       >
         {availableModes.map((m) => (
           <Select.Option key={m.value} value={m.value}>
@@ -84,11 +89,11 @@ export const UserWidgetPassword = ({
         <Input.Password
           style={{ flexGrow: "1" }}
           value={mode === "assign" ? String(password) : ""}
-          onChange={onPasswordChange}
           disabled={mode !== "assign"}
+          onChange={onPasswordChange}
           {...inputProps}
-        ></Input.Password>
+        />
       )}
-    </Space.Compact>
+    </Flex>
   );
 };

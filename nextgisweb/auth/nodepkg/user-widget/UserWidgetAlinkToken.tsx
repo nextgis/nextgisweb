@@ -1,26 +1,26 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Flex, Input, Select } from "@nextgisweb/gui/antd";
+import { Flex, Input, Select, Space } from "@nextgisweb/gui/antd";
 import type { InputProps } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { assert } from "@nextgisweb/jsrealm/error";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, pgettext } from "@nextgisweb/pyramid/i18n";
 
 const modes = [
   {
     key: "keep" as const,
     model: undefined,
-    label: gettext("Keep existing"),
+    label: pgettext("alink_mode", "Keep existing"),
   },
   {
     key: "assign" as const,
     model: true,
-    label: gettext("Assign new"),
+    label: pgettext("alink_mode", "Assign new"),
   },
   {
     key: "turn_off" as const,
     model: false,
-    label: gettext("Turn off"),
+    label: pgettext("alink_mode", "Turn off"),
   },
 ];
 
@@ -68,7 +68,7 @@ export function UserWidgetAlinkToken({
       <Select
         style={
           state[0] !== "turn_off"
-            ? { flexGrow: "0", flexShrink: "0", width: "15em" }
+            ? { flexGrow: "0", flexShrink: "0", width: "20em" }
             : undefined
         }
         popupMatchSelectWidth={false}
@@ -82,18 +82,18 @@ export function UserWidgetAlinkToken({
         }}
       />
       {state[0] === "keep" && (
-        <>
+        <Space.Compact style={{ flexGrow: "1" }}>
           <Input.Password
             style={{ flexGrow: "1" }}
             value={url}
             readOnly={true}
           />
           <CopyToClipboardButton
-            type="link"
+            type="default"
             getTextToCopy={() => url}
             iconOnly
           />
-        </>
+        </Space.Compact>
       )}
       {state[0] === "assign" && (
         <span style={{ flexGrow: "1" }}>
