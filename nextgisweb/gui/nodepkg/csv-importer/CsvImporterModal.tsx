@@ -62,6 +62,7 @@ export default function CsvImporterModal({
 
   return (
     <Modal
+      fullscreenOnMobile
       {...props}
       title={title}
       width={width}
@@ -81,7 +82,7 @@ export default function CsvImporterModal({
         </>
       }
     >
-      <div style={{ height: contentHeight }}>
+      <div style={{ height: contentHeight, flex: 1, minHeight: 0 }}>
         <CsvImporter targetColumns={targetColumns} onChange={setRows} />
       </div>
     </Modal>

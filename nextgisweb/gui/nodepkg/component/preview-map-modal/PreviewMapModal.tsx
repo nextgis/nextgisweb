@@ -16,13 +16,14 @@ export function PreviewMapModal({
 }: PreviewMapModalProps) {
   return (
     <Modal
+      fullscreenOnMobile
       className="map-preview-modal"
       {...props}
       onCancel={onCancel}
-      closeIcon={false}
+      closeIcon={onCancel ? undefined : false}
       footer={null}
-      width={"60vw"}
-      height={"60vh"}
+      width="60vw"
+      height="60vh"
     >
       {children}
     </Modal>

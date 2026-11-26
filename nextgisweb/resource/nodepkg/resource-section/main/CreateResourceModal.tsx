@@ -106,6 +106,7 @@ export default function CreateResourceModal({
 
   return (
     <Modal
+      fullscreenOnMobile
       classNames={{ container: "ngw-resource-create-resource-modal" }}
       style={{ ...themeVariables, ...(style ? style : {}) }}
       title={
@@ -162,9 +163,7 @@ export default function CreateResourceModal({
         )}
         <div
           className="resources"
-          style={
-            compact ? { maxHeight: "50dvh", paddingInlineEnd: 0 } : undefined
-          }
+          style={compact ? { paddingInlineEnd: 0 } : undefined}
         >
           <div
             className="grid"

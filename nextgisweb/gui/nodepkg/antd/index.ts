@@ -33,7 +33,6 @@ export {
   Listy,
   Mentions,
   Menu,
-  Modal,
   Pagination,
   Popconfirm,
   Popover,
@@ -88,6 +87,9 @@ export type { TableProps, TableRef } from "./table";
 export type { TabsProps } from "./tabs";
 export type { InputIntegerProps } from "./input-integer";
 export type { InputBigIntegerProps } from "./input-big-integer";
+
+export { default as Modal } from "./Modal";
+export type { ModalProps } from "./Modal";
 
 export { InputValue, PasswordValue } from "./InputValue";
 export { CheckboxValue } from "./CheckboxValue";

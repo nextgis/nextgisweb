@@ -2,7 +2,24 @@
   width: fit-content;
 
   .ant-modal-container {
+    display: flex;
+    flex-direction: column;
     border-radius: 0;
     padding: 0 !important;
+    height: 100%;
+  }
+
+  .ant-modal-body {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .ant-modal-close {
+    display: none;
+  }
+
+  // Keep a close button available while the layer is loading.
+  &.ngw-modal-fullscreen:not(:has(.ngw-webmap-map-container)) .ant-modal-close {
+    display: inline-flex;
   }
 }

@@ -137,7 +137,7 @@ export function ExtentEditorModal({
   return (
     <PreviewMapModal open={open} {...props}>
       <PreviewMap
-        style={{ height: "60vh", width: "60vw" }}
+        style={{ height: "100%" }}
         basemap
         allowMapModeChange={false}
         initialMapExtent={initialMapExtent}

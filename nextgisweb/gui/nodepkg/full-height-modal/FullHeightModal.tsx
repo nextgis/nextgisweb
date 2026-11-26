@@ -17,6 +17,7 @@ export function FullHeightModal({
 }: FullHeightModalProps) {
   return (
     <Modal
+      fullscreenOnMobile
       className={classNames("ngw-full-height-modal", className)}
       width={width}
       centered={centered}

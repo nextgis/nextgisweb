@@ -32,9 +32,6 @@ const getPickerModalProps = ({
   const bodyStyle =
     styles && "body" in styles ? styles.body : defaultCardBodyStyle;
 
-  cardOptions.styles = { ...cardOptions.styles, body: bodyStyle };
-  cardOptions.style = cardOptions.style || defaultCardStyle;
-
   const modalProps: ModalProps = {
     ...modalDefaultProps,
     styles: {
@@ -46,8 +43,19 @@ const getPickerModalProps = ({
     },
   };
 
-  const cardProps = {
+  const cardProps: CardProps = {
     ...cardOptions,
+    style: {
+      ...(cardOptions.style || defaultCardStyle),
+      display: "flex",
+      flexDirection: "column",
+      flex: 1,
+      minHeight: 0,
+    },
+    styles: {
+      ...cardOptions.styles,
+      body: { ...bodyStyle, flex: "1 1 auto", minHeight: 0 },
+    },
   };
 
   return { modalProps, cardProps };

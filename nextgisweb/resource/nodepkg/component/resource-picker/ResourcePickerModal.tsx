@@ -75,6 +75,7 @@ function ResourcePickerModal<V extends SelectValue = SelectValue>({
 
   return (
     <Modal
+      fullscreenOnMobile
       className="resource-picker-modal"
       open={open}
       destroyOnHidden

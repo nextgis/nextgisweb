@@ -18,6 +18,7 @@ export function EditorModal({
 }: PropsWithChildren<ModalProps>) {
   return (
     <Modal
+      fullscreenOnMobile
       className={classNames("ngw-editor-modal", className)}
       width={width}
       centered={centered}

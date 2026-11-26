@@ -27,10 +27,7 @@ function PreviewLayerModal({
 
   return (
     <PreviewMapModal open onCancel={onCancel} {...props}>
-      <PreviewLayer
-        style={{ height: "60vh", width: "60vw" }}
-        resourceId={resourceId}
-      >
+      <PreviewLayer style={{ height: "100%" }} resourceId={resourceId}>
         <ButtonControl
           position="top-right"
           onClick={onCancel}

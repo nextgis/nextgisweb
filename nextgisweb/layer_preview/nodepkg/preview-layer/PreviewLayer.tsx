@@ -82,10 +82,10 @@ export function PreviewLayer({
     return <LoadingWrapper />;
   }
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", height: "75vh", ...style }}>
       <PreviewMap
         mapExtent={mapExtent}
-        style={{ height: "75vh", ...style }}
+        style={{ height: "100%" }}
         basemap={!isBasemapResource}
       >
         <OpacityControl value={opacity} onChange={setOpacity} />

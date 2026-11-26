@@ -41,6 +41,7 @@ export function ExportModal({
 
   return (
     <ResourceActionModal
+      fullscreenOnMobile
       centered={false}
       {...modalProps}
       title={gettext("Export")}
