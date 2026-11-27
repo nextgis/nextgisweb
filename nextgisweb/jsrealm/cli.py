@@ -104,7 +104,7 @@ def install(
     npkgs = dict(chain(*[scan_for_nodepkgs(cid, cpath) for cid, cpath in cpaths.items()]))
 
     package_json: dict[str, dict | str | bool] = {"private": True}
-    package_json["packageManager"] = "pnpm@11.2.2"
+    package_json["packageManager"] = "pnpm@12.22.0"
     package_json["engines"] = {"node": ">=22.0.0"}
     package_json["nextgisweb"] = nextgisweb = {}
 
@@ -218,6 +218,7 @@ def install(
         "updateNotifier": False,
         "hoistWorkspacePackages": True,
         "shamefullyHoist": True,
+        "verifyDepsBeforeRun": False,
     }
 
     if s_allow_builds:

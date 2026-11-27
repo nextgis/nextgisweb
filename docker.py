@@ -87,6 +87,11 @@ def on_virtualenv(event):
     )
     event.requirement("$CRATER_ROOT/package/nextgisweb/crate/mvt")
 
+    event.before_install(
+        "mkdir -p $CRATER_ROOT/.config/pnpm",
+        "echo 'symlinkedLockfileTargetDirs: [/]' > $CRATER_ROOT/.config/pnpm/config.yaml",
+    )
+
     event.after_install(
         "rm -rf /tmp/rustup /tmp/cargo",
         "ln -s package/nextgisweb/.prettierrc.cjs $CRATER_ROOT/",
