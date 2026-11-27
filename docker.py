@@ -14,6 +14,7 @@ class Package(PackageBase):
 @AppImage.on_apt.handler
 def on_apt(event):
     event.package(
+        "rustup",
         # uWSGI internal routing support
         "libpcre2-8-0",
         "libpcre2-dev",
@@ -83,7 +84,7 @@ def on_virtualenv(event):
     # same layer. The toolchain version is pinned by rust-toolchain.toml.
     event.before_install(
         "export RUSTUP_HOME=/tmp/rustup CARGO_HOME=/tmp/cargo PATH=/tmp/cargo/bin:$PATH",
-        "curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none",
+        "rustup set profile minimal",
     )
     event.requirement("$CRATER_ROOT/package/nextgisweb/crate/mvt")
 
