@@ -47,6 +47,11 @@ def is_rgb(ds):
         if band.DataType != gdal.GDT_Byte:
             return False
 
+    if ds.RasterCount == 4:
+        # A fourth band is only alpha if GDAL says so. Treating an arbitrary
+        # fourth band (e. g. NIR) as alpha makes overviews use lossy JPEG.
+        return ds.GetRasterBand(4).GetColorInterpretation() == gdal.GCI_AlphaBand
+
     return True
 
 
