@@ -4,7 +4,7 @@ use geo_types::{
     Coord, Geometry, GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon,
     Point, Polygon,
 };
-use map_tile_toolkit::{Slicer, TileId};
+use map_tile_toolkit::{Quantizer, Slicer, TileId};
 use mlt_core::fast_mvt::{
     MvtFeatureBuilder, MvtGeomType, MvtLayerBuilder, MvtTileBuilder, MvtValueRef,
 };
@@ -174,13 +174,90 @@ impl<'a> Wkb<'a> {
 }
 
 fn tile_point(p: Coord<f64>, bbox: (f64, f64, f64, f64), extent: f64) -> Coord<i32> {
+    let c = tile_coord_f64(p, bbox, extent);
+    Coord {
+        x: c.x.round() as i32,
+        y: c.y.round() as i32,
+    }
+}
+
+fn tile_coord_f64(p: Coord<f64>, bbox: (f64, f64, f64, f64), extent: f64) -> Coord<f64> {
     let (minx, miny, maxx, maxy) = bbox;
     let sx = extent / (maxx - minx);
     let sy = extent / (maxy - miny);
     Coord {
-        x: ((p.x - minx) * sx).round() as i32,
-        y: ((maxy - p.y) * sy).round() as i32,
+        x: (p.x - minx) * sx,
+        y: (maxy - p.y) * sy,
     }
+}
+
+fn dedupe_collinear_line(line: Vec<Coord<i32>>) -> Vec<Coord<i32>> {
+    let mut out: Vec<Coord<i32>> = Vec::with_capacity(line.len());
+    for v in line {
+        push_clean_vertex(&mut out, v);
+    }
+    out
+}
+
+fn dedupe_collinear_ring(ring: impl Iterator<Item = Coord<i32>>) -> Vec<Coord<i32>> {
+    let mut out: Vec<Coord<i32>> = Vec::new();
+    for v in ring {
+        push_clean_vertex(&mut out, v);
+    }
+    if out.len() > 1 && out.first() == out.last() {
+        out.pop();
+    }
+    trim_ring_seam(&mut out);
+    out
+}
+
+fn finalize_ring(ring: impl IntoIterator<Item = Coord<i32>>) -> Option<Vec<Coord<i32>>> {
+    let mut ring = dedupe_collinear_ring(ring.into_iter());
+    if ring.len() < 3 {
+        return None;
+    }
+    if ring.first() != ring.last() {
+        if let Some(first) = ring.first().copied() {
+            ring.push(first);
+        }
+    }
+    (ring.len() >= 4).then_some(ring)
+}
+
+fn clean_line(points: impl Iterator<Item = Coord<i32>>) -> Option<Vec<Coord<i32>>> {
+    let line = dedupe_collinear_line(points.collect());
+    (line.len() >= 2).then_some(line)
+}
+
+fn push_clean_vertex(out: &mut Vec<Coord<i32>>, v: Coord<i32>) {
+    match out.as_slice() {
+        [.., last] if *last == v => {}
+        [.., prev, last] if between_collinear(*prev, *last, v) => {
+            *out.last_mut().expect("two vertices") = v;
+        }
+        _ => out.push(v),
+    }
+}
+
+fn trim_ring_seam(ring: &mut Vec<Coord<i32>>) {
+    if ring.len() >= 3 {
+        let first = ring[0];
+        let second = ring[1];
+        let last = *ring.last().expect("len>=3");
+        if between_collinear(last, first, second) {
+            ring.remove(0);
+        }
+    }
+}
+
+fn between_collinear(a: Coord<i32>, b: Coord<i32>, c: Coord<i32>) -> bool {
+    let abx = i64::from(b.x) - i64::from(a.x);
+    let aby = i64::from(b.y) - i64::from(a.y);
+    let bcx = i64::from(c.x) - i64::from(b.x);
+    let bcy = i64::from(c.y) - i64::from(b.y);
+    abx.wrapping_mul(bcy) == aby.wrapping_mul(bcx)
+        && i128::from(abx) * i128::from(bcy) == i128::from(aby) * i128::from(bcx)
+        && i128::from(abx) * i128::from(bcx) + i128::from(aby) * i128::from(bcy) > 0
 }
 
 fn add_geometry(
@@ -213,25 +290,19 @@ fn add_geometry(
             }
         }
         Geometry::LineString(l) => {
-            let line: Vec<_> = l.0.into_iter().filter_map(convert).collect();
-            if line.len() >= 2 {
+            if let Some(line) = clean_line(l.0.into_iter().filter_map(convert)) {
                 lines.push(line);
             }
         }
         Geometry::MultiLineString(ml) => {
             for l in ml.0 {
-                let line: Vec<_> = l.0.into_iter().filter_map(convert).collect();
-                if line.len() >= 2 {
+                if let Some(line) = clean_line(l.0.into_iter().filter_map(convert)) {
                     lines.push(line);
                 }
             }
         }
-        Geometry::Polygon(p) => add_polygon(p, bbox, extent, polygons),
-        Geometry::MultiPolygon(mp) => {
-            for p in mp.0 {
-                add_polygon(p, bbox, extent, polygons);
-            }
-        }
+        Geometry::Polygon(p) => add_polygons_quantized(std::iter::once(p), bbox, extent, polygons),
+        Geometry::MultiPolygon(mp) => add_polygons_quantized(mp.0, bbox, extent, polygons),
         Geometry::GeometryCollection(gc) => {
             for g in gc.0 {
                 add_geometry(g, bbox, extent, points, lines, polygons)?;
@@ -242,7 +313,59 @@ fn add_geometry(
     Ok(())
 }
 
-fn add_polygon(
+fn add_polygons_quantized(
+    polys: impl IntoIterator<Item = Polygon<f64>>,
+    bbox: (f64, f64, f64, f64),
+    extent: f64,
+    polygons: &mut Vec<Vec<Vec<Coord<i32>>>>,
+) {
+    let polys: Vec<Polygon<f64>> = polys.into_iter().collect();
+    if polys.is_empty() {
+        return;
+    }
+
+    let to_f64_ring = |ring: &LineString<f64>| -> Vec<Coord<f64>> {
+        ring.0
+            .iter()
+            .copied()
+            .filter(|c| c.x.is_finite() && c.y.is_finite())
+            .map(|c| tile_coord_f64(c, bbox, extent))
+            .collect()
+    };
+
+    let mut quantizer = Quantizer::new();
+    let input = polys.iter().map(|p| {
+        let mut rings: Vec<Vec<Coord<f64>>> = Vec::with_capacity(1 + p.interiors().len());
+        rings.push(to_f64_ring(p.exterior()));
+        for ring in p.interiors() {
+            rings.push(to_f64_ring(ring));
+        }
+        rings
+    });
+
+    match quantizer.multi_polygon(input) {
+        Ok(quantized) => {
+            for poly in quantized.polygons() {
+                let mut rings: Vec<Vec<Coord<i32>>> = Vec::new();
+                for ring in poly {
+                    if let Some(ring) = finalize_ring(ring.iter().copied()) {
+                        rings.push(ring);
+                    }
+                }
+                if !rings.is_empty() {
+                    polygons.push(rings);
+                }
+            }
+        }
+        Err(_) => {
+            for p in polys {
+                add_polygon_fallback(p, bbox, extent, polygons);
+            }
+        }
+    }
+}
+
+fn add_polygon_fallback(
     p: Polygon<f64>,
     bbox: (f64, f64, f64, f64),
     extent: f64,
@@ -256,12 +379,10 @@ fn add_polygon(
         }
     };
     let mut rings = Vec::new();
-    let exterior: Vec<_> = p.exterior().0.iter().copied().filter_map(convert).collect();
-    if exterior.len() >= 3 {
-        rings.push(exterior);
+    if let Some(ext) = finalize_ring(p.exterior().0.iter().copied().filter_map(convert)) {
+        rings.push(ext);
         for ring in p.interiors() {
-            let ring: Vec<_> = ring.0.iter().copied().filter_map(convert).collect();
-            if ring.len() >= 3 {
+            if let Some(ring) = finalize_ring(ring.0.iter().copied().filter_map(convert)) {
                 rings.push(ring);
             }
         }
@@ -665,3 +786,4 @@ mod tests {
         assert!(encode(vec![], 0, BBOX, 80).is_err());
     }
 }
+

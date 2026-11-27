@@ -80,8 +80,8 @@ def mvt(
         if IFeatureQueryClipByBox.providedBy(query):
             query.clip_by_box(bbox)
 
-        if IFeatureQuerySimplify.providedBy(query):
-            tolerance = ((obj.srs.maxx - obj.srs.minx) / (1 << z)) / extent
+        if IFeatureQuerySimplify.providedBy(query) and simplification > 0:
+            tolerance = ((merc.maxx - merc.minx) / (1 << z)) / extent
             query.simplify(tolerance * simplification)
 
         layers.append((obj, query))

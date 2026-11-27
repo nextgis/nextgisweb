@@ -392,9 +392,9 @@ checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 
 [[package]]
 name = "map-tile-toolkit"
-version = "0.3.4"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e92eef61d9662d2ef22e512a14a58c646c8113df86d5bec2f3f2efe41cc2e301"
+checksum = "c082f8960343b24fa9ac7f9e81b4fb3edb345f1a4fda1cbbcfa5a4e67b336f6c"
 dependencies = [
  "geo-types",
  "thiserror",

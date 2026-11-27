@@ -205,8 +205,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 # work out of the box without discarding the Z coordinate.
                 geomexpr = func.st_clipbybox2d(func.st_force2d(geomexpr), clip)
 
-            if self._simplify is not None:
-                geomexpr = func.st_simplifypreservetopology(geomexpr, self._simplify)
+            if self._simplify is not None and self._simplify > 0:
+                geomexpr = func.st_simplify(geomexpr, self._simplify, True)
 
             if self._box:
                 columns.extend(
